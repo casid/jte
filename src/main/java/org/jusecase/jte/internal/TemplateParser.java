@@ -196,7 +196,7 @@ final class TemplateParser {
         if (startIndex < 0) {
             return;
         }
-        if (endIndex <= startIndex) {
+        if (endIndex < startIndex) {
             return;
         }
         callback.accept(depth, templateCode.substring(startIndex, endIndex));

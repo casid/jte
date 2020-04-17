@@ -204,6 +204,13 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithoutParams() {
+        givenTag("basic", "I do nothing!");
+        givenTemplate("@tag.basic()");
+        thenOutputIs("I do nothing!");
+    }
+
+    @Test
     void hotReload() {
         givenTemplate("${model.hello} World");
         thenOutputIs("Hello World");

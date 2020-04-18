@@ -6,14 +6,15 @@ import java.util.LinkedHashSet;
 
 public class TemplateCompiler {
 
-    public static final String TAG_EXTENSION = ".tag";
-    public static final String LAYOUT_EXTENSION = ".layout";
+    public static final String TAG_EXTENSION = ".jtag";
+    public static final String LAYOUT_EXTENSION = ".jlayout";
 
     private final CodeResolver codeResolver;
 
     private final String templatePackageName;
     private final String tagPackageName;
     private final String layoutPackageName;
+    private final boolean debug = false;
 
     public TemplateCompiler(CodeResolver codeResolver) {
         this(codeResolver, "org.jusecase.jte");
@@ -32,6 +33,9 @@ public class TemplateCompiler {
         String templateCode = codeResolver.resolve(name);
         if (templateCode == null) {
             throw new RuntimeException("No code found for template " + name);
+        }
+        if (templateCode.isEmpty()) {
+            return EmptyTemplate.INSTANCE;
         }
 
         ClassInfo templateInfo = new ClassInfo(name, templatePackageName);
@@ -52,7 +56,9 @@ public class TemplateCompiler {
         templateDefinition.setCode(javaCode.toString());
         classDefinitions.add(templateDefinition);
 
-        System.out.println(templateDefinition.getCode());
+        if (debug) {
+            System.out.println(templateDefinition.getCode());
+        }
 
         try {
             ClassCompiler classCompiler = new ClassCompiler();
@@ -91,7 +97,9 @@ public class TemplateCompiler {
 
         classDefinition.setCode(javaCode.toString());
 
-        System.out.println(classDefinition.getCode());
+        if (debug) {
+            System.out.println(classDefinition.getCode());
+        }
     }
 
     private void compileLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
@@ -124,7 +132,9 @@ public class TemplateCompiler {
 
         classDefinition.setCode(javaCode.toString());
 
-        System.out.println(classDefinition.getCode());
+        if (debug) {
+            System.out.println(classDefinition.getCode());
+        }
     }
 
 

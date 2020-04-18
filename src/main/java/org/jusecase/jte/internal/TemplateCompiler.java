@@ -9,7 +9,6 @@ public class TemplateCompiler {
     private final CodeResolver codeResolver;
 
     private final String templatePackageName;
-    private final String templatePackagePrefix;
 
     private final String tagPackageName;
     private final String tagPackagePrefix;
@@ -22,7 +21,6 @@ public class TemplateCompiler {
     public TemplateCompiler(CodeResolver codeResolver, String packageName) {
         this.codeResolver = codeResolver;
         this.templatePackageName = packageName + ".templates";
-        this.templatePackagePrefix = templatePackageName + ".";
         this.tagPackageName = packageName + ".tags";
         this.tagPackagePrefix = tagPackageName + ".";
     }
@@ -34,11 +32,13 @@ public class TemplateCompiler {
             throw new RuntimeException("No code found for template " + name);
         }
 
+        ClassInfo classInfo = new ClassInfo(name, templatePackageName);
+
         TemplateParameterParser attributeParser = new TemplateParameterParser();
         attributeParser.parse(templateCode);
 
-        StringBuilder javaCode = new StringBuilder("package " + templatePackageName + ";\n");
-        javaCode.append("public final class ").append(name).append(" implements org.jusecase.jte.internal.Template<").append(attributeParser.className).append("> {\n");
+        StringBuilder javaCode = new StringBuilder("package " + classInfo.packageName + ";\n");
+        javaCode.append("public final class ").append(classInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(attributeParser.className).append("> {\n");
         javaCode.append("\tpublic void render(").append(attributeParser.className).append(" ").append(attributeParser.instanceName).append(", org.jusecase.jte.TemplateOutput output) {\n");
 
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
@@ -46,7 +46,7 @@ public class TemplateCompiler {
         javaCode.append("\t}\n");
         javaCode.append("}\n");
 
-        ClassDefinition templateDefinition = new ClassDefinition(templatePackagePrefix + name);
+        ClassDefinition templateDefinition = new ClassDefinition(classInfo.fullName);
         templateDefinition.setCode(javaCode.toString());
         classDefinitions.add(templateDefinition);
 
@@ -194,5 +194,35 @@ public class TemplateCompiler {
                 }
             }
         }
+    }
+
+    private static final class ClassInfo {
+        final String className;
+        final String packageName;
+        final String fullName;
+
+        ClassInfo(String name, String parentPackage) {
+            int endIndex = name.lastIndexOf('.');
+            if (endIndex == -1) {
+                endIndex = name.length();
+            }
+
+            int startIndex = name.lastIndexOf('/');
+            if (startIndex == -1) {
+                startIndex = 0;
+            } else {
+                startIndex += 1;
+            }
+
+            className = name.substring(startIndex, endIndex);
+            if (startIndex == 0) {
+                packageName = parentPackage;
+            } else {
+                packageName = parentPackage + "." + name.substring(0, startIndex - 1).replace('/', '.');
+            }
+            fullName = packageName + "." + className;
+        }
+
+
     }
 }

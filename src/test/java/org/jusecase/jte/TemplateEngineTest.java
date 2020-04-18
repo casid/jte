@@ -7,6 +7,8 @@ import org.jusecase.jte.TemplateEngine.Mode;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TemplateEngineTest {
+    String templateName = "test/TestTemplate.template";
+
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
     TemplateEngine templateEngine = new TemplateEngine(dummyCodeResolver, Mode.Development);
     Model model = new Model();
@@ -45,6 +47,20 @@ public class TemplateEngineTest {
     void helloLength() {
         givenTemplate("'${model.hello}' has length: ${model.hello.length()}");
         thenOutputIs("'Hello' has length: 5");
+    }
+
+    @Test
+    void simpleTemplateName() {
+        templateName = "Simple";
+        givenTemplate("Hello");
+        thenOutputIs("Hello");
+    }
+
+    @Test
+    void simpleTemplateNameWithExtension() {
+        templateName = "Simple.txt";
+        givenTemplate("Hello");
+        thenOutputIs("Hello");
     }
 
     @Test
@@ -233,12 +249,12 @@ public class TemplateEngineTest {
 
     private void givenTemplate(String template) {
         template = "@param org.jusecase.jte.TemplateEngineTest.Model model\n" + template;
-        dummyCodeResolver.givenTemplateCode("TestTemplate", template);
+        dummyCodeResolver.givenTemplateCode(templateName, template);
     }
 
     private void thenOutputIs(String expected) {
         DummyTemplateOutput templateOutput = new DummyTemplateOutput();
-        templateEngine.render("TestTemplate", model, templateOutput);
+        templateEngine.render(templateName, model, templateOutput);
 
         assertThat(templateOutput.toString()).isEqualTo(expected);
     }

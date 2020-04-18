@@ -6,12 +6,12 @@ import java.util.LinkedHashSet;
 
 public class TemplateCompiler {
 
+    public static final String TAG_EXTENSION = ".tag";
+
     private final CodeResolver codeResolver;
 
     private final String templatePackageName;
-
     private final String tagPackageName;
-    private final String tagPackagePrefix;
 
     public TemplateCompiler(CodeResolver codeResolver) {
         this(codeResolver, "org.jusecase.jte");
@@ -22,7 +22,6 @@ public class TemplateCompiler {
         this.codeResolver = codeResolver;
         this.templatePackageName = packageName + ".templates";
         this.tagPackageName = packageName + ".tags";
-        this.tagPackagePrefix = tagPackageName + ".";
     }
 
 
@@ -32,13 +31,13 @@ public class TemplateCompiler {
             throw new RuntimeException("No code found for template " + name);
         }
 
-        ClassInfo classInfo = new ClassInfo(name, templatePackageName);
+        ClassInfo templateInfo = new ClassInfo(name, templatePackageName);
 
         TemplateParameterParser attributeParser = new TemplateParameterParser();
         attributeParser.parse(templateCode);
 
-        StringBuilder javaCode = new StringBuilder("package " + classInfo.packageName + ";\n");
-        javaCode.append("public final class ").append(classInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(attributeParser.className).append("> {\n");
+        StringBuilder javaCode = new StringBuilder("package " + templateInfo.packageName + ";\n");
+        javaCode.append("public final class ").append(templateInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(attributeParser.className).append("> {\n");
         javaCode.append("\tpublic void render(").append(attributeParser.className).append(" ").append(attributeParser.instanceName).append(", org.jusecase.jte.TemplateOutput output) {\n");
 
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
@@ -46,7 +45,7 @@ public class TemplateCompiler {
         javaCode.append("\t}\n");
         javaCode.append("}\n");
 
-        ClassDefinition templateDefinition = new ClassDefinition(classInfo.fullName);
+        ClassDefinition templateDefinition = new ClassDefinition(templateInfo.fullName);
         templateDefinition.setCode(javaCode.toString());
         classDefinitions.add(templateDefinition);
 
@@ -61,7 +60,9 @@ public class TemplateCompiler {
     }
 
     private void compileTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
-        ClassDefinition classDefinition = new ClassDefinition(tagPackagePrefix + name);
+        ClassInfo tagInfo = new ClassInfo(name, tagPackageName);
+
+        ClassDefinition classDefinition = new ClassDefinition(tagInfo.fullName);
         if (classDefinitions.contains(classDefinition)) {
             return;
         }
@@ -73,8 +74,8 @@ public class TemplateCompiler {
 
         classDefinitions.add(classDefinition);
 
-        StringBuilder javaCode = new StringBuilder("package " + tagPackageName + ";\n");
-        javaCode.append("public final class ").append(name).append(" {\n");
+        StringBuilder javaCode = new StringBuilder("package " + tagInfo.packageName + ";\n");
+        javaCode.append("public final class ").append(tagInfo.className).append(" {\n");
         javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
         ParameterParser parameterParser = new ParameterParser();
         int lastIndex = parameterParser.parse(tagCode, parameter -> javaCode.append(", ").append(parameter));
@@ -158,10 +159,10 @@ public class TemplateCompiler {
 
         @Override
         public void onTag(int depth, String name, String params) {
-            compileTag(name, classDefinitions);
+            compileTag(name.replace('.', '/') + TAG_EXTENSION, classDefinitions);
 
             writeIndentation(depth);
-            javaCode.append(tagPackagePrefix).append(name).append(".render(output");
+            javaCode.append(tagPackageName).append('.').append(name).append(".render(output");
 
             if (!params.isBlank()) {
                 javaCode.append(", ").append(params);

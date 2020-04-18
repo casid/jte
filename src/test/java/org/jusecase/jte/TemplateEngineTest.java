@@ -3,6 +3,7 @@ package org.jusecase.jte;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jusecase.jte.TemplateEngine.Mode;
+import org.jusecase.jte.internal.TemplateCompiler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -227,6 +228,13 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithPackage() {
+        givenTag("my/basic", "I have a custom package");
+        givenTemplate("@tag.my.basic()");
+        thenOutputIs("I have a custom package");
+    }
+
+    @Test
     void hotReload() {
         givenTemplate("${model.hello} World");
         thenOutputIs("Hello World");
@@ -244,7 +252,7 @@ public class TemplateEngineTest {
     }
 
     private void givenTag(String name, String code) {
-        dummyCodeResolver.givenTagCode(name, code);
+        dummyCodeResolver.givenTagCode(name + TemplateCompiler.TAG_EXTENSION, code);
     }
 
     private void givenTemplate(String template) {

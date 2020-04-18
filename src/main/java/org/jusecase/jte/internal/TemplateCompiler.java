@@ -26,7 +26,7 @@ public class TemplateCompiler {
 
 
     public Template<?> compile(String name) {
-        String templateCode = codeResolver.resolveTemplate(name);
+        String templateCode = codeResolver.resolve(name);
         if (templateCode == null) {
             throw new RuntimeException("No code found for template " + name);
         }
@@ -67,7 +67,7 @@ public class TemplateCompiler {
             return;
         }
 
-        String tagCode = codeResolver.resolveTag(name);
+        String tagCode = codeResolver.resolve(name);
         if (tagCode == null) {
             throw new RuntimeException("No code found for tag " + name);
         }

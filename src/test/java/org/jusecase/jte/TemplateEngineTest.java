@@ -252,12 +252,12 @@ public class TemplateEngineTest {
     }
 
     private void givenTag(String name, String code) {
-        dummyCodeResolver.givenTagCode(name + TemplateCompiler.TAG_EXTENSION, code);
+        dummyCodeResolver.givenCode(name + TemplateCompiler.TAG_EXTENSION, code);
     }
 
     private void givenTemplate(String template) {
         template = "@param org.jusecase.jte.TemplateEngineTest.Model model\n" + template;
-        dummyCodeResolver.givenTemplateCode(templateName, template);
+        dummyCodeResolver.givenCode(templateName, template);
     }
 
     private void thenOutputIs(String expected) {

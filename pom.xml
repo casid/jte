@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jusecase</groupId>
-    <artifactId>java-native-template</artifactId>
+    <artifactId>java-template-engine</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
 

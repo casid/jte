@@ -4,14 +4,26 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 final class TemplateParser {
+    private static final int LAYOUT_SECTION_DEPTH = 4;
+
+    private final TemplateType type;
+
     private Mode currentMode;
     private Deque<Mode> stack = new ArrayDeque<>();
     private int depth;
 
+    TemplateParser(TemplateType type) {
+        this.type = type;
+    }
+
     public void parse(int startIndex, String templateCode, TemplateParserVisitor visitor) {
         int lastIndex = startIndex;
 
-        char previousChar5;
+        char previousChar9;
+        char previousChar8 = 0;
+        char previousChar7 = 0;
+        char previousChar6 = 0;
+        char previousChar5 = 0;
         char previousChar4 = 0;
         char previousChar3 = 0;
         char previousChar2 = 0;
@@ -24,6 +36,10 @@ final class TemplateParser {
         StringBuilder currentTagName = new StringBuilder();
 
         for (int i = 0; i < templateCode.length(); ++i) {
+            previousChar9 = previousChar8;
+            previousChar8 = previousChar7;
+            previousChar7 = previousChar6;
+            previousChar6 = previousChar5;
             previousChar5 = previousChar4;
             previousChar4 = previousChar3;
             previousChar3 = previousChar2;
@@ -163,10 +179,53 @@ final class TemplateParser {
                 pop();
                 if (currentMode == Mode.Tag) {
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, currentTagName.toString(), c));
+                    lastIndex = i + 1;
+                    pop();
+                } else if (currentMode == Mode.Layout) {
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, currentTagName.toString(), c));
+                }
+            } else if (previousChar6 == '@' && previousChar5 == 'l' && previousChar4 == 'a' && previousChar3 == 'y' && previousChar2 == 'o' && previousChar1 == 'u' && previousChar0 == 't' && currentChar == '.') {
+                if (currentMode == Mode.Text) {
+                    extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
+                    lastIndex = i + 1;
                 }
 
-                lastIndex = i + 1;
+                push(Mode.Layout);
+                push(Mode.TagName);
+                currentTagName.setLength(0);
+            } else if (previousChar8 == '@' && previousChar7 == 'e' && previousChar6 == 'n' && previousChar5 == 'd' && previousChar4 == 'l' && previousChar3 == 'a' && previousChar2 == 'y' && previousChar1 == 'o' && previousChar0 == 'u' && currentChar == 't') {
                 pop();
+                lastIndex = i + 1;
+
+                visitor.onLayoutEnd(depth);
+            } else if (previousChar6 == '@' && previousChar5 == 's' && previousChar4 == 'e' && previousChar3 == 'c' && previousChar2 == 't' && previousChar1 == 'i' && previousChar0 == 'o' && currentChar == 'n') {
+                if (type == TemplateType.Layout && currentMode == Mode.Text) {
+                    extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
+                    lastIndex = i + 1;
+                }
+                push(Mode.LayoutSection);
+            } else if (currentChar == '(' && currentMode == Mode.LayoutSection) {
+                lastIndex = i + 1;
+            } else if (currentChar == ')' && currentMode == Mode.LayoutSection) {
+                extract(templateCode, lastIndex, i, visitor::onLayoutSection);
+                lastIndex = i + 1;
+                if (type != TemplateType.Layout) {
+                    push(Mode.Text);
+                    depth += LAYOUT_SECTION_DEPTH;
+                } else {
+                    pop();
+                }
+            } else if (previousChar9 == '@' && previousChar8 == 'e' && previousChar7 == 'n' && previousChar6 == 'd' && previousChar5 == 's' && previousChar4 == 'e' && previousChar3 == 'c' && previousChar2 == 't' && previousChar1 == 'i' && previousChar0 == 'o' && currentChar == 'n') {
+                if (currentMode == Mode.Text) {
+                    extract(templateCode, lastIndex, i - 10, visitor::onTextPart);
+                }
+
+                pop();
+                pop();
+                depth -= LAYOUT_SECTION_DEPTH;
+                lastIndex = i + 1;
+
+                visitor.onLayoutSectionEnd(depth);
             }
         }
 
@@ -218,5 +277,7 @@ final class TemplateParser {
         Tag,
         TagName,
         TagCode,
+        Layout,
+        LayoutSection,
     }
 }

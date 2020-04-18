@@ -251,6 +251,49 @@ public class TemplateEngineTest {
         thenOutputIs("This is visible...");
     }
 
+    @Test
+    void layout() {
+        givenLayout("main", "@param org.jusecase.jte.TemplateEngineTest.Model model\n" +
+                "\n" +
+                "<body>\n" +
+                "<b>Welcome to my site - you are on page ${model.x}</b>\n" +
+                "\n" +
+                "<div class=\"content\">\n" +
+                "    @section(content)\n" +
+                "</div>\n" +
+                "\n" +
+                "<div class=\"footer\">\n" +
+                "    @section(footer)\n" +
+                "</div>\n" +
+                "</body>");
+
+        givenTemplate("@layout.main(model)\n" +
+                "    @section(content)\n" +
+                "        ${model.hello}, enjoy this great content\n" +
+                "    @endsection\n" +
+                "    @section(footer)\n" +
+                "        Come again!\n" +
+                "    @endsection\n" +
+                "@endlayout");
+
+        thenOutputIs("\n" +
+                "<body>\n" +
+                "<b>Welcome to my site - you are on page 42</b>\n" +
+                "\n" +
+                "<div class=\"content\">\n" +
+                "    \n" +
+                "        Hello, enjoy this great content\n" +
+                "    \n" +
+                "</div>\n" +
+                "\n" +
+                "<div class=\"footer\">\n" +
+                "    \n" +
+                "        Come again!\n" +
+                "    \n" +
+                "</div>\n" +
+                "</body>");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode(name + TemplateCompiler.TAG_EXTENSION, code);
     }
@@ -258,6 +301,10 @@ public class TemplateEngineTest {
     private void givenTemplate(String template) {
         template = "@param org.jusecase.jte.TemplateEngineTest.Model model\n" + template;
         dummyCodeResolver.givenCode(templateName, template);
+    }
+
+    private void givenLayout(String name, String code) {
+        dummyCodeResolver.givenCode(name + TemplateCompiler.LAYOUT_EXTENSION, code);
     }
 
     private void thenOutputIs(String expected) {

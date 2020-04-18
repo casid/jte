@@ -7,11 +7,13 @@ import java.util.LinkedHashSet;
 public class TemplateCompiler {
 
     public static final String TAG_EXTENSION = ".tag";
+    public static final String LAYOUT_EXTENSION = ".layout";
 
     private final CodeResolver codeResolver;
 
     private final String templatePackageName;
     private final String tagPackageName;
+    private final String layoutPackageName;
 
     public TemplateCompiler(CodeResolver codeResolver) {
         this(codeResolver, "org.jusecase.jte");
@@ -22,6 +24,7 @@ public class TemplateCompiler {
         this.codeResolver = codeResolver;
         this.templatePackageName = packageName + ".templates";
         this.tagPackageName = packageName + ".tags";
+        this.layoutPackageName = packageName + ".layouts";
     }
 
 
@@ -41,7 +44,7 @@ public class TemplateCompiler {
         javaCode.append("\tpublic void render(").append(attributeParser.className).append(" ").append(attributeParser.instanceName).append(", org.jusecase.jte.TemplateOutput output) {\n");
 
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
-        new TemplateParser().parse(attributeParser.lastIndex, templateCode, new CodeGenerator(javaCode, classDefinitions));
+        new TemplateParser(TemplateType.Template).parse(attributeParser.lastIndex, templateCode, new CodeGenerator(TemplateType.Template, javaCode, classDefinitions));
         javaCode.append("\t}\n");
         javaCode.append("}\n");
 
@@ -81,7 +84,40 @@ public class TemplateCompiler {
         int lastIndex = parameterParser.parse(tagCode, parameter -> javaCode.append(", ").append(parameter));
         javaCode.append(") {\n");
 
-        new TemplateParser().parse(lastIndex, tagCode, new CodeGenerator(javaCode, classDefinitions));
+        new TemplateParser(TemplateType.Tag).parse(lastIndex, tagCode, new CodeGenerator(TemplateType.Tag, javaCode, classDefinitions));
+
+        javaCode.append("\t}\n");
+        javaCode.append("}\n");
+
+        classDefinition.setCode(javaCode.toString());
+
+        System.out.println(classDefinition.getCode());
+    }
+
+    private void compileLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+        ClassInfo layoutInfo = new ClassInfo(name, layoutPackageName);
+
+        ClassDefinition classDefinition = new ClassDefinition(layoutInfo.fullName);
+        if (classDefinitions.contains(classDefinition)) {
+            return;
+        }
+
+        String layoutCode = codeResolver.resolve(name);
+        if (layoutCode == null) {
+            throw new RuntimeException("No code found for layout " + name);
+        }
+
+        classDefinitions.add(classDefinition);
+
+        StringBuilder javaCode = new StringBuilder("package " + layoutInfo.packageName + ";\n");
+        javaCode.append("public final class ").append(layoutInfo.className).append(" {\n");
+        javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
+        ParameterParser parameterParser = new ParameterParser();
+        int lastIndex = parameterParser.parse(layoutCode, parameter -> javaCode.append(", ").append(parameter));
+        javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutSectionLookup");
+        javaCode.append(") {\n");
+
+        new TemplateParser(TemplateType.Layout).parse(lastIndex, layoutCode, new CodeGenerator(TemplateType.Layout, javaCode, classDefinitions));
 
         javaCode.append("\t}\n");
         javaCode.append("}\n");
@@ -93,16 +129,22 @@ public class TemplateCompiler {
 
 
     private class CodeGenerator implements TemplateParserVisitor {
+        private final TemplateType type;
         private final LinkedHashSet<ClassDefinition> classDefinitions;
         private final StringBuilder javaCode;
 
-        private CodeGenerator(StringBuilder javaCode, LinkedHashSet<ClassDefinition> classDefinitions) {
+        private CodeGenerator(TemplateType type, StringBuilder javaCode, LinkedHashSet<ClassDefinition> classDefinitions) {
+            this.type = type;
             this.javaCode = javaCode;
             this.classDefinitions = classDefinitions;
         }
 
         @Override
         public void onTextPart(int depth, String textPart) {
+            if (textPart.isEmpty()) {
+                return;
+            }
+
             writeIndentation(depth);
             javaCode.append("output.write(\"");
             appendEscaped(textPart);
@@ -170,6 +212,57 @@ public class TemplateCompiler {
             javaCode.append(");\n");
         }
 
+        @Override
+        public void onLayout(int depth, String name, String params) {
+            compileLayout(name.replace('.', '/') + LAYOUT_EXTENSION, classDefinitions);
+
+            writeIndentation(depth);
+            javaCode.append(layoutPackageName).append('.').append(name).append(".render(output");
+
+            if (!params.isBlank()) {
+                javaCode.append(", ").append(params);
+            }
+
+            javaCode.append(", new java.util.function.Function<String, Runnable>() {\n");
+            writeIndentation(depth + 1);
+            javaCode.append("public Runnable apply(String jteLayoutSection) {\n");
+        }
+
+        @Override
+        public void onLayoutSection(int depth, String name) {
+            if (type == TemplateType.Layout) {
+                writeIndentation(depth);
+                javaCode.append("jteLayoutSectionLookup.apply(\"").append(name.trim()).append("\").run();\n");
+            } else {
+                writeIndentation(depth + 2);
+                javaCode.append("if (\"").append(name.trim()).append("\".equals(jteLayoutSection)) {\n");
+                writeIndentation(depth + 3);
+                javaCode.append("return new Runnable() {\n");
+                writeIndentation(depth + 4);
+                javaCode.append("public void run() {\n");
+            }
+        }
+
+        @Override
+        public void onLayoutSectionEnd(int depth) {
+            writeIndentation(depth + 4);
+            javaCode.append("}\n");
+            writeIndentation(depth + 3);
+            javaCode.append("};\n");
+            writeIndentation(depth + 2);
+            javaCode.append("}\n");
+        }
+
+        @Override
+        public void onLayoutEnd(int depth) {
+            writeIndentation(depth + 2);
+            javaCode.append("return null;\n");
+            writeIndentation(depth + 1);
+            javaCode.append("}\n");
+            writeIndentation(depth);
+            javaCode.append("});\n");
+        }
+
         @SuppressWarnings("StringRepeatCanBeUsed")
         private void writeIndentation(int depth) {
             for (int i = 0; i < depth + 2; ++i) {
@@ -180,7 +273,9 @@ public class TemplateCompiler {
         private void appendEscaped(String text) {
             for (int i = 0; i < text.length(); ++i) {
                 char c = text.charAt(i);
-                if (c == '\n') {
+                if (c == '\"') {
+                    javaCode.append("\\\"");
+                } else if (c == '\n') {
                     javaCode.append("\\n");
                 } else if (c == '\t') {
                     javaCode.append("\\t");

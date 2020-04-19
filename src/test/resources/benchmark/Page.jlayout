@@ -1,4 +1,6 @@
-@param org.jusecase.jte.benchmark.Page page
+@import org.jusecase.jte.benchmark.Page
+
+@param Page page
 
 <!DOCTYPE html>
 <html lang="en">

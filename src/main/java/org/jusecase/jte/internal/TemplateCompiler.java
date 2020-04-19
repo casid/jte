@@ -8,6 +8,7 @@ public class TemplateCompiler {
 
     public static final String TAG_EXTENSION = ".jtag";
     public static final String LAYOUT_EXTENSION = ".jlayout";
+    public static final String CLASS_SUFFIX = "JteGenerated";
 
     private final CodeResolver codeResolver;
 
@@ -44,6 +45,10 @@ public class TemplateCompiler {
         attributeParser.parse(templateCode);
 
         StringBuilder javaCode = new StringBuilder("package " + templateInfo.packageName + ";\n");
+        for (String importClass : attributeParser.importClasses) {
+            javaCode.append("import ").append(importClass).append(";\n");
+        }
+
         javaCode.append("public final class ").append(templateInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(attributeParser.className).append("> {\n");
         javaCode.append("\tpublic void render(").append(attributeParser.className).append(" ").append(attributeParser.instanceName).append(", org.jusecase.jte.TemplateOutput output) {\n");
 
@@ -83,11 +88,18 @@ public class TemplateCompiler {
 
         classDefinitions.add(classDefinition);
 
+        TagOrLayoutParameterParser parameterParser = new TagOrLayoutParameterParser();
+        int lastIndex = parameterParser.parse(tagCode);
+
         StringBuilder javaCode = new StringBuilder("package " + tagInfo.packageName + ";\n");
+        for (String importClass : parameterParser.importClasses) {
+            javaCode.append("import ").append(importClass).append(";\n");
+        }
         javaCode.append("public final class ").append(tagInfo.className).append(" {\n");
         javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
-        ParameterParser parameterParser = new ParameterParser();
-        int lastIndex = parameterParser.parse(tagCode, parameter -> javaCode.append(", ").append(parameter));
+        for (String parameter : parameterParser.parameters) {
+            javaCode.append(", ").append(parameter);
+        }
         javaCode.append(") {\n");
 
         new TemplateParser(TemplateType.Tag).parse(lastIndex, tagCode, new CodeGenerator(TemplateType.Tag, javaCode, classDefinitions));
@@ -117,11 +129,18 @@ public class TemplateCompiler {
 
         classDefinitions.add(classDefinition);
 
+        TagOrLayoutParameterParser parameterParser = new TagOrLayoutParameterParser();
+        int lastIndex = parameterParser.parse(layoutCode);
+
         StringBuilder javaCode = new StringBuilder("package " + layoutInfo.packageName + ";\n");
+        for (String importClass : parameterParser.importClasses) {
+            javaCode.append("import ").append(importClass).append(";\n");
+        }
         javaCode.append("public final class ").append(layoutInfo.className).append(" {\n");
         javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
-        ParameterParser parameterParser = new ParameterParser();
-        int lastIndex = parameterParser.parse(layoutCode, parameter -> javaCode.append(", ").append(parameter));
+        for (String parameter : parameterParser.parameters) {
+            javaCode.append(", ").append(parameter);
+        }
         javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutSectionLookup");
         javaCode.append(") {\n");
 
@@ -214,7 +233,7 @@ public class TemplateCompiler {
             compileTag(name.replace('.', '/') + TAG_EXTENSION, classDefinitions);
 
             writeIndentation(depth);
-            javaCode.append(tagPackageName).append('.').append(name).append(".render(output");
+            javaCode.append(tagPackageName).append('.').append(name).append(CLASS_SUFFIX).append(".render(output");
 
             if (!params.isBlank()) {
                 javaCode.append(", ").append(params);
@@ -227,7 +246,7 @@ public class TemplateCompiler {
             compileLayout(name.replace('.', '/') + LAYOUT_EXTENSION, classDefinitions);
 
             writeIndentation(depth);
-            javaCode.append(layoutPackageName).append('.').append(name).append(".render(output");
+            javaCode.append(layoutPackageName).append('.').append(name).append(CLASS_SUFFIX).append(".render(output");
 
             if (!params.isBlank()) {
                 javaCode.append(", ").append(params);
@@ -320,7 +339,7 @@ public class TemplateCompiler {
                 startIndex += 1;
             }
 
-            className = name.substring(startIndex, endIndex);
+            className = name.substring(startIndex, endIndex) + CLASS_SUFFIX;
             if (startIndex == 0) {
                 packageName = parentPackage;
             } else {

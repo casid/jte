@@ -294,12 +294,35 @@ public class TemplateEngineTest {
                 "</body>");
     }
 
+    @Test
+    void enumCheck() {
+        givenRawTemplate(
+                "@import org.jusecase.jte.TemplateEngineTest.Model\n" +
+                "@import org.jusecase.jte.TemplateEngineTest.ModelType\n" +
+                "@param Model model\n" +
+                "@if (model.type == ModelType.One)" +
+                "one" +
+                "@else" +
+                "not one" +
+                "@endif");
+
+        model.type = ModelType.One;
+        thenOutputIs("one");
+
+        model.type = ModelType.Two;
+        thenOutputIs("not one");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode(name + TemplateCompiler.TAG_EXTENSION, code);
     }
 
     private void givenTemplate(String template) {
         template = "@param org.jusecase.jte.TemplateEngineTest.Model model\n" + template;
+        givenRawTemplate(template);
+    }
+
+    private void givenRawTemplate(String template) {
         dummyCodeResolver.givenCode(templateName, template);
     }
 
@@ -318,6 +341,7 @@ public class TemplateEngineTest {
         public String hello;
         public int x;
         public int[] array;
+        public ModelType type;
 
         @SuppressWarnings("unused")
         public String getAnotherWorld() {
@@ -328,5 +352,10 @@ public class TemplateEngineTest {
         public void setX(int amount) {
             x = amount;
         }
+    }
+
+    @SuppressWarnings("unused")
+    public enum ModelType {
+        One, Two, Three
     }
 }

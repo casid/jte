@@ -1,25 +1,40 @@
 package org.jusecase.jte.internal;
 
-final class ParameterParser {
-    int parse(String tagCode, ParameterParserVisitor visitor) {
-        int lastIndex = 0;
+import java.util.function.Consumer;
 
+final class ParameterParser {
+
+    private final String code;
+    private final ParameterParserVisitor visitor;
+    private int lastIndex;
+
+    public ParameterParser(String code, ParameterParserVisitor visitor) {
+        this.code = code;
+        this.visitor = visitor;
+    }
+
+    int parse() {
+        parse("@import", visitor::onImport);
+        parse("@param", visitor::onParameter);
+
+        return lastIndex;
+    }
+
+    private void parse(String keyword, Consumer<String> callback) {
         while (true) {
-            int attributeStart = tagCode.indexOf("@param", lastIndex);
+            int attributeStart = code.indexOf(keyword, lastIndex);
             if (attributeStart == -1) {
                 break;
             }
 
-            int attributeEnd = tagCode.indexOf("\n", attributeStart);
+            int attributeEnd = code.indexOf("\n", attributeStart);
             if (attributeEnd == -1) {
                 break;
             }
 
-            String parameter = tagCode.substring(attributeStart + 6, attributeEnd).trim();
-            visitor.onParameter(parameter);
+            String parameter = code.substring(attributeStart + keyword.length(), attributeEnd).trim();
+            callback.accept(parameter);
             lastIndex = attributeEnd + 1;
         }
-
-        return lastIndex;
     }
 }

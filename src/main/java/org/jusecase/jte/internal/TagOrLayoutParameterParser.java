@@ -3,15 +3,12 @@ package org.jusecase.jte.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-final class TemplateParameterParser {
+final class TagOrLayoutParameterParser {
     List<String> importClasses = new ArrayList<>();
+    List<String> parameters = new ArrayList<>();
 
-    int lastIndex;
-    String className;
-    String instanceName;
-
-    public void parse(String templateCode) {
-        lastIndex = new ParameterParser(templateCode, new ParameterParserVisitor() {
+    public int parse(String templateCode) {
+        return new ParameterParser(templateCode, new ParameterParserVisitor() {
             @Override
             public void onImport(String importClass) {
                 importClasses.add(importClass);
@@ -19,9 +16,7 @@ final class TemplateParameterParser {
 
             @Override
             public void onParameter(String parameter) {
-                String[] params = parameter.split(" ");
-                className = params[0];
-                instanceName = params[1];
+                parameters.add(parameter);
             }
         }).parse();
     }

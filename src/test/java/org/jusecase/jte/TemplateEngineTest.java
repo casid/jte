@@ -245,8 +245,8 @@ public class TemplateEngineTest {
 
     @Test
     void comment() {
-        givenTemplate("!{/*This is a comment*/}" +
-                "!{// This as well}" +
+        givenTemplate("<%--This is a comment" +
+                " ${model.hello} everything in here is omitted--%>" +
                 "This is visible...");
         thenOutputIs("This is visible...");
     }

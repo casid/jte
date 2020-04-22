@@ -48,7 +48,17 @@ final class TemplateParser {
             previousChar0 = currentChar;
             currentChar = templateCode.charAt(i);
 
-            if (previousChar0 == '$' && currentChar == '{') {
+            if (currentMode != Mode.Comment && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
+                if (currentMode == Mode.Text) {
+                    extract(templateCode, lastIndex, i - 3, visitor::onTextPart);
+                }
+                push(Mode.Comment);
+            } else if (currentMode == Mode.Comment) {
+                if (previousChar2 == '-' && previousChar1 == '-' && previousChar0 == '%' && currentChar == '>') {
+                    pop();
+                    lastIndex = i + 1;
+                }
+            } else if (previousChar0 == '$' && currentChar == '{') {
                 if (currentMode == Mode.Text) {
                     extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
                 }
@@ -279,5 +289,6 @@ final class TemplateParser {
         TagCode,
         Layout,
         LayoutSection,
+        Comment,
     }
 }

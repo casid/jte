@@ -1,8 +1,16 @@
 package org.jusecase.jte.internal;
 
 import org.jusecase.jte.CodeResolver;
+import org.jusecase.jte.output.FileOutput;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TemplateCompiler {
 
@@ -20,7 +28,6 @@ public class TemplateCompiler {
 
     public TemplateCompiler(CodeResolver codeResolver) {
         this(codeResolver, "org.jusecase.jte");
-
     }
 
     public TemplateCompiler(CodeResolver codeResolver, String packageName) {
@@ -30,14 +37,59 @@ public class TemplateCompiler {
         this.layoutPackageName = packageName + ".layouts";
     }
 
-
     public Template<?> compile(String name) {
+        LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
+        ClassDefinition templateDefinition = generateJavaCode(name, classDefinitions);
+        if (templateDefinition == null) {
+            return EmptyTemplate.INSTANCE;
+        }
+
+        try {
+            ClassCompiler classCompiler = new ClassCompiler();
+            return (Template<?>) classCompiler.compile(templateDefinition.getName(), classDefinitions).getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void generateJavaCode(List<String> names, Path outputDirectory) {
+        Set<ClassDefinition> classDefinitions = generateJavaCode(names);
+        for (ClassDefinition classDefinition : classDefinitions) {
+            try (FileOutput fileOutput = new FileOutput(outputDirectory.resolve(classDefinition.getFileName()))) {
+                fileOutput.write(classDefinition.getCode());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+
+        String[] files = new String[classDefinitions.size()];
+        int i = 0;
+        for (ClassDefinition classDefinition : classDefinitions) {
+            files[i++] = outputDirectory.resolve(classDefinition.getFileName()).toFile().getAbsolutePath();
+        }
+
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        compiler.run(null, null, null, files);
+
+    }
+
+    private Set<ClassDefinition> generateJavaCode(List<String> names) {
+        LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
+
+        for (String name : names) {
+            generateJavaCode(name, classDefinitions);
+        }
+
+        return classDefinitions;
+    }
+
+    private ClassDefinition generateJavaCode(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
         String templateCode = codeResolver.resolve(name);
         if (templateCode == null) {
             throw new RuntimeException("No code found for template " + name);
         }
         if (templateCode.isEmpty()) {
-            return EmptyTemplate.INSTANCE;
+            return null;
         }
 
         ClassInfo templateInfo = new ClassInfo(name, templatePackageName);
@@ -53,7 +105,6 @@ public class TemplateCompiler {
         javaCode.append("public final class ").append(templateInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(attributeParser.className).append("> {\n");
         javaCode.append("\tpublic void render(").append(attributeParser.className).append(" ").append(attributeParser.instanceName).append(", org.jusecase.jte.TemplateOutput output) {\n");
 
-        LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         new TemplateParser(TemplateType.Template).parse(attributeParser.lastIndex, templateCode, new CodeGenerator(TemplateType.Template, javaCode, classDefinitions));
         javaCode.append("\t}\n");
         javaCode.append("}\n");
@@ -66,12 +117,7 @@ public class TemplateCompiler {
             System.out.println(templateDefinition.getCode());
         }
 
-        try {
-            ClassCompiler classCompiler = new ClassCompiler();
-            return (Template<?>) classCompiler.compile(templateDefinition.getName(), classDefinitions).getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return templateDefinition;
     }
 
     private ClassInfo compileTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {

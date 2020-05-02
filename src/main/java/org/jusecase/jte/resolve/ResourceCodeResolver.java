@@ -1,5 +1,6 @@
-package org.jusecase.jte;
+package org.jusecase.jte.resolve;
 
+import org.jusecase.jte.CodeResolver;
 import org.jusecase.jte.internal.IoUtils;
 
 import java.io.IOException;

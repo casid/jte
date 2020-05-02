@@ -1,6 +1,6 @@
 package org.jusecase.jte.internal;
 
-final class ClassDefinition {
+public final class ClassDefinition {
     private final String name;
     private String code;
 
@@ -12,11 +12,11 @@ final class ClassDefinition {
         this.code = code;
     }
 
-    String getCode() {
+    public String getCode() {
         return code;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
@@ -35,5 +35,9 @@ final class ClassDefinition {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public String getFileName() {
+        return getName().replace('.', '/') + ".java";
     }
 }

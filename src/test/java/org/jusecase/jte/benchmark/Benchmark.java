@@ -1,6 +1,6 @@
 package org.jusecase.jte.benchmark;
 
-import org.jusecase.jte.ResourceCodeResolver;
+import org.jusecase.jte.resolve.ResourceCodeResolver;
 import org.jusecase.jte.TemplateEngine;
 import org.jusecase.jte.output.StringOutput;
 

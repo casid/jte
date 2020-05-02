@@ -7,9 +7,9 @@ final class TemplateParser {
     private static final int LAYOUT_SECTION_DEPTH = 4;
 
     private final TemplateType type;
+    private final Deque<Mode> stack = new ArrayDeque<>();
 
     private Mode currentMode;
-    private Deque<Mode> stack = new ArrayDeque<>();
     private int depth;
 
     TemplateParser(TemplateType type) {
@@ -122,6 +122,10 @@ final class TemplateParser {
                 lastIndex = i + 1;
 
                 pop();
+
+                if (currentMode == Mode.Condition || currentMode == Mode.ConditionElse) {
+                    pop();
+                }
 
                 push(Mode.ConditionElse);
 

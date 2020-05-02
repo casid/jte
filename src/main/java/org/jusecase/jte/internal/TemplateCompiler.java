@@ -6,9 +6,10 @@ import java.util.LinkedHashSet;
 
 public class TemplateCompiler {
 
-    public static final String TAG_EXTENSION = ".jtag";
-    public static final String LAYOUT_EXTENSION = ".jlayout";
-    public static final String CLASS_SUFFIX = "JteGenerated";
+    public static final String TAG_EXTENSION = ".jte";
+    public static final String LAYOUT_EXTENSION = ".jte";
+    public static final String CLASS_PREFIX = "Jte";
+    public static final String CLASS_SUFFIX = "Generated";
 
     private final CodeResolver codeResolver;
 
@@ -73,12 +74,12 @@ public class TemplateCompiler {
         }
     }
 
-    private void compileTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+    private ClassInfo compileTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
         ClassInfo tagInfo = new ClassInfo(name, tagPackageName);
 
         ClassDefinition classDefinition = new ClassDefinition(tagInfo.fullName);
         if (classDefinitions.contains(classDefinition)) {
-            return;
+            return tagInfo;
         }
 
         String tagCode = codeResolver.resolve(name);
@@ -112,14 +113,16 @@ public class TemplateCompiler {
         if (debug) {
             System.out.println(classDefinition.getCode());
         }
+
+        return tagInfo;
     }
 
-    private void compileLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+    private ClassInfo compileLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
         ClassInfo layoutInfo = new ClassInfo(name, layoutPackageName);
 
         ClassDefinition classDefinition = new ClassDefinition(layoutInfo.fullName);
         if (classDefinitions.contains(classDefinition)) {
-            return;
+            return layoutInfo;
         }
 
         String layoutCode = codeResolver.resolve(name);
@@ -154,6 +157,8 @@ public class TemplateCompiler {
         if (debug) {
             System.out.println(classDefinition.getCode());
         }
+
+        return layoutInfo;
     }
 
 
@@ -230,10 +235,11 @@ public class TemplateCompiler {
 
         @Override
         public void onTag(int depth, String name, String params) {
-            compileTag(name.replace('.', '/') + TAG_EXTENSION, classDefinitions);
+            ClassInfo tagInfo = compileTag(name.replace('.', '/') + TAG_EXTENSION, classDefinitions);
 
             writeIndentation(depth);
-            javaCode.append(tagPackageName).append('.').append(name).append(CLASS_SUFFIX).append(".render(output");
+
+            javaCode.append(tagInfo.fullName).append(".render(output");
 
             if (!params.isBlank()) {
                 javaCode.append(", ").append(params);
@@ -243,10 +249,10 @@ public class TemplateCompiler {
 
         @Override
         public void onLayout(int depth, String name, String params) {
-            compileLayout(name.replace('.', '/') + LAYOUT_EXTENSION, classDefinitions);
+            ClassInfo layoutInfo = compileLayout(name.replace('.', '/') + LAYOUT_EXTENSION, classDefinitions);
 
             writeIndentation(depth);
-            javaCode.append(layoutPackageName).append('.').append(name).append(CLASS_SUFFIX).append(".render(output");
+            javaCode.append(layoutInfo.fullName).append(".render(output");
 
             if (!params.isBlank()) {
                 javaCode.append(", ").append(params);
@@ -339,7 +345,7 @@ public class TemplateCompiler {
                 startIndex += 1;
             }
 
-            className = name.substring(startIndex, endIndex) + CLASS_SUFFIX;
+            className = CLASS_PREFIX + name.substring(startIndex, endIndex) + CLASS_SUFFIX;
             if (startIndex == 0) {
                 packageName = parentPackage;
             } else {

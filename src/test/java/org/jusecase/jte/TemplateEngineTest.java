@@ -313,6 +313,38 @@ public class TemplateEngineTest {
         thenOutputIs("not one");
     }
 
+    @Test
+    void nestedJavascript() {
+        givenTemplate("@if (model.isCaseA() && model.isCaseB())\n" +
+                        "        <meta name=\"robots\" content=\"a, b\">\n" +
+                        "        @elseif (model.isCaseB())\n" +
+                        "        <meta name=\"robots\" content=\"b\">\n" +
+                        "        @elseif (model.isCaseA())\n" +
+                        "        <meta name=\"robots\" content=\"a\">\n" +
+                        "        @endif" +
+                "@if (model.x > 0)\n" +
+                "        <meta name=\"description\" content=\"${model.x}\">\n" +
+                "        @endif\n" +
+                "\n" +
+                "        <script>\n" +
+                "            function readCookie(name) {");
+        thenOutputIs("\n" +
+                "        <meta name=\"robots\" content=\"a\">\n" +
+                "        \n" +
+                "        <meta name=\"description\" content=\"42\">\n" +
+                "        \n" +
+                "\n" +
+                "        <script>\n" +
+                "            function readCookie(name) {");
+    }
+
+    @Test
+    void classPrefix() {
+        templateName = "test/404.jte";
+        givenTemplate("Hello");
+        thenOutputIs("Hello");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode(name + TemplateCompiler.TAG_EXTENSION, code);
     }
@@ -351,6 +383,16 @@ public class TemplateEngineTest {
         @SuppressWarnings("unused")
         public void setX(int amount) {
             x = amount;
+        }
+
+        @SuppressWarnings("unused")
+        public boolean isCaseA() {
+            return true;
+        }
+
+        @SuppressWarnings("unused")
+        public boolean isCaseB() {
+            return false;
         }
     }
 

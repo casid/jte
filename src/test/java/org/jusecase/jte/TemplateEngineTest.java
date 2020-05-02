@@ -2,16 +2,16 @@ package org.jusecase.jte;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.jusecase.jte.TemplateEngine.Mode;
 import org.jusecase.jte.internal.TemplateCompiler;
+import org.jusecase.jte.output.StringOutput;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TemplateEngineTest {
-    String templateName = "test/TestTemplate.template";
+    String templateName = "test/template.jte";
 
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-    TemplateEngine templateEngine = new TemplateEngine(dummyCodeResolver, Mode.Development);
+    TemplateEngine templateEngine = new TemplateEngine(dummyCodeResolver);
     Model model = new Model();
 
     @BeforeEach
@@ -239,6 +239,8 @@ public class TemplateEngineTest {
         givenTemplate("${model.hello} World");
         thenOutputIs("Hello World");
 
+        templateEngine.invalidate(templateName);
+
         givenTemplate("${model.hello}");
         thenOutputIs("Hello");
     }
@@ -363,10 +365,10 @@ public class TemplateEngineTest {
     }
 
     private void thenOutputIs(String expected) {
-        DummyTemplateOutput templateOutput = new DummyTemplateOutput();
-        templateEngine.render(templateName, model, templateOutput);
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, model, output);
 
-        assertThat(templateOutput.toString()).isEqualTo(expected);
+        assertThat(output.toString()).isEqualTo(expected);
     }
 
     public static class Model {

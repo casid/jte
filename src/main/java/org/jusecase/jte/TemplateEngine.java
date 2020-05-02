@@ -12,16 +12,9 @@ public final class TemplateEngine {
     private final ConcurrentMap<String, Template> templateCache;
 
 
-    public TemplateEngine(CodeResolver codeResolver, Mode mode) {
+    public TemplateEngine(CodeResolver codeResolver) {
         compiler = new TemplateCompiler(codeResolver);
-
-        if (mode == Mode.Development) {
-            templateCache = null;
-        } else if (mode == Mode.Production) {
-            templateCache = new ConcurrentHashMap<>();
-        } else {
-            throw new IllegalStateException("Unsupported mode " + mode);
-        }
+        templateCache = new ConcurrentHashMap<>();
     }
 
     public void render(String name, Object model, TemplateOutput output) {
@@ -29,16 +22,16 @@ public final class TemplateEngine {
         template.render(model, output);
     }
 
-    private Template resolveTemplate(String name) {
-        if (templateCache != null) {
-            return templateCache.computeIfAbsent(name, compiler::compile);
-        } else {
-            return compiler.compile(name);
-        }
+    public void invalidate(String name) {
+        templateCache.remove(name);
     }
 
-    public enum Mode {
-        Development,
-        Production
+    public void invalidateAll() {
+        templateCache.clear();
     }
+
+    private Template resolveTemplate(String name) {
+        return templateCache.computeIfAbsent(name, compiler::compile);
+    }
+
 }

@@ -7,10 +7,11 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class TemplateCompiler {
 
@@ -21,23 +22,37 @@ public class TemplateCompiler {
 
     private final CodeResolver codeResolver;
 
+    private final Path classDirectory;
     private final String templatePackageName;
     private final String tagPackageName;
     private final String layoutPackageName;
     private final boolean debug = false;
 
     public TemplateCompiler(CodeResolver codeResolver) {
-        this(codeResolver, "org.jusecase.jte");
+        this(codeResolver, null);
     }
 
-    public TemplateCompiler(CodeResolver codeResolver, String packageName) {
+    public TemplateCompiler(CodeResolver codeResolver, Path classDirectory) {
+        this(codeResolver, "org.jusecase.jte", classDirectory);
+    }
+
+    public TemplateCompiler(CodeResolver codeResolver, String packageName, Path classDirectory) {
         this.codeResolver = codeResolver;
+        this.classDirectory = classDirectory;
         this.templatePackageName = packageName + ".templates";
         this.tagPackageName = packageName + ".tags";
         this.layoutPackageName = packageName + ".layouts";
     }
 
     public Template<?> compile(String name) {
+        if (classDirectory == null) {
+            return compileInMemory(name);
+        } else {
+            return loadPrecompiled(name, true);
+        }
+    }
+
+    private Template<?> compileInMemory(String name) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         ClassDefinition templateDefinition = generateJavaCode(name, classDefinitions);
         if (templateDefinition == null) {
@@ -52,10 +67,32 @@ public class TemplateCompiler {
         }
     }
 
-    public void generateJavaCode(List<String> names, Path outputDirectory) {
-        Set<ClassDefinition> classDefinitions = generateJavaCode(names);
+    private Template<?> loadPrecompiled(String name, boolean firstAttempt) {
+        try {
+            ClassInfo templateInfo = new ClassInfo(name, templatePackageName);
+
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{classDirectory.toUri().toURL()});
+            return (Template<?>) classLoader.loadClass(templateInfo.fullName).getConstructor().newInstance();
+        } catch (ClassNotFoundException e) {
+            if (firstAttempt) {
+                generateJavaCode(List.of(name));
+                return loadPrecompiled(name, false);
+            } else {
+                throw new RuntimeException(e);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void generateJavaCode(List<String> names) {
+        LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
+        for (String name : names) {
+            generateJavaCode(name, classDefinitions);
+        }
+
         for (ClassDefinition classDefinition : classDefinitions) {
-            try (FileOutput fileOutput = new FileOutput(outputDirectory.resolve(classDefinition.getFileName()))) {
+            try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getFileName()))) {
                 fileOutput.write(classDefinition.getCode());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -65,22 +102,12 @@ public class TemplateCompiler {
         String[] files = new String[classDefinitions.size()];
         int i = 0;
         for (ClassDefinition classDefinition : classDefinitions) {
-            files[i++] = outputDirectory.resolve(classDefinition.getFileName()).toFile().getAbsolutePath();
+            files[i++] = classDirectory.resolve(classDefinition.getFileName()).toFile().getAbsolutePath();
         }
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         compiler.run(null, null, null, files);
 
-    }
-
-    private Set<ClassDefinition> generateJavaCode(List<String> names) {
-        LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
-
-        for (String name : names) {
-            generateJavaCode(name, classDefinitions);
-        }
-
-        return classDefinitions;
     }
 
     private ClassDefinition generateJavaCode(String name, LinkedHashSet<ClassDefinition> classDefinitions) {

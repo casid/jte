@@ -3,6 +3,7 @@ package org.jusecase.jte;
 import org.jusecase.jte.internal.Template;
 import org.jusecase.jte.internal.TemplateCompiler;
 
+import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -11,9 +12,12 @@ public final class TemplateEngine {
     private final TemplateCompiler compiler;
     private final ConcurrentMap<String, Template> templateCache;
 
-
     public TemplateEngine(CodeResolver codeResolver) {
-        compiler = new TemplateCompiler(codeResolver);
+        this(codeResolver, null);
+    }
+
+    public TemplateEngine(CodeResolver codeResolver, Path classDirectory) {
+        compiler = new TemplateCompiler(codeResolver, classDirectory);
         templateCache = new ConcurrentHashMap<>();
     }
 

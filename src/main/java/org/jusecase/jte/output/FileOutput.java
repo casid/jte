@@ -2,14 +2,34 @@ package org.jusecase.jte.output;
 
 import org.jusecase.jte.TemplateOutput;
 
-public class FileOutput implements TemplateOutput {
-    @Override
-    public void write(Object value) {
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
+public class FileOutput implements TemplateOutput, Closeable {
+
+    private final BufferedWriter writer;
+
+    public FileOutput(Path file) throws IOException {
+        Files.createDirectories(file.getParent());
+        writer = Files.newBufferedWriter(file, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
     }
 
     @Override
-    public void write(int value) {
+    public void write(Object value) {
+        try {
+            writer.write(value.toString());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
+    @Override
+    public void close() throws IOException {
+        writer.close();
     }
 }

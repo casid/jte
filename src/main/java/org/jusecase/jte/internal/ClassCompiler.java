@@ -22,12 +22,12 @@ final class ClassCompiler {
         ClassLoader cl = lookup.lookupClass().getClassLoader();
 
 
+        StringWriter out = new StringWriter();
         try {
             List<CharSequenceJavaFileObject> files = new ArrayList<>();
             for (ClassDefinition classDefinition : classDefinitions) {
                 files.add(new CharSequenceJavaFileObject(classDefinition.getName(), classDefinition.getCode()));
             }
-            StringWriter out = new StringWriter();
 
             StringBuilder classpath = new StringBuilder();
             String separator = System.getProperty("path.separator");
@@ -57,11 +57,10 @@ final class ClassCompiler {
                 throw new RuntimeException("Compilation error: " + out);
             }
 
-
             return classLoader.loadClass(name);
         }
         catch (Exception e) {
-            throw new RuntimeException("Error while compiling " + classDefinitions, e);
+            throw new RuntimeException("Error while compiling: " + out, e);
         }
     }
 
@@ -71,7 +70,11 @@ final class ClassCompiler {
 
         @Override
         protected Class<?> findClass(String name) {
-            byte[] bytes = fileObjectMap.get(name).getBytes();
+            JavaFileObject fileObject = fileObjectMap.get(name);
+            if (fileObject == null) {
+                throw new RuntimeException("No class found for " + name);
+            }
+            byte[] bytes = fileObject.getBytes();
             return defineClass(name, bytes, 0, bytes.length);
         }
     }

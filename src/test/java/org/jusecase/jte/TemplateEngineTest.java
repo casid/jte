@@ -348,7 +348,7 @@ public class TemplateEngineTest {
     }
 
     private void givenTag(String name, String code) {
-        dummyCodeResolver.givenCode(name + TemplateCompiler.TAG_EXTENSION, code);
+        dummyCodeResolver.givenCode("tag/" + name + TemplateCompiler.TAG_EXTENSION, code);
     }
 
     private void givenTemplate(String template) {
@@ -361,7 +361,7 @@ public class TemplateEngineTest {
     }
 
     private void givenLayout(String name, String code) {
-        dummyCodeResolver.givenCode(name + TemplateCompiler.LAYOUT_EXTENSION, code);
+        dummyCodeResolver.givenCode("layout/" + name + TemplateCompiler.LAYOUT_EXTENSION, code);
     }
 
     private void thenOutputIs(String expected) {

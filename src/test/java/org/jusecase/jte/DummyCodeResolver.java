@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DummyCodeResolver implements CodeResolver {
-    private Map<String, String> codeLookup = new HashMap<>();
+    private final Map<String, String> codeLookup = new HashMap<>();
 
     @Override
     public String resolve(String name) {

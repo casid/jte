@@ -17,6 +17,6 @@ public class WelcomePage extends Page {
 
     @Override
     public String getTemplate() {
-        return "WelcomePage.jte";
+        return "welcome.jte";
     }
 }

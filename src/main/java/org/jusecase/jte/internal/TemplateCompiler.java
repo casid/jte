@@ -28,10 +28,6 @@ public class TemplateCompiler {
     private final String layoutPackageName;
     private final boolean debug = false;
 
-    public TemplateCompiler(CodeResolver codeResolver) {
-        this(codeResolver, null);
-    }
-
     public TemplateCompiler(CodeResolver codeResolver, Path classDirectory) {
         this(codeResolver, "org.jusecase.jte", classDirectory);
     }
@@ -39,9 +35,9 @@ public class TemplateCompiler {
     public TemplateCompiler(CodeResolver codeResolver, String packageName, Path classDirectory) {
         this.codeResolver = codeResolver;
         this.classDirectory = classDirectory;
-        this.templatePackageName = packageName + ".templates";
-        this.tagPackageName = packageName + ".tags";
-        this.layoutPackageName = packageName + ".layouts";
+        this.templatePackageName = packageName + ".template";
+        this.tagPackageName = packageName + ".tag";
+        this.layoutPackageName = packageName + ".layout";
     }
 
     public Template<?> compile(String name) {
@@ -147,7 +143,7 @@ public class TemplateCompiler {
         return templateDefinition;
     }
 
-    private ClassInfo compileTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+    private ClassInfo generateTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
         ClassInfo tagInfo = new ClassInfo(name, tagPackageName);
 
         ClassDefinition classDefinition = new ClassDefinition(tagInfo.fullName);
@@ -190,7 +186,7 @@ public class TemplateCompiler {
         return tagInfo;
     }
 
-    private ClassInfo compileLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+    private ClassInfo generateLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
         ClassInfo layoutInfo = new ClassInfo(name, layoutPackageName);
 
         ClassDefinition classDefinition = new ClassDefinition(layoutInfo.fullName);
@@ -308,7 +304,7 @@ public class TemplateCompiler {
 
         @Override
         public void onTag(int depth, String name, String params) {
-            ClassInfo tagInfo = compileTag(name.replace('.', '/') + TAG_EXTENSION, classDefinitions);
+            ClassInfo tagInfo = generateTag("tag/" + name.replace('.', '/') + TAG_EXTENSION, classDefinitions);
 
             writeIndentation(depth);
 
@@ -322,7 +318,7 @@ public class TemplateCompiler {
 
         @Override
         public void onLayout(int depth, String name, String params) {
-            ClassInfo layoutInfo = compileLayout(name.replace('.', '/') + LAYOUT_EXTENSION, classDefinitions);
+            ClassInfo layoutInfo = generateLayout("layout/" + name.replace('.', '/') + LAYOUT_EXTENSION, classDefinitions);
 
             writeIndentation(depth);
             javaCode.append(layoutInfo.fullName).append(".render(output");

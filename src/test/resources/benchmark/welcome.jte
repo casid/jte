@@ -1,7 +1,7 @@
 @import org.jusecase.jte.benchmark.WelcomePage
 @param WelcomePage page
 
-@layout.PageLayout(page)
+@layout.page(page)
     @section(content)
         <p>Greetings! Don't forget to visit all the other pages!</p>
     @endsection

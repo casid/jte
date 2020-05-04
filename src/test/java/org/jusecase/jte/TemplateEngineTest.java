@@ -190,6 +190,15 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithMethodCallForParam() {
+        givenTag("card", "@param java.lang.String firstParam\n" +
+                "@param int secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+        givenTemplate("@tag.card(model.getAnotherWorld(), model.x), That was a tag!");
+        thenOutputIs("One: Another World, two: 42, That was a tag!");
+    }
+
+    @Test
     void tagInTag() {
         givenTag("divTwo", "@param int amount\n" +
                          "Divided by two is ${amount / 2}!");

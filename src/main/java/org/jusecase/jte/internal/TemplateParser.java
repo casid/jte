@@ -91,10 +91,10 @@ final class TemplateParser {
                 push(Mode.Condition);
             } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
                 lastIndex = i + 1;
-                push(Mode.ConditionCode);
-            } else if (currentChar == '(' && currentMode == Mode.ConditionCode) {
-                push(Mode.ConditionCode);
-            } else if (currentChar == ')' && currentMode == Mode.ConditionCode) {
+                push(Mode.JavaCode);
+            } else if (currentChar == '(' && currentMode == Mode.JavaCode) {
+                push(Mode.JavaCode);
+            } else if (currentChar == ')' && currentMode == Mode.JavaCode) {
                 pop();
                 if (currentMode == Mode.Condition) {
                     extract(templateCode, lastIndex, i, visitor::onConditionStart);
@@ -104,6 +104,12 @@ final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onConditionElse);
                     lastIndex = i + 1;
                     push(Mode.Text);
+                } else if (currentMode == Mode.Tag) {
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, currentTagName.toString(), c));
+                    lastIndex = i + 1;
+                    pop();
+                } else if (currentMode == Mode.Layout) {
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, currentTagName.toString(), c));
                 }
             } else if (previousChar3 == '@' && previousChar2 == 'e' && previousChar1 == 'l' && previousChar0 == 's' && currentChar == 'e' && templateCode.charAt(i + 1) != 'i') {
                 if (currentMode == Mode.Text) {
@@ -184,19 +190,10 @@ final class TemplateParser {
             } else if (currentMode == Mode.TagName) {
                 if (currentChar == '(') {
                     pop();
-                    push(Mode.TagCode);
+                    push(Mode.JavaCode);
                     lastIndex = i + 1;
                 } else if (currentChar != ' ') {
                     currentTagName.append(currentChar);
-                }
-            } else if (currentChar == ')' && currentMode == Mode.TagCode) {
-                pop();
-                if (currentMode == Mode.Tag) {
-                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, currentTagName.toString(), c));
-                    lastIndex = i + 1;
-                    pop();
-                } else if (currentMode == Mode.Layout) {
-                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, currentTagName.toString(), c));
                 }
             } else if (previousChar6 == '@' && previousChar5 == 'l' && previousChar4 == 'a' && previousChar3 == 'y' && previousChar2 == 'o' && previousChar1 == 'u' && previousChar0 == 't' && currentChar == '.') {
                 if (currentMode == Mode.Text) {
@@ -284,13 +281,12 @@ final class TemplateParser {
         Code,
         CodeStatement,
         Condition,
-        ConditionCode,
+        JavaCode,
         ConditionElse,
         ForLoop,
         ForLoopCode,
         Tag,
         TagName,
-        TagCode,
         Layout,
         LayoutSection,
         Comment,

@@ -432,7 +432,7 @@ public class TemplateCompiler {
                 startIndex += 1;
             }
 
-            className = CLASS_PREFIX + name.substring(startIndex, endIndex) + CLASS_SUFFIX;
+            className = CLASS_PREFIX + name.substring(startIndex, endIndex).replace("-", "") + CLASS_SUFFIX;
             if (startIndex == 0) {
                 packageName = parentPackage;
             } else {

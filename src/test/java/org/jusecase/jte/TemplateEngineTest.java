@@ -350,6 +350,13 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void snakeCaseCanBeCompiled() {
+        templateName = "snake-case.jte";
+        givenTemplate("Hello");
+        thenOutputIs("Hello");
+    }
+
+    @Test
     void classPrefix() {
         templateName = "test/404.jte";
         givenTemplate("Hello");

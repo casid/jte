@@ -363,6 +363,12 @@ public class TemplateEngineTest {
         thenOutputIs("Hello");
     }
 
+    @Test
+    void escaping() {
+        givenTemplate("\\");
+        thenOutputIs("\\");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + TemplateCompiler.TAG_EXTENSION, code);
     }

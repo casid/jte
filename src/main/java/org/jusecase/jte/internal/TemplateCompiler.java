@@ -407,6 +407,8 @@ public class TemplateCompiler {
                     javaCode.append("\\f");
                 } else if (c == '\b') {
                     javaCode.append("\\b");
+                } else if (c == '\\') {
+                    javaCode.append("\\\\");
                 } else {
                     javaCode.append(c);
                 }

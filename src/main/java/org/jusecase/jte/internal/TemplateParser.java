@@ -80,6 +80,10 @@ final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onCodeStatement);
                     lastIndex = i + 1;
                 }
+            } else if (currentChar == '\"' && currentMode == Mode.JavaCode) {
+                push(Mode.JavaCodeString);
+            } else if (currentChar == '\"' && currentMode == Mode.JavaCodeString && previousChar0 != '\\') {
+                pop();
             } else if (currentChar == '}' && currentMode == Mode.Code) {
                 pop();
                 if (currentMode == Mode.Text) {
@@ -286,6 +290,7 @@ final class TemplateParser {
         CodeStatement,
         Condition,
         JavaCode,
+        JavaCodeString,
         ConditionElse,
         ForLoop,
         ForLoopCode,

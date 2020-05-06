@@ -187,6 +187,20 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void braceInJavaString() {
+        model.hello = ":-)";
+        givenTemplate("@if(\":-)\".equals(model.hello))this is a smiley@endif");
+        thenOutputIs("this is a smiley");
+    }
+
+    @Test
+    void braceInJavaStringWithEscapedQuote() {
+        model.hello = "\":-)";
+        givenTemplate("@if(\"\\\":-)\".equals(model.hello))this is a smiley@endif");
+        thenOutputIs("this is a smiley");
+    }
+
+    @Test
     void tag() {
         givenTag("card", "@param java.lang.String firstParam\n" +
                          "@param int secondParam\n" +

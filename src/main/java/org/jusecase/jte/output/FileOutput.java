@@ -20,9 +20,9 @@ public class FileOutput implements TemplateOutput, Closeable {
     }
 
     @Override
-    public void write(Object value) {
+    public void writeSafeContent(String value) {
         try {
-            writer.write(value.toString());
+            writer.write(value);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

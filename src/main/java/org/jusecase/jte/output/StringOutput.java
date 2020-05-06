@@ -14,7 +14,7 @@ public class StringOutput implements TemplateOutput {
     }
 
     @Override
-    public void write(Object value) {
+    public void writeSafeContent(String value) {
         stringBuilder.append(value);
     }
 

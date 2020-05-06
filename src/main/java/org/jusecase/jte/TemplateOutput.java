@@ -1,33 +1,45 @@
 package org.jusecase.jte;
 
 public interface TemplateOutput {
-    void write(Object value);
+    void writeSafeContent(String value);
+
+    default void writeUnsafeContent(String value) {
+        writeSafeContent(value);
+    }
+
+    default void write(Object value) {
+        if (value == null) {
+            writeSafeContent("null");
+        } else {
+            writeUnsafeContent(value.toString());
+        }
+    }
 
     default void write(boolean value) {
-        write(String.valueOf(value));
+        writeSafeContent(String.valueOf(value));
     }
 
     default void write(byte value) {
-        write(String.valueOf(value));
+        writeSafeContent(String.valueOf(value));
     }
 
     default void write(short value) {
-        write(String.valueOf(value));
+        writeSafeContent(String.valueOf(value));
     }
 
     default void write(int value) {
-        write(String.valueOf(value));
+        writeSafeContent(String.valueOf(value));
     }
 
     default void write(long value) {
-        write(String.valueOf(value));
+        writeSafeContent(String.valueOf(value));
     }
 
     default void write(float value) {
-        write(String.valueOf(value));
+        writeSafeContent(String.valueOf(value));
     }
 
     default void write(double value) {
-        write(String.valueOf(value));
+        writeSafeContent(String.valueOf(value));
     }
 }

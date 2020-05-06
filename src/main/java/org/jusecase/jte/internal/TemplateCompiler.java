@@ -267,7 +267,7 @@ public class TemplateCompiler {
             }
 
             writeIndentation(depth);
-            javaCode.append("output.write(\"");
+            javaCode.append("output.writeSafeContent(\"");
             appendEscaped(textPart);
             javaCode.append("\");\n");
         }

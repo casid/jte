@@ -181,6 +181,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void blockInJavacode() {
+        givenTemplate("!{int y = 50; if(y>10){ y=60; }}${y}");
+        thenOutputIs("60");
+    }
+
+    @Test
     void tag() {
         givenTag("card", "@param java.lang.String firstParam\n" +
                          "@param int secondParam\n" +

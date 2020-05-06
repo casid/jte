@@ -70,7 +70,11 @@ final class TemplateParser {
                 }
                 lastIndex = i + 1;
                 push(Mode.CodeStatement);
-            } else if (currentChar == '}' && currentMode == Mode.CodeStatement) {
+            } else if (currentChar == '{' && currentMode == Mode.CodeStatement) {
+                depth++;
+            } else if (currentChar == '}' && currentMode == Mode.CodeStatement && depth > 0) {
+                depth--;
+            } else if (currentChar == '}' && currentMode == Mode.CodeStatement && depth == 0) {
                 pop();
                 if (currentMode == Mode.Text) {
                     extract(templateCode, lastIndex, i, visitor::onCodeStatement);

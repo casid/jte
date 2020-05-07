@@ -1,5 +1,6 @@
 package org.jusecase.jte;
 
+@SuppressWarnings("unused") // Methods are called by generated templates
 public interface TemplateOutput {
     void writeSafeContent(String value);
 
@@ -7,7 +8,43 @@ public interface TemplateOutput {
         writeSafeContent(value);
     }
 
-    default void write(Object value) {
+    default void writeSafe(Object value) {
+        if (value == null) {
+            writeSafeContent("null");
+        } else {
+            writeSafeContent(value.toString());
+        }
+    }
+
+    default void writeSafe(boolean value) {
+        writeSafeContent(String.valueOf(value));
+    }
+
+    default void writeSafe(byte value) {
+        writeSafeContent(String.valueOf(value));
+    }
+
+    default void writeSafe(short value) {
+        writeSafeContent(String.valueOf(value));
+    }
+
+    default void writeSafe(int value) {
+        writeSafeContent(String.valueOf(value));
+    }
+
+    default void writeSafe(long value) {
+        writeSafeContent(String.valueOf(value));
+    }
+
+    default void writeSafe(float value) {
+        writeSafeContent(String.valueOf(value));
+    }
+
+    default void writeSafe(double value) {
+        writeSafeContent(String.valueOf(value));
+    }
+
+    default void writeUnsafe(Object value) {
         if (value == null) {
             writeSafeContent("null");
         } else {
@@ -15,31 +52,31 @@ public interface TemplateOutput {
         }
     }
 
-    default void write(boolean value) {
+    default void writeUnsafe(boolean value) {
         writeSafeContent(String.valueOf(value));
     }
 
-    default void write(byte value) {
+    default void writeUnsafe(byte value) {
         writeSafeContent(String.valueOf(value));
     }
 
-    default void write(short value) {
+    default void writeUnsafe(short value) {
         writeSafeContent(String.valueOf(value));
     }
 
-    default void write(int value) {
+    default void writeUnsafe(int value) {
         writeSafeContent(String.valueOf(value));
     }
 
-    default void write(long value) {
+    default void writeUnsafe(long value) {
         writeSafeContent(String.valueOf(value));
     }
 
-    default void write(float value) {
+    default void writeUnsafe(float value) {
         writeSafeContent(String.valueOf(value));
     }
 
-    default void write(double value) {
+    default void writeUnsafe(double value) {
         writeSafeContent(String.valueOf(value));
     }
 }

@@ -5,6 +5,8 @@ interface TemplateParserVisitor {
 
     void onCodePart(int depth, String codePart);
 
+    void onSafeCodePart(int depth, String codePart);
+
     void onCodeStatement(int depth, String codePart);
 
     void onConditionStart(int depth, String condition);

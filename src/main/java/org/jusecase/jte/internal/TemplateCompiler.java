@@ -108,7 +108,7 @@ public class TemplateCompiler {
 
         for (ClassDefinition classDefinition : classDefinitions) {
             try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getFileName()))) {
-                fileOutput.write(classDefinition.getCode());
+                fileOutput.writeSafeContent(classDefinition.getCode());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
@@ -275,7 +275,13 @@ public class TemplateCompiler {
         @Override
         public void onCodePart(int depth, String codePart) {
             writeIndentation(depth);
-            javaCode.append("output.write(").append(codePart).append(");\n");
+            javaCode.append("output.writeUnsafe(").append(codePart).append(");\n");
+        }
+
+        @Override
+        public void onSafeCodePart(int depth, String codePart) {
+            writeIndentation(depth);
+            javaCode.append("output.writeSafe(").append(codePart).append(");\n");
         }
 
         @Override

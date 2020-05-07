@@ -24,6 +24,17 @@ public class TemplateEngine_OutputEscapingTest {
         assertThat(stringOutput.toString()).isEqualTo("Hello <cleaned>Model</cleaned>, 1, 1.0");
     }
 
+    @Test
+    void alreadyEscaped() {
+        dummyCodeResolver.givenCode("template.jte", "@import java.lang.String\n" +
+                "@param String model\n" +
+                "Hello $safe{model}, ${1}, ${1.0f}");
+
+        templateEngine.render("template.jte", "Model", secureOutput);
+
+        assertThat(stringOutput.toString()).isEqualTo("Hello Model, 1, 1.0");
+    }
+
     static class SecureOutput implements TemplateOutput {
 
         private final TemplateOutput output;

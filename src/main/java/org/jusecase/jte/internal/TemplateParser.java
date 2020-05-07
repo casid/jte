@@ -64,6 +64,12 @@ final class TemplateParser {
                 }
                 lastIndex = i + 1;
                 push(Mode.Code);
+            } else if (previousChar4 == '$' && previousChar3 == 's' && previousChar2 == 'a' && previousChar1 == 'f' && previousChar0 == 'e' && currentChar == '{') {
+                if (currentMode == Mode.Text) {
+                    extract(templateCode, lastIndex, i - 5, visitor::onTextPart);
+                }
+                lastIndex = i + 1;
+                push(Mode.SafeCode);
             } else if (previousChar0 == '!' && currentChar == '{') {
                 if (currentMode == Mode.Text) {
                     extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
@@ -88,6 +94,12 @@ final class TemplateParser {
                 pop();
                 if (currentMode == Mode.Text) {
                     extract(templateCode, lastIndex, i, visitor::onCodePart);
+                    lastIndex = i + 1;
+                }
+            } else if (currentChar == '}' && currentMode == Mode.SafeCode) {
+                pop();
+                if (currentMode == Mode.Text) {
+                    extract(templateCode, lastIndex, i, visitor::onSafeCodePart);
                     lastIndex = i + 1;
                 }
             } else if (previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f') {
@@ -287,6 +299,7 @@ final class TemplateParser {
     enum Mode {
         Text,
         Code,
+        SafeCode,
         CodeStatement,
         Condition,
         JavaCode,

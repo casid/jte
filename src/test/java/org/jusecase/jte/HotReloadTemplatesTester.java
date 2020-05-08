@@ -11,6 +11,11 @@ public class HotReloadTemplatesTester {
         DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "test", "resources", "benchmark"));
         TemplateEngine templateEngine = new TemplateEngine(codeResolver, Path.of("jte"));
 
-        codeResolver.enableHotReloadBlocking(templateEngine, s -> System.out.println("Invalidated " + s));
+        codeResolver.enableHotReloadBlocking(templateEngine, templates -> {
+            System.out.println("Invalidated " + templates);
+            for (String template : templates) {
+                templateEngine.prepareForRendering(template);
+            }
+        });
     }
 }

@@ -57,6 +57,14 @@ public final class TemplateEngine {
         }
     }
 
+    /**
+     * Prepares the template with the given name for rendering
+     * @param name Template name
+     */
+    public void prepareForRendering(String name) {
+        resolveTemplate(name);
+    }
+
     private Template resolveTemplate(String name) {
         return templateCache.computeIfAbsent(name, compiler::compile);
     }

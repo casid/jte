@@ -37,7 +37,11 @@ public final class ClassDefinition {
         return name.hashCode();
     }
 
-    public String getFileName() {
+    public String getJavaFileName() {
         return getName().replace('.', '/') + ".java";
+    }
+
+    public String getClassFileName() {
+        return getName().replace('.', '/') + ".class";
     }
 }

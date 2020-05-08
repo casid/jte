@@ -4,8 +4,11 @@ import org.jusecase.jte.internal.Template;
 import org.jusecase.jte.internal.TemplateCompiler;
 
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiFunction;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public final class TemplateEngine {
@@ -26,12 +29,32 @@ public final class TemplateEngine {
         template.render(model, output);
     }
 
-    public void invalidate(String name) {
-        templateCache.remove(name);
-    }
+    /**
+     * Notify the template engine, that the given code has changed and needs to be invalidated.
+     * @param name Template, Tag or Layout name
+     * @return List of templates that have been invalidated
+     */
+    public List<String> invalidate(String name) {
+        if (name.startsWith(TemplateCompiler.TAG_DIRECTORY) || name.startsWith(TemplateCompiler.LAYOUT_DIRECTORY)) {
+            templateCache.compute(name, (n, t) -> {
+                compiler.clean(name);
+                return null;
+            });
 
-    public void invalidateAll() {
-        templateCache.clear();
+            List<String> templateNames = compiler.getTemplatesUsing(name);
+            for (String templateName : templateNames) {
+                invalidate(templateName);
+            }
+
+            return templateNames;
+        } else {
+            templateCache.compute(name, (n, t) -> {
+                compiler.clean(name);
+                return null;
+            });
+
+            return Collections.singletonList(name);
+        }
     }
 
     private Template resolveTemplate(String name) {

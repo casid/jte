@@ -11,10 +11,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TemplateCompiler {
 
@@ -30,6 +31,7 @@ public class TemplateCompiler {
     private final Path classDirectory;
     private final String packageName;
     private final boolean debug = false;
+    private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
 
     public TemplateCompiler(CodeResolver codeResolver, Path classDirectory) {
         this(codeResolver, "org.jusecase.jte", classDirectory);
@@ -51,7 +53,7 @@ public class TemplateCompiler {
 
     private Template<?> compileInMemory(String name) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
-        ClassDefinition templateDefinition = generateJavaCode(name, classDefinitions);
+        ClassDefinition templateDefinition = generateTemplate(name, classDefinitions);
         if (templateDefinition == null) {
             return EmptyTemplate.INSTANCE;
         }
@@ -82,32 +84,18 @@ public class TemplateCompiler {
         }
     }
 
-    public void precompileAll(Path templateRoot) {
-        if (templateRoot == null) {
-            throw new NullPointerException("Cannot precompile classes without a templateRoot.");
-        }
-
-        try (Stream<Path> stream = Files.walk(templateRoot)) {
-            List<String> templateNames = stream
-                    .filter(p -> !Files.isDirectory(p))
-                    .map(p -> templateRoot.relativize(p).toString().replace('\\', '/'))
-                    .filter(s -> !s.startsWith(TAG_DIRECTORY) && !s.startsWith(LAYOUT_DIRECTORY))
-                    .filter(s -> s.endsWith(".jte"))
-                    .collect(Collectors.toList());
-            precompile(templateNames);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Failed to compile all templates in " + classDirectory, e);
-        }
+    public void precompileAll() {
+        precompile(codeResolver.resolveAllTemplateNames());
     }
 
     public void precompile(List<String> names) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
-            generateJavaCode(name, classDefinitions);
+            generateTemplate(name, classDefinitions);
         }
 
         for (ClassDefinition classDefinition : classDefinitions) {
-            try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getFileName()))) {
+            try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getJavaFileName()))) {
                 fileOutput.writeSafeContent(classDefinition.getCode());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -117,14 +105,14 @@ public class TemplateCompiler {
         String[] files = new String[classDefinitions.size()];
         int i = 0;
         for (ClassDefinition classDefinition : classDefinitions) {
-            files[i++] = classDirectory.resolve(classDefinition.getFileName()).toFile().getAbsolutePath();
+            files[i++] = classDirectory.resolve(classDefinition.getJavaFileName()).toFile().getAbsolutePath();
         }
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         compiler.run(null, null, null, files);
     }
 
-    private ClassDefinition generateJavaCode(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+    private ClassDefinition generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
         String templateCode = codeResolver.resolve(name);
         if (templateCode == null) {
             throw new RuntimeException("No code found for template " + name);
@@ -132,6 +120,8 @@ public class TemplateCompiler {
         if (templateCode.isEmpty()) {
             return null;
         }
+
+        LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
 
         ClassInfo templateInfo = new ClassInfo(name, packageName);
 
@@ -146,9 +136,11 @@ public class TemplateCompiler {
         javaCode.append("public final class ").append(templateInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(attributeParser.className).append("> {\n");
         javaCode.append("\tpublic void render(").append(attributeParser.className).append(" ").append(attributeParser.instanceName).append(", org.jusecase.jte.TemplateOutput output) {\n");
 
-        new TemplateParser(TemplateType.Template).parse(attributeParser.lastIndex, templateCode, new CodeGenerator(TemplateType.Template, javaCode, classDefinitions));
+        new TemplateParser(TemplateType.Template).parse(attributeParser.lastIndex, templateCode, new CodeGenerator(TemplateType.Template, javaCode, classDefinitions, templateDependencies));
         javaCode.append("\t}\n");
         javaCode.append("}\n");
+
+        this.templateDependencies.put(name, templateDependencies);
 
         ClassDefinition templateDefinition = new ClassDefinition(templateInfo.fullName);
         templateDefinition.setCode(javaCode.toString());
@@ -161,7 +153,8 @@ public class TemplateCompiler {
         return templateDefinition;
     }
 
-    private ClassInfo generateTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+    private ClassInfo generateTag(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+        templateDependencies.add(name);
         ClassInfo tagInfo = new ClassInfo(name, packageName);
 
         ClassDefinition classDefinition = new ClassDefinition(tagInfo.fullName);
@@ -190,7 +183,7 @@ public class TemplateCompiler {
         }
         javaCode.append(") {\n");
 
-        new TemplateParser(TemplateType.Tag).parse(lastIndex, tagCode, new CodeGenerator(TemplateType.Tag, javaCode, classDefinitions));
+        new TemplateParser(TemplateType.Tag).parse(lastIndex, tagCode, new CodeGenerator(TemplateType.Tag, javaCode, classDefinitions, templateDependencies));
 
         javaCode.append("\t}\n");
         javaCode.append("}\n");
@@ -204,7 +197,8 @@ public class TemplateCompiler {
         return tagInfo;
     }
 
-    private ClassInfo generateLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+    private ClassInfo generateLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+        templateDependencies.add(name);
         ClassInfo layoutInfo = new ClassInfo(name, packageName);
 
         ClassDefinition classDefinition = new ClassDefinition(layoutInfo.fullName);
@@ -234,7 +228,7 @@ public class TemplateCompiler {
         javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
         javaCode.append(") {\n");
 
-        new TemplateParser(TemplateType.Layout).parse(lastIndex, layoutCode, new CodeGenerator(TemplateType.Layout, javaCode, classDefinitions));
+        new TemplateParser(TemplateType.Layout).parse(lastIndex, layoutCode, new CodeGenerator(TemplateType.Layout, javaCode, classDefinitions, templateDependencies));
 
         javaCode.append("\t}\n");
         javaCode.append("}\n");
@@ -248,16 +242,49 @@ public class TemplateCompiler {
         return layoutInfo;
     }
 
+    public void clean(String name) {
+        if (classDirectory == null) {
+            return;
+        }
+
+        ClassInfo classInfo = new ClassInfo(name, packageName);
+        ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName);
+
+        deleteFile(classDirectory.resolve(classDefinition.getJavaFileName()));
+        deleteFile(classDirectory.resolve(classDefinition.getClassFileName()));
+    }
+
+    private void deleteFile(Path file) {
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to delete file " + file, e);
+        }
+    }
+
+    public List<String> getTemplatesUsing(String name) {
+        List<String> result = new ArrayList<>();
+        for (Map.Entry<String, LinkedHashSet<String>> dependencies : templateDependencies.entrySet()) {
+            if (dependencies.getValue().contains(name)) {
+                result.add(dependencies.getKey());
+            }
+        }
+
+        return result;
+    }
+
 
     private class CodeGenerator implements TemplateParserVisitor {
         private final TemplateType type;
-        private final LinkedHashSet<ClassDefinition> classDefinitions;
         private final StringBuilder javaCode;
+        private final LinkedHashSet<ClassDefinition> classDefinitions;
+        private final LinkedHashSet<String> templateDependencies;
 
-        private CodeGenerator(TemplateType type, StringBuilder javaCode, LinkedHashSet<ClassDefinition> classDefinitions) {
+        private CodeGenerator(TemplateType type, StringBuilder javaCode, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
             this.type = type;
             this.javaCode = javaCode;
             this.classDefinitions = classDefinitions;
+            this.templateDependencies = templateDependencies;
         }
 
         @Override
@@ -328,7 +355,7 @@ public class TemplateCompiler {
 
         @Override
         public void onTag(int depth, String name, String params) {
-            ClassInfo tagInfo = generateTag(TAG_DIRECTORY + name.replace('.', '/') + TAG_EXTENSION, classDefinitions);
+            ClassInfo tagInfo = generateTag(TAG_DIRECTORY + name.replace('.', '/') + TAG_EXTENSION, classDefinitions, templateDependencies);
 
             writeIndentation(depth);
 
@@ -342,7 +369,7 @@ public class TemplateCompiler {
 
         @Override
         public void onLayout(int depth, String name, String params) {
-            ClassInfo layoutInfo = generateLayout(LAYOUT_DIRECTORY + name.replace('.', '/') + LAYOUT_EXTENSION, classDefinitions);
+            ClassInfo layoutInfo = generateLayout(LAYOUT_DIRECTORY + name.replace('.', '/') + LAYOUT_EXTENSION, classDefinitions, templateDependencies);
 
             writeIndentation(depth);
             javaCode.append(layoutInfo.fullName).append(".render(output");

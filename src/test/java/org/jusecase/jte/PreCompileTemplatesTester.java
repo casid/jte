@@ -8,8 +8,8 @@ import java.nio.file.Path;
 
 public class PreCompileTemplatesTester {
     @Test
-    void name() {
+    void precompile() {
         TemplateCompiler compiler = new TemplateCompiler(new ResourceCodeResolver("benchmark"), Path.of("jte"));
-        compiler.precompileAll(Path.of("src", "test", "resources", "benchmark"));
+        compiler.precompileAll();
     }
 }

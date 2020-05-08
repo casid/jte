@@ -46,6 +46,7 @@ public class DirectoryCodeResolver implements CodeResolver {
     @SuppressWarnings("unused") // Not used by unit tests, but depending projects
     public void enableHotReload(TemplateEngine templateEngine, Consumer<List<String>> onTemplatesInvalidated) {
         Thread reloadThread = new Thread(() -> enableHotReloadBlocking(templateEngine, onTemplatesInvalidated));
+        reloadThread.setName("jte-reloader");
         reloadThread.setDaemon(true);
         reloadThread.start();
     }

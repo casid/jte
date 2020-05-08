@@ -25,6 +25,8 @@ interface TemplateParserVisitor {
 
     void onLayout(int depth, String name, String params);
 
+    void onLayoutSlot(int depth, String name);
+
     void onLayoutSection(int depth, String name);
 
     void onLayoutSectionEnd(int depth);

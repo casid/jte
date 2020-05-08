@@ -20,7 +20,7 @@
         @endfor
     </div>
     <div class="content">
-        @section(content)
+        @slot(content)
     </div>
     <div class="footer">
         This page has ${page.getVisits()} already.

@@ -357,18 +357,19 @@ public class TemplateCompiler {
         }
 
         @Override
+        public void onLayoutSlot(int depth, String name) {
+            writeIndentation(depth);
+            javaCode.append("jteLayoutSectionLookup.apply(\"").append(name.trim()).append("\").run();\n");
+        }
+
+        @Override
         public void onLayoutSection(int depth, String name) {
-            if (type == TemplateType.Layout) {
-                writeIndentation(depth);
-                javaCode.append("jteLayoutSectionLookup.apply(\"").append(name.trim()).append("\").run();\n");
-            } else {
-                writeIndentation(depth + 2);
-                javaCode.append("if (\"").append(name.trim()).append("\".equals(jteLayoutSection)) {\n");
-                writeIndentation(depth + 3);
-                javaCode.append("return new Runnable() {\n");
-                writeIndentation(depth + 4);
-                javaCode.append("public void run() {\n");
-            }
+            writeIndentation(depth + 2);
+            javaCode.append("if (\"").append(name.trim()).append("\".equals(jteLayoutSection)) {\n");
+            writeIndentation(depth + 3);
+            javaCode.append("return new Runnable() {\n");
+            writeIndentation(depth + 4);
+            javaCode.append("public void run() {\n");
         }
 
         @Override

@@ -290,11 +290,11 @@ public class TemplateEngineTest {
                 "<b>Welcome to my site - you are on page ${model.x}</b>\n" +
                 "\n" +
                 "<div class=\"content\">\n" +
-                "    @section(content)\n" +
+                "    @slot(content)\n" +
                 "</div>\n" +
                 "\n" +
                 "<div class=\"footer\">\n" +
-                "    @section(footer)\n" +
+                "    @slot(footer)\n" +
                 "</div>\n" +
                 "</body>");
 

@@ -326,6 +326,39 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void nestedLayouts() {
+        givenLayout("main",
+                "<header>@slot(header)</header>" +
+                "<content>@slot(content)</content>" +
+                "<footer>@slot(footer)</footer>");
+        givenLayout("mainExtended", "@layout.main()" +
+                "@section(content)" +
+                "@slot(contentPrefix)" +
+                "<b>@slot(content)</b>" +
+                "@slot(contentSuffix)" +
+                "@endsection" +
+                "@endlayout");
+        givenTemplate("@layout.mainExtended()" +
+                "@section(header)" +
+                "this is the header" +
+                "@endsection" +
+                "@section(contentPrefix)" +
+                "<content-prefix>" +
+                "@endsection" +
+                "@section(content)" +
+                "this is the content" +
+                "@endsection" +
+                "@section(contentSuffix)" +
+                "<content-suffix>" +
+                "@endsection" +
+                "@endlayout");
+
+        thenOutputIs("<header>this is the header</header>" +
+                "<content><content-prefix><b>this is the content</b><content-suffix></content>" +
+                "<footer></footer>");
+    }
+
+    @Test
     void enumCheck() {
         givenRawTemplate(
                 "@import org.jusecase.jte.TemplateEngineTest.Model\n" +

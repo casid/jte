@@ -385,7 +385,11 @@ public class TemplateCompiler {
         @Override
         public void onLayoutEnd(int depth) {
             writeIndentation(depth + 2);
-            javaCode.append("return null;\n");
+            if (type == TemplateType.Layout) {
+                javaCode.append("return jteLayoutSectionLookup.apply(jteLayoutSection);\n");
+            } else {
+                javaCode.append("return () -> {};\n");
+            }
             writeIndentation(depth + 1);
             javaCode.append("}\n");
             writeIndentation(depth);

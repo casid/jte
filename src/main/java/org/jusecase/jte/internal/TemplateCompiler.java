@@ -231,7 +231,7 @@ public class TemplateCompiler {
         for (String parameter : parameterParser.parameters) {
             javaCode.append(", ").append(parameter);
         }
-        javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutSectionLookup");
+        javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
         javaCode.append(") {\n");
 
         new TemplateParser(TemplateType.Layout).parse(lastIndex, layoutCode, new CodeGenerator(TemplateType.Layout, javaCode, classDefinitions));
@@ -353,19 +353,19 @@ public class TemplateCompiler {
 
             javaCode.append(", new java.util.function.Function<String, Runnable>() {\n");
             writeIndentation(depth + 1);
-            javaCode.append("public Runnable apply(String jteLayoutSection) {\n");
+            javaCode.append("public Runnable apply(String jteLayoutDefinition) {\n");
         }
 
         @Override
-        public void onLayoutSlot(int depth, String name) {
+        public void onLayoutRender(int depth, String name) {
             writeIndentation(depth);
-            javaCode.append("jteLayoutSectionLookup.apply(\"").append(name.trim()).append("\").run();\n");
+            javaCode.append("jteLayoutDefinitionLookup.apply(\"").append(name.trim()).append("\").run();\n");
         }
 
         @Override
-        public void onLayoutSection(int depth, String name) {
+        public void onLayoutDefine(int depth, String name) {
             writeIndentation(depth + 2);
-            javaCode.append("if (\"").append(name.trim()).append("\".equals(jteLayoutSection)) {\n");
+            javaCode.append("if (\"").append(name.trim()).append("\".equals(jteLayoutDefinition)) {\n");
             writeIndentation(depth + 3);
             javaCode.append("return new Runnable() {\n");
             writeIndentation(depth + 4);
@@ -373,7 +373,7 @@ public class TemplateCompiler {
         }
 
         @Override
-        public void onLayoutSectionEnd(int depth) {
+        public void onLayoutDefineEnd(int depth) {
             writeIndentation(depth + 4);
             javaCode.append("}\n");
             writeIndentation(depth + 3);
@@ -386,7 +386,7 @@ public class TemplateCompiler {
         public void onLayoutEnd(int depth) {
             writeIndentation(depth + 2);
             if (type == TemplateType.Layout) {
-                javaCode.append("return jteLayoutSectionLookup.apply(jteLayoutSection);\n");
+                javaCode.append("return jteLayoutDefinitionLookup.apply(jteLayoutDefinition);\n");
             } else {
                 javaCode.append("return () -> {};\n");
             }

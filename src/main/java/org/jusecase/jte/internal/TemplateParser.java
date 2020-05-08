@@ -4,7 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 final class TemplateParser {
-    private static final int LAYOUT_SECTION_DEPTH = 4;
+    private static final int LAYOUT_DEFINITION_DEPTH = 4;
 
     private final TemplateType type;
     private final Deque<Mode> stack = new ArrayDeque<>();
@@ -229,40 +229,40 @@ final class TemplateParser {
                 lastIndex = i + 1;
 
                 visitor.onLayoutEnd(depth);
-            } else if (previousChar6 == '@' && previousChar5 == 's' && previousChar4 == 'e' && previousChar3 == 'c' && previousChar2 == 't' && previousChar1 == 'i' && previousChar0 == 'o' && currentChar == 'n') {
-                if (type == TemplateType.Layout && currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
+            } else if (previousChar5 == '@' && previousChar4 == 'd' && previousChar3 == 'e' && previousChar2 == 'f' && previousChar1 == 'i' && previousChar0 == 'n' && currentChar == 'e') {
+                if (currentMode == Mode.Text) {
+                    extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
                     lastIndex = i + 1;
                 }
-                push(Mode.LayoutSection);
-            } else if (currentChar == '(' && currentMode == Mode.LayoutSection) {
+                push(Mode.LayoutDefine);
+            } else if (currentChar == '(' && currentMode == Mode.LayoutDefine) {
                 lastIndex = i + 1;
-            } else if (currentChar == ')' && currentMode == Mode.LayoutSection) {
-                extract(templateCode, lastIndex, i, visitor::onLayoutSection);
+            } else if (currentChar == ')' && currentMode == Mode.LayoutDefine) {
+                extract(templateCode, lastIndex, i, visitor::onLayoutDefine);
                 lastIndex = i + 1;
                 push(Mode.Text);
-                depth += LAYOUT_SECTION_DEPTH;
-            } else if (previousChar9 == '@' && previousChar8 == 'e' && previousChar7 == 'n' && previousChar6 == 'd' && previousChar5 == 's' && previousChar4 == 'e' && previousChar3 == 'c' && previousChar2 == 't' && previousChar1 == 'i' && previousChar0 == 'o' && currentChar == 'n') {
+                depth += LAYOUT_DEFINITION_DEPTH;
+            } else if (previousChar8 == '@' && previousChar7 == 'e' && previousChar6 == 'n' && previousChar5 == 'd' && previousChar4 == 'd' && previousChar3 == 'e' && previousChar2 == 'f' && previousChar1 == 'i' && previousChar0 == 'n' && currentChar == 'e') {
                 if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 10, visitor::onTextPart);
+                    extract(templateCode, lastIndex, i - 9, visitor::onTextPart);
                 }
 
                 pop();
                 pop();
-                depth -= LAYOUT_SECTION_DEPTH;
+                depth -= LAYOUT_DEFINITION_DEPTH;
                 lastIndex = i + 1;
 
-                visitor.onLayoutSectionEnd(depth);
-            } else if (previousChar3 == '@' && previousChar2 == 's' && previousChar1 == 'l' && previousChar0 == 'o' && currentChar == 't') {
+                visitor.onLayoutDefineEnd(depth);
+            } else if (previousChar5 == '@' && previousChar4 == 'r' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'e' && currentChar == 'r') {
                 if (type == TemplateType.Layout && currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 4, visitor::onTextPart);
+                    extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
                     lastIndex = i + 1;
                 }
-                push(Mode.LayoutSlot);
-            } else if (currentChar == '(' && currentMode == Mode.LayoutSlot) {
+                push(Mode.LayoutRender);
+            } else if (currentChar == '(' && currentMode == Mode.LayoutRender) {
                 lastIndex = i + 1;
-            } else if (currentChar == ')' && currentMode == Mode.LayoutSlot) {
-                extract(templateCode, lastIndex, i, visitor::onLayoutSlot);
+            } else if (currentChar == ')' && currentMode == Mode.LayoutRender) {
+                extract(templateCode, lastIndex, i, visitor::onLayoutRender);
                 lastIndex = i + 1;
                 pop();
             }
@@ -318,8 +318,8 @@ final class TemplateParser {
         Tag,
         TagName,
         Layout,
-        LayoutSection,
-        LayoutSlot,
+        LayoutDefine,
+        LayoutRender,
         Comment,
     }
 }

@@ -25,11 +25,11 @@ interface TemplateParserVisitor {
 
     void onLayout(int depth, String name, String params);
 
-    void onLayoutSlot(int depth, String name);
+    void onLayoutRender(int depth, String name);
 
-    void onLayoutSection(int depth, String name);
+    void onLayoutDefine(int depth, String name);
 
-    void onLayoutSectionEnd(int depth);
+    void onLayoutDefineEnd(int depth);
 
     void onLayoutEnd(int depth);
 }

@@ -290,21 +290,21 @@ public class TemplateEngineTest {
                 "<b>Welcome to my site - you are on page ${model.x}</b>\n" +
                 "\n" +
                 "<div class=\"content\">\n" +
-                "    @slot(content)\n" +
+                "    @render(content)\n" +
                 "</div>\n" +
                 "\n" +
                 "<div class=\"footer\">\n" +
-                "    @slot(footer)\n" +
+                "    @render(footer)\n" +
                 "</div>\n" +
                 "</body>");
 
         givenTemplate("@layout.main(model)\n" +
-                "    @section(content)\n" +
+                "    @define(content)\n" +
                 "        ${model.hello}, enjoy this great content\n" +
-                "    @endsection\n" +
-                "    @section(footer)\n" +
+                "    @enddefine\n" +
+                "    @define(footer)\n" +
                 "        Come again!\n" +
-                "    @endsection\n" +
+                "    @enddefine\n" +
                 "@endlayout");
 
         thenOutputIs("\n" +
@@ -328,29 +328,29 @@ public class TemplateEngineTest {
     @Test
     void nestedLayouts() {
         givenLayout("main",
-                "<header>@slot(header)</header>" +
-                "<content>@slot(content)</content>" +
-                "<footer>@slot(footer)</footer>");
+                "<header>@render(header)</header>" +
+                "<content>@render(content)</content>" +
+                "<footer>@render(footer)</footer>");
         givenLayout("mainExtended", "@layout.main()" +
-                "@section(content)" +
-                "@slot(contentPrefix)" +
-                "<b>@slot(content)</b>" +
-                "@slot(contentSuffix)" +
-                "@endsection" +
+                "@define(content)" +
+                "@render(contentPrefix)" +
+                "<b>@render(content)</b>" +
+                "@render(contentSuffix)" +
+                "@enddefine" +
                 "@endlayout");
         givenTemplate("@layout.mainExtended()" +
-                "@section(header)" +
+                "@define(header)" +
                 "this is the header" +
-                "@endsection" +
-                "@section(contentPrefix)" +
+                "@enddefine" +
+                "@define(contentPrefix)" +
                 "<content-prefix>" +
-                "@endsection" +
-                "@section(content)" +
+                "@enddefine" +
+                "@define(content)" +
                 "this is the content" +
-                "@endsection" +
-                "@section(contentSuffix)" +
+                "@enddefine" +
+                "@define(contentSuffix)" +
                 "<content-suffix>" +
-                "@endsection" +
+                "@enddefine" +
                 "@endlayout");
 
         thenOutputIs("<header>this is the header</header>" +

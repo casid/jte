@@ -2,7 +2,7 @@
 @param WelcomePage page
 
 @layout.page(page)
-    @section(content)
+    @define(content)
         <p>Greetings! Don't forget to visit all the other pages!</p>
-    @endsection
+    @enddefine
 @endlayout

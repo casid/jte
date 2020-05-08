@@ -9,8 +9,8 @@
     <version>0.0.1</version>
     <packaging>jar</packaging>
 
-    <name>Java Native Template</name>
-    <description>Java template engine using native.</description>
+    <name>Java Template Engine</name>
+    <description>A template engine using native java code.</description>
     <url>http://jusecase.org</url>
     <developers>
         <developer>

@@ -154,81 +154,48 @@ public class TemplateCompiler {
     }
 
     private ClassInfo generateTag(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
-        templateDependencies.add(name);
-        ClassInfo tagInfo = new ClassInfo(name, packageName);
-
-        ClassDefinition classDefinition = new ClassDefinition(tagInfo.fullName);
-        if (classDefinitions.contains(classDefinition)) {
-            return tagInfo;
-        }
-
-        String tagCode = codeResolver.resolve(name);
-        if (tagCode == null) {
-            throw new RuntimeException("No code found for tag " + name);
-        }
-
-        classDefinitions.add(classDefinition);
-
-        TagOrLayoutParameterParser parameterParser = new TagOrLayoutParameterParser();
-        int lastIndex = parameterParser.parse(tagCode);
-
-        StringBuilder javaCode = new StringBuilder("package " + tagInfo.packageName + ";\n");
-        for (String importClass : parameterParser.importClasses) {
-            javaCode.append("import ").append(importClass).append(";\n");
-        }
-        javaCode.append("public final class ").append(tagInfo.className).append(" {\n");
-        javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
-        for (String parameter : parameterParser.parameters) {
-            javaCode.append(", ").append(parameter);
-        }
-        javaCode.append(") {\n");
-
-        new TemplateParser(TemplateType.Tag).parse(lastIndex, tagCode, new CodeGenerator(TemplateType.Tag, javaCode, classDefinitions, templateDependencies));
-
-        javaCode.append("\t}\n");
-        javaCode.append("}\n");
-
-        classDefinition.setCode(javaCode.toString());
-
-        if (debug) {
-            System.out.println(classDefinition.getCode());
-        }
-
-        return tagInfo;
+        return generateTagOrLayout(TemplateType.Tag, name, classDefinitions, templateDependencies);
     }
 
     private ClassInfo generateLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
-        templateDependencies.add(name);
-        ClassInfo layoutInfo = new ClassInfo(name, packageName);
+        return generateTagOrLayout(TemplateType.Layout, name, classDefinitions, templateDependencies);
+    }
 
-        ClassDefinition classDefinition = new ClassDefinition(layoutInfo.fullName);
+    private ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+        templateDependencies.add(name);
+        ClassInfo classInfo = new ClassInfo(name, packageName);
+
+        ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName);
         if (classDefinitions.contains(classDefinition)) {
-            return layoutInfo;
+            return classInfo;
         }
 
-        String layoutCode = codeResolver.resolve(name);
-        if (layoutCode == null) {
-            throw new RuntimeException("No code found for layout " + name);
+        String code = codeResolver.resolve(name);
+        if (code == null) {
+            throw new RuntimeException("No code found for " + type + ": " + name);
         }
 
         classDefinitions.add(classDefinition);
 
         TagOrLayoutParameterParser parameterParser = new TagOrLayoutParameterParser();
-        int lastIndex = parameterParser.parse(layoutCode);
+        int lastIndex = parameterParser.parse(code);
 
-        StringBuilder javaCode = new StringBuilder("package " + layoutInfo.packageName + ";\n");
+        StringBuilder javaCode = new StringBuilder("package " + classInfo.packageName + ";\n");
         for (String importClass : parameterParser.importClasses) {
             javaCode.append("import ").append(importClass).append(";\n");
         }
-        javaCode.append("public final class ").append(layoutInfo.className).append(" {\n");
+
+        javaCode.append("public final class ").append(classInfo.className).append(" {\n");
         javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
         for (String parameter : parameterParser.parameters) {
             javaCode.append(", ").append(parameter);
         }
-        javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
+        if (type == TemplateType.Layout) {
+            javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
+        }
         javaCode.append(") {\n");
 
-        new TemplateParser(TemplateType.Layout).parse(lastIndex, layoutCode, new CodeGenerator(TemplateType.Layout, javaCode, classDefinitions, templateDependencies));
+        new TemplateParser(type).parse(lastIndex, code, new CodeGenerator(type, javaCode, classDefinitions, templateDependencies));
 
         javaCode.append("\t}\n");
         javaCode.append("}\n");
@@ -239,7 +206,7 @@ public class TemplateCompiler {
             System.out.println(classDefinition.getCode());
         }
 
-        return layoutInfo;
+        return classInfo;
     }
 
     public void clean(String name) {

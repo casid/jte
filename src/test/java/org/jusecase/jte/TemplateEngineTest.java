@@ -264,6 +264,28 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithNamedParam() {
+        givenTag("named", "@param int one\n" +
+                "@param int two\n" +
+                "${one}, ${two}");
+        givenTemplate("@tag.named(two: 2, one: 1)");
+        thenOutputIs("1, 2");
+    }
+
+    @Test
+    void tagWithNamedParamString() {
+        givenTag("named", "@param int one\n" +
+                "@param int two\n" +
+                "@param String three\n" +
+                "${one}, ${two}, ${three}");
+        givenTemplate("@tag.named(\n" +
+                "two: 2,\n" +
+                "three: \"Hello, there ;-)\",\n" +
+                "one: 1)");
+        thenOutputIs("1, 2, Hello, there ;-)");
+    }
+
+    @Test
     void hotReload() {
         givenTemplate("${model.hello} World");
         thenOutputIs("Hello World");

@@ -1,7 +1,9 @@
 package org.jusecase.jte.internal;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 final class TemplateParser {
     private static final int LAYOUT_DEFINITION_DEPTH = 4;
@@ -19,8 +21,7 @@ final class TemplateParser {
     public void parse(int startIndex, String templateCode, TemplateParserVisitor visitor) {
         int lastIndex = startIndex;
 
-        char previousChar9;
-        char previousChar8 = 0;
+        char previousChar8;
         char previousChar7 = 0;
         char previousChar6 = 0;
         char previousChar5 = 0;
@@ -33,10 +34,8 @@ final class TemplateParser {
         currentMode = Mode.Text;
         stack.push(currentMode);
         depth = 0;
-        StringBuilder currentTagName = new StringBuilder();
 
         for (int i = 0; i < templateCode.length(); ++i) {
-            previousChar9 = previousChar8;
             previousChar8 = previousChar7;
             previousChar7 = previousChar6;
             previousChar6 = previousChar5;
@@ -86,7 +85,7 @@ final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onCodeStatement);
                     lastIndex = i + 1;
                 }
-            } else if (currentChar == '\"' && currentMode == Mode.JavaCode) {
+            } else if (currentChar == '\"' && currentMode.isJava()) {
                 push(Mode.JavaCodeString);
             } else if (currentChar == '\"' && currentMode == Mode.JavaCodeString && previousChar0 != '\\') {
                 pop();
@@ -112,10 +111,20 @@ final class TemplateParser {
             } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
                 lastIndex = i + 1;
                 push(Mode.JavaCode);
-            } else if (currentChar == '(' && currentMode == Mode.JavaCode) {
+            } else if (currentChar == '(' && currentMode.isJava()) {
                 push(Mode.JavaCode);
-            } else if (currentChar == ')' && currentMode == Mode.JavaCode) {
+            } else if (currentChar == ')' && currentMode.isJava()) {
+                if (currentMode == Mode.JavaCodeParam) {
+                    TagOrLayoutMode previousMode = getPreviousMode(TagOrLayoutMode.class);
+                    extract(templateCode, lastIndex, i, (d, c) -> {
+                        if (c != null && !c.isBlank()) {
+                            previousMode.params.add(c);
+                        }
+                    });
+                }
+
                 pop();
+
                 if (currentMode == Mode.Condition) {
                     extract(templateCode, lastIndex, i, visitor::onConditionStart);
                     lastIndex = i + 1;
@@ -124,13 +133,23 @@ final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onConditionElse);
                     lastIndex = i + 1;
                     push(Mode.Text);
-                } else if (currentMode == Mode.Tag) {
-                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, currentTagName.toString(), c));
+                } else if (currentMode instanceof TagMode) {
+                    TagMode tagMode = (TagMode)currentMode;
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, tagMode.name.toString(), tagMode.params));
                     lastIndex = i + 1;
                     pop();
-                } else if (currentMode == Mode.Layout) {
-                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, currentTagName.toString(), c));
+                } else if (currentMode instanceof LayoutMode) {
+                    LayoutMode layoutMode = (LayoutMode)currentMode;
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, layoutMode.name.toString(), layoutMode.params));
                 }
+            } else if (currentChar == ',' && currentMode == Mode.JavaCodeParam) {
+                TagOrLayoutMode previousMode = getPreviousMode(TagOrLayoutMode.class);
+                extract(templateCode, lastIndex, i, (d, c) -> {
+                    if (c != null && !c.isBlank()) {
+                        previousMode.params.add(c);
+                    }
+                });
+                lastIndex = i + 1;
             } else if (previousChar3 == '@' && previousChar2 == 'e' && previousChar1 == 'l' && previousChar0 == 's' && currentChar == 'e' && templateCode.charAt(i + 1) != 'i') {
                 if (currentMode == Mode.Text) {
                     extract(templateCode, lastIndex, i - 4, visitor::onTextPart);
@@ -204,16 +223,15 @@ final class TemplateParser {
                     lastIndex = i + 1;
                 }
 
-                push(Mode.Tag);
+                push(new TagMode());
                 push(Mode.TagName);
-                currentTagName.setLength(0);
             } else if (currentMode == Mode.TagName) {
                 if (currentChar == '(') {
                     pop();
-                    push(Mode.JavaCode);
+                    push(Mode.JavaCodeParam);
                     lastIndex = i + 1;
                 } else if (currentChar != ' ') {
-                    currentTagName.append(currentChar);
+                    getPreviousMode(TagOrLayoutMode.class).name.append(currentChar);
                 }
             } else if (previousChar6 == '@' && previousChar5 == 'l' && previousChar4 == 'a' && previousChar3 == 'y' && previousChar2 == 'o' && previousChar1 == 'u' && previousChar0 == 't' && currentChar == '.') {
                 if (currentMode == Mode.Text) {
@@ -221,9 +239,8 @@ final class TemplateParser {
                     lastIndex = i + 1;
                 }
 
-                push(Mode.Layout);
+                push(new LayoutMode());
                 push(Mode.TagName);
-                currentTagName.setLength(0);
             } else if (previousChar8 == '@' && previousChar7 == 'e' && previousChar6 == 'n' && previousChar5 == 'd' && previousChar4 == 'l' && previousChar3 == 'a' && previousChar2 == 'y' && previousChar1 == 'o' && previousChar0 == 'u' && currentChar == 't') {
                 pop();
                 lastIndex = i + 1;
@@ -290,6 +307,16 @@ final class TemplateParser {
         currentMode = stack.peek();
     }
 
+    private <T extends Mode> T getPreviousMode(Class<T> modeClass) {
+        for (Mode mode : stack) {
+            if (modeClass.isAssignableFrom(mode.getClass())) {
+                //noinspection unchecked
+                return (T)mode;
+            }
+        }
+        throw new IllegalStateException("Expected mode of type " + modeClass + " on the stack, but found nothing!");
+    }
+
     private void extract(String templateCode, int startIndex, int endIndex, VisitorCallback callback) {
         if (startIndex < 0) {
             return;
@@ -304,22 +331,56 @@ final class TemplateParser {
         void accept(int depth, String content);
     }
 
-    enum Mode {
-        Text,
-        Code,
-        SafeCode,
-        CodeStatement,
-        Condition,
-        JavaCode,
-        JavaCodeString,
-        ConditionElse,
-        ForLoop,
-        ForLoopCode,
-        Tag,
-        TagName,
-        Layout,
-        LayoutDefine,
-        LayoutRender,
-        Comment,
+    private interface Mode {
+        Mode Text = new StatelessMode();
+        Mode Code = new StatelessMode();
+        Mode SafeCode = new StatelessMode();
+        Mode CodeStatement = new StatelessMode();
+        Mode Condition = new StatelessMode();
+        Mode JavaCode = new StatelessMode(true);
+        Mode JavaCodeParam = new StatelessMode(true);
+        Mode JavaCodeString = new StatelessMode();
+        Mode ConditionElse = new StatelessMode();
+        Mode ForLoop = new StatelessMode();
+        Mode ForLoopCode = new StatelessMode();
+        Mode TagName = new StatelessMode();
+        Mode LayoutDefine = new StatelessMode();
+        Mode LayoutRender = new StatelessMode();
+        Mode Comment = new StatelessMode();
+
+        boolean isJava();
+    }
+
+    private static class StatelessMode implements Mode {
+        private final boolean java;
+
+        private StatelessMode() {
+            this(false);
+        }
+
+        private StatelessMode(boolean java) {
+            this.java = java;
+        }
+
+        @Override
+        public boolean isJava() {
+            return java;
+        }
+    }
+
+    private static abstract class TagOrLayoutMode implements Mode {
+        final StringBuilder name = new StringBuilder();
+        final List<String> params = new ArrayList<>();
+
+        @Override
+        public boolean isJava() {
+            return false;
+        }
+    }
+
+    private static class TagMode extends TagOrLayoutMode {
+    }
+
+    private static class LayoutMode extends TagOrLayoutMode {
     }
 }

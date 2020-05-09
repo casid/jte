@@ -1,5 +1,7 @@
 package org.jusecase.jte.internal;
 
+import java.util.List;
+
 interface TemplateParserVisitor {
     void onTextPart(int depth, String textPart);
 
@@ -21,9 +23,9 @@ interface TemplateParserVisitor {
 
     void onForLoopEnd(int depth);
 
-    void onTag(int depth, String name, String params);
+    void onTag(int depth, String name, List<String> params);
 
-    void onLayout(int depth, String name, String params);
+    void onLayout(int depth, String name, List<String> params);
 
     void onLayoutRender(int depth, String name);
 

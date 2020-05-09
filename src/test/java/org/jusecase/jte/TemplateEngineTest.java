@@ -286,6 +286,36 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithDefaultParam() {
+        givenTag("named", "@param int one = 1\n" +
+                "@param int two = 2\n" +
+                "${one}, ${two}");
+        givenTemplate("@tag.named()");
+
+        thenOutputIs("1, 2");
+    }
+
+    @Test
+    void tagWithDefaultParam_firstSet() {
+        givenTag("named", "@param int one = 1\n" +
+                "@param int two = 2\n" +
+                "${one}, ${two}");
+        givenTemplate("@tag.named(one: 6)");
+
+        thenOutputIs("6, 2");
+    }
+
+    @Test
+    void tagWithDefaultParam_secondSet() {
+        givenTag("named", "@param int one = 1\n" +
+                "@param int two = 2\n" +
+                "${one}, ${two}");
+        givenTemplate("@tag.named(two: 5)");
+
+        thenOutputIs("1, 5");
+    }
+
+    @Test
     void hotReload() {
         givenTemplate("${model.hello} World");
         thenOutputIs("Hello World");
@@ -378,6 +408,20 @@ public class TemplateEngineTest {
         thenOutputIs("<header>this is the header</header>" +
                 "<content><content-prefix><b>this is the content</b><content-suffix></content>" +
                 "<footer></footer>");
+    }
+
+    @Test
+    void layoutWithNamedParams() {
+        givenLayout("main",
+                "@param int status = 5\n" +
+                "@param int duration = -1\n" +
+                "Hello, @render(content) your status is ${status}, the duration is ${duration}");
+
+        givenTemplate("@layout.main()" +
+                "@define(content)Sir@enddefine" +
+                "@endlayout");
+
+        thenOutputIs("Hello, Sir your status is 5, the duration is -1");
     }
 
     @Test

@@ -351,25 +351,44 @@ public class TemplateCompiler {
         }
 
         private void appendParams(String name, List<String> params) {
-            if (params.isEmpty()) {
-                return;
-            }
-
             List<ParamInfo> paramInfos = paramOrder.get(name);
             if (paramInfos == null) {
                 throw new IllegalStateException("No parameter information for " + name);
             }
 
-            params.stream().map(ParamCallInfo::new).sorted((p1, p2) -> {
-                int i1 = getParameterIndex(name, paramInfos, p1);
-                int i2 = getParameterIndex(name, paramInfos, p2);
-                return i1 - i2;
-            }).forEach(p -> javaCode.append(", ").append(p.data));
+            if (paramInfos.isEmpty()) {
+                return;
+            }
+
+            int index = 0;
+            ParamCallInfo[] paramCallInfos = new ParamCallInfo[paramInfos.size()];
+            for (String param : params) {
+                ParamCallInfo paramCallInfo = new ParamCallInfo(param);
+                int parameterIndex = getParameterIndex(name, paramInfos, paramCallInfo);
+                if (parameterIndex == -1) {
+                    parameterIndex = index;
+                }
+                paramCallInfos[parameterIndex] = paramCallInfo;
+
+                ++index;
+            }
+
+            for (int i = 0; i < paramCallInfos.length; i++) {
+                ParamCallInfo paramCallInfo = paramCallInfos[i];
+                if (paramCallInfo != null) {
+                    javaCode.append(", ").append(paramCallInfo.data);
+                } else {
+                    ParamInfo paramInfo = paramInfos.get(i);
+                    if (paramInfo.defaultValue != null) {
+                        javaCode.append(", ").append(paramInfo.defaultValue);
+                    }
+                }
+            }
         }
 
         private int getParameterIndex(String name, List<ParamInfo> paramInfos, ParamCallInfo paramCallInfo) {
             if (paramCallInfo.name == null) {
-                return 0;
+                return -1;
             }
 
             for (int i = 0; i < paramInfos.size(); ++i) {

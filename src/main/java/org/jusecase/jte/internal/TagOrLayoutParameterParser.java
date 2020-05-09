@@ -24,12 +24,14 @@ final class TagOrLayoutParameterParser {
     static final class ParamInfo {
         final String type;
         final String name;
+        final String defaultValue;
 
         private ParamInfo(String parameterString) {
             int typeStartIndex = -1;
             int typeEndIndex = -1;
             int nameStartIndex = -1;
             int nameEndIndex = -1;
+            int defaultValueStartIndex = -1;
             for (int i = 0; i < parameterString.length(); ++i) {
                 char character = parameterString.charAt(i);
 
@@ -46,8 +48,13 @@ final class TagOrLayoutParameterParser {
                         nameStartIndex = i;
                     }
                 } else if (nameEndIndex == -1) {
-                    if (Character.isWhitespace(character)) {
+                    if (Character.isWhitespace(character) || character == '=') {
                         nameEndIndex = i;
+                        i += 1;
+                    }
+                } else if (defaultValueStartIndex == -1) {
+                    if (!Character.isWhitespace(character)) {
+                        defaultValueStartIndex = i;
                     }
                 }
             }
@@ -63,6 +70,12 @@ final class TagOrLayoutParameterParser {
             }
 
             this.name = parameterString.substring(nameStartIndex, nameEndIndex);
+
+            if (defaultValueStartIndex == -1) {
+                this.defaultValue = null;
+            } else {
+                this.defaultValue = parameterString.substring(defaultValueStartIndex);
+            }
         }
     }
 }

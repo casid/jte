@@ -28,7 +28,7 @@ public class TemplateCompiler {
 
     private final Path classDirectory;
     private final String packageName;
-    private final boolean debug = true;
+    private final boolean debug = false;
     private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
 

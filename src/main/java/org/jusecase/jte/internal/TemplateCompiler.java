@@ -514,7 +514,7 @@ public class TemplateCompiler {
                     if (character == '"' || character == '\'') {
                         break;
                     }
-                    if (character == ':') {
+                    if (character == '=') {
                         nameEndIndex = i;
                     }
                 } else if (dataStartIndex == -1) {
@@ -525,8 +525,8 @@ public class TemplateCompiler {
             }
 
             if (nameEndIndex != -1 && dataStartIndex != -1) {
-                name = param.substring(0, nameEndIndex);
-                data = param.substring(dataStartIndex);
+                name = param.substring(0, nameEndIndex).trim();
+                data = param.substring(dataStartIndex).trim();
             } else {
                 name = null;
                 data = param;

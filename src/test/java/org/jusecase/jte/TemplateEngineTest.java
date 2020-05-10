@@ -268,7 +268,7 @@ public class TemplateEngineTest {
         givenTag("named", "@param int one\n" +
                 "@param int two\n" +
                 "${one}, ${two}");
-        givenTemplate("@tag.named(two: 2, one: 1)");
+        givenTemplate("@tag.named(two = 2, one = 1)");
         thenOutputIs("1, 2");
     }
 
@@ -279,10 +279,19 @@ public class TemplateEngineTest {
                 "@param String three\n" +
                 "${one}, ${two}, ${three}");
         givenTemplate("@tag.named(\n" +
-                "two: 2,\n" +
-                "three: \"Hello, there ;-)\",\n" +
-                "one: 1)");
+                "two = 2,\n" +
+                "three = \"Hello, there ;-)\",\n" +
+                "one = 1)");
         thenOutputIs("1, 2, Hello, there ;-)");
+    }
+
+    @Test
+    void tagWithNamedParam_ternary() {
+        givenTag("named", "@param int one\n" +
+                "@param int two\n" +
+                "${one}, ${two}");
+        givenTemplate("@tag.named(two = 1 == 2 ? 1 : 0, one = 1)");
+        thenOutputIs("1, 0");
     }
 
     @Test
@@ -300,7 +309,7 @@ public class TemplateEngineTest {
         givenTag("named", "@param int one = 1\n" +
                 "@param int two = 2\n" +
                 "${one}, ${two}");
-        givenTemplate("@tag.named(one: 6)");
+        givenTemplate("@tag.named(one = 6)");
 
         thenOutputIs("6, 2");
     }
@@ -310,7 +319,7 @@ public class TemplateEngineTest {
         givenTag("named", "@param int one = 1\n" +
                 "@param int two = 2\n" +
                 "${one}, ${two}");
-        givenTemplate("@tag.named(two: 5)");
+        givenTemplate("@tag.named(two= 5)");
 
         thenOutputIs("1, 5");
     }

@@ -83,6 +83,10 @@ public class TemplateCompiler {
         }
     }
 
+    public void cleanAll() {
+        IoUtils.deleteDirectoryContent(classDirectory);
+    }
+
     public void precompileAll() {
         precompile(codeResolver.resolveAllTemplateNames());
     }

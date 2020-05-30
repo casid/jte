@@ -1,9 +1,10 @@
 package org.jusecase.jte.internal;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 
 public final class IoUtils {
     public static String toString(InputStream inputStream) throws IOException {
@@ -14,5 +15,22 @@ public final class IoUtils {
             result.write(buffer, 0, length);
         }
         return result.toString(StandardCharsets.UTF_8);
+    }
+
+    public static void deleteDirectoryContent(Path directory) {
+        if (!Files.exists(directory)) {
+            return;
+        }
+
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            Files.walk(directory)
+                    .filter(d -> d != directory)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }

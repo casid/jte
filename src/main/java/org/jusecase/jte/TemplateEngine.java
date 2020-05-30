@@ -64,6 +64,10 @@ public final class TemplateEngine {
         resolveTemplate(name);
     }
 
+    public void cleanAll() {
+        compiler.cleanAll();
+    }
+
     public void precompileAll() {
         compiler.precompileAll();
     }

@@ -9,6 +9,7 @@ public class PreCompileTemplatesTest {
     @Test
     void precompileAll() {
         TemplateEngine templateEngine = new TemplateEngine(new DirectoryCodeResolver(Path.of("src/test/resources/benchmark")), Path.of("jte"));
+        templateEngine.cleanAll();
         templateEngine.precompileAll();
     }
 }

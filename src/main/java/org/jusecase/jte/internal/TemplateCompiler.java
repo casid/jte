@@ -4,8 +4,6 @@ import org.jusecase.jte.CodeResolver;
 import org.jusecase.jte.internal.TagOrLayoutParameterParser.ParamInfo;
 import org.jusecase.jte.output.FileOutput;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
@@ -73,7 +71,7 @@ public class TemplateCompiler {
             return (Template<?>) classLoader.loadClass(templateInfo.fullName).getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             if (firstAttempt) {
-                precompile(List.of(name));
+                precompile(List.of(name), null);
                 return loadPrecompiled(name, false);
             } else {
                 throw new RuntimeException(e);
@@ -87,11 +85,11 @@ public class TemplateCompiler {
         IoUtils.deleteDirectoryContent(classDirectory);
     }
 
-    public void precompileAll() {
-        precompile(codeResolver.resolveAllTemplateNames());
+    public void precompileAll(List<String> compilePath) {
+        precompile(codeResolver.resolveAllTemplateNames(), compilePath);
     }
 
-    public void precompile(List<String> names) {
+    public void precompile(List<String> names, List<String> compilePath) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
             generateTemplate(name, classDefinitions);
@@ -111,11 +109,7 @@ public class TemplateCompiler {
             files[i++] = classDirectory.resolve(classDefinition.getJavaFileName()).toFile().getAbsolutePath();
         }
 
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        int result = compiler.run(null, null, null, files);
-        if (result != 0) {
-            throw new RuntimeException("Java compiler failed with error code " + result + ", failed to compile templates");
-        }
+        ClassFilesCompiler.compile(files, compilePath);
     }
 
     private ClassDefinition generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {

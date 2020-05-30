@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jusecase</groupId>
-    <artifactId>java-template-engine</artifactId>
+    <artifactId>jte</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>Java Template Engine</name>
-    <description>A template engine using native java code.</description>
+    <description>A template engine using plain Java code.</description>
     <url>http://jusecase.org</url>
     <developers>
         <developer>
@@ -33,7 +33,7 @@
     </licenses>
 
     <scm>
-        <url>todo</url>
+        <url>https://github.com/casid/jte.git</url>
     </scm>
 
     <properties>

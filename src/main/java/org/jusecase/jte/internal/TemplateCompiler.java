@@ -112,7 +112,10 @@ public class TemplateCompiler {
         }
 
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        compiler.run(null, null, null, files);
+        int result = compiler.run(null, null, null, files);
+        if (result != 0) {
+            throw new RuntimeException("Java compiler failed with error code " + result + ", failed to compile templates");
+        }
     }
 
     private ClassDefinition generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {

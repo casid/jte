@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class TemplateParameterParser {
-    List<String> importClasses = new ArrayList<>();
+    final List<String> importClasses = new ArrayList<>();
 
     int lastIndex;
     String className;

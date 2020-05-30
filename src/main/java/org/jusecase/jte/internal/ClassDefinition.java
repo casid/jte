@@ -27,9 +27,7 @@ public final class ClassDefinition {
 
         ClassDefinition that = (ClassDefinition) o;
 
-        if (!name.equals(that.name)) return false;
-
-        return true;
+        return name.equals(that.name);
     }
 
     @Override

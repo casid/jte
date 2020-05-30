@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class TagOrLayoutParameterParser {
-    List<String> importClasses = new ArrayList<>();
-    List<ParamInfo> parameters = new ArrayList<>();
+    final List<String> importClasses = new ArrayList<>();
+    final List<ParamInfo> parameters = new ArrayList<>();
 
     public int parse(String templateCode) {
         return new ParameterParser(templateCode, new ParameterParserVisitor() {

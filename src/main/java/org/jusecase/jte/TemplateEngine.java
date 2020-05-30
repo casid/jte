@@ -2,6 +2,7 @@ package org.jusecase.jte;
 
 import org.jusecase.jte.internal.Template;
 import org.jusecase.jte.internal.TemplateCompiler;
+import org.jusecase.jte.resolve.ResourceCodeResolver;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -58,10 +59,13 @@ public final class TemplateEngine {
 
     /**
      * Prepares the template with the given name for rendering
-     * @param name Template name
      */
     public void prepareForRendering(String name) {
         resolveTemplate(name);
+    }
+
+    public void precompileAll() {
+        compiler.precompileAll();
     }
 
     private Template resolveTemplate(String name) {

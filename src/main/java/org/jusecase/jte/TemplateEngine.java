@@ -79,4 +79,7 @@ public final class TemplateEngine {
         return templateCache.computeIfAbsent(name, compiler::compile);
     }
 
+    public void setNullSafeTemplateCode(boolean value) {
+        compiler.setNullSafeTemplateCode(value);
+    }
 }

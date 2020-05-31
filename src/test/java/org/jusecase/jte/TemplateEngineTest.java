@@ -6,6 +6,7 @@ import org.jusecase.jte.internal.TemplateCompiler;
 import org.jusecase.jte.output.StringOutput;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class TemplateEngineTest {
     String templateName = "test/template.jte";
@@ -87,10 +88,10 @@ public class TemplateEngineTest {
     @Test
     void condition_else() {
         givenTemplate("@if (model.x == 42)" +
-                            "Bingo" +
-                       "@else" +
-                            "Bongo" +
-                       "@endif");
+                "Bingo" +
+                "@else" +
+                "Bongo" +
+                "@endif");
 
         model.x = 42;
         thenOutputIs("Bingo");
@@ -101,10 +102,10 @@ public class TemplateEngineTest {
     @Test
     void condition_elseif() {
         givenTemplate("@if (model.x == 42)" +
-                            "Bingo" +
-                       "@elseif (model.x == 43)" +
-                            "Bongo" +
-                       "@endif!");
+                "Bingo" +
+                "@elseif (model.x == 43)" +
+                "Bongo" +
+                "@endif!");
 
         model.x = 42;
         thenOutputIs("Bingo!");
@@ -134,8 +135,8 @@ public class TemplateEngineTest {
     void loop() {
         model.array = new int[]{1, 2, 3};
         givenTemplate("@for (int i : model.array)" +
-                        "${i}" +
-                      "@endfor");
+                "${i}" +
+                "@endfor");
         thenOutputIs("123");
     }
 
@@ -143,10 +144,10 @@ public class TemplateEngineTest {
     void loopWithCondition() {
         model.array = new int[]{1, 2, 3};
         givenTemplate("@for (int i : model.array)" +
-                        "@if (i > 1)" +
-                            "${i}" +
-                        "@endif" +
-                      "@endfor");
+                "@if (i > 1)" +
+                "${i}" +
+                "@endif" +
+                "@endfor");
         thenOutputIs("23");
     }
 
@@ -154,11 +155,11 @@ public class TemplateEngineTest {
     void classicLoop() {
         model.array = new int[]{10, 20, 30};
         givenTemplate("@for (int i = 0; i < model.array.length; ++i)" +
-                        "Index ${i} is ${model.array[i]}" +
-                        "@if (i < model.array.length - 1)" +
-                            "<br>" +
-                        "@endif" +
-                      "@endfor");
+                "Index ${i} is ${model.array[i]}" +
+                "@if (i < model.array.length - 1)" +
+                "<br>" +
+                "@endif" +
+                "@endfor");
         thenOutputIs("Index 0 is 10<br>Index 1 is 20<br>Index 2 is 30");
     }
 
@@ -203,8 +204,8 @@ public class TemplateEngineTest {
     @Test
     void tag() {
         givenTag("card", "@param java.lang.String firstParam\n" +
-                         "@param int secondParam\n" +
-                         "One: ${firstParam}, two: ${secondParam}");
+                "@param int secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
         givenTemplate("@tag.card(model.hello, model.x), That was a tag!");
         thenOutputIs("One: Hello, two: 42, That was a tag!");
     }
@@ -221,7 +222,7 @@ public class TemplateEngineTest {
     @Test
     void tagInTag() {
         givenTag("divTwo", "@param int amount\n" +
-                         "Divided by two is ${amount / 2}!");
+                "Divided by two is ${amount / 2}!");
         givenTag("card", "@param java.lang.String firstParam\n" +
                 "@param int secondParam\n" +
                 "${firstParam}, @tag.divTwo(secondParam)");
@@ -242,7 +243,7 @@ public class TemplateEngineTest {
         givenTag("recursion", "@param int amount\n" +
                 "${amount}" +
                 "@if (amount > 0)" +
-                    "@tag.recursion(amount - 1)" +
+                "@tag.recursion(amount - 1)" +
                 "@endif"
         );
         givenTemplate("@tag.recursion(5)");
@@ -390,8 +391,8 @@ public class TemplateEngineTest {
     void nestedLayouts() {
         givenLayout("main",
                 "<header>@render(header)</header>" +
-                "<content>@render(content)</content>" +
-                "<footer>@render(footer)</footer>");
+                        "<content>@render(content)</content>" +
+                        "<footer>@render(footer)</footer>");
         givenLayout("mainExtended", "@layout.main()" +
                 "@define(content)" +
                 "@render(contentPrefix)" +
@@ -423,8 +424,8 @@ public class TemplateEngineTest {
     void layoutWithNamedParams() {
         givenLayout("main",
                 "@param int status = 5\n" +
-                "@param int duration = -1\n" +
-                "Hello, @render(content) your status is ${status}, the duration is ${duration}");
+                        "@param int duration = -1\n" +
+                        "Hello, @render(content) your status is ${status}, the duration is ${duration}");
 
         givenTemplate("@layout.main()" +
                 "@define(content)Sir@enddefine" +
@@ -437,13 +438,13 @@ public class TemplateEngineTest {
     void enumCheck() {
         givenRawTemplate(
                 "@import org.jusecase.jte.TemplateEngineTest.Model\n" +
-                "@import org.jusecase.jte.TemplateEngineTest.ModelType\n" +
-                "@param Model model\n" +
-                "@if (model.type == ModelType.One)" +
-                "one" +
-                "@else" +
-                "not one" +
-                "@endif");
+                        "@import org.jusecase.jte.TemplateEngineTest.ModelType\n" +
+                        "@param Model model\n" +
+                        "@if (model.type == ModelType.One)" +
+                        "one" +
+                        "@else" +
+                        "not one" +
+                        "@endif");
 
         model.type = ModelType.One;
         thenOutputIs("one");
@@ -455,12 +456,12 @@ public class TemplateEngineTest {
     @Test
     void nestedJavascript() {
         givenTemplate("@if (model.isCaseA() && model.isCaseB())\n" +
-                        "        <meta name=\"robots\" content=\"a, b\">\n" +
-                        "        @elseif (model.isCaseB())\n" +
-                        "        <meta name=\"robots\" content=\"b\">\n" +
-                        "        @elseif (model.isCaseA())\n" +
-                        "        <meta name=\"robots\" content=\"a\">\n" +
-                        "        @endif" +
+                "        <meta name=\"robots\" content=\"a, b\">\n" +
+                "        @elseif (model.isCaseB())\n" +
+                "        <meta name=\"robots\" content=\"b\">\n" +
+                "        @elseif (model.isCaseA())\n" +
+                "        <meta name=\"robots\" content=\"a\">\n" +
+                "        @endif" +
                 "@if (model.x > 0)\n" +
                 "        <meta name=\"description\" content=\"${model.x}\">\n" +
                 "        @endif\n" +
@@ -497,6 +498,87 @@ public class TemplateEngineTest {
         thenOutputIs("\\");
     }
 
+    @Test
+    void npe_if() {
+        model = null;
+        givenTemplate("@if(model.hello.equals(\"dummy\"))" +
+                "yes" +
+                "@else" +
+                "no" +
+                "@endif");
+
+        thenRenderingFailsWithException(NullPointerException.class);
+    }
+
+    @Test
+    void npe_nullSafe_if() {
+        templateEngine.setNullSafeTemplateCode(true);
+        model = null;
+        givenTemplate("@if(model.hello.equals(\"dummy\"))" +
+                "yes" +
+                "@else" +
+                "no" +
+                "@endif");
+
+        thenOutputIs("no");
+    }
+
+    @Test
+    void npe_nullSafe_elseif() {
+        templateEngine.setNullSafeTemplateCode(true);
+        model = null;
+        givenTemplate("@if(model.hello.equals(\"yes\"))" +
+                "yes" +
+                "@elseif(model.hello.equals(\"no\"))" +
+                "no" +
+                "@endif");
+
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_output() {
+        model = null;
+        givenTemplate("${model.hello} world");
+
+        thenRenderingFailsWithException(NullPointerException.class);
+    }
+
+    @Test
+    void npe_nullSafe_output() {
+        templateEngine.setNullSafeTemplateCode(true);
+        model = null;
+        givenTemplate("This is ${model.hello} world");
+
+        thenOutputIs("This is null world");
+    }
+
+    @Test
+    void npe_nullSafe_output_int() {
+        templateEngine.setNullSafeTemplateCode(true);
+        model = null;
+        givenTemplate("This is ${model.x}.");
+
+        thenOutputIs("This is 0.");
+    }
+
+    @Test
+    void npe_nullSafe_safeOutput() {
+        templateEngine.setNullSafeTemplateCode(true);
+        model = null;
+        givenTemplate("This is $safe{model.hello} world");
+
+        thenOutputIs("This is null world");
+    }
+
+    @Test
+    void npe_internal_stillThrown() {
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("This is ${model.getThatThrows()} world");
+
+        thenRenderingFailsWithException(NullPointerException.class);
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + TemplateCompiler.TAG_EXTENSION, code);
     }
@@ -519,6 +601,12 @@ public class TemplateEngineTest {
         templateEngine.render(templateName, model, output);
 
         assertThat(output.toString()).isEqualTo(expected);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private void thenRenderingFailsWithException(Class<? extends Throwable> clazz) {
+        Throwable throwable = catchThrowable(() -> thenOutputIs("ignored"));
+        assertThat(throwable).isInstanceOf(clazz);
     }
 
     public static class Model {
@@ -545,6 +633,11 @@ public class TemplateEngineTest {
         @SuppressWarnings("unused")
         public boolean isCaseB() {
             return false;
+        }
+
+        @SuppressWarnings("unused")
+        public String getThatThrows() {
+            throw new NullPointerException("Oops");
         }
     }
 

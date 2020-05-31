@@ -21,23 +21,19 @@ public class TemplateCompiler {
     public static final String LAYOUT_DIRECTORY = "layout/";
     public static final String CLASS_PREFIX = "Jte";
     public static final String CLASS_SUFFIX = "Generated";
+    public static final String PACKAGE_NAME = "org.jusecase.jte.generated";
 
     private final CodeResolver codeResolver;
 
     private final Path classDirectory;
-    private final String packageName;
     private final boolean debug = false;
     private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
+    private boolean nullSafeTemplateCode;
 
     public TemplateCompiler(CodeResolver codeResolver, Path classDirectory) {
-        this(codeResolver, "org.jusecase.jte", classDirectory);
-    }
-
-    public TemplateCompiler(CodeResolver codeResolver, String packageName, Path classDirectory) {
         this.codeResolver = codeResolver;
         this.classDirectory = classDirectory;
-        this.packageName = packageName;
     }
 
     public Template<?> compile(String name) {
@@ -65,7 +61,7 @@ public class TemplateCompiler {
 
     private Template<?> loadPrecompiled(String name, boolean firstAttempt) {
         try {
-            ClassInfo templateInfo = new ClassInfo(name, packageName);
+            ClassInfo templateInfo = new ClassInfo(name, PACKAGE_NAME);
 
             URLClassLoader classLoader = new URLClassLoader(new URL[]{classDirectory.toUri().toURL()});
             return (Template<?>) classLoader.loadClass(templateInfo.fullName).getConstructor().newInstance();
@@ -123,7 +119,7 @@ public class TemplateCompiler {
 
         LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
 
-        ClassInfo templateInfo = new ClassInfo(name, packageName);
+        ClassInfo templateInfo = new ClassInfo(name, PACKAGE_NAME);
 
         TemplateParameterParser attributeParser = new TemplateParameterParser();
         attributeParser.parse(templateCode);
@@ -163,7 +159,7 @@ public class TemplateCompiler {
 
     private ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
         templateDependencies.add(name);
-        ClassInfo classInfo = new ClassInfo(name, packageName);
+        ClassInfo classInfo = new ClassInfo(name, PACKAGE_NAME);
 
         ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName);
         if (classDefinitions.contains(classDefinition)) {
@@ -215,7 +211,7 @@ public class TemplateCompiler {
             return;
         }
 
-        ClassInfo classInfo = new ClassInfo(name, packageName);
+        ClassInfo classInfo = new ClassInfo(name, PACKAGE_NAME);
         ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName);
 
         deleteFile(classDirectory.resolve(classDefinition.getJavaFileName()));
@@ -243,6 +239,9 @@ public class TemplateCompiler {
         return result;
     }
 
+    public void setNullSafeTemplateCode(boolean nullSafeTemplateCode) {
+        this.nullSafeTemplateCode = nullSafeTemplateCode;
+    }
 
     private class CodeGenerator implements TemplateParserVisitor {
         private final TemplateType type;
@@ -272,13 +271,25 @@ public class TemplateCompiler {
         @Override
         public void onCodePart(int depth, String codePart) {
             writeIndentation(depth);
-            javaCode.append("output.writeUnsafe(").append(codePart).append(");\n");
+            javaCode.append("output.writeUnsafe(");
+            if (nullSafeTemplateCode) {
+                javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ").append(codePart).append(")");
+            } else {
+                javaCode.append(codePart);
+            }
+            javaCode.append(");\n");
         }
 
         @Override
         public void onSafeCodePart(int depth, String codePart) {
             writeIndentation(depth);
-            javaCode.append("output.writeSafe(").append(codePart).append(");\n");
+            javaCode.append("output.writeSafe(");
+            if (nullSafeTemplateCode) {
+                javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ").append(codePart).append(")");
+            } else {
+                javaCode.append(codePart);
+            }
+            javaCode.append(");\n");
         }
 
         @Override
@@ -290,13 +301,29 @@ public class TemplateCompiler {
         @Override
         public void onConditionStart(int depth, String condition) {
             writeIndentation(depth);
-            javaCode.append("if (").append(condition).append(") {\n");
+            javaCode.append("if (");
+
+            if (nullSafeTemplateCode) {
+                javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ").append(condition).append(")");
+            } else {
+                javaCode.append(condition);
+            }
+
+            javaCode.append(") {\n");
         }
 
         @Override
         public void onConditionElse(int depth, String condition) {
             writeIndentation(depth);
-            javaCode.append("} else if (").append(condition).append(") {\n");
+            javaCode.append("} else if (");
+
+            if (nullSafeTemplateCode) {
+                javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ").append(condition).append(")");
+            } else {
+                javaCode.append(condition);
+            }
+
+            javaCode.append(") {\n");
         }
 
         @Override

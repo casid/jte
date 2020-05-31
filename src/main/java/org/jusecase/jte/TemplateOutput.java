@@ -9,9 +9,7 @@ public interface TemplateOutput {
     }
 
     default void writeSafe(Object value) {
-        if (value == null) {
-            writeSafeContent("null");
-        } else {
+        if (value != null) {
             writeSafeContent(value.toString());
         }
     }
@@ -45,9 +43,7 @@ public interface TemplateOutput {
     }
 
     default void writeUnsafe(Object value) {
-        if (value == null) {
-            writeSafeContent("null");
-        } else {
+        if (value != null) {
             writeUnsafeContent(value.toString());
         }
     }

@@ -568,6 +568,15 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void npe_nullSafe_output_object() {
+        templateEngine.setNullSafeTemplateCode(true);
+        model = null;
+        givenTemplate("This is ${model.type} world");
+
+        thenOutputIs("This is  world");
+    }
+
+    @Test
     void npe_nullSafe_safeOutput() {
         templateEngine.setNullSafeTemplateCode(true);
         model = null;

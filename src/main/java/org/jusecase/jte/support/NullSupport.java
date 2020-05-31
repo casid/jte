@@ -30,12 +30,12 @@ public final class NullSupport {
         }
     }
 
-    public static String evaluate(Supplier<String> expression) {
+    public static <T> T evaluate(Supplier<T> expression) {
         try {
             return expression.get();
         } catch (NullPointerException e) {
             if (isTemplateOrigin(e)) {
-                return "";
+                return null;
             }
             throw e;
         }

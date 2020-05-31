@@ -5,6 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.jusecase.jte.internal.TemplateCompiler;
 import org.jusecase.jte.output.StringOutput;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
@@ -579,6 +584,135 @@ public class TemplateEngineTest {
         thenRenderingFailsWithException(NullPointerException.class);
     }
 
+    @Test
+    void npe_nullSafe_for_booleanArray() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (boolean i : model.booleanArray)" +
+                "${i}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_byteArray() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (byte i : model.byteArray)" +
+                "${i}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_shortArray() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (short i : model.shortArray)" +
+                "${i}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_intArray() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (int i : model.intArray)" +
+                "${i}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_longArray() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (long i : model.longArray)" +
+                "${i}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_floatArray() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (float i : model.floatArray)" +
+                "${i}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_doubleArray() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (double i : model.doubleArray)" +
+                "${i}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_list() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (String s : model.list)" +
+                "${s}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_arrayList() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (String s : model.arrayList)" +
+                "${s}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_iterable() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (String s : model.iterable)" +
+                "${s}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_set() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (String s : model.set)" +
+                "${s}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_nullSafe_for_collection() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("@for (String s : model.collection)" +
+                "${s}" +
+                "@endfor");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_for() {
+        model = null;
+        givenTemplate("@for (int i : model.array)" +
+                "${i}" +
+                "@endfor");
+        thenRenderingFailsWithException(NullPointerException.class);
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + TemplateCompiler.TAG_EXTENSION, code);
     }
@@ -609,33 +743,43 @@ public class TemplateEngineTest {
         assertThat(throwable).isInstanceOf(clazz);
     }
 
+    @SuppressWarnings("unused")
     public static class Model {
         public String hello;
         public int x;
         public int[] array;
         public ModelType type;
 
-        @SuppressWarnings("unused")
+        // For null iteration tests
+        public boolean[] booleanArray;
+        public byte[] byteArray;
+        public short[] shortArray;
+        public int[] intArray;
+        public long[] longArray;
+        public float[] floatArray;
+        public double[] doubleArray;
+        public List<String> list;
+        public ArrayList<String> arrayList;
+        public Set<String> set;
+        public Collection<String> collection;
+        public Iterable<String> iterable;
+
         public String getAnotherWorld() {
             return "Another World";
         }
 
-        @SuppressWarnings("unused")
         public void setX(int amount) {
             x = amount;
         }
 
-        @SuppressWarnings("unused")
         public boolean isCaseA() {
             return true;
         }
 
-        @SuppressWarnings("unused")
         public boolean isCaseB() {
             return false;
         }
 
-        @SuppressWarnings("unused")
         public String getThatThrows() {
             throw new NullPointerException("Oops");
         }

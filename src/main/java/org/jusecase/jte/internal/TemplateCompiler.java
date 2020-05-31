@@ -341,7 +341,21 @@ public class TemplateCompiler {
         @Override
         public void onForLoopStart(int depth, String codePart) {
             writeIndentation(depth);
-            javaCode.append("for (").append(codePart).append(") {\n");
+            javaCode.append("for (");
+            if (nullSafeTemplateCode) {
+                int index = codePart.indexOf(':');
+                if (index == -1) {
+                    javaCode.append(codePart);
+                } else {
+                    javaCode.append(codePart, 0, index + 1);
+                    javaCode.append(" org.jusecase.jte.support.NullSupport.evaluateIterable(() -> ");
+                    javaCode.append(codePart, index + 2, codePart.length());
+                    javaCode.append(")");
+                }
+            } else {
+                javaCode.append(codePart);
+            }
+            javaCode.append(") {\n");
         }
 
         @Override

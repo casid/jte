@@ -550,7 +550,7 @@ public class TemplateEngineTest {
         model = null;
         givenTemplate("This is ${model.hello} world");
 
-        thenOutputIs("This is null world");
+        thenOutputIs("This is  world");
     }
 
     @Test
@@ -559,7 +559,7 @@ public class TemplateEngineTest {
         model = null;
         givenTemplate("This is ${model.x}.");
 
-        thenOutputIs("This is 0.");
+        thenOutputIs("This is .");
     }
 
     @Test
@@ -568,7 +568,7 @@ public class TemplateEngineTest {
         model = null;
         givenTemplate("This is $safe{model.hello} world");
 
-        thenOutputIs("This is null world");
+        thenOutputIs("This is  world");
     }
 
     @Test

@@ -2,9 +2,7 @@ package org.jusecase.jte.support;
 
 import org.jusecase.jte.internal.TemplateCompiler;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 @SuppressWarnings("unused") // Used by generated template code
 public final class NullSupport {
@@ -24,18 +22,40 @@ public final class NullSupport {
             return expression.get();
         } catch (NullPointerException e) {
             if (isTemplateOrigin(e)) {
-                return null;
+                return "";
             }
             throw e;
         }
     }
 
-    public static int evaluate(IntSupplier expression) {
+    public static String evaluate(IntSupplier expression) {
         try {
-            return expression.getAsInt();
+            return String.valueOf(expression.getAsInt());
         } catch (NullPointerException e) {
             if (isTemplateOrigin(e)) {
-                return 0;
+                return "";
+            }
+            throw e;
+        }
+    }
+
+    public static String evaluate(LongSupplier expression) {
+        try {
+            return String.valueOf(expression.getAsLong());
+        } catch (NullPointerException e) {
+            if (isTemplateOrigin(e)) {
+                return "";
+            }
+            throw e;
+        }
+    }
+
+    public static String evaluate(DoubleSupplier expression) {
+        try {
+            return String.valueOf(expression.getAsDouble());
+        } catch (NullPointerException e) {
+            if (isTemplateOrigin(e)) {
+                return "";
             }
             throw e;
         }

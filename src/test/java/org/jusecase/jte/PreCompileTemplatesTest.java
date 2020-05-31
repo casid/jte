@@ -30,8 +30,8 @@ public class PreCompileTemplatesTest {
             templateEngine.cleanAll();
             templateEngine.precompileAll(Arrays.asList("src/test/resources/external/external.jar", "target/classes"));
 
-            assertThat(Files.exists(Path.of("jte", "org", "jusecase", "jte", "JteexternalGenerated.java"))).isTrue();
-            assertThat(Files.exists(Path.of("jte", "org", "jusecase", "jte", "JteexternalGenerated.class"))).isTrue();
+            assertThat(Files.exists(Path.of("jte", "org", "jusecase", "jte", "generated", "JteexternalGenerated.java"))).isTrue();
+            assertThat(Files.exists(Path.of("jte", "org", "jusecase", "jte", "generated", "JteexternalGenerated.class"))).isTrue();
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }

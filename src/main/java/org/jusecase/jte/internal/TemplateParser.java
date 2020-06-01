@@ -7,6 +7,7 @@ import java.util.List;
 
 final class TemplateParser {
     private static final int LAYOUT_DEFINITION_DEPTH = 4;
+    private static final int LET_DEPTH = 1;
 
     private final TemplateType type;
     private final Deque<Mode> stack = new ArrayDeque<>();
@@ -108,7 +109,15 @@ final class TemplateParser {
                 }
 
                 push(Mode.Condition);
-            } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
+            } else if (previousChar2 == '@' && previousChar1 == 'l' && previousChar0 == 'e' && currentChar == 't') {
+                if (currentMode == Mode.Text) {
+                    extract(templateCode, lastIndex, i - 3, visitor::onTextPart);
+                    lastIndex = i + 1;
+                }
+
+                push(new LetMode());
+                push(Mode.LetName);
+            } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse || currentMode instanceof LetMode)) {
                 lastIndex = i + 1;
                 push(Mode.JavaCode);
             } else if (currentChar == '(' && currentMode.isJava()) {
@@ -119,6 +128,13 @@ final class TemplateParser {
                     extract(templateCode, lastIndex, i, (d, c) -> {
                         if (c != null && !c.isBlank()) {
                             previousMode.params.add(c);
+                        }
+                    });
+                } else if (currentMode == Mode.LetCode) {
+                    LetMode previousMode = getPreviousMode(LetMode.class);
+                    extract(templateCode, lastIndex, i, (d, c) -> {
+                        if (c != null && !c.isBlank()) {
+                            previousMode.code.append(c.trim());
                         }
                     });
                 }
@@ -133,6 +149,12 @@ final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onConditionElse);
                     lastIndex = i + 1;
                     push(Mode.Text);
+                } else if (currentMode instanceof LetMode) {
+                    LetMode letMode = (LetMode)currentMode;
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onLetStart(d, letMode.name.toString(), letMode.code.toString()));
+                    lastIndex = i + 1;
+                    push(Mode.Text);
+                    depth += LET_DEPTH;
                 } else if (currentMode instanceof TagMode) {
                     TagMode tagMode = (TagMode)currentMode;
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, tagMode.name.toString(), tagMode.params));
@@ -141,6 +163,14 @@ final class TemplateParser {
                 } else if (currentMode instanceof LayoutMode) {
                     LayoutMode layoutMode = (LayoutMode)currentMode;
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, layoutMode.name.toString(), layoutMode.params));
+                }
+            } else if (currentMode == Mode.LetName) {
+                if (currentChar == '=') {
+                    pop();
+                    push(Mode.LetCode);
+                    lastIndex = i + 1;
+                } else if (currentChar != ' ' && currentChar != '(') {
+                    getPreviousMode(LetMode.class).name.append(currentChar);
                 }
             } else if (currentChar == ',' && currentMode == Mode.JavaCodeParam) {
                 TagOrLayoutMode previousMode = getPreviousMode(TagOrLayoutMode.class);
@@ -184,6 +214,19 @@ final class TemplateParser {
 
                 if (currentMode == Mode.Condition || currentMode == Mode.ConditionElse) {
                     visitor.onConditionEnd(depth);
+                    pop();
+                }
+            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'l' && previousChar0 == 'e' && currentChar == 't') {
+                if (currentMode == Mode.Text) {
+                    extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
+                }
+                lastIndex = i + 1;
+
+                pop();
+
+                if (currentMode instanceof LetMode) {
+                    depth -= LET_DEPTH;
+                    visitor.onLetEnd(depth);
                     pop();
                 }
             } else if (previousChar2 == '@' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r') {
@@ -348,6 +391,8 @@ final class TemplateParser {
         Mode LayoutDefine = new StatelessMode();
         Mode LayoutRender = new StatelessMode();
         Mode Comment = new StatelessMode();
+        Mode LetName = new StatelessMode();
+        Mode LetCode = new StatelessMode(true);
 
         boolean isJava();
     }
@@ -366,6 +411,16 @@ final class TemplateParser {
         @Override
         public boolean isJava() {
             return java;
+        }
+    }
+
+    private static class LetMode implements Mode {
+        final StringBuilder name = new StringBuilder();
+        final StringBuilder code = new StringBuilder();
+
+        @Override
+        public boolean isJava() {
+            return false;
         }
     }
 

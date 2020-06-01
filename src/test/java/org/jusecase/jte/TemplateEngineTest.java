@@ -722,6 +722,29 @@ public class TemplateEngineTest {
         thenRenderingFailsWithException(NullPointerException.class);
     }
 
+    @Test
+    void npe_statement() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("!{var x = model.hello.length()}${x}");
+        thenOutputIs("");
+    }
+
+    @Test
+    void npe_statement_notNull() {
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("!{var x = model.hello.length()}${x}");
+        thenOutputIs("5");
+    }
+
+    @Test
+    void npe_call() {
+        model = null;
+        templateEngine.setNullSafeTemplateCode(true);
+        givenTemplate("!{model.hello.length()}");
+        thenOutputIs("");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + TemplateCompiler.TAG_EXTENSION, code);
     }

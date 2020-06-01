@@ -295,7 +295,22 @@ public class TemplateCompiler {
         @Override
         public void onCodeStatement(int depth, String codePart) {
             writeIndentation(depth);
-            javaCode.append(codePart).append(";\n");
+            if (nullSafeTemplateCode) {
+                int index = codePart.indexOf('=');
+                if (index == -1) {
+                    javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ");
+                    javaCode.append(codePart);
+                    javaCode.append(")");
+                } else {
+                    javaCode.append(codePart, 0, index + 1);
+                    javaCode.append(" org.jusecase.jte.support.NullSupport.evaluate(() -> ");
+                    javaCode.append(codePart, index + 2, codePart.length());
+                    javaCode.append(")");
+                }
+            } else {
+                javaCode.append(codePart);
+            }
+            javaCode.append(";\n");
         }
 
         @Override

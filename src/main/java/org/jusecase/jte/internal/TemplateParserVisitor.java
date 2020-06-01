@@ -19,10 +19,6 @@ interface TemplateParserVisitor {
 
     void onConditionEnd(int depth);
 
-    void onLetStart(int depth, String name, String code);
-
-    void onLetEnd(int depth);
-
     void onForLoopStart(int depth, String codePart);
 
     void onForLoopEnd(int depth);

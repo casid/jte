@@ -339,24 +339,6 @@ public class TemplateCompiler {
         }
 
         @Override
-        public void onLetStart(int depth, String name, String code) {
-            writeIndentation(depth);
-            javaCode.append("{\n");
-            writeIndentation(depth + 1);
-            javaCode.append("var ").append(name).append(" = org.jusecase.jte.support.NullSupport.evaluate(() -> ").append(code).append(");\n");
-            writeIndentation(depth + 1);
-            javaCode.append("if (").append(name).append(" != null) {\n");
-        }
-
-        @Override
-        public void onLetEnd(int depth) {
-            writeIndentation(depth + 1);
-            javaCode.append("}\n");
-            writeIndentation(depth);
-            javaCode.append("}\n");
-        }
-
-        @Override
         public void onForLoopStart(int depth, String codePart) {
             writeIndentation(depth);
             javaCode.append("for (");

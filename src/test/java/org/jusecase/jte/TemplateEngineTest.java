@@ -137,20 +137,6 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void condition_let() {
-        givenTemplate("@let(type = model.type)<b>${type}</b>@endlet");
-
-        model.type = null;
-        thenOutputIs("");
-
-        model.type = ModelType.One;
-        thenOutputIs("<b>One</b>");
-
-        model = null;
-        thenOutputIs("");
-    }
-
-    @Test
     void loop() {
         model.array = new int[]{1, 2, 3};
         givenTemplate("@for (int i : model.array)" +

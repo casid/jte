@@ -2,6 +2,7 @@ package org.jusecase.jte.internal;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+import java.io.File;
 import java.util.List;
 
 public class ClassFilesCompiler {
@@ -9,7 +10,7 @@ public class ClassFilesCompiler {
         if (compilePath != null && !compilePath.isEmpty()) {
             String[] args = new String[files.length + 2];
             args[0] = "-classpath";
-            args[1] = String.join(":", compilePath);
+            args[1] = String.join(File.pathSeparator, compilePath);
             System.arraycopy(files, 0, args, 2, files.length);
 
             runCompiler(args);

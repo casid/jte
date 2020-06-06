@@ -58,6 +58,7 @@ public final class TemplateEngine {
 
     /**
      * Prepares the template with the given name for rendering
+     * @param name template name
      */
     public void prepareForRendering(String name) {
         resolveTemplate(name);

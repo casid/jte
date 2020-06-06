@@ -270,26 +270,29 @@ public class TemplateCompiler {
 
         @Override
         public void onCodePart(int depth, String codePart) {
-            writeIndentation(depth);
-            javaCode.append("output.writeUnsafe(");
-            if (nullSafeTemplateCode) {
-                javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ").append(codePart).append(")");
-            } else {
-                javaCode.append(codePart);
-            }
-            javaCode.append(");\n");
+            writeCodePart(depth, codePart, "output.writeUnsafe(");
         }
 
         @Override
         public void onSafeCodePart(int depth, String codePart) {
+            writeCodePart(depth, codePart, "output.writeSafe(");
+        }
+
+        private void writeCodePart(int depth, String codePart, String method) {
             writeIndentation(depth);
-            javaCode.append("output.writeSafe(");
             if (nullSafeTemplateCode) {
-                javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ").append(codePart).append(")");
-            } else {
-                javaCode.append(codePart);
+                javaCode.append("try {\n");
+                writeIndentation(depth + 1);
             }
-            javaCode.append(");\n");
+            javaCode.append(method).append(codePart).append(");\n");
+            if (nullSafeTemplateCode) {
+                writeIndentation(depth);
+                javaCode.append("} catch (NullPointerException outputNpe) {\n");
+                writeIndentation(depth + 1);
+                javaCode.append("org.jusecase.jte.support.NullSupport.handleNullOutput(outputNpe);\n");
+                writeIndentation(depth);
+                javaCode.append("}\n");
+            }
         }
 
         @Override

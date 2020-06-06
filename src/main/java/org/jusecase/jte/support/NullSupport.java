@@ -113,6 +113,13 @@ public final class NullSupport {
         }
     }
 
+    public static void handleNullOutput(NullPointerException e) {
+        if (isTemplateOrigin(e)) {
+            return;
+        }
+        throw e;
+    }
+
     private static boolean isTemplateOrigin(NullPointerException e) {
         StackTraceElement[] stackTrace = e.getStackTrace();
         if (stackTrace.length == 0) {

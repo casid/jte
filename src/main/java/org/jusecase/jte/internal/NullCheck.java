@@ -1,16 +1,9 @@
-package org.jusecase.jte.support;
+package org.jusecase.jte.internal;
 
-import net.jodah.typetools.TypeResolver;
-import org.jusecase.jte.internal.TemplateCompiler;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import java.util.function.*;
 
 @SuppressWarnings("unused") // Used by generated template code
-public final class NullSupport {
+public final class NullCheck {
     private static final boolean[] EMPTY_BOOLEAN_ARRAY = new boolean[0];
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
     private static final short[] EMPTY_SHORT_ARRAY = new short[0];
@@ -69,45 +62,6 @@ public final class NullSupport {
         } catch (NullPointerException e) {
             if (isTemplateOrigin(e)) {
                 return "";
-            }
-            throw e;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T evaluateIterable(Supplier<T> expression) {
-        try {
-            return expression.get();
-        } catch (NullPointerException e) {
-            if (isTemplateOrigin(e)) {
-                Class<?>[] classes = TypeResolver.resolveRawArguments(Supplier.class, expression.getClass());
-                Class<?> clazz = classes[0];
-
-                if (clazz == List.class || clazz == Collection.class || clazz == Iterable.class) {
-                    return (T)Collections.emptyList();
-                } else if (clazz == Set.class) {
-                    return (T)Collections.emptySet();
-                } else if (clazz == boolean[].class) {
-                    return (T)EMPTY_BOOLEAN_ARRAY;
-                } else if (clazz == byte[].class) {
-                    return (T)EMPTY_BYTE_ARRAY;
-                } else if (clazz == short[].class) {
-                    return (T)EMPTY_SHORT_ARRAY;
-                } else if (clazz == int[].class) {
-                    return (T)EMPTY_INT_ARRAY;
-                } else if (clazz == long[].class) {
-                    return (T)EMPTY_LONG_ARRAY;
-                } else if (clazz == float[].class) {
-                    return (T)EMPTY_FLOAT_ARRAY;
-                } else if (clazz == double[].class) {
-                    return (T)EMPTY_DOUBLE_ARRAY;
-                } else {
-                    try {
-                        return (T)clazz.getConstructor().newInstance();
-                    } catch (Exception instantiationException) {
-                        throw new UnsupportedOperationException("NullSupport does not yet handle iterable class " + clazz, instantiationException);
-                    }
-                }
             }
             throw e;
         }

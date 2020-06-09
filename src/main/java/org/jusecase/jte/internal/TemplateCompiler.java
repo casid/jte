@@ -289,7 +289,7 @@ public class TemplateCompiler {
                 writeIndentation(depth);
                 javaCode.append("} catch (NullPointerException outputNpe) {\n");
                 writeIndentation(depth + 1);
-                javaCode.append("org.jusecase.jte.support.NullSupport.handleNullOutput(outputNpe);\n");
+                javaCode.append("org.jusecase.jte.internal.NullCheck.handleNullOutput(outputNpe);\n");
                 writeIndentation(depth);
                 javaCode.append("}\n");
             }
@@ -301,12 +301,12 @@ public class TemplateCompiler {
             if (nullSafeTemplateCode) {
                 int index = codePart.indexOf('=');
                 if (index == -1) {
-                    javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ");
+                    javaCode.append("org.jusecase.jte.internal.NullCheck.evaluate(() -> ");
                     javaCode.append(codePart);
                     javaCode.append(")");
                 } else {
                     javaCode.append(codePart, 0, index + 1);
-                    javaCode.append(" org.jusecase.jte.support.NullSupport.evaluate(() -> ");
+                    javaCode.append(" org.jusecase.jte.internal.NullCheck.evaluate(() -> ");
                     javaCode.append(codePart, index + 2, codePart.length());
                     javaCode.append(")");
                 }
@@ -322,7 +322,7 @@ public class TemplateCompiler {
             javaCode.append("if (");
 
             if (nullSafeTemplateCode) {
-                javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ").append(condition).append(")");
+                javaCode.append("org.jusecase.jte.internal.NullCheck.evaluate(() -> ").append(condition).append(")");
             } else {
                 javaCode.append(condition);
             }
@@ -336,7 +336,7 @@ public class TemplateCompiler {
             javaCode.append("} else if (");
 
             if (nullSafeTemplateCode) {
-                javaCode.append("org.jusecase.jte.support.NullSupport.evaluate(() -> ").append(condition).append(")");
+                javaCode.append("org.jusecase.jte.internal.NullCheck.evaluate(() -> ").append(condition).append(")");
             } else {
                 javaCode.append(condition);
             }
@@ -359,21 +359,7 @@ public class TemplateCompiler {
         @Override
         public void onForLoopStart(int depth, String codePart) {
             writeIndentation(depth);
-            javaCode.append("for (");
-            if (nullSafeTemplateCode) {
-                int index = codePart.indexOf(':');
-                if (index == -1) {
-                    javaCode.append(codePart);
-                } else {
-                    javaCode.append(codePart, 0, index + 1);
-                    javaCode.append(" org.jusecase.jte.support.NullSupport.evaluateIterable(() -> ");
-                    javaCode.append(codePart, index + 2, codePart.length());
-                    javaCode.append(")");
-                }
-            } else {
-                javaCode.append(codePart);
-            }
-            javaCode.append(") {\n");
+            javaCode.append("for (").append(codePart).append(") {\n");
         }
 
         @Override

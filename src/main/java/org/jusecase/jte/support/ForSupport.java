@@ -44,14 +44,6 @@ public class ForSupport<T> implements Iterable<ForSupport<T>> {
         return index;
     }
 
-    public boolean isOdd() {
-        return (index + 1) % 2 == 0;
-    }
-
-    public boolean isEven() {
-        return !isOdd();
-    }
-
     public T get() {
         return item;
     }

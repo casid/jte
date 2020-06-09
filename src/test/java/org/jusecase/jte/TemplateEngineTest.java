@@ -169,6 +169,16 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void loopWithVariable() {
+        model.array = new int[]{1, 2, 3};
+        givenTemplate("@for (int i : model.array)" +
+                "!{var y = i + 1}" +
+                "${y}" +
+                "@endfor");
+        thenOutputIs("234");
+    }
+
+    @Test
     void statement() {
         givenTemplate("!{model.setX(12)}${model.x}");
         thenOutputIs("12");
@@ -184,12 +194,6 @@ public class TemplateEngineTest {
     void variable() {
         givenTemplate("!{int y = 50}${y}");
         thenOutputIs("50");
-    }
-
-    @Test
-    void blockInJavacode() {
-        givenTemplate("!{int y = 50; if(y>10){ y=60; }}${y}");
-        thenOutputIs("60");
     }
 
     @Test

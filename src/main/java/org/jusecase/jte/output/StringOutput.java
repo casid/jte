@@ -6,7 +6,7 @@ public class StringOutput implements TemplateOutput {
     private final StringBuilder stringBuilder;
 
     public StringOutput() {
-        this(1024);
+        this(8 * 1024);
     }
 
     public StringOutput(int capacity) {

@@ -12,9 +12,15 @@ jte is a simple, yet powerful template engine for Java. jte is designed to intro
 - <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offering completion and refactoring support.
 - Hot reloading of templates during development.
 
+## TLDR
+
+Have a look how jte feels inside IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
+
+<img src="jte-intellij.gif" width="50%" />
+
 ## 5 minutes example
 
-To get a quick impression how jte behaves and feels, here's a small page template `example.jte`:
+To get a quick impression how jte works, here's a small page template `example.jte`:
 ```htm
 @import org.example.Page
 
@@ -32,13 +38,13 @@ To get a quick impression how jte behaves and feels, here's a small page templat
 </body>
 ```
 
-To render this template, you first need an instance of `TemplateEngine`. Typically you create it once per application (it is safe to share the engine between threads):
+To render this template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):
 ```java
 CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This is the directory where your .jte files are located.
 TemplateEngine templateEngine = new TemplateEngine(codeResolver);
 ```
 
-Now we can render the template like this:
+With the `TemplateEngine` ready, templates are rendered like this:
 ```java
 TemplateOutput output = new StringOutput();
 templateEngine.render("example.jte", page, output);
@@ -85,12 +91,6 @@ Let's move stuff from our example page to `layout/page.jte`:
 ```
 
 Check out the [syntax documentation](DOCUMENTATION.md), for a more comprehensive introduction.
-
-## IntelliJ Plugin
-
-To be fair, the above template looks very dim. Have a look how it looks and feels inside IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte IntelliJ plugin</a> installed:
-
-![alt IntelliJ plugin](jte-intellij.gif)
 
 ## Performance
 By design, jte provides very fast output. This is a <a href="https://github.com/casid/template-benchmark/">fork of mbosecke/template-benchmark</a> with jte included, running on a MacBook Pro 2015:

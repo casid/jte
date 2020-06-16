@@ -1,4 +1,4 @@
-# jte
+# jte (Java Template Engine)
 [![Build Status](https://travis-ci.org/casid/jte.svg?branch=master)](https://travis-ci.org/casid/jte)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/casid/jte/master/LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/org.jusecase/inject.svg)](http://mvnrepository.com/artifact/org.jusecase/jte)

@@ -3,10 +3,10 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/casid/jte/master/LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/org.jusecase/inject.svg)](http://mvnrepository.com/artifact/org.jusecase/jte)
 
-jte is a simple yet powerful template engine for Java. jte is designed to introduce as few new keywords as possible and build upon existing Java features, so that it is very easy to reason about what a template does. The <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offers full completion and refactoring support for Java parts as well as for jte keywords. Supports Java 11 or higher.
+jte is a simple, yet powerful template engine for Java. jte is designed to introduce as few new keywords as possible and build upon existing Java features, so that it is very easy to reason about what a template does. The <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offers full completion and refactoring support for Java parts as well as for jte keywords. Supports Java 11 or higher.
 
 ## Features
-- Intuitive, easy to learn syntax.
+- Intuitive, easy to learn [syntax](DOCUMENTATION.md).
 - Blazing fast execution, about <a href="https://github.com/casid/template-benchmark/">100k templates rendered per second</a> on a MacBook Pro 2015.
 - Small footprint, no external dependencies. The jar is ~60 KB.
 - <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offering completion and refactoring support.
@@ -84,7 +84,7 @@ Let's move stuff from our example page to `layout/page.jte`:
 @endlayout
 ```
 
-Check out the syntax documentation, for a more complete introduction.
+Check out the [syntax documentation](DOCUMENTATION.md), for a more comprehensive introduction.
 
 ## Performance
 By design, jte provides very fast output. This is a <a href="https://github.com/casid/template-benchmark/">fork of mbosecke/template-benchmark</a> with jte included, running on a MacBook Pro 2015:

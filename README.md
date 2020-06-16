@@ -10,6 +10,7 @@ jte is a simple yet powerful template engine for Java. jte is designed to introd
 - Blazing fast execution, about <a href="https://github.com/casid/template-benchmark/">100k templates rendered per second</a> on a MacBook Pro 2015.
 - Small footprint, no external dependencies. The jar is ~60 KB.
 - <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offering completion and refactoring support.
+- Hot reloading of templates during development
 
 ## 5 minutes example
 

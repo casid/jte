@@ -88,9 +88,9 @@ Check out the [syntax documentation](DOCUMENTATION.md), for a more comprehensive
 
 ## IntelliJ Plugin
 
-To be fair, the above template looks very dim. Have a look how it looks inside IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
+To be fair, the above template looks very dim. Have a look how it looks and feels inside IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte IntelliJ plugin</a> installed:
 
-![alt IntelliJ plugin](intellij-plugin-1.png)
+![alt IntelliJ plugin](jte-intellij.gif)
 
 ## Performance
 By design, jte provides very fast output. This is a <a href="https://github.com/casid/template-benchmark/">fork of mbosecke/template-benchmark</a> with jte included, running on a MacBook Pro 2015:

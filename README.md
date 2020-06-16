@@ -54,7 +54,7 @@ With the `TemplateEngine` ready, templates are rendered like this:
 ```java
 TemplateOutput output = new StringOutput();
 templateEngine.render("example.jte", page, output);
-System.out.println(output.toString());
+System.out.println(output);
 ```
 
 > Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required.

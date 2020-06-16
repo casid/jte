@@ -103,4 +103,6 @@ jte is available on <a href="http://mvnrepository.com/artifact/org.jusecase/jte"
 </dependency>
 ```
 
+## Websites rendered with jte
 
+- <a href="https://mazebert.com">Mazebert TD (game website)</a>

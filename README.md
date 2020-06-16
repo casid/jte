@@ -14,13 +14,13 @@ jte is a simple, yet powerful template engine for Java. jte is designed to intro
 
 ## TLDR
 
-Have a look how jte feels inside IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
+jte is a lot of fun to work with! Have a look how it feels like in IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
 
 <img src="jte-intellij.gif" width="50%" />
 
 ## 5 minutes example
 
-To get a quick impression how jte works, here's a small page template `example.jte`:
+Here is a small page template `example.jte`:
 ```htm
 @import org.example.Page
 
@@ -37,6 +37,12 @@ To get a quick impression how jte works, here's a small page template `example.j
     <p>Welcome to my example page!</p>
 </body>
 ```
+
+So what is going on here?
+- `@import` directly translates to Java imports, in this case so that `org.example.Page` is known to the template.
+- `@param Page page` is the parameter that needs to be passed to this template.
+- `@if`/`@endif` is an if-block, the stuff inside the braces (`page.getDescription() != null`) is plain Java code. @JSP users, yes, there is `@elseif()` and `@else` in jte ❤️.
+- `${}` finally writes to the underlying template output, as known from various other template engines.
 
 To render this template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):
 ```java

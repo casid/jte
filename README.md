@@ -86,10 +86,16 @@ Let's move stuff from our example page to `layout/page.jte`:
 
 Check out the [syntax documentation](DOCUMENTATION.md), for a more comprehensive introduction.
 
+## IntelliJ Plugin
+
+To be fair, the above template looks very dim. Have a look how it looks inside IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
+
+![alt IntelliJ plugin](intellij-plugin-1.png)
+
 ## Performance
 By design, jte provides very fast output. This is a <a href="https://github.com/casid/template-benchmark/">fork of mbosecke/template-benchmark</a> with jte included, running on a MacBook Pro 2015:
 
-![alt text](https://raw.githubusercontent.com/casid/template-benchmark/master/results.png)
+![alt Template Benchmark](https://raw.githubusercontent.com/casid/template-benchmark/master/results.png)
 
 ## Getting started
 

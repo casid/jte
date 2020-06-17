@@ -4,6 +4,19 @@
 
 jte is a simple, yet powerful templating engine for Java. All jte templates are compiled to Java class files, meaning jte adds essentially zero overhead to your application. All template files use the .jte file extension.
 
+## Table of Contents
+- [Rendering a template](#rendering-a-template)
+- [Displaying data](#displaying-data)
+- [Control structures](#control-structures)
+  - [If Statements](#if-statements)
+  - [Loops](#loops)
+- [Comments](#comments)
+- [Tags](#tags)
+- [Layouts](#layouts)
+- [Hot Reloading](#hot-reloading)
+- [Precompiling Templates](#precompiling-templates)
+- [Output Escaping](#output-escaping)
+
 ## Rendering a template
 
 To render any template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):
@@ -246,6 +259,14 @@ Layouts are called like tags, but you can define what content should be put in t
     @enddefine
 @endlayout
 ```
+
+## Hot Reloading
+
+tbd
+
+## Precompiling Templates
+
+tbd
 
 ## Output Escaping
 

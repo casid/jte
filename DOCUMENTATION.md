@@ -23,9 +23,9 @@ templateEngine.render("example.jte", model, output);
 Where `output` specifies where the template is rendered to and `model` is the data passed to this template, which can be an instance of any class. Root templates must have exactly one data parameter passed to them.
 
 > Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required. Currently the following implementations are available:
-- `StringOutput` - writes to a string
-- `FileOutput` - writes to the given file
-- `PrintWriterOutput` - writes to a `PrintWriter`, for instance the writer provided by `HttpServletRequest`.
+> - `StringOutput` - writes to a string
+> - `FileOutput` - writes to the given file
+> - `PrintWriterOutput` - writes to a `PrintWriter`, for instance the writer provided by `HttpServletRequest`.
 
 A minimal template would look like this.
 
@@ -36,7 +36,7 @@ A minimal template would look like this.
 Hello world!
 ```
 
-This will be translated to the following Java class:
+Behind the scenes, this will be translated to the following Java class:
 
 ```java
 package org.jusecase.jte.generated.test;

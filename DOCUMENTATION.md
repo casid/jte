@@ -89,6 +89,54 @@ Note the difference of safe und unsafe content. All static parts of a template a
 
 > **Caution!** All core `TemplateOutput` implementations make no difference between handling safe and unsafe content. Output escaping comes in many flavours and jte doesn't want to force an opinion on you. See the section [Output Escaping](#output-escaping) for more details.
 
+## Control structures
+
+jte provides convenient shortcuts for common Java control structures, such as conditional statements and loops. These shortcuts provide a very clean, terse way of working with Java control structures, while also remaining familiar to their Java counterparts.
+
+### If Statements
+
+You may construct if statements using the `@if`, `@elseif`, `@else` and `@endif` keywords. These translate directly to their Java counterparts:
+
+```xml
+@if(model.entries.isEmpty())
+  I have no entries!
+@elseif(model.entries.size() == 1)
+  I have one entry!
+@else
+  I have ${model.entries.size()} entries!
+@endif
+```
+
+### Loops
+
+In addition to if statements, jte provides the `@for` and `@endfor` keywords to loop over iterable data. Again, `for` translates directly to its Java counterpart:
+
+```xml
+@for(Entry entry : model.entries)
+  <li>${entry.title}</li>
+@endfor
+
+@for(var entry : model.entries)
+  <li>${entry.title}</li>
+@endfor
+
+@for(int i = 0; i < 10; ++i)
+  <li>i is ${i}</li>
+@endfor
+```
+
+When looping, you may use the `ForSupport`class to gain information about the loop, such as whether you are in the first or last iteration through the loop.
+
+```xml
+@import org.jusecase.jte.support.ForSupport
+<%-- ... --%>
+@for(ForSupport<Entry> entryLoop : ForSupport.of(model.entries))
+  <tr class="${(entryLoop.getIndex() + 1) % 2 == 0 ? "even" : "odd"}">
+    ${entryLoop.get().title}
+  </tr>
+@endfor
+```
+
 ## Output Escaping
 
 It is recommended to wrap `TemplateOutput` when output escaping is needed. For instance, if you already have <a href="https://jsoup.org/cookbook/cleaning-html/whitelist-sanitizer">jsoup</a> in your project you could do this:

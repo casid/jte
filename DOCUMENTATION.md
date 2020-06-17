@@ -266,7 +266,43 @@ tbd
 
 ## Precompiling Templates
 
-tbd
+To speed up startup of your production server, it is possible to precompile all templates during the build. This way, the template engine can load the .class file for each template directly, without first compiling it.
+
+To do this, you need to pass a directory to the `TemplateEngine`, to specify where compiled template classes are located. Without this directory, `TemplateEngine` will compile templates in memory and precompilation cannot be used.
+
+```java
+Path sourceDirectory = Path.of("src/main/jte"); // This is the directory where your .jte files are located.
+Path targetDirectory = Path.of("jte"); // This is the directoy where compiled templates are located.
+
+CodeResolver codeResolver = new DirectoryCodeResolver(sourceDirectory);
+TemplateEngine templateEngine = new TemplateEngine(codeResolver, targetDirectory);
+```
+
+To precompile all templates, you'd simply invoke `templateEngine.precompileAll();`. However, this would still let your Java process compile all templates on startup.
+
+There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
+
+> It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte compiler plugin always matches your jte dependency.
+
+```xml
+<plugin>
+    <groupId>org.jusecase</groupId>
+    <artifactId>jte-maven-compiler-plugin</artifactId>
+    <version>${jte.version}</version>
+    <configuration>
+        <sourceDirectory>src/main/jte</sourceDirectory> <!-- This is the directory where your .jte files are located. -->
+        <targetDirectory>jte</targetDirectory> <!-- This is the directoy where compiled templates are located. -->
+    </configuration>
+    <executions>
+        <execution>
+            <phase>process-classes</phase>
+            <goals>
+                <goal>precompile</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
 
 ## Output Escaping
 

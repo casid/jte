@@ -9,8 +9,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
 To render any template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):
 
 ```java
-// This is the directory where your .jte files are located.
-CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte"));
+CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This is the directory where your .jte files are located.
 TemplateEngine templateEngine = new TemplateEngine(codeResolver);
 ```
 

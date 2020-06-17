@@ -42,9 +42,9 @@ Behind the scenes, this will be translated to the following Java class:
 package org.jusecase.jte.generated.test;
 import my.Model;
 public final class JteexampleGenerated implements org.jusecase.jte.internal.Template<Model> {
-  public void render(Model model, org.jusecase.jte.TemplateOutput output) {
-    output.writeSafeContent("Hello world!");
-  }
+    public void render(Model model, org.jusecase.jte.TemplateOutput output) {
+        output.writeSafeContent("Hello world!");
+    }
 }
 ```
 
@@ -67,7 +67,7 @@ If your model class would look like this:
 ```java
 package my;
 public class Model {
-  public String name = "jte";
+    public String name = "jte";
 }
 ```
 
@@ -77,11 +77,11 @@ The output of the above template would be `Hello jte!`. Behind the scenes, the f
 package org.jusecase.jte.generated.test;
 import my.Model;
 public final class JtetemplateGenerated implements org.jusecase.jte.internal.Template<Model> {
-  public void render(Model model, org.jusecase.jte.TemplateOutput output) {
-    output.writeSafeContent("Hello ");
-    output.writeUnsafe(model.jte);
-    output.writeSafeContent("!");
-  }
+    public void render(Model model, org.jusecase.jte.TemplateOutput output) {
+        output.writeSafeContent("Hello ");
+        output.writeUnsafe(model.jte);
+        output.writeSafeContent("!");
+    }
 }
 ```
 
@@ -99,11 +99,11 @@ You may construct if statements using the `@if`, `@elseif`, `@else` and `@endif`
 
 ```xml
 @if(model.entries.isEmpty())
-  I have no entries!
+    I have no entries!
 @elseif(model.entries.size() == 1)
-  I have one entry!
+    I have one entry!
 @else
-  I have ${model.entries.size()} entries!
+    I have ${model.entries.size()} entries!
 @endif
 ```
 
@@ -113,15 +113,15 @@ In addition to if statements, jte provides the `@for` and `@endfor` keywords to 
 
 ```xml
 @for(Entry entry : model.entries)
-  <li>${entry.title}</li>
+    <li>${entry.title}</li>
 @endfor
 
 @for(var entry : model.entries)
-  <li>${entry.title}</li>
+    <li>${entry.title}</li>
 @endfor
 
 @for(int i = 0; i < 10; ++i)
-  <li>i is ${i}</li>
+    <li>i is ${i}</li>
 @endfor
 ```
 
@@ -131,10 +131,120 @@ When looping, you may use the `ForSupport`class to gain information about the lo
 @import org.jusecase.jte.support.ForSupport
 <%-- ... --%>
 @for(ForSupport<Entry> entryLoop : ForSupport.of(model.entries))
-  <tr class="${(entryLoop.getIndex() + 1) % 2 == 0 ? "even" : "odd"}">
-    ${entryLoop.get().title}
-  </tr>
+    <tr class="${(entryLoop.getIndex() + 1) % 2 == 0 ? "even" : "odd"}">
+        ${entryLoop.get().title}
+    </tr>
 @endfor
+```
+
+## Comments
+
+jte allows you to define comments in your templates. Unlike HTML comments, jte comments are not included in the output of your template:
+
+```xml
+<%-- This comment will not be present in the rendered output --%>
+```
+
+## Tags
+
+To share common functionality between templates, you can extract it into tags. All tags must be located within the `tag` directory in the jte root directory.
+
+Here is an example tag, located in `tag/drawEntry.jte`
+
+```xml
+@import my.Entry
+@param Entry entry
+@param boolean verbose
+
+<h2>${entry.title}</h2>
+@if(verbose)
+    <h3>${entry.subtitle}</h3>
+@endif
+```
+
+Tags can be called like regular Java methods.
+
+```xml
+@tag.drawEntry(model.entry1, true)
+@tag.drawEntry(model.entry2, false)
+```
+
+Subdirectories in the `tag` directory act like packages in java. For instance, if the drawEntry tag was located in `tag/entry/drawEntry.jte`, you would call it like this:
+
+```xml
+@tag.entry.drawEntry(model.entry1, true)
+@tag.entry.drawEntry(model.entry2, false)
+```
+
+If you don't want to depend on the parameter order, you can explicitly name parameters when calling the template (this is what the <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> suggests by default).
+
+```xml
+@tag.entry.drawEntry(entry = model.entry1, verbose = true)
+@tag.entry.drawEntry(entry = model.entry2, verbose = false)
+```
+
+You can also define default values for all parameters, so that they only need to be passed when needed.
+
+```xml
+@import my.Entry
+@param Entry entry
+@param boolean verbose = false
+
+<h2>${entry.title}</h2>
+@if(verbose)
+    <h3>${entry.subtitle}</h3>
+@endif
+```
+
+The second call could then be simplified to this:
+
+```xml
+@tag.entry.drawEntry(entry = model.entry1, verbose = true)
+@tag.entry.drawEntry(entry = model.entry2)
+```
+
+## Layouts
+
+Layouts provide all features of tags, plus render sections. They are particularly useful to share structure between different templates. All layouts must be located within the `layout` directory in the jte root directory.
+
+Here is an example layout, located in `layout/page.jte`
+
+```htm
+@import org.example.Page
+
+@param Page page
+
+<head>
+    @if(page.getDescription() != null)
+        <meta name="description" content="${page.getDescription()}">
+    @endif
+    <title>${page.getTitle()}</title>
+</head>
+<body>
+    <h1>${page.getTitle()}</h1>
+    <div class="content">
+        @render(content)
+    </div>
+    <div class="footer">
+        @render(footer)
+    </div>
+</body>
+```
+
+Layouts are called like tags, but you can define what content should be put in the `@render` slots declared in the layout. Here is an example using the above page layout:
+
+```htm
+@import org.example.WelcomePage
+@param WelcomePage welcomePage
+
+@layout.page(welcomePage)
+    @define(content)
+        <p>Welcome, ${welcomePage.getUserName()}.</p>
+    @enddefine
+    @define(footer)
+        <p>Thanks for visiting, come again soon!</p>
+    @enddefine
+@endlayout
 ```
 
 ## Output Escaping

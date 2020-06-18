@@ -262,7 +262,25 @@ Layouts are called like tags, but you can define what content should be put in t
 
 ## Hot Reloading
 
-tbd
+When using the `DirectoryCodeResolver`, hot reloading can be activated. It makes sense to do this on dev environments only. `enableHotReload` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, all related templates are be invalidated and a listener is called with a list of invalidated templates.
+
+```java
+if (isDevEnvironment()) {
+    codeResolver.enableHotReload(templateEngine, templates -> {
+        for (String template : templates) {
+            try {
+                templateEngine.prepareForRendering(template);
+            } catch (Exception e) {
+                logger.error("Failed to recompile " + template, e);
+            }
+        }
+    });
+}
+```
+
+In the above example `prepareForRendering` is called for every invalidated template. This will trigger recompilation even before you refresh the page you're working on in the browser.
+
+> It is up to you how to handle hot reloading for your particular use case. For instance, if you have a static site that pre-renders everything to .html files, you may want to trigger a re-render of static files that use the just invalidated templates.
 
 ## Precompiling Templates
 

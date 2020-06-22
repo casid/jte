@@ -4,6 +4,10 @@ package org.jusecase.jte;
 public interface TemplateOutput {
     void writeSafeContent(String value);
 
+    default void writeStaticContent(String value, byte[] bytes) {
+        writeSafeContent(value);
+    }
+
     default void writeUnsafeContent(String value) {
         writeSafeContent(value);
     }

@@ -284,6 +284,8 @@ final class TemplateParser {
         if (lastIndex < templateCode.length()) {
             extract(templateCode, lastIndex, templateCode.length(), visitor::onTextPart);
         }
+
+        visitor.onComplete();
     }
 
     private void push(Mode mode) {

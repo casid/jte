@@ -34,4 +34,6 @@ interface TemplateParserVisitor {
     void onLayoutDefineEnd(int depth);
 
     void onLayoutEnd(int depth);
+
+    void onComplete();
 }

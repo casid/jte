@@ -16,7 +16,6 @@ class Benchmark {
 
     Benchmark() {
         templateEngine = new TemplateEngine(new ResourceCodeResolver("benchmark"));
-        templateEngine.setNullSafeTemplateCode(true);
     }
 
     public void run() {

@@ -22,6 +22,8 @@ public class TemplateCompiler {
     public static final String CLASS_PREFIX = "Jte";
     public static final String CLASS_SUFFIX = "Generated";
     public static final String PACKAGE_NAME = "org.jusecase.jte.generated";
+    public static final String TEXT_PART_STRING = "TEXT_PART_STRING_";
+    public static final String TEXT_PART_BINARY = "TEXT_PART_BINARY_";
 
     private final CodeResolver codeResolver;
 
@@ -130,9 +132,10 @@ public class TemplateCompiler {
         }
 
         javaCode.append("public final class ").append(templateInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(attributeParser.className).append("> {\n");
+        int fieldsIndex = javaCode.length();
         javaCode.append("\tpublic void render(").append(attributeParser.className).append(" ").append(attributeParser.instanceName).append(", org.jusecase.jte.TemplateOutput output) {\n");
 
-        new TemplateParser(TemplateType.Template).parse(attributeParser.lastIndex, templateCode, new CodeGenerator(TemplateType.Template, javaCode, classDefinitions, templateDependencies));
+        new TemplateParser(TemplateType.Template).parse(attributeParser.lastIndex, templateCode, new CodeGenerator(TemplateType.Template, javaCode, fieldsIndex, classDefinitions, templateDependencies));
         javaCode.append("\t}\n");
         javaCode.append("}\n");
 
@@ -182,6 +185,7 @@ public class TemplateCompiler {
         }
 
         javaCode.append("public final class ").append(classInfo.className).append(" {\n");
+        int fieldsIndex = javaCode.length();
         javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
         for (ParamInfo parameter : parameterParser.parameters) {
             javaCode.append(", ").append(parameter.type).append(' ').append(parameter.name);
@@ -192,7 +196,7 @@ public class TemplateCompiler {
         }
         javaCode.append(") {\n");
 
-        new TemplateParser(type).parse(lastIndex, code, new CodeGenerator(type, javaCode, classDefinitions, templateDependencies));
+        new TemplateParser(type).parse(lastIndex, code, new CodeGenerator(type, javaCode, fieldsIndex, classDefinitions, templateDependencies));
 
         javaCode.append("\t}\n");
         javaCode.append("}\n");
@@ -246,14 +250,34 @@ public class TemplateCompiler {
     private class CodeGenerator implements TemplateParserVisitor {
         private final TemplateType type;
         private final StringBuilder javaCode;
+        private final int fieldsIndex;
         private final LinkedHashSet<ClassDefinition> classDefinitions;
         private final LinkedHashSet<String> templateDependencies;
+        private final List<String> textParts = new ArrayList<>();
 
-        private CodeGenerator(TemplateType type, StringBuilder javaCode, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+        private CodeGenerator(TemplateType type, StringBuilder javaCode, int fieldsIndex, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
             this.type = type;
             this.javaCode = javaCode;
+            this.fieldsIndex = fieldsIndex;
             this.classDefinitions = classDefinitions;
             this.templateDependencies = templateDependencies;
+        }
+
+        @Override
+        public void onComplete() {
+            if (textParts.isEmpty()) {
+                return;
+            }
+
+            StringBuilder fields = new StringBuilder();
+            for (int i = 0; i < textParts.size(); i++) {
+                fields.append("\tprivate static final String ").append(TEXT_PART_STRING).append(i).append(" = \"");
+                appendEscaped(fields, textParts.get(i));
+                fields.append("\";\n");
+                fields.append("\tprivate static final byte[] ").append(TEXT_PART_BINARY).append(i).append(" = org.jusecase.jte.internal.IoUtils.getUtf8Bytes(").append(TEXT_PART_STRING).append(i).append(");\n");
+            }
+
+            javaCode.insert(fieldsIndex, fields);
         }
 
         @Override
@@ -263,9 +287,12 @@ public class TemplateCompiler {
             }
 
             writeIndentation(depth);
-            javaCode.append("output.writeSafeContent(\"");
-            appendEscaped(textPart);
-            javaCode.append("\");\n");
+            javaCode.append("output.writeStaticContent(");
+            javaCode.append(TEXT_PART_STRING).append(textParts.size()).append(", ");
+            javaCode.append(TEXT_PART_BINARY).append(textParts.size());
+            javaCode.append(");\n");
+
+            textParts.add(textPart);
         }
 
         @Override
@@ -492,7 +519,7 @@ public class TemplateCompiler {
             }
         }
 
-        private void appendEscaped(String text) {
+        private void appendEscaped(StringBuilder javaCode, String text) {
             for (int i = 0; i < text.length(); ++i) {
                 char c = text.charAt(i);
                 if (c == '\"') {

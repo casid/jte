@@ -6,7 +6,7 @@
 
     <groupId>org.jusecase</groupId>
     <artifactId>jte</artifactId>
-    <version>0.1.1</version>
+    <version>0.2.0</version> <!-- Also bump ${jte.version} in jte-maven-compiler-plugin -->
     <packaging>jar</packaging>
 
     <name>jte</name>

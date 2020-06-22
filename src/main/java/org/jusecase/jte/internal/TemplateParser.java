@@ -305,11 +305,10 @@ final class TemplateParser {
         currentMode = stack.peek();
     }
 
-    @SuppressWarnings("SameParameterValue")
+    @SuppressWarnings({"SameParameterValue", "unchecked"})
     private <T extends Mode> T getPreviousMode(Class<T> modeClass) {
         for (Mode mode : stack) {
             if (modeClass.isAssignableFrom(mode.getClass())) {
-                //noinspection unchecked
                 return (T)mode;
             }
         }

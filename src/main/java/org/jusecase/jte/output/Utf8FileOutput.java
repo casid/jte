@@ -15,8 +15,9 @@ public final class Utf8FileOutput implements TemplateOutput, Closeable {
 
     private final OutputStream outputStream;
 
-    public Utf8FileOutput(Path path) throws IOException {
-        outputStream = Files.newOutputStream(path, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+    public Utf8FileOutput(Path file) throws IOException {
+        Files.createDirectories(file.getParent());
+        outputStream = Files.newOutputStream(file, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
     }
 
     @Override

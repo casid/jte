@@ -21,11 +21,13 @@ public class Utf8FileOutputTest {
     }
 
     private void assertEncoding(String expected) {
-        Path path = Path.of("utf-8-file-output.tmp");
-        try (Utf8FileOutput output = new Utf8FileOutput(path)) {
+        Path directory = Path.of("temp");
+        Path file = directory.resolve("utf-8-file-output.tmp");
+
+        try (Utf8FileOutput output = new Utf8FileOutput(file)) {
             output.writeSafeContent(expected);
 
-            try (InputStream is = Files.newInputStream(path)) {
+            try (InputStream is = Files.newInputStream(file)) {
                 String result = IoUtils.toString(is);
                 assertThat(result).isEqualTo(expected);
             }
@@ -34,7 +36,8 @@ public class Utf8FileOutputTest {
             throw new UncheckedIOException(e);
         } finally {
             try {
-                Files.delete(path);
+                Files.delete(file);
+                Files.delete(directory);
             } catch (IOException e) {
                 // Ignored
             }

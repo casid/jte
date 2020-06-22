@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,8 +17,12 @@ public class FileOutput implements TemplateOutput, Closeable {
     private final BufferedWriter writer;
 
     public FileOutput(Path file) throws IOException {
+        this(file, StandardCharsets.UTF_8);
+    }
+
+    public FileOutput(Path file, Charset charset) throws IOException {
         Files.createDirectories(file.getParent());
-        writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        writer = Files.newBufferedWriter(file, charset, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
     }
 
     @Override

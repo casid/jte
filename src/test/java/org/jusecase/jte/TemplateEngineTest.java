@@ -709,7 +709,8 @@ public class TemplateEngineTest {
     @Test
     void emptyTemplate() {
         givenRawTemplate("");
-        thenRenderingFailsWithException();
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to load test/template.jte");
     }
 
     @Test
@@ -746,6 +747,28 @@ public class TemplateEngineTest {
         givenTemplate("Hello\n@layout.page(model)");
         thenRenderingFailsWithException()
                 .hasMessage("Layout not found: layout/page.jte, referenced at test/template.jte:3");
+    }
+
+    @Test
+    void compileError3() {
+        givenTemplate("${model.hello}\n" +
+                "${model.hello}\n" +
+                "${model.helloUnknown}");
+
+        thenRenderingFailsWithException()
+                .hasMessageStartingWith("Failed to compile template, error at test/template.jte:4\n")
+                .hasMessageContaining("cannot find symbol")
+                .hasMessageContaining("model.helloUnknown");
+    }
+
+    @Test
+    void compileError4() {
+        givenTag("test", "@param org.jusecase.jte.TemplateEngineTest.Model model\nThis will not compile!\n${model.helloUnknown}\n!!");
+        givenTemplate("@tag.test(model)");
+        thenRenderingFailsWithException()
+                .hasMessageStartingWith("Failed to compile template, error at tag/test.jte:3\n")
+                .hasMessageContaining("cannot find symbol")
+                .hasMessageContaining("model.helloUnknown");
     }
 
     private void givenTag(String name, String code) {

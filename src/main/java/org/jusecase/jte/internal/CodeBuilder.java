@@ -97,4 +97,8 @@ final class CodeBuilder {
 
         currentJavaLine += count;
     }
+
+    public int[] getLineInfo() {
+        return Arrays.copyOf(lineInfo, currentJavaLine);
+    }
 }

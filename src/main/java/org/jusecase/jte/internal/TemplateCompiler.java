@@ -56,10 +56,10 @@ public class TemplateCompiler {
                 precompile(List.of(name), null);
                 return loadPrecompiled(name, false);
             } else {
-                throw new TemplateException("Failed to load template " + name, e);
+                throw new TemplateException("Failed to load " + name, e);
             }
         } catch (Exception e) {
-            throw new TemplateException("Failed to load template " + name, e);
+            throw new TemplateException("Failed to load " + name, e);
         }
     }
 
@@ -91,7 +91,7 @@ public class TemplateCompiler {
             files[i++] = classDirectory.resolve(classDefinition.getJavaFileName()).toFile().getAbsolutePath();
         }
 
-        ClassFilesCompiler.compile(files, compilePath);
+        ClassFilesCompiler.compile(files, compilePath, classDirectory, templateByClassName);
     }
 
     private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
@@ -330,6 +330,8 @@ public class TemplateCompiler {
 
             javaCode.append("\t}\n");
             javaCode.append("}\n");
+
+            this.classInfo.lineInfo = javaCode.getLineInfo();
         }
 
         @Override
@@ -599,37 +601,6 @@ public class TemplateCompiler {
 
         public String getCode() {
             return javaCode.getCode();
-        }
-    }
-
-    private static final class ClassInfo {
-        final String name;
-        final String className;
-        final String packageName;
-        final String fullName;
-
-        ClassInfo(String name, String parentPackage) {
-            this.name = name;
-
-            int endIndex = name.lastIndexOf('.');
-            if (endIndex == -1) {
-                endIndex = name.length();
-            }
-
-            int startIndex = name.lastIndexOf('/');
-            if (startIndex == -1) {
-                startIndex = 0;
-            } else {
-                startIndex += 1;
-            }
-
-            className = CLASS_PREFIX + name.substring(startIndex, endIndex).replace("-", "") + CLASS_SUFFIX;
-            if (startIndex == 0) {
-                packageName = parentPackage;
-            } else {
-                packageName = parentPackage + "." + name.substring(0, startIndex - 1).replace('/', '.');
-            }
-            fullName = packageName + "." + className;
         }
     }
 

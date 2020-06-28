@@ -16,7 +16,8 @@ public final class TemplateEngine {
     private final ConcurrentMap<String, Template> templateCache;
 
     public TemplateEngine(CodeResolver codeResolver) {
-        this(codeResolver, null);
+        this(codeResolver, Path.of("jte"));
+        cleanAll();
     }
 
     public TemplateEngine(CodeResolver codeResolver, Path classDirectory) {

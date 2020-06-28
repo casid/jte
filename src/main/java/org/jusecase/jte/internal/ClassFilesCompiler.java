@@ -1,5 +1,7 @@
 package org.jusecase.jte.internal;
 
+import org.jusecase.jte.TemplateException;
+
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.File;
@@ -24,7 +26,7 @@ public class ClassFilesCompiler {
 
         int result = compiler.run(null, null, null, args);
         if (result != 0) {
-            throw new RuntimeException("Java compiler failed with error code " + result + ", failed to compile templates");
+            throw new TemplateException("Java compiler failed with error code " + result + ", failed to compile templates");
         }
     }
 }

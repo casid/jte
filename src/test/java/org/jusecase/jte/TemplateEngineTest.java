@@ -706,6 +706,20 @@ public class TemplateEngineTest {
                 .hasMessage("Failed to render test/template.jte, error at tag/model.jte:4");
     }
 
+    @Test
+    void compileError1() {
+        givenTemplate("@tag.model(model)");
+        thenRenderingFailsWithException()
+            .hasMessage("Tag not found: tag/model.jte, referenced at test/template.jte:2");
+    }
+
+    @Test
+    void compileError2() {
+        givenTemplate("Hello\n@layout.page(model)");
+        thenRenderingFailsWithException()
+                .hasMessage("Layout not found: layout/page.jte, referenced at test/template.jte:3");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + TemplateCompiler.TAG_EXTENSION, code);
     }

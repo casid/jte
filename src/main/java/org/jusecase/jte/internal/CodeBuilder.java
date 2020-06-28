@@ -49,6 +49,10 @@ final class CodeBuilder {
         return this;
     }
 
+    public int getCurrentTemplateLine() {
+        return currentTemplateLine;
+    }
+
     public String getCode() {
         return javaCode.toString();
     }

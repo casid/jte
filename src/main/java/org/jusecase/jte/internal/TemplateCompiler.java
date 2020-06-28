@@ -1,6 +1,7 @@
 package org.jusecase.jte.internal;
 
 import org.jusecase.jte.CodeResolver;
+import org.jusecase.jte.TemplateException;
 import org.jusecase.jte.output.FileOutput;
 
 import java.io.IOException;
@@ -41,26 +42,7 @@ public class TemplateCompiler {
     }
 
     public Template<?> compile(String name) {
-        if (classDirectory == null) {
-            return compileInMemory(name);
-        } else {
-            return loadPrecompiled(name, true);
-        }
-    }
-
-    private Template<?> compileInMemory(String name) {
-        LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
-        ClassDefinition templateDefinition = generateTemplate(name, classDefinitions);
-        if (templateDefinition == null) {
-            return EmptyTemplate.INSTANCE;
-        }
-
-        try {
-            ClassCompiler classCompiler = new ClassCompiler();
-            return (Template<?>) classCompiler.compile(templateDefinition.getName(), classDefinitions).getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return loadPrecompiled(name, true);
     }
 
     private Template<?> loadPrecompiled(String name, boolean firstAttempt) {
@@ -74,10 +56,10 @@ public class TemplateCompiler {
                 precompile(List.of(name), null);
                 return loadPrecompiled(name, false);
             } else {
-                throw new RuntimeException(e);
+                throw new TemplateException("Failed to load template " + name, e);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new TemplateException("Failed to load template " + name, e);
         }
     }
 
@@ -112,14 +94,8 @@ public class TemplateCompiler {
         ClassFilesCompiler.compile(files, compilePath);
     }
 
-    private ClassDefinition generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
-        String templateCode = codeResolver.resolve(name);
-        if (templateCode == null) {
-            throw new RuntimeException("No code found for template " + name);
-        }
-        if (templateCode.isEmpty()) {
-            return null;
-        }
+    private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+        String templateCode = resolveCode(TemplateType.Template, name, null);
 
         LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
 
@@ -139,19 +115,17 @@ public class TemplateCompiler {
         if (debug) {
             System.out.println(templateDefinition.getCode());
         }
-
-        return templateDefinition;
     }
 
-    private ClassInfo generateTag(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
-        return generateTagOrLayout(TemplateType.Tag, name, classDefinitions, templateDependencies);
+    private ClassInfo generateTag(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
+        return generateTagOrLayout(TemplateType.Tag, name, classDefinitions, templateDependencies, debugInfo);
     }
 
-    private ClassInfo generateLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
-        return generateTagOrLayout(TemplateType.Layout, name, classDefinitions, templateDependencies);
+    private ClassInfo generateLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
+        return generateTagOrLayout(TemplateType.Layout, name, classDefinitions, templateDependencies, debugInfo);
     }
 
-    private ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+    private ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
         templateDependencies.add(name);
         ClassInfo classInfo = new ClassInfo(name, PACKAGE_NAME);
 
@@ -160,10 +134,7 @@ public class TemplateCompiler {
             return classInfo;
         }
 
-        String code = codeResolver.resolve(name);
-        if (code == null) {
-            throw new RuntimeException("No code found for " + type + ": " + name);
-        }
+        String code = resolveCode(type, name, debugInfo);
 
         classDefinitions.add(classDefinition);
 
@@ -178,6 +149,18 @@ public class TemplateCompiler {
         }
 
         return classInfo;
+    }
+
+    private String resolveCode(TemplateType type, String name, DebugInfo debugInfo) {
+        String code = codeResolver.resolve(name);
+        if (code == null) {
+            String message = type + " not found: " + name;
+            if (debugInfo != null) {
+                message += ", referenced at " + debugInfo.name + ":" + debugInfo.line;
+            }
+            throw new TemplateException(message);
+        }
+        return code;
     }
 
     public void clean(String name) {
@@ -467,7 +450,7 @@ public class TemplateCompiler {
         @Override
         public void onTag(int depth, String name, List<String> params) {
             String tagName = TAG_DIRECTORY + name.replace('.', '/') + TAG_EXTENSION;
-            ClassInfo tagInfo = generateTag(tagName, classDefinitions, templateDependencies);
+            ClassInfo tagInfo = generateTag(tagName, classDefinitions, templateDependencies, getCurrentDebugInfo());
 
             writeIndentation(depth);
 
@@ -480,7 +463,7 @@ public class TemplateCompiler {
         @Override
         public void onLayout(int depth, String name, List<String> params) {
             String layoutName = LAYOUT_DIRECTORY + name.replace('.', '/') + LAYOUT_EXTENSION;
-            ClassInfo layoutInfo = generateLayout(layoutName, classDefinitions, templateDependencies);
+            ClassInfo layoutInfo = generateLayout(layoutName, classDefinitions, templateDependencies, getCurrentDebugInfo());
 
             writeIndentation(depth);
             javaCode.append(layoutInfo.fullName).append(".render(output");
@@ -490,6 +473,10 @@ public class TemplateCompiler {
             javaCode.append(", new java.util.function.Function<String, Runnable>() {\n");
             writeIndentation(depth + 1);
             javaCode.append("public Runnable apply(String jteLayoutDefinition) {\n");
+        }
+
+        private DebugInfo getCurrentDebugInfo() {
+            return new DebugInfo(classInfo.name, javaCode.getCurrentTemplateLine() + 1);
         }
 
         private void appendParams(String name, List<String> params) {

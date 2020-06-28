@@ -1,11 +1,11 @@
 package org.jusecase.jte.internal;
 
 import org.jusecase.jte.CodeResolver;
-import org.jusecase.jte.internal.TagOrLayoutParameterParser.ParamInfo;
 import org.jusecase.jte.output.FileOutput;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -22,6 +22,7 @@ public class TemplateCompiler {
     public static final String CLASS_PREFIX = "Jte";
     public static final String CLASS_SUFFIX = "Generated";
     public static final String PACKAGE_NAME = "org.jusecase.jte.generated";
+    public static final String LINE_INFO_FIELD = "LINE_INFO";
     public static final String TEXT_PART_STRING = "TEXT_PART_STRING_";
     public static final String TEXT_PART_BINARY = "TEXT_PART_BINARY_";
 
@@ -31,6 +32,7 @@ public class TemplateCompiler {
     private final boolean debug = false;
     private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
     private boolean nullSafeTemplateCode;
 
     public TemplateCompiler(CodeResolver codeResolver, Path classDirectory) {
@@ -123,27 +125,16 @@ public class TemplateCompiler {
 
         ClassInfo templateInfo = new ClassInfo(name, PACKAGE_NAME);
 
-        TemplateParameterParser attributeParser = new TemplateParameterParser();
-        attributeParser.parse(templateCode);
-
-        StringBuilder javaCode = new StringBuilder("package " + templateInfo.packageName + ";\n");
-        for (String importClass : attributeParser.importClasses) {
-            javaCode.append("import ").append(importClass).append(";\n");
-        }
-
-        javaCode.append("public final class ").append(templateInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(attributeParser.className).append("> {\n");
-        int fieldsIndex = javaCode.length();
-        javaCode.append("\tpublic void render(").append(attributeParser.className).append(" ").append(attributeParser.instanceName).append(", org.jusecase.jte.TemplateOutput output) {\n");
-
-        new TemplateParser(TemplateType.Template).parse(attributeParser.lastIndex, templateCode, new CodeGenerator(TemplateType.Template, javaCode, fieldsIndex, classDefinitions, templateDependencies));
-        javaCode.append("\t}\n");
-        javaCode.append("}\n");
+        CodeGenerator codeGenerator = new CodeGenerator(templateInfo, TemplateType.Template, classDefinitions, templateDependencies);
+        new TemplateParser(TemplateType.Template, codeGenerator).parse(templateCode);
 
         this.templateDependencies.put(name, templateDependencies);
 
         ClassDefinition templateDefinition = new ClassDefinition(templateInfo.fullName);
-        templateDefinition.setCode(javaCode.toString());
+        templateDefinition.setCode(codeGenerator.getCode());
         classDefinitions.add(templateDefinition);
+
+        templateByClassName.put(templateDefinition.getName(), templateInfo);
 
         if (debug) {
             System.out.println(templateDefinition.getCode());
@@ -176,32 +167,11 @@ public class TemplateCompiler {
 
         classDefinitions.add(classDefinition);
 
-        TagOrLayoutParameterParser parameterParser = new TagOrLayoutParameterParser();
-        int lastIndex = parameterParser.parse(code);
+        CodeGenerator codeGenerator = new CodeGenerator(classInfo, type, classDefinitions, templateDependencies);
+        new TemplateParser(type, codeGenerator).parse(code);
 
-        StringBuilder javaCode = new StringBuilder("package " + classInfo.packageName + ";\n");
-        for (String importClass : parameterParser.importClasses) {
-            javaCode.append("import ").append(importClass).append(";\n");
-        }
-
-        javaCode.append("public final class ").append(classInfo.className).append(" {\n");
-        int fieldsIndex = javaCode.length();
-        javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
-        for (ParamInfo parameter : parameterParser.parameters) {
-            javaCode.append(", ").append(parameter.type).append(' ').append(parameter.name);
-        }
-        paramOrder.put(name, parameterParser.parameters);
-        if (type == TemplateType.Layout) {
-            javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
-        }
-        javaCode.append(") {\n");
-
-        new TemplateParser(type).parse(lastIndex, code, new CodeGenerator(type, javaCode, fieldsIndex, classDefinitions, templateDependencies));
-
-        javaCode.append("\t}\n");
-        javaCode.append("}\n");
-
-        classDefinition.setCode(javaCode.toString());
+        classDefinition.setCode(codeGenerator.getCode());
+        templateByClassName.put(classDefinition.getName(), classInfo);
 
         if (debug) {
             System.out.println(classDefinition.getCode());
@@ -247,29 +217,125 @@ public class TemplateCompiler {
         this.nullSafeTemplateCode = nullSafeTemplateCode;
     }
 
+    public DebugInfo resolveDebugInfo(ClassLoader classLoader, StackTraceElement[] stackTrace) {
+        if (stackTrace.length == 0) {
+            return null;
+        }
+
+        for (StackTraceElement stackTraceElement : stackTrace) {
+           if (stackTraceElement.getClassName().startsWith(PACKAGE_NAME)) {
+               ClassInfo classInfo = templateByClassName.get(stackTraceElement.getClassName());
+               if (classInfo != null) {
+                   return new DebugInfo(classInfo.name, resolveLineNumber(classLoader, classInfo, stackTraceElement.getLineNumber()));
+               }
+           }
+        }
+
+        return null;
+    }
+
+    private int resolveLineNumber(ClassLoader classLoader, ClassInfo classInfo, int lineNumber) {
+        try {
+            Class<?> clazz = classLoader.loadClass(classInfo.fullName);
+            Field lineInfoField = clazz.getField(LINE_INFO_FIELD);
+            int[] javaLineToTemplateLine = (int[]) lineInfoField.get(null);
+            return javaLineToTemplateLine[lineNumber - 1] + 1;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     private class CodeGenerator implements TemplateParserVisitor {
+        private final ClassInfo classInfo;
         private final TemplateType type;
-        private final StringBuilder javaCode;
-        private final int fieldsIndex;
+        private final CodeBuilder javaCode = new CodeBuilder();
         private final LinkedHashSet<ClassDefinition> classDefinitions;
         private final LinkedHashSet<String> templateDependencies;
+        private final List<ParamInfo> parameters = new ArrayList<>();
         private final List<String> textParts = new ArrayList<>();
 
-        private CodeGenerator(TemplateType type, StringBuilder javaCode, int fieldsIndex, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+        private boolean hasWrittenPackage;
+        private boolean hasWrittenClass;
+
+        private CodeGenerator(ClassInfo classInfo, TemplateType type, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+            this.classInfo = classInfo;
             this.type = type;
-            this.javaCode = javaCode;
-            this.fieldsIndex = fieldsIndex;
             this.classDefinitions = classDefinitions;
             this.templateDependencies = templateDependencies;
         }
 
         @Override
-        public void onComplete() {
-            if (textParts.isEmpty()) {
-                return;
+        public void onImport(String importClass) {
+            writePackageIfRequired();
+            javaCode.append("import ").append(importClass).append(";\n");
+        }
+
+        private void writePackageIfRequired() {
+            if (!hasWrittenPackage) {
+                javaCode.append("package " + classInfo.packageName + ";\n");
+                hasWrittenPackage = true;
+            }
+        }
+
+        @Override
+        public void onParam(ParamInfo parameter) {
+            writePackageIfRequired();
+            if (!hasWrittenClass) {
+                if (type == TemplateType.Template) {
+                    writeTemplateClass(parameter);
+                } else {
+                    writeTagOrLayoutClass();
+                }
             }
 
-            StringBuilder fields = new StringBuilder();
+            javaCode.append(", ").append(parameter.type).append(' ').append(parameter.name);
+
+            parameters.add(parameter);
+        }
+
+        private void writeTemplateClass(ParamInfo parameter) {
+            javaCode.append("public final class ").append(classInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(parameter.type).append("> {\n");
+            javaCode.markFieldsIndex();
+            javaCode.append("\tpublic void render(org.jusecase.jte.TemplateOutput output");
+
+            hasWrittenClass = true;
+        }
+
+        private void writeTagOrLayoutClass() {
+            javaCode.append("public final class ").append(classInfo.className).append(" {\n");
+            javaCode.markFieldsIndex();
+            javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
+
+            hasWrittenClass = true;
+        }
+
+        @Override
+        public void onParamsComplete() {
+            writePackageIfRequired();
+            if (!hasWrittenClass) {
+                writeTagOrLayoutClass();
+            }
+
+            if (type == TemplateType.Layout) {
+                javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
+            }
+            javaCode.append(") {\n");
+
+            paramOrder.put(classInfo.name, parameters);
+        }
+
+        @Override
+        public void onLineFinished() {
+            javaCode.finishTemplateLine();
+        }
+
+        @Override
+        public void onComplete() {
+            int lineCount = textParts.size() * 2 + 1;
+            javaCode.insertFieldLines(lineCount);
+
+            StringBuilder fields = new StringBuilder(64 + 32 * lineCount);
+            javaCode.addLineInfoField(fields);
             for (int i = 0; i < textParts.size(); i++) {
                 fields.append("\tprivate static final String ").append(TEXT_PART_STRING).append(i).append(" = \"");
                 appendEscaped(fields, textParts.get(i));
@@ -277,7 +343,10 @@ public class TemplateCompiler {
                 fields.append("\tprivate static final byte[] ").append(TEXT_PART_BINARY).append(i).append(" = org.jusecase.jte.internal.IoUtils.getUtf8Bytes(").append(TEXT_PART_STRING).append(i).append(");\n");
             }
 
-            javaCode.insert(fieldsIndex, fields);
+            javaCode.insertFields(fields);
+
+            javaCode.append("\t}\n");
+            javaCode.append("}\n");
         }
 
         @Override
@@ -512,7 +581,6 @@ public class TemplateCompiler {
             javaCode.append("});\n");
         }
 
-        @SuppressWarnings("StringRepeatCanBeUsed")
         private void writeIndentation(int depth) {
             for (int i = 0; i < depth + 2; ++i) {
                 javaCode.append('\t');
@@ -541,14 +609,21 @@ public class TemplateCompiler {
                 }
             }
         }
+
+        public String getCode() {
+            return javaCode.getCode();
+        }
     }
 
     private static final class ClassInfo {
+        final String name;
         final String className;
         final String packageName;
         final String fullName;
 
         ClassInfo(String name, String parentPackage) {
+            this.name = name;
+
             int endIndex = name.lastIndexOf('.');
             if (endIndex == -1) {
                 endIndex = name.length();

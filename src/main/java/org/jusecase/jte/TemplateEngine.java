@@ -1,5 +1,6 @@
 package org.jusecase.jte;
 
+import org.jusecase.jte.internal.DebugInfo;
 import org.jusecase.jte.internal.Template;
 import org.jusecase.jte.internal.TemplateCompiler;
 
@@ -25,7 +26,16 @@ public final class TemplateEngine {
 
     public void render(String name, Object model, TemplateOutput output) {
         Template template = resolveTemplate(name);
-        template.render(model, output);
+        try {
+            template.render(output, model);
+        } catch (Exception e) {
+            DebugInfo debugInfo = compiler.resolveDebugInfo(template.getClass().getClassLoader(), e.getStackTrace());
+            String message = "Failed to render " + name;
+            if (debugInfo != null) {
+                message += ", error at " + debugInfo.name + ":" + debugInfo.line;
+            }
+            throw new TemplateException(message, e);
+        }
     }
 
     /**

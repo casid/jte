@@ -1,5 +1,6 @@
 package org.jusecase.jte;
 
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jusecase.jte.internal.TemplateCompiler;
@@ -516,7 +517,7 @@ public class TemplateEngineTest {
                 "no" +
                 "@endif");
 
-        thenRenderingFailsWithException(NullPointerException.class);
+        thenRenderingFailsWithExceptionCausedBy(NullPointerException.class);
     }
 
     @Test
@@ -550,7 +551,7 @@ public class TemplateEngineTest {
         model = null;
         givenTemplate("${model.hello} world");
 
-        thenRenderingFailsWithException(NullPointerException.class);
+        thenRenderingFailsWithExceptionCausedBy(NullPointerException.class);
     }
 
     @Test
@@ -594,7 +595,7 @@ public class TemplateEngineTest {
         templateEngine.setNullSafeTemplateCode(true);
         givenTemplate("This is ${model.getThatThrows()} world");
 
-        thenRenderingFailsWithException(NullPointerException.class);
+        thenRenderingFailsWithExceptionCausedBy(NullPointerException.class);
     }
 
     // Making for null-safe would be very messy and require an extra dependency,
@@ -606,7 +607,7 @@ public class TemplateEngineTest {
         givenTemplate("@for (int i : model.array)" +
                 "${i}" +
                 "@endfor");
-        thenRenderingFailsWithException(NullPointerException.class);
+        thenRenderingFailsWithExceptionCausedBy(NullPointerException.class);
     }
 
     @Test
@@ -630,6 +631,79 @@ public class TemplateEngineTest {
         templateEngine.setNullSafeTemplateCode(true);
         givenTemplate("!{model.hello.length()}");
         thenOutputIs("");
+    }
+
+    @Test
+    void exceptionLineNumber1() {
+        givenRawTemplate(
+                "@import org.jusecase.jte.TemplateEngineTest.Model\n" +
+                "\n" +
+                "@param org.jusecase.jte.TemplateEngineTest.Model model\n" +
+                "\n" +
+                "${model.getThatThrows()}\n"
+        );
+        thenRenderingFailsWithException()
+                .hasCauseInstanceOf(NullPointerException.class)
+                .hasMessage("Failed to render test/template.jte, error at test/template.jte:5");
+    }
+
+    @Test
+    void exceptionLineNumber2() {
+        givenRawTemplate(
+                "@import org.jusecase.jte.TemplateEngineTest.Model\n" +
+                        "\n\n\n" +
+                        "@param org.jusecase.jte.TemplateEngineTest.Model model\n" +
+                        "\n" +
+                        "${model.getThatThrows()}\n"
+        );
+        thenRenderingFailsWithException()
+                .hasCauseInstanceOf(NullPointerException.class)
+                .hasMessage("Failed to render test/template.jte, error at test/template.jte:7");
+    }
+
+    @Test
+    void exceptionLineNumber3() {
+        givenRawTemplate(
+                "@import org.jusecase.jte.TemplateEngineTest.Model\n" +
+                        "\n" +
+                        "@param org.jusecase.jte.TemplateEngineTest.Model model\n" +
+                        "\n" +
+                        "${model.hello} ${model.getThatThrows()}\n"
+        );
+        thenRenderingFailsWithException()
+                .hasCauseInstanceOf(NullPointerException.class)
+                .hasMessage("Failed to render test/template.jte, error at test/template.jte:5");
+    }
+
+    @Test
+    void exceptionLineNumber4() {
+        givenRawTemplate(
+                "@import org.jusecase.jte.TemplateEngineTest.Model\n" +
+                        "\n" +
+                        "@param org.jusecase.jte.TemplateEngineTest.Model model\n" +
+                        "\n" +
+                        "${model.hello}\n" +
+                        "@for(int i = 0; i < 3; i++)\n" +
+                        "\t${i}\n" +
+                        "\t${model.getThatThrows()}\n" +
+                        "@endfor\n"
+        );
+        thenRenderingFailsWithException()
+                .hasCauseInstanceOf(NullPointerException.class)
+                .hasMessage("Failed to render test/template.jte, error at test/template.jte:8");
+    }
+
+    @Test
+    void exceptionLineNumber5() {
+        givenTag("model", "@param org.jusecase.jte.TemplateEngineTest.Model model\n" +
+                "@param int i = 0\n" +
+                "i is: ${i}\n" +
+                "${model.getThatThrows()}");
+        givenTemplate("@tag.model(model)");
+
+        thenRenderingFailsWithException()
+                .hasCauseInstanceOf(NullPointerException.class)
+                .hasMessage("Failed to render test/template.jte, error at tag/model.jte:4");
     }
 
     private void givenTag(String name, String code) {
@@ -656,10 +730,14 @@ public class TemplateEngineTest {
         assertThat(output.toString()).isEqualTo(expected);
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private void thenRenderingFailsWithException(Class<? extends Throwable> clazz) {
+    private AbstractThrowableAssert<?, ? extends Throwable> thenRenderingFailsWithException() {
         Throwable throwable = catchThrowable(() -> thenOutputIs("ignored"));
-        assertThat(throwable).isInstanceOf(clazz);
+        return assertThat(throwable).isInstanceOf(TemplateException.class);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private void thenRenderingFailsWithExceptionCausedBy(Class<? extends Throwable> clazz) {
+        thenRenderingFailsWithException().hasCauseInstanceOf(clazz);
     }
 
     @SuppressWarnings("unused")

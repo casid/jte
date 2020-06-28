@@ -9,17 +9,20 @@ final class TemplateParser {
     private static final int LAYOUT_DEFINITION_DEPTH = 4;
 
     private final TemplateType type;
+    private final TemplateParserVisitor visitor;
     private final Deque<Mode> stack = new ArrayDeque<>();
 
     private Mode currentMode;
     private int depth;
+    private boolean paramsComplete;
 
-    TemplateParser(TemplateType type) {
+    TemplateParser(TemplateType type, TemplateParserVisitor visitor) {
         this.type = type;
+        this.visitor = visitor;
     }
 
-    public void parse(int startIndex, String templateCode, TemplateParserVisitor visitor) {
-        int lastIndex = startIndex;
+    public void parse(String templateCode) {
+        int lastIndex = 0;
 
         char previousChar8;
         char previousChar7 = 0;
@@ -47,7 +50,21 @@ final class TemplateParser {
             previousChar0 = currentChar;
             currentChar = templateCode.charAt(i);
 
-            if (currentMode != Mode.Comment && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
+            if (previousChar5 == '@' && previousChar4 == 'i' && previousChar3 == 'm' && previousChar2 == 'p' && previousChar1 == 'o' && previousChar0 == 'r' && currentChar == 't') {
+                push(Mode.Import);
+                lastIndex = i + 1;
+            } else if (currentMode == Mode.Import && currentChar == '\n') {
+                extract(templateCode, lastIndex, i, (depth, content) -> visitor.onImport(content.trim()));
+                pop();
+                lastIndex = i + 1;
+            } else if (previousChar4 == '@' && previousChar3 == 'p' && previousChar2 == 'a' && previousChar1 == 'r' && previousChar0 == 'a' && currentChar == 'm') {
+                push(Mode.Param);
+                lastIndex = i + 1;
+            } else if (currentMode == Mode.Param && currentChar == '\n') {
+                extract(templateCode, lastIndex, i, (depth, content) -> visitor.onParam(new ParamInfo(content.trim())));
+                pop();
+                lastIndex = i + 1;
+            } else if (currentMode != Mode.Comment && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
                 if (currentMode == Mode.Text) {
                     extract(templateCode, lastIndex, i - 3, visitor::onTextPart);
                 }
@@ -279,6 +296,10 @@ final class TemplateParser {
                 lastIndex = i + 1;
                 pop();
             }
+
+            if (currentChar == '\n') {
+                visitor.onLineFinished();
+            }
         }
 
         if (lastIndex < templateCode.length()) {
@@ -316,6 +337,11 @@ final class TemplateParser {
     }
 
     private void extract(String templateCode, int startIndex, int endIndex, VisitorCallback callback) {
+        if (!paramsComplete && currentMode != Mode.Param && currentMode != Mode.Import) {
+            visitor.onParamsComplete();
+            paramsComplete = true;
+        }
+
         if (startIndex < 0) {
             return;
         }
@@ -330,6 +356,8 @@ final class TemplateParser {
     }
 
     private interface Mode {
+        Mode Import = new StatelessMode();
+        Mode Param = new StatelessMode();
         Mode Text = new StatelessMode();
         Mode Code = new StatelessMode();
         Mode SafeCode = new StatelessMode();

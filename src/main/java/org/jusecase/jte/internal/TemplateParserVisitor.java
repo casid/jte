@@ -3,6 +3,12 @@ package org.jusecase.jte.internal;
 import java.util.List;
 
 interface TemplateParserVisitor {
+    void onImport(String importClass);
+
+    void onParam(ParamInfo parameter);
+
+    void onParamsComplete();
+
     void onTextPart(int depth, String textPart);
 
     void onCodePart(int depth, String codePart);
@@ -34,6 +40,8 @@ interface TemplateParserVisitor {
     void onLayoutDefineEnd(int depth);
 
     void onLayoutEnd(int depth);
+
+    void onLineFinished();
 
     void onComplete();
 }

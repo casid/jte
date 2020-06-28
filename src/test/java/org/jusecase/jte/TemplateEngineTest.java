@@ -707,6 +707,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void compileError0() {
+        thenRenderingFailsWithException()
+            .hasMessage("Template not found: test/template.jte");
+    }
+
+    @Test
     void compileError1() {
         givenTemplate("@tag.model(model)");
         thenRenderingFailsWithException()

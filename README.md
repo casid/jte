@@ -111,9 +111,10 @@ jte is available on <a href="http://mvnrepository.com/artifact/org.jusecase/jte"
 <dependency>
     <groupId>org.jusecase</groupId>
     <artifactId>jte</artifactId>
-    <version>0.1.1</version>
+    <version>0.2.0</version>
 </dependency>
 ```
+Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)
 
 ## Websites rendered with jte
 

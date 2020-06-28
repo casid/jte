@@ -4,4 +4,4 @@ jdk:
   - openjdk11
 
 after_success:
-  - mvn clean test
+  - mvn clean test jacoco:report coveralls:report

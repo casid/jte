@@ -306,6 +306,7 @@ final class TemplateParser {
             extract(templateCode, lastIndex, templateCode.length(), visitor::onTextPart);
         }
 
+        completeParamsIfRequired();
         visitor.onComplete();
     }
 
@@ -337,10 +338,7 @@ final class TemplateParser {
     }
 
     private void extract(String templateCode, int startIndex, int endIndex, VisitorCallback callback) {
-        if (!paramsComplete && currentMode != Mode.Param && currentMode != Mode.Import) {
-            visitor.onParamsComplete();
-            paramsComplete = true;
-        }
+        completeParamsIfRequired();
 
         if (startIndex < 0) {
             return;
@@ -349,6 +347,13 @@ final class TemplateParser {
             return;
         }
         callback.accept(depth, templateCode.substring(startIndex, endIndex));
+    }
+
+    private void completeParamsIfRequired() {
+        if (!paramsComplete && currentMode != Mode.Param && currentMode != Mode.Import) {
+            visitor.onParamsComplete();
+            paramsComplete = true;
+        }
     }
 
     interface VisitorCallback {

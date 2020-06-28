@@ -707,6 +707,28 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void emptyTemplate() {
+        givenRawTemplate("");
+        thenRenderingFailsWithException();
+    }
+
+    @Test
+    void emptyTag() {
+        givenTag("test", "");
+        givenTemplate("@tag.test()");
+        thenOutputIs("");
+    }
+
+    @Test
+    void emptyLayout() {
+        givenLayout("test", "");
+        givenTemplate(
+                "@layout.test()\n" +
+                "@endlayout");
+        thenOutputIs("");
+    }
+
+    @Test
     void compileError0() {
         thenRenderingFailsWithException()
             .hasMessage("Template not found: test/template.jte");

@@ -143,7 +143,7 @@ When looping, you may use the `ForSupport`class to gain information about the lo
 ```xml
 @import org.jusecase.jte.support.ForSupport
 <%-- ... --%>
-@for(ForSupport<Entry> entryLoop : ForSupport.of(model.entries))
+@for(var entryLoop : ForSupport.of(model.entries))
     <tr class="${(entryLoop.getIndex() + 1) % 2 == 0 ? "even" : "odd"}">
         ${entryLoop.get().title}
     </tr>

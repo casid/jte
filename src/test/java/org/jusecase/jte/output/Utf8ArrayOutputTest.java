@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,13 +14,27 @@ public class Utf8ArrayOutputTest {
     @Test
     void test() {
         assertEncoding("Hello world", 11);
+        assertEncoding("Äöü-µ", 9);
         assertEncoding("你好，世界", 15);
         assertEncoding("你好，世界 \uD83D\uDE02\uD83D\uDE02\uD83D\uDE02", 28);
     }
 
+    @Test
+    void binary() {
+        assertEncoding(o -> {
+            o.writeStaticContent(null, "<h1>Hello ".getBytes(StandardCharsets.UTF_8));
+            o.writeUnsafeContent("你好，世界");
+            o.writeStaticContent(null, "</h1>".getBytes(StandardCharsets.UTF_8));
+        }, "<h1>Hello 你好，世界</h1>", 30);
+    }
+
     private void assertEncoding(String expected, int expectedContentLength) {
+        assertEncoding(o -> o.writeSafeContent(expected), expected, expectedContentLength);
+    }
+
+    private void assertEncoding(Consumer<Utf8ArrayOutput> outputConsumer, String expected, int expectedContentLength) {
         Utf8ArrayOutput output = new Utf8ArrayOutput();
-        output.writeSafeContent(expected);
+        outputConsumer.accept(output);
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             output.writeTo(outputStream);
@@ -31,6 +46,4 @@ public class Utf8ArrayOutputTest {
             throw new UncheckedIOException(e);
         }
     }
-
-
 }

@@ -80,12 +80,12 @@ final class TemplateParser {
                 }
                 lastIndex = i + 1;
                 push(Mode.Code);
-            } else if (previousChar4 == '$' && previousChar3 == 's' && previousChar2 == 'a' && previousChar1 == 'f' && previousChar0 == 'e' && currentChar == '{') {
+            } else if (previousChar6 == '$' && previousChar5 == 'u' && previousChar4 == 'n' && previousChar3 == 's' && previousChar2 == 'a' && previousChar1 == 'f' && previousChar0 == 'e' && currentChar == '{') {
                 if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 5, visitor::onTextPart);
+                    extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
                 }
                 lastIndex = i + 1;
-                push(Mode.SafeCode);
+                push(Mode.UnsafeCode);
             } else if (previousChar0 == '!' && currentChar == '{') {
                 if (currentMode == Mode.Text) {
                     extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
@@ -108,7 +108,7 @@ final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onCodePart);
                     lastIndex = i + 1;
                 }
-            } else if (currentChar == '}' && currentMode == Mode.SafeCode) {
+            } else if (currentChar == '}' && currentMode == Mode.UnsafeCode) {
                 pop();
                 if (currentMode == Mode.Text) {
                     extract(templateCode, lastIndex, i, visitor::onSafeCodePart);
@@ -365,7 +365,7 @@ final class TemplateParser {
         Mode Param = new StatelessMode();
         Mode Text = new StatelessMode();
         Mode Code = new StatelessMode();
-        Mode SafeCode = new StatelessMode();
+        Mode UnsafeCode = new StatelessMode();
         Mode CodeStatement = new StatelessMode();
         Mode Condition = new StatelessMode();
         Mode JavaCode = new StatelessMode(true);

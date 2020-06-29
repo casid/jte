@@ -582,10 +582,10 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void npe_nullSafe_safeOutput() {
+    void npe_nullSafe_unsafeOutput() {
         templateEngine.setNullSafeTemplateCode(true);
         model = null;
-        givenTemplate("This is $safe{model.hello} world");
+        givenTemplate("This is $unsafe{model.hello} world");
 
         thenOutputIs("This is  world");
     }

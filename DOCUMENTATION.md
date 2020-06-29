@@ -351,8 +351,8 @@ Before rendering, you'd simply wrap the actual `TemplateOutput` you are using:
 TemplateOutput output = new SecureOutput(new StringOutput());
 ```
 
-In rare cases you may want to skip output escaping for a certain element. You can do this by using `$safe{}` instead of `${}`. For instance, to trust the model name, we would write:
+In rare cases you may want to skip output escaping for a certain element. You can do this by using `$unsafe{}` instead of `${}`. For instance, to trust the model name, we would write:
 
 ```
-$safe{model.name}
+$unsafe{model.name}
 ```

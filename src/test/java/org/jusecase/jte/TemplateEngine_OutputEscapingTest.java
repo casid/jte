@@ -28,7 +28,7 @@ public class TemplateEngine_OutputEscapingTest {
     void alreadyEscaped() {
         dummyCodeResolver.givenCode("template.jte", "@import java.lang.String\n" +
                 "@param String model\n" +
-                "Hello $safe{model}, ${1}, ${1.0f}");
+                "Hello $unsafe{model}, ${1}, ${1.0f}");
 
         templateEngine.render("template.jte", "Model", secureOutput);
 

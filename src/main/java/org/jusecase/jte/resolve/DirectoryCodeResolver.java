@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 public class DirectoryCodeResolver implements CodeResolver {
     private final Path root;
+    private Thread reloadThread;
 
     public DirectoryCodeResolver(Path root) {
         this.root = root;
@@ -44,10 +45,14 @@ public class DirectoryCodeResolver implements CodeResolver {
     }
 
     public void enableHotReload(TemplateEngine templateEngine, Consumer<List<String>> onTemplatesInvalidated) {
-        Thread reloadThread = new Thread(() -> enableHotReloadBlocking(templateEngine, onTemplatesInvalidated));
+        reloadThread = new Thread(() -> enableHotReloadBlocking(templateEngine, onTemplatesInvalidated));
         reloadThread.setName("jte-reloader");
         reloadThread.setDaemon(true);
         reloadThread.start();
+    }
+
+    public void stopHotReload() {
+        reloadThread.interrupt();
     }
 
     public void enableHotReloadBlocking(TemplateEngine templateEngine, Consumer<List<String>> onTemplatesInvalidated) {

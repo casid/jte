@@ -39,6 +39,7 @@ class TemplateEngine_HotReloadTest {
 
     @AfterEach
     void tearDown() {
+        codeResolver.stopHotReload();
         IoUtils.deleteDirectoryContent(tempDirectory);
     }
 

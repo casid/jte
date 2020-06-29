@@ -40,7 +40,9 @@ class Benchmark {
         System.out.println();
     }
 
-    private void render(Page page) {
-        templateEngine.render(page.getTemplate(), page, new StringOutput());
+    StringOutput render(Page page) {
+        StringOutput output = new StringOutput();
+        templateEngine.render(page.getTemplate(), page, output);
+        return output;
     }
 }

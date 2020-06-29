@@ -7,7 +7,7 @@ import java.nio.file.Path;
 
 public class HotReloadTemplatesTester {
     @Test
-    void name() {
+    void run() {
         DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "test", "resources", "benchmark"));
         TemplateEngine templateEngine = new TemplateEngine(codeResolver, Path.of("jte"));
 

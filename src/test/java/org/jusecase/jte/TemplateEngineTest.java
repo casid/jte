@@ -348,9 +348,29 @@ public class TemplateEngineTest {
     void tagWithVarArgs2() {
         givenTag("varargs",
                 "@param String ... values\n" +
-                        "@for(String value : values)${value} @endfor");
+                "@for(String value : values)${value} @endfor");
         givenTemplate("@tag.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
+    }
+
+    @Test
+    void tagWithVarArgs3() {
+        givenTag("localize",
+                "@param String key\n" +
+                "@param String ... values\n" +
+                "${key} with @for(String value : values)${value} @endfor");
+        givenTemplate("@tag.localize(key = \"test.key\", \"Hello\", \"World\")");
+        thenOutputIs("test.key with Hello World ");
+    }
+
+    @Test
+    void tagWithVarArgs4() {
+        givenTag("localize",
+                "@param String key\n" +
+                        "@param String ... values\n" +
+                        "${key} with @for(String value : values)${value} @endfor");
+        givenTemplate("@tag.localize(\"test.key\", \"Hello\", \"World\")");
+        thenOutputIs("test.key with Hello World ");
     }
 
     @Test

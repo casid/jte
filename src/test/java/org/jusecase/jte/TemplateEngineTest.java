@@ -336,6 +336,24 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithVarArgs1() {
+        givenTag("varargs",
+                "@param String ... values\n" +
+                "@for(String value : values)${value} @endfor");
+        givenTemplate("@tag.varargs(\"Hello\")");
+        thenOutputIs("Hello");
+    }
+
+    @Test
+    void tagWithVarArgs2() {
+        givenTag("varargs",
+                "@param String ... values\n" +
+                        "@for(String value : values)${value} @endfor");
+        givenTemplate("@tag.varargs(\"Hello\", \"World\")");
+        thenOutputIs("Hello World ");
+    }
+
+    @Test
     void hotReload() {
         givenTemplate("${model.hello} World");
         thenOutputIs("Hello World");

@@ -11,6 +11,7 @@ final class ParamInfo {
         int nameStartIndex = -1;
         int nameEndIndex = -1;
         int defaultValueStartIndex = -1;
+        int varArgsIndex = parameterString.indexOf("...");
         for (int i = 0; i < parameterString.length(); ++i) {
             char character = parameterString.charAt(i);
 
@@ -19,7 +20,7 @@ final class ParamInfo {
                     typeStartIndex = i;
                 }
             } else if (typeEndIndex == -1) {
-                if (Character.isWhitespace(character)) {
+                if (Character.isWhitespace(character) && i > varArgsIndex) {
                     typeEndIndex = i;
                 }
             } else if (nameStartIndex == -1) {

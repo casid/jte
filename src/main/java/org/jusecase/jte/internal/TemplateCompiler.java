@@ -492,7 +492,7 @@ public class TemplateCompiler {
             }
 
             int index = 0;
-            ParamCallInfo[] paramCallInfos = new ParamCallInfo[paramInfos.size()];
+            ParamCallInfo[] paramCallInfos = new ParamCallInfo[Math.max(params.size(), paramInfos.size())];
             for (String param : params) {
                 ParamCallInfo paramCallInfo = new ParamCallInfo(param);
                 int parameterIndex = getParameterIndex(name, paramInfos, paramCallInfo);

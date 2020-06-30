@@ -15,7 +15,7 @@ public final class Utf8StreamOutput implements TemplateOutput {
     }
 
     @Override
-    public void writeSafeContent(String value) {
+    public void writeContent(String value) {
         try {
             IoUtils.writeUtf8(value, outputStream);
         } catch (IOException e) {

@@ -13,7 +13,7 @@ interface TemplateParserVisitor {
 
     void onCodePart(int depth, String codePart);
 
-    void onSafeCodePart(int depth, String codePart);
+    void onUnsafeCodePart(int depth, String codePart);
 
     void onCodeStatement(int depth, String codePart);
 

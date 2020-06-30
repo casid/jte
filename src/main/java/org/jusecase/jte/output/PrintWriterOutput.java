@@ -13,7 +13,7 @@ public class PrintWriterOutput implements TemplateOutput {
     }
 
     @Override
-    public void writeSafeContent(String value) {
+    public void writeContent(String value) {
         writer.write(value);
     }
 }

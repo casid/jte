@@ -44,13 +44,13 @@ public class TemplateEngine_OutputEscapingTest {
         }
 
         @Override
-        public void writeSafeContent(String value) {
-            output.writeSafeContent(value);
+        public void writeContent(String value) {
+            output.writeContent(value);
         }
 
         @Override
-        public void writeUnsafeContent(String value) {
-            output.writeSafeContent("<cleaned>" + value + "</cleaned>");
+        public void writeUserContent(String value) {
+            output.writeContent("<cleaned>" + value + "</cleaned>");
         }
     }
 }

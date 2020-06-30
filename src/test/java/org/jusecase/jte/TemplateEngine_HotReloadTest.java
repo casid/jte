@@ -92,7 +92,7 @@ class TemplateEngine_HotReloadTest {
 
     private void whenFileIsWritten(String name, String content) {
         try (FileOutput fileOutput = new FileOutput(tempDirectory.resolve(name))) {
-            fileOutput.writeSafeContent(content);
+            fileOutput.writeContent(content);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

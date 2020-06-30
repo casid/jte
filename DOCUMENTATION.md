@@ -54,7 +54,7 @@ package org.jusecase.jte.generated.test;
 import my.Model;
 public final class JteexampleGenerated implements org.jusecase.jte.internal.Template<Model> {
     public void render(Model model, org.jusecase.jte.TemplateOutput output) {
-        output.writeSafeContent("Hello world!");
+        output.writeStaticContent("Hello world!");
     }
 }
 ```
@@ -89,9 +89,9 @@ package org.jusecase.jte.generated.test;
 import my.Model;
 public final class JtetemplateGenerated implements org.jusecase.jte.internal.Template<Model> {
     public void render(Model model, org.jusecase.jte.TemplateOutput output) {
-        output.writeSafeContent("Hello ");
-        output.writeUnsafe(model.jte);
-        output.writeSafeContent("!");
+        output.writeStaticContent("Hello ");
+        output.writeUserContent(model.name);
+        output.writeStaticContent("!");
     }
 }
 ```
@@ -334,13 +334,13 @@ public class SecureOutput implements TemplateOutput {
     }
 
     @Override
-    public void writeSafeContent(String value) {
-        output.writeSafeContent(value);
+    public void writeContent(String value) {
+        output.writeContent(value);
     }
 
     @Override
-    public void writeUnsafeContent(String value) {
-        output.writeSafeContent(Jsoup.clean(value, Whitelist.basic()));
+    public void writeUserContent(String value) {
+        output.writeContent(Jsoup.clean(value, Whitelist.basic()));
     }
 }
 ```

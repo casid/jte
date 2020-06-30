@@ -79,7 +79,7 @@ public class TemplateCompiler {
 
         for (ClassDefinition classDefinition : classDefinitions) {
             try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getJavaFileName()))) {
-                fileOutput.writeSafeContent(classDefinition.getCode());
+                fileOutput.writeContent(classDefinition.getCode());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
@@ -351,12 +351,12 @@ public class TemplateCompiler {
 
         @Override
         public void onCodePart(int depth, String codePart) {
-            writeCodePart(depth, codePart, "output.writeUnsafe(");
+            writeCodePart(depth, codePart, "output.writeSafe(");
         }
 
         @Override
-        public void onSafeCodePart(int depth, String codePart) {
-            writeCodePart(depth, codePart, "output.writeSafe(");
+        public void onUnsafeCodePart(int depth, String codePart) {
+            writeCodePart(depth, codePart, "output.writeUnsafe(");
         }
 
         private void writeCodePart(int depth, String codePart, String method) {

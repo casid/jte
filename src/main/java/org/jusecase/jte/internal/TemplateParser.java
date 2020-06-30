@@ -111,7 +111,7 @@ final class TemplateParser {
             } else if (currentChar == '}' && currentMode == Mode.UnsafeCode) {
                 pop();
                 if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i, visitor::onSafeCodePart);
+                    extract(templateCode, lastIndex, i, visitor::onUnsafeCodePart);
                     lastIndex = i + 1;
                 }
             } else if (previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f') {

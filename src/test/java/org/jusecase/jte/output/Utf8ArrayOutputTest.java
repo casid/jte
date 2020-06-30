@@ -23,13 +23,13 @@ public class Utf8ArrayOutputTest {
     void binary() {
         assertEncoding(o -> {
             o.writeStaticContent(null, "<h1>Hello ".getBytes(StandardCharsets.UTF_8));
-            o.writeUnsafeContent("你好，世界");
+            o.writeUserContent("你好，世界");
             o.writeStaticContent(null, "</h1>".getBytes(StandardCharsets.UTF_8));
         }, "<h1>Hello 你好，世界</h1>", 30);
     }
 
     private void assertEncoding(String expected, int expectedContentLength) {
-        assertEncoding(o -> o.writeSafeContent(expected), expected, expectedContentLength);
+        assertEncoding(o -> o.writeContent(expected), expected, expectedContentLength);
     }
 
     private void assertEncoding(Consumer<Utf8ArrayOutput> outputConsumer, String expected, int expectedContentLength) {

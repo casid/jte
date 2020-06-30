@@ -26,7 +26,7 @@ public class FileOutput implements TemplateOutput, Closeable {
     }
 
     @Override
-    public void writeSafeContent(String value) {
+    public void writeContent(String value) {
         try {
             writer.write(value);
         } catch (IOException e) {

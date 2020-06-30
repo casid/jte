@@ -341,7 +341,7 @@ public class TemplateEngineTest {
                 "@param String ... values\n" +
                 "@for(String value : values)${value} @endfor");
         givenTemplate("@tag.varargs(\"Hello\")");
-        thenOutputIs("Hello");
+        thenOutputIs("Hello ");
     }
 
     @Test

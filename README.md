@@ -1,6 +1,6 @@
 # jte (Java Template Engine)
 [![Build Status](https://travis-ci.org/casid/jte.svg?branch=master)](https://travis-ci.org/casid/jte)
-[![Coverage Status](https://coveralls.io/repos/github/casid/jte/badge.svg?branch=master&latest=1)](https://coveralls.io/github/casid/jte?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/casid/jte/badge.svg?branch=master)](https://coveralls.io/github/casid/jte?branch=master)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/casid/jte/master/LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/org.jusecase/jte.svg)](http://mvnrepository.com/artifact/org.jusecase/jte)
 
@@ -113,13 +113,13 @@ jte is available on <a href="http://mvnrepository.com/artifact/org.jusecase/jte"
 <dependency>
     <groupId>org.jusecase</groupId>
     <artifactId>jte</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-compile group: 'org.jusecase', name: 'jte', version: '0.2.0'
+compile group: 'org.jusecase', name: 'jte', version: '0.3.0'
 ```
 
 Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)

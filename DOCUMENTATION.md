@@ -220,12 +220,23 @@ The second call could then be simplified to this:
 
 ### Varargs
 
-The last parameter of a tag can be a varargs parameter. For instance, if you created a tag to localize messages, that include optional parameters depending on the key you're localizing, you could create a tag `tag/localize.jte`:
+The last parameter of a tag can be a varargs parameter. For instance, if you created a tag to wrap elements in a list you could create something like `tag/list.jte`:
 
 ```xml
-@param String key
-@param String ... params
-${my.LocalizationContext.getCurrent().localize(key, params)}
+@param String title
+@param String ... elements
+<h2>${title}</h2>
+<ul>
+@for(var element : elements)
+    <li>${element}</li>
+@endfor
+</ul>
+```
+
+And call it like this:
+
+```xml
+@tag.list(title = "Things to do", "Cook dinner", "Eat", "Netflix and Chill")
 ```
 
 ## Layouts

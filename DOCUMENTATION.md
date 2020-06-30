@@ -187,12 +187,16 @@ Subdirectories in the `tag` directory act like packages in java. For instance, i
 @tag.entry.drawEntry(model.entry2, false)
 ```
 
+### Named parameters
+
 If you don't want to depend on the parameter order, you can explicitly name parameters when calling the template (this is what the <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> suggests by default).
 
 ```xml
 @tag.entry.drawEntry(entry = model.entry1, verbose = true)
 @tag.entry.drawEntry(entry = model.entry2, verbose = false)
 ```
+
+### Default parameters
 
 You can also define default values for all parameters, so that they only need to be passed when needed.
 
@@ -212,6 +216,16 @@ The second call could then be simplified to this:
 ```xml
 @tag.entry.drawEntry(entry = model.entry1, verbose = true)
 @tag.entry.drawEntry(entry = model.entry2)
+```
+
+### Varargs
+
+The last parameter of a tag can be a varargs parameter. For instance, if you created a tag to localize messages, that include optional parameters depending on the key you're localizing, you could create a tag `tag/localize.jte`:
+
+```xml
+@param String key
+@param String ... params
+${my.LocalizationContext.getCurrent().localize(key, params)}
 ```
 
 ## Layouts
@@ -351,7 +365,7 @@ Before rendering, you'd simply wrap the actual `TemplateOutput` you are using:
 TemplateOutput output = new SecureOutput(new StringOutput());
 ```
 
-In rare cases you may want to skip output escaping for a certain element. You can do this by using `$unsafe{}` instead of `${}`. For instance, to trust the model name, we would write:
+In rare cases you may want to skip output escaping for a certain element. You can do this by using `$unsafe{}` instead of `${}`. For instance, to trust the model name, you would write:
 
 ```
 $unsafe{model.name}

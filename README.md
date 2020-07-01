@@ -122,7 +122,7 @@ jte is available on <a href="http://mvnrepository.com/artifact/org.jusecase/jte"
 compile group: 'org.jusecase', name: 'jte', version: '0.3.0'
 ```
 
-Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)
+No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)
 
 ## Websites rendered with jte
 

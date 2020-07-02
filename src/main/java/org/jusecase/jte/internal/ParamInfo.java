@@ -11,9 +11,20 @@ final class ParamInfo {
         int nameStartIndex = -1;
         int nameEndIndex = -1;
         int defaultValueStartIndex = -1;
+        int genericDepth = 0;
         int varArgsIndex = parameterString.indexOf("...");
         for (int i = 0; i < parameterString.length(); ++i) {
             char character = parameterString.charAt(i);
+
+            if (character == '<') {
+                ++genericDepth;
+            } else if (character == '>') {
+                --genericDepth;
+            }
+
+            if (genericDepth > 0) {
+                continue;
+            }
 
             if (typeStartIndex == -1) {
                 if (!Character.isWhitespace(character)) {

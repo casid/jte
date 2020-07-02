@@ -6,10 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.jusecase.jte.internal.TemplateCompiler;
 import org.jusecase.jte.output.StringOutput;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -218,6 +215,23 @@ public class TemplateEngineTest {
                 "One: ${firstParam}, two: ${secondParam}");
         givenTemplate("@tag.card(model.hello, model.x), That was a tag!");
         thenOutputIs("One: Hello, two: 42, That was a tag!");
+    }
+
+    @Test
+    void tagWithGenericParam() {
+        givenTag("entry", "@param java.util.Map.Entry<String, java.util.List<String>> entry\n" +
+                "${entry.getKey()}: ${entry.getValue()}");
+        givenRawTemplate("@param java.util.Map<String, java.util.List<String>> map\n" +
+                "@for(var entry : map.entrySet())@tag.entry(entry)\n@endfor");
+
+        Map<String, List<String>> model = new TreeMap<>();
+        model.put("one", Arrays.asList("1", "2"));
+        model.put("two", Arrays.asList("6", "7"));
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, model, output);
+
+        assertThat(output.toString()).isEqualTo("one: [1, 2]\ntwo: [6, 7]\n");
     }
 
     @Test

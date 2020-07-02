@@ -41,7 +41,7 @@ class Benchmark {
     }
 
     StringOutput render(Page page) {
-        StringOutput output = new StringOutput();
+        StringOutput output = new StringOutput(512);
         templateEngine.render(page.getTemplate(), page, output);
         return output;
     }

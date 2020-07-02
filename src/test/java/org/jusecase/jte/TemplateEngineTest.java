@@ -483,6 +483,15 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void layoutWithVarArgs() {
+        givenLayout("varargs",
+                "@param String ... values\n" +
+                        "@for(String value : values)${value} @endfor");
+        givenTemplate("@layout.varargs(\"Hello\", \"World\")@endlayout");
+        thenOutputIs("Hello World ");
+    }
+
+    @Test
     void enumCheck() {
         givenRawTemplate(
                 "@import org.jusecase.jte.TemplateEngineTest.Model\n" +

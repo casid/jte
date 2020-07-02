@@ -236,6 +236,7 @@ public class TemplateCompiler {
         private final LinkedHashSet<String> templateDependencies;
         private final List<ParamInfo> parameters = new ArrayList<>();
         private final List<String> textParts = new ArrayList<>();
+        private final Deque<LayoutStack> layoutStack = new ArrayDeque<>();
 
         private boolean hasWrittenPackage;
         private boolean hasWrittenClass;
@@ -289,6 +290,10 @@ public class TemplateCompiler {
             javaCode.markFieldsIndex();
             javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
 
+            if (type == TemplateType.Layout) {
+                javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
+            }
+
             hasWrittenClass = true;
         }
 
@@ -299,9 +304,6 @@ public class TemplateCompiler {
                 writeTagOrLayoutClass();
             }
 
-            if (type == TemplateType.Layout) {
-                javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
-            }
             javaCode.append(") {\n");
 
             paramOrder.put(classInfo.name, parameters);
@@ -470,11 +472,11 @@ public class TemplateCompiler {
             writeIndentation(depth);
             javaCode.append(layoutInfo.fullName).append(".render(output");
 
-            appendParams(layoutName, params);
-
             javaCode.append(", new java.util.function.Function<String, Runnable>() {\n");
             writeIndentation(depth + 1);
             javaCode.append("public Runnable apply(String jteLayoutDefinition) {\n");
+
+            layoutStack.push(new LayoutStack(layoutName, params));
         }
 
         private DebugInfo getCurrentDebugInfo() {
@@ -566,8 +568,16 @@ public class TemplateCompiler {
             }
             writeIndentation(depth + 1);
             javaCode.append("}\n");
+
             writeIndentation(depth);
-            javaCode.append("});\n");
+            javaCode.append("}");
+
+            if (!layoutStack.isEmpty()) {
+                LayoutStack stack = layoutStack.pop();
+                appendParams(stack.name, stack.params);
+            }
+
+            javaCode.append(");\n");
         }
 
         private void writeIndentation(int depth) {
@@ -637,6 +647,16 @@ public class TemplateCompiler {
                 name = null;
                 data = param;
             }
+        }
+    }
+
+    private static class LayoutStack {
+        public final String name;
+        public final List<String> params;
+
+        public LayoutStack(String name, List<String> params) {
+            this.name = name;
+            this.params = params;
         }
     }
 }

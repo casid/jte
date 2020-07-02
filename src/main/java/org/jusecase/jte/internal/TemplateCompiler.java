@@ -472,9 +472,7 @@ public class TemplateCompiler {
             writeIndentation(depth);
             javaCode.append(layoutInfo.fullName).append(".render(output");
 
-            javaCode.append(", new java.util.function.Function<String, Runnable>() {\n");
-            writeIndentation(depth + 1);
-            javaCode.append("public Runnable apply(String jteLayoutDefinition) {\n");
+            javaCode.append(", jteLayoutDefinition -> {\n");
 
             layoutStack.push(new LayoutStack(layoutName, params));
         }
@@ -540,35 +538,28 @@ public class TemplateCompiler {
 
         @Override
         public void onLayoutDefine(int depth, String name) {
-            writeIndentation(depth + 2);
+            writeIndentation(depth + 1);
             javaCode.append("if (\"").append(name.trim()).append("\".equals(jteLayoutDefinition)) {\n");
-            writeIndentation(depth + 3);
-            javaCode.append("return new Runnable() {\n");
-            writeIndentation(depth + 4);
-            javaCode.append("public void run() {\n");
+            writeIndentation(depth + 2);
+            javaCode.append("return () -> {\n");
         }
 
         @Override
         public void onLayoutDefineEnd(int depth) {
-            writeIndentation(depth + 4);
-            javaCode.append("}\n");
-            writeIndentation(depth + 3);
-            javaCode.append("};\n");
             writeIndentation(depth + 2);
+            javaCode.append("};\n");
+            writeIndentation(depth + 1);
             javaCode.append("}\n");
         }
 
         @Override
         public void onLayoutEnd(int depth) {
-            writeIndentation(depth + 2);
+            writeIndentation(depth + 1);
             if (type == TemplateType.Layout) {
                 javaCode.append("return jteLayoutDefinitionLookup.apply(jteLayoutDefinition);\n");
             } else {
                 javaCode.append("return () -> {};\n");
             }
-            writeIndentation(depth + 1);
-            javaCode.append("}\n");
-
             writeIndentation(depth);
             javaCode.append("}");
 

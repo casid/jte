@@ -6,7 +6,7 @@ import java.util.Deque;
 import java.util.List;
 
 final class TemplateParser {
-    private static final int LAYOUT_DEFINITION_DEPTH = 4;
+    private static final int LAYOUT_DEFINITION_DEPTH = 2;
 
     private final TemplateType type;
     private final TemplateParserVisitor visitor;

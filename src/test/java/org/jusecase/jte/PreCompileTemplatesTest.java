@@ -1,6 +1,8 @@
 package org.jusecase.jte;
 
 import org.junit.jupiter.api.Test;
+import org.jusecase.jte.benchmark.WelcomePage;
+import org.jusecase.jte.output.StringOutput;
 import org.jusecase.jte.resolve.DirectoryCodeResolver;
 
 import java.net.URL;
@@ -14,9 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PreCompileTemplatesTest {
     @Test
     void precompileAll() {
-        TemplateEngine templateEngine = new TemplateEngine(new DirectoryCodeResolver(Path.of("src/test/resources/benchmark")), Path.of("jte"));
+        TemplateEngine templateEngine = new TemplateEngine(new DirectoryCodeResolver(Path.of("src/test/resources/benchmark")), Path.of("jte"), TemplateMode.Precompiled);
         templateEngine.cleanAll();
         templateEngine.precompileAll();
+
+        StringOutput output = new StringOutput();
+        templateEngine.render("welcome.jte", new WelcomePage(12), output);
+        assertThat(output.toString()).contains("This page has 12 visits already.");
     }
 
     @Test

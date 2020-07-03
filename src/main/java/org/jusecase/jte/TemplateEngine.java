@@ -17,12 +17,19 @@ public final class TemplateEngine {
 
     public TemplateEngine(CodeResolver codeResolver) {
         this(codeResolver, Path.of("jte"));
-        cleanAll();
     }
 
     public TemplateEngine(CodeResolver codeResolver, Path classDirectory) {
-        compiler = new TemplateCompiler(codeResolver, classDirectory);
+        this(codeResolver, classDirectory, TemplateMode.Dynamic);
+    }
+
+    public TemplateEngine(CodeResolver codeResolver, Path classDirectory, TemplateMode templateMode) {
+        compiler = new TemplateCompiler(codeResolver, classDirectory, templateMode);
         templateCache = new ConcurrentHashMap<>();
+
+        if (templateMode == TemplateMode.Dynamic) {
+            cleanAll();
+        }
     }
 
     public void render(String name, Object model, TemplateOutput output) {

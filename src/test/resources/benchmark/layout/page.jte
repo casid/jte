@@ -23,7 +23,7 @@
         @render(content)
     </div>
     <div class="footer">
-        This page has ${page.getVisits()} already.
+        This page has ${page.getVisits()} visits already.
     </div>
 </body>
 

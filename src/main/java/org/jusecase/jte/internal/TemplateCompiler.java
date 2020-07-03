@@ -2,11 +2,13 @@ package org.jusecase.jte.internal;
 
 import org.jusecase.jte.CodeResolver;
 import org.jusecase.jte.TemplateException;
+import org.jusecase.jte.TemplateMode;
 import org.jusecase.jte.output.FileOutput;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -31,35 +33,50 @@ public class TemplateCompiler {
     private final CodeResolver codeResolver;
 
     private final Path classDirectory;
+    private final TemplateMode templateMode;
+    private final ClassLoader singleClassLoader;
     private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
     private boolean nullSafeTemplateCode;
 
-    public TemplateCompiler(CodeResolver codeResolver, Path classDirectory) {
+    public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, TemplateMode templateMode) {
         this.codeResolver = codeResolver;
         this.classDirectory = classDirectory;
+        this.templateMode = templateMode;
+
+        if (templateMode == TemplateMode.Precompiled) {
+            singleClassLoader = createClassLoader();
+        } else {
+            singleClassLoader = null;
+        }
     }
 
     public Template<?> compile(String name) {
-        return loadPrecompiled(name, true);
-    }
+        if (templateMode == TemplateMode.Dynamic) {
+            precompile(List.of(name), null);
+        }
 
-    private Template<?> loadPrecompiled(String name, boolean firstAttempt) {
         try {
             ClassInfo templateInfo = new ClassInfo(name, PACKAGE_NAME);
-
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{classDirectory.toUri().toURL()});
-            return (Template<?>) classLoader.loadClass(templateInfo.fullName).getConstructor().newInstance();
-        } catch (ClassNotFoundException e) {
-            if (firstAttempt) {
-                precompile(List.of(name), null);
-                return loadPrecompiled(name, false);
-            } else {
-                throw new TemplateException("Failed to load " + name, e);
-            }
+            return (Template<?>) getClassLoader().loadClass(templateInfo.fullName).getConstructor().newInstance();
         } catch (Exception e) {
             throw new TemplateException("Failed to load " + name, e);
+        }
+    }
+
+    private ClassLoader getClassLoader() {
+        if (singleClassLoader == null) {
+            return createClassLoader();
+        }
+        return singleClassLoader;
+    }
+
+    private ClassLoader createClassLoader() {
+        try {
+            return new URLClassLoader(new URL[]{classDirectory.toUri().toURL()});
+        } catch (MalformedURLException e) {
+            throw new TemplateException("Failed to create class loader for " + classDirectory, e);
         }
     }
 

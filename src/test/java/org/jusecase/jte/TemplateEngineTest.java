@@ -31,6 +31,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void templateWithoutParameters() {
+        givenRawTemplate("Hello World!");
+        thenOutputIs("Hello World!");
+    }
+
+    @Test
     void helloWorld_lineBreak() {
         givenTemplate("${model.hello}\nWorld");
         thenOutputIs("Hello\nWorld");
@@ -770,8 +776,7 @@ public class TemplateEngineTest {
     @Test
     void emptyTemplate() {
         givenRawTemplate("");
-        thenRenderingFailsWithException()
-                .hasMessage("Failed to load test/template.jte");
+        thenOutputIs("");
     }
 
     @Test

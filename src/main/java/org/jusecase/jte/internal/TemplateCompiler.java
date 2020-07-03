@@ -26,11 +26,11 @@ public class TemplateCompiler {
     public static final String LINE_INFO_FIELD = "LINE_INFO";
     public static final String TEXT_PART_STRING = "TEXT_PART_STRING_";
     public static final String TEXT_PART_BINARY = "TEXT_PART_BINARY_";
+    public static final boolean DEBUG = false;
 
     private final CodeResolver codeResolver;
 
     private final Path classDirectory;
-    private final boolean debug = false;
     private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
@@ -112,7 +112,7 @@ public class TemplateCompiler {
 
         templateByClassName.put(templateDefinition.getName(), templateInfo);
 
-        if (debug) {
+        if (DEBUG) {
             System.out.println(templateDefinition.getCode());
         }
     }
@@ -144,7 +144,7 @@ public class TemplateCompiler {
         classDefinition.setCode(codeGenerator.getCode());
         templateByClassName.put(classDefinition.getName(), classInfo);
 
-        if (debug) {
+        if (DEBUG) {
             System.out.println(classDefinition.getCode());
         }
 
@@ -301,7 +301,14 @@ public class TemplateCompiler {
         public void onParamsComplete() {
             writePackageIfRequired();
             if (!hasWrittenClass) {
-                writeTagOrLayoutClass();
+                if (type == TemplateType.Template) {
+                    // The user wrote a base template without any parameters
+                    ParamInfo dummyParameter = new ParamInfo("Object model");
+                    writeTemplateClass(dummyParameter);
+                    onParam(dummyParameter);
+                } else {
+                    writeTagOrLayoutClass();
+                }
             }
 
             javaCode.append(") {\n");

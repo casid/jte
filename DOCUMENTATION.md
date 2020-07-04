@@ -285,13 +285,17 @@ Layouts are called like tags, but you can define what content should be put in t
 
 ## Hot Reloading
 
+### For a regular website
+
 When using the `DirectoryCodeResolver`, hot reloading is supported out of the box. Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If there is any modification detected, the template is recompiled and the old one discarded to GC. 
 
-> It makes sense to do this on your local development environment only. When running in production, [precompiled templates](#precompiling-templates) are recommended instead. With precompiled templates, all those checks are avoided.
+> It makes sense to do this on your local development environment only. When running in production, for maximum performance and security [precompiled templates](#precompiling-templates) are recommended instead.
 
-If you clone this repository, you can fire up the [SimpleWebServer](src/test/java/org/jusecase/jte/benchmark/SimpleWebServer.java) main method. It will fire up a tiny webserver with one page to play with on http://localhost:8080.
+If you clone this repository, you can launch the [SimpleWebServer](src/test/java/org/jusecase/jte/benchmark/SimpleWebServer.java) example's main method. It will fire up a tiny webserver with one page to play with at http://localhost:8080.
 
-In case you're using jte to render static websites, you can also listen to template file changes and re-render affected static files:
+### For a statically rendered website
+
+In case you're using jte to pre-render static websites as HTML files, you can also listen to template file changes during development and re-render affected static files:
  
 `DirectoryCodeResolver::startTemplateFilesListener` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, a listener is called with a list of changed templates.
 

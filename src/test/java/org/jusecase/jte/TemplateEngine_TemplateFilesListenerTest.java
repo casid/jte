@@ -91,10 +91,12 @@ class TemplateEngine_TemplateFilesListenerTest {
     }
 
     private void whenFileIsWritten(String name, String content) {
-        try (FileOutput fileOutput = new FileOutput(tempDirectory.resolve(name))) {
-            fileOutput.writeContent(content);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        synchronized (templatesInvalidated) {
+            try (FileOutput fileOutput = new FileOutput(tempDirectory.resolve(name))) {
+                fileOutput.writeContent(content);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
     }
 

@@ -20,6 +20,7 @@
         @endfor
     </div>
     <div class="content">
+        <h1>${page.getTitle()}</h1>
         @render(content)
     </div>
     <div class="footer">

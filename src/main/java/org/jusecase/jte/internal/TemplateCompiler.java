@@ -2,7 +2,6 @@ package org.jusecase.jte.internal;
 
 import org.jusecase.jte.CodeResolver;
 import org.jusecase.jte.TemplateException;
-import org.jusecase.jte.TemplateMode;
 import org.jusecase.jte.output.FileOutput;
 
 import java.io.IOException;
@@ -53,7 +52,7 @@ public class TemplateCompiler {
     }
 
     public Template<?> compile(String name) {
-        if (templateMode == TemplateMode.Dynamic) {
+        if (templateMode == TemplateMode.OnDemand) {
             precompile(List.of(name), null);
         }
 
@@ -200,6 +199,25 @@ public class TemplateCompiler {
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to delete file " + file, e);
         }
+    }
+
+    public boolean hasChanged(String name) {
+        if (codeResolver.hasChanged(name)) {
+            return true;
+        }
+
+        LinkedHashSet<String> dependencies = templateDependencies.get(name);
+        if (dependencies == null) {
+            return false;
+        }
+
+        for (String dependency : dependencies) {
+            if (codeResolver.hasChanged(dependency)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public List<String> getTemplatesUsing(String name) {

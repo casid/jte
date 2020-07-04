@@ -15,7 +15,7 @@ public class TemplateEngineTest {
     String templateName = "test/template.jte";
 
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-    TemplateEngine templateEngine = new TemplateEngine(dummyCodeResolver);
+    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver);
     Model model = new Model();
 
     @BeforeEach
@@ -391,17 +391,6 @@ public class TemplateEngineTest {
                         "${key} with @for(String value : values)${value} @endfor");
         givenTemplate("@tag.localize(\"test.key\", \"Hello\", \"World\")");
         thenOutputIs("test.key with Hello World ");
-    }
-
-    @Test
-    void hotReload() {
-        givenTemplate("${model.hello} World");
-        thenOutputIs("Hello World");
-
-        templateEngine.invalidate(templateName);
-
-        givenTemplate("${model.hello}");
-        thenOutputIs("Hello");
     }
 
     @Test

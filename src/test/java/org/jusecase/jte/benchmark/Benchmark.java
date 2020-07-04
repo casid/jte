@@ -1,5 +1,6 @@
 package org.jusecase.jte.benchmark;
 
+import org.jusecase.jte.output.StringOutputPool;
 import org.jusecase.jte.resolve.ResourceCodeResolver;
 import org.jusecase.jte.TemplateEngine;
 import org.jusecase.jte.output.StringOutput;
@@ -8,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 class Benchmark {
 
+    private final StringOutputPool stringOutputPool = new StringOutputPool();
     private final TemplateEngine templateEngine;
 
     public static void main(String[] args) {
@@ -15,7 +17,7 @@ class Benchmark {
     }
 
     Benchmark() {
-        templateEngine = new TemplateEngine(new ResourceCodeResolver("benchmark"));
+        templateEngine = TemplateEngine.create(new ResourceCodeResolver("benchmark"));
     }
 
     public void run() {
@@ -41,7 +43,7 @@ class Benchmark {
     }
 
     StringOutput render(Page page) {
-        StringOutput output = new StringOutput(512);
+        StringOutput output = stringOutputPool.get();
         templateEngine.render(page.getTemplate(), page, output);
         return output;
     }

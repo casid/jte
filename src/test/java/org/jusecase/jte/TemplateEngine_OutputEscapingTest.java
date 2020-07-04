@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TemplateEngine_OutputEscapingTest {
 
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-    TemplateEngine templateEngine = new TemplateEngine(dummyCodeResolver);
+    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver);
 
     StringOutput stringOutput = new StringOutput();
     SecureOutput secureOutput = new SecureOutput(stringOutput);

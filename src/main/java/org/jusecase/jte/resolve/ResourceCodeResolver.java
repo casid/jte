@@ -25,4 +25,9 @@ public class ResourceCodeResolver implements CodeResolver {
             throw new UncheckedIOException(e);
         }
     }
+
+    @Override
+    public boolean hasChanged(String name) {
+        return false;
+    }
 }

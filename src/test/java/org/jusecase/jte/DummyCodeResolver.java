@@ -11,6 +11,11 @@ public class DummyCodeResolver implements CodeResolver {
         return codeLookup.get(name);
     }
 
+    @Override
+    public boolean hasChanged(String name) {
+        return false;
+    }
+
     public void givenCode(String name, String code) {
         codeLookup.put(name, code);
     }

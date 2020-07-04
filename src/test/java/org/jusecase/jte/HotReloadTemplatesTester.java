@@ -9,9 +9,9 @@ public class HotReloadTemplatesTester {
     @Test
     void run() {
         DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "test", "resources", "benchmark"));
-        TemplateEngine templateEngine = new TemplateEngine(codeResolver, Path.of("jte"));
+        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, Path.of("jte"));
 
-        codeResolver.enableHotReloadBlocking(templateEngine, templates -> {
+        codeResolver.startTemplateFilesListenerBlocking(templateEngine, templates -> {
             System.out.println("Invalidated " + templates);
             for (String template : templates) {
                 templateEngine.prepareForRendering(template);

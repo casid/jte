@@ -46,6 +46,10 @@ public interface TemplateOutput {
         writeContent(String.valueOf(value));
     }
 
+    default void writeSafe(char value) {
+        writeContent(String.valueOf(value));
+    }
+
     default void writeUnsafe(Object value) {
         if (value != null) {
             writeContent(value.toString());
@@ -77,6 +81,10 @@ public interface TemplateOutput {
     }
 
     default void writeUnsafe(double value) {
+        writeContent(String.valueOf(value));
+    }
+
+    default void writeUnsafe(char value) {
         writeContent(String.valueOf(value));
     }
 }

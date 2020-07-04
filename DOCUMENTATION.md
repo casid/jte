@@ -21,7 +21,7 @@ To render any template, an instance of `TemplateEngine` is required. Typically y
 
 ```java
 CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This is the directory where your .jte files are located.
-TemplateEngine templateEngine = new TemplateEngine(codeResolver);
+TemplateEngine templateEngine = TemplateEngine.create(codeResolver);
 ```
 
 With the TemplateEngine ready, templates are rendered like this:
@@ -88,7 +88,7 @@ The output of the above template would be `Hello jte!`. Behind the scenes, the f
 package org.jusecase.jte.generated.test;
 import my.Model;
 public final class JtetemplateGenerated implements org.jusecase.jte.internal.Template<Model> {
-    public void render(Model model, org.jusecase.jte.TemplateOutput output) {
+    public void render(org.jusecase.jte.TemplateOutput output, Model model) {
         output.writeStaticContent("Hello ");
         output.writeUserContent(model.name);
         output.writeStaticContent("!");
@@ -285,41 +285,37 @@ Layouts are called like tags, but you can define what content should be put in t
 
 ## Hot Reloading
 
-When using the `DirectoryCodeResolver`, hot reloading can be activated. It makes sense to do this on dev environments only. `enableHotReload` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, all related templates are be invalidated and a listener is called with a list of invalidated templates.
+When using the `DirectoryCodeResolver`, hot reloading is supported out of the box. Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If there is any modification detected, the template is recompiled and the old one discarded to GC. 
+
+> It makes sense to do this on your local development environment only. When running in production, [precompiled templates](#precompiling-templates) are recommended instead. With precompiled templates, all those checks are avoided.
+
+If you clone this repository, you can fire up the [SimpleWebServer](src/test/java/org/jusecase/jte/benchmark/SimpleWebServer.java) main method. It will fire up a tiny webserver with one page to play with on http://localhost:8080.
+
+In case you're using jte to render static websites, you can also listen to template file changes and re-render affected static files:
+ 
+`DirectoryCodeResolver::startTemplateFilesListener` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, a listener is called with a list of changed templates.
 
 ```java
-if (isDevEnvironment()) {
-    codeResolver.enableHotReload(templateEngine, templates -> {
+if (isDeveloperEnvironment()) {
+    codeResolver.startTemplateFilesListener(templateEngine, templates -> {
         for (String template : templates) {
-            try {
-                templateEngine.prepareForRendering(template);
-            } catch (Exception e) {
-                logger.error("Failed to recompile " + template, e);
-            }
+            // Re-render the static HTML file
         }
     });
 }
 ```
 
-In the above example `prepareForRendering` is called for every invalidated template. This will trigger recompilation even before you refresh the page you're working on in the browser.
-
-> It is up to you how to handle hot reloading for your particular use case. For instance, if you have a static site that pre-renders everything to .html files, you may want to trigger a re-render of static files that use the just invalidated templates.
-
 ## Precompiling Templates
 
-To speed up startup of your production server, it is possible to precompile all templates during the build. This way, the template engine can load the .class file for each template directly, without first compiling it.
+To speed up the startup of your production server, it is possible to precompile all templates during the build. This way, the template engine can load the .class file for each template directly, without first compiling it. For security reasons you may not want to run a JDK on production - with precompiled templates this is not needed. This implies that features like hot reloading won't work either.
 
-To do this, you need to pass a directory to the `TemplateEngine`, to specify where compiled template classes are located. Without this directory, `TemplateEngine` will compile templates in memory and precompilation cannot be used.
+To do this, you need to create a `TemplateEngine` with the `createPrecompiled` factory method and specify where compiled template classes are located:
 
 ```java
-Path sourceDirectory = Path.of("src/main/jte"); // This is the directory where your .jte files are located.
 Path targetDirectory = Path.of("jte"); // This is the directoy where compiled templates are located.
 
-CodeResolver codeResolver = new DirectoryCodeResolver(sourceDirectory);
-TemplateEngine templateEngine = new TemplateEngine(codeResolver, targetDirectory);
+TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory);
 ```
-
-To precompile all templates, you'd simply invoke `templateEngine.precompileAll();`. However, this would still let your Java process compile all templates on startup.
 
 There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
 

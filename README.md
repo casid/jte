@@ -17,7 +17,7 @@ jte is a simple, yet powerful template engine for Java. All jte templates are co
 
 jte is a lot of fun to work with! Have a look how it feels like in IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
 
-<img src="jte-intellij.gif" width="50%" />
+<img alt="jte in IntelliJ" src="jte-intellij.gif" width="50%" />
 
 ## 5 minutes example
 
@@ -48,7 +48,7 @@ So what is going on here?
 To render this template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):
 ```java
 CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This is the directory where your .jte files are located.
-TemplateEngine templateEngine = new TemplateEngine(codeResolver);
+TemplateEngine templateEngine = TemplateEngine.create(codeResolver);
 ```
 
 With the `TemplateEngine` ready, templates are rendered like this:

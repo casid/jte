@@ -1,6 +1,6 @@
 # jte (Java Template Engine)
-[![Build Status](https://travis-ci.org/casid/jte.svg?branch=master)](https://travis-ci.org/casid/jte)
-[![Coverage Status](https://coveralls.io/repos/github/casid/jte/badge.svg?branch=master&v=1)](https://coveralls.io/github/casid/jte?branch=master)
+[![Build Status](https://travis-ci.org/casid/jte.svg?branch=master&v=1)](https://travis-ci.org/casid/jte)
+[![Coverage Status](https://coveralls.io/repos/github/casid/jte/badge.svg?branch=master&v=2)](https://coveralls.io/github/casid/jte?branch=master)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/casid/jte/master/LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/org.jusecase/jte.svg)](http://mvnrepository.com/artifact/org.jusecase/jte)
 

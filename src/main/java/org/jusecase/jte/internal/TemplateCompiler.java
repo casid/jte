@@ -10,7 +10,6 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,8 +24,6 @@ public class TemplateCompiler {
     public static final String CLASS_SUFFIX = "Generated";
     public static final String PACKAGE_NAME = "org.jusecase.jte.generated";
     public static final String LINE_INFO_FIELD = "LINE_INFO";
-    public static final String TEXT_PART_STRING = "TEXT_PART_STRING_";
-    public static final String TEXT_PART_BINARY = "TEXT_PART_BINARY_";
     public static final boolean DEBUG = false;
 
     private final CodeResolver codeResolver;
@@ -179,28 +176,6 @@ public class TemplateCompiler {
         return code;
     }
 
-    public void clean(String name) {
-        if (classDirectory == null) {
-            return;
-        }
-
-        ClassInfo classInfo = new ClassInfo(name, PACKAGE_NAME);
-        ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName);
-
-        deleteFile(classDirectory.resolve(classDefinition.getJavaFileName()));
-        deleteFile(classDirectory.resolve(classDefinition.getClassFileName()));
-
-        paramOrder.remove(name);
-    }
-
-    private void deleteFile(Path file) {
-        try {
-            Files.deleteIfExists(file);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Failed to delete file " + file, e);
-        }
-    }
-
     public boolean hasChanged(String name) {
         if (codeResolver.hasChanged(name)) {
             return true;
@@ -270,7 +245,6 @@ public class TemplateCompiler {
         private final LinkedHashSet<ClassDefinition> classDefinitions;
         private final LinkedHashSet<String> templateDependencies;
         private final List<ParamInfo> parameters = new ArrayList<>();
-        private final List<String> textParts = new ArrayList<>();
         private final Deque<LayoutStack> layoutStack = new ArrayDeque<>();
 
         private boolean hasWrittenPackage;
@@ -358,18 +332,11 @@ public class TemplateCompiler {
 
         @Override
         public void onComplete() {
-            int lineCount = textParts.size() * 2 + 1;
+            int lineCount = 1;
             javaCode.insertFieldLines(lineCount);
 
             StringBuilder fields = new StringBuilder(64 + 32 * lineCount);
             javaCode.addLineInfoField(fields);
-            for (int i = 0; i < textParts.size(); i++) {
-                fields.append("\tprivate static final String ").append(TEXT_PART_STRING).append(i).append(" = \"");
-                appendEscaped(fields, textParts.get(i));
-                fields.append("\";\n");
-                fields.append("\tprivate static final byte[] ").append(TEXT_PART_BINARY).append(i).append(" = org.jusecase.jte.internal.IoUtils.getUtf8Bytes(").append(TEXT_PART_STRING).append(i).append(");\n");
-            }
-
             javaCode.insertFields(fields);
 
             javaCode.append("\t}\n");
@@ -385,12 +352,9 @@ public class TemplateCompiler {
             }
 
             writeIndentation(depth);
-            javaCode.append("output.writeStaticContent(");
-            javaCode.append(TEXT_PART_STRING).append(textParts.size()).append(", ");
-            javaCode.append(TEXT_PART_BINARY).append(textParts.size());
-            javaCode.append(");\n");
-
-            textParts.add(textPart);
+            javaCode.append("output.writeStaticContent(\"");
+            appendEscaped(javaCode.getStringBuilder(), textPart);
+            javaCode.append("\");\n");
         }
 
         @Override

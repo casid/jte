@@ -4,7 +4,7 @@ package org.jusecase.jte;
 public interface TemplateOutput {
     void writeContent(String value);
 
-    default void writeStaticContent(String value, byte[] bytes) {
+    default void writeStaticContent(String value) {
         writeContent(value);
     }
 

@@ -4,13 +4,15 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.jusecase.jte.TemplateEngine;
-import org.jusecase.jte.output.Utf8ArrayOutput;
+import org.jusecase.jte.output.StringOutput;
+import org.jusecase.jte.output.StringOutputPool;
 import org.jusecase.jte.resolve.DirectoryCodeResolver;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,6 +23,7 @@ public class SimpleWebServer implements HttpHandler {
 
     private final DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "test", "resources", "benchmark"));
     private final TemplateEngine templateEngine = TemplateEngine.create(codeResolver);
+    private final StringOutputPool stringOutputPool = new StringOutputPool();
     private final AtomicInteger visits = new AtomicInteger();
 
     private void start() throws IOException {
@@ -33,12 +36,14 @@ public class SimpleWebServer implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        Utf8ArrayOutput output = new Utf8ArrayOutput();
+        StringOutput output = stringOutputPool.get();
         templateEngine.render("welcome.jte", new WelcomePage(visits.incrementAndGet()), output);
 
-        exchange.sendResponseHeaders(200, output.getContentLength());
+        byte[] bytes = output.toString().getBytes(StandardCharsets.UTF_8);
+
+        exchange.sendResponseHeaders(200, bytes.length);
         try (OutputStream os = new BufferedOutputStream(exchange.getResponseBody())) {
-            output.writeTo(os);
+            os.write(bytes);
         }
     }
 }

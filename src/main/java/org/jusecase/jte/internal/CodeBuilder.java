@@ -34,11 +34,6 @@ final class CodeBuilder {
         return this;
     }
 
-    public CodeBuilder append(int code) {
-        javaCode.append(code);
-        return this;
-    }
-
     public CodeBuilder finishTemplateLine() {
         ++currentTemplateLine;
         return this;
@@ -100,5 +95,9 @@ final class CodeBuilder {
 
     public int[] getLineInfo() {
         return Arrays.copyOf(lineInfo, currentJavaLine);
+    }
+
+    public StringBuilder getStringBuilder() {
+        return javaCode;
     }
 }

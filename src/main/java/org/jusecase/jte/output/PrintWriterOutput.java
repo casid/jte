@@ -4,7 +4,6 @@ import org.jusecase.jte.TemplateOutput;
 
 import java.io.PrintWriter;
 
-@SuppressWarnings("unused") // By api users
 public class PrintWriterOutput implements TemplateOutput {
     private final PrintWriter writer;
 

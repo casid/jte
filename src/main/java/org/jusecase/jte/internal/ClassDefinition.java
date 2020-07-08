@@ -38,8 +38,4 @@ public final class ClassDefinition {
     public String getJavaFileName() {
         return getName().replace('.', '/') + ".java";
     }
-
-    public String getClassFileName() {
-        return getName().replace('.', '/') + ".class";
-    }
 }

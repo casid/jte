@@ -43,6 +43,14 @@ public abstract class AbstractTemplateOutputTest {
     }
 
     @Test
+    void writeLong() {
+        output.writeSafe(1250L);
+        output.writeUnsafe(-320L);
+
+        thenOutputIs("1250-320");
+    }
+
+    @Test
     void writeFloat() {
         output.writeSafe(1250.0f);
         output.writeUnsafe(-320.0f);

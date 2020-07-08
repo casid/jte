@@ -2,11 +2,14 @@ package org.jusecase.jte.internal;
 
 import org.jusecase.jte.CodeResolver;
 import org.jusecase.jte.TemplateException;
+import org.jusecase.jte.TemplateOutput;
 import org.jusecase.jte.output.FileOutput;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -53,11 +56,21 @@ public class TemplateCompiler {
             precompile(List.of(name), null);
         }
 
-        try {
-            ClassInfo templateInfo = new ClassInfo(name, PACKAGE_NAME);
-            return (Template<?>) getClassLoader().loadClass(templateInfo.fullName).getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new TemplateException("Failed to load " + name, e);
+        ClassInfo templateInfo = new ClassInfo(name, PACKAGE_NAME);
+
+        if (isTag(name)) {
+            try {
+                Class<?> tagClass = getClassLoader().loadClass(templateInfo.fullName);
+                return new TemplateTagWrapper(name, tagClass);
+            } catch (Exception e) {
+                throw new TemplateException("Failed to load " + name, e);
+            }
+        } else {
+            try {
+                return (Template<?>) getClassLoader().loadClass(templateInfo.fullName).getConstructor().newInstance();
+            } catch (Exception e) {
+                throw new TemplateException("Failed to load " + name, e);
+            }
         }
     }
 
@@ -87,7 +100,18 @@ public class TemplateCompiler {
     public void precompile(List<String> names, List<String> compilePath) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
-            generateTemplate(name, classDefinitions);
+            if (isTag(name)) {
+                LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
+
+                ClassInfo templateInfo = generateTag(name, classDefinitions, templateDependencies, null);
+
+                this.templateDependencies.put(name, templateDependencies);
+
+                templateByClassName.put(templateInfo.name, templateInfo);
+
+            } else {
+                generateTemplate(name, classDefinitions);
+            }
         }
 
         for (ClassDefinition classDefinition : classDefinitions) {
@@ -105,6 +129,11 @@ public class TemplateCompiler {
         }
 
         ClassFilesCompiler.compile(files, compilePath, classDirectory, templateByClassName);
+    }
+
+    private boolean isTag(String name) {
+        // TODO better check!
+        return name.startsWith(TAG_DIRECTORY);
     }
 
     private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
@@ -654,6 +683,73 @@ public class TemplateCompiler {
         public LayoutStack(String name, List<String> params) {
             this.name = name;
             this.params = params;
+        }
+    }
+
+    private class TemplateTagWrapper implements Template<Map<String, Object>> {
+        private final String name;
+        private final Class<?> tagClass;
+
+        public TemplateTagWrapper(String name, Class<?> tagClass) {
+            this.name = name;
+            this.tagClass = tagClass;
+        }
+
+        @Override
+        public void render(TemplateOutput output, Map<String, Object> model) {
+            List<ParamInfo> paramInfos = paramOrder.get(name);
+
+            Method renderMethod = tagClass.getDeclaredMethods()[0];
+
+            Class<?>[] parameterTypes = renderMethod.getParameterTypes();
+            Object[] arguments = new Object[parameterTypes.length];
+
+            int i = 0;
+            arguments[i++] = output;
+
+            for (ParamInfo paramInfo : paramInfos) {
+                Object param = model.get(paramInfo.name);
+                if (param != null) {
+                    arguments[i++] = param;
+                } else if (paramInfo.defaultValue != null) {
+                    Class<?> parameterType = parameterTypes[i];
+                    arguments[i++] = convertDefaultValue(parameterType, paramInfo.defaultValue);
+                } else {
+                    throw new TemplateException("Missing parameter " + paramInfo.name + " while rendering tag " + name);
+                }
+            }
+
+            try {
+                renderMethod.invoke(null, arguments);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new TemplateException("Failed to dynamically invoke tag " + name, e);
+            }
+        }
+
+        private Object convertDefaultValue(Class<?> parameterType, String defaultValue) {
+            if ("null".equals(defaultValue)) {
+                return null;
+            }
+
+            try {
+                if (parameterType == String.class) {
+                    return defaultValue.replace("\"", "");
+                } else if (parameterType == boolean.class || parameterType == Boolean.class) {
+                    return Boolean.parseBoolean(defaultValue);
+                } else if (parameterType == int.class || parameterType == Integer.class) {
+                    return Integer.parseInt(defaultValue);
+                } else if (parameterType == long.class || parameterType == Long.class) {
+                    return Long.parseLong(defaultValue);
+                } else if (parameterType == float.class || parameterType == Float.class) {
+                    return Float.parseFloat(defaultValue);
+                } else if (parameterType == double.class || parameterType == Double.class) {
+                    return Double.parseDouble(defaultValue);
+                }
+            } catch (Exception e) {
+                throw new TemplateException("Unsupported default value '" + defaultValue + "' (" + parameterType + ") for dynamic tag invocation.");
+            }
+
+            throw new TemplateException("Unsupported default value '" + defaultValue + "' (" + parameterType + ") for dynamic tag invocation.");
         }
     }
 }

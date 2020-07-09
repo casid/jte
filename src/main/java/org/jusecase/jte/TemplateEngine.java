@@ -1,13 +1,11 @@
 package org.jusecase.jte;
 
-import org.jusecase.jte.internal.DebugInfo;
-import org.jusecase.jte.internal.Template;
-import org.jusecase.jte.internal.TemplateCompiler;
-import org.jusecase.jte.internal.TemplateMode;
+import org.jusecase.jte.internal.*;
 
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -99,6 +97,38 @@ public final class TemplateEngine {
             }
             throw new TemplateException(message, e);
         }
+    }
+
+    /**
+     * Renders a tag with the given name.
+     * This comes at the cost of a dynamic method invocation and losing the type safety for params that jte usually provides.
+     * However, this is useful while migrating to jte.
+     * For instance, you can port a JSP tag to a jte tag and invoke the new jte tag from all other JSPs,
+     * so that there are no redundant implementations during the migration.
+     * @param name the template name relative to the specified root directory, for instance "tag/myTag.jte".
+     * @param params map of parameters that should be passed to the tag.
+     * @param output any implementation of {@link TemplateOutput}, where the template will be written to.
+     * @throws TemplateException in case the tag failed to render, containing information where the error happened.
+     */
+    public void renderTag(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
+        render(name, params, output); // Currently there's no difference to a regular render call...
+    }
+
+    /**
+     * Renders a layout with the given name.
+     * This comes at the cost of a dynamic method invocation and losing the type safety for params that jte usually provides.
+     * However, this is useful while migrating to jte.
+     * For instance, you can port a JSP layout to a jte layout and invoke the new jte layout from all other JSPs,
+     * so that there are no redundant implementations during the migration.
+     * @param name the template name relative to the specified root directory, for instance "layout/myLayout.jte".
+     * @param params map of parameters that should be passed to the layout.
+     * @param layoutDefinitions map of layout definitions that should be passed to the layout.
+     * @param output any implementation of {@link TemplateOutput}, where the template will be written to.
+     * @throws TemplateException in case the layout failed to render, containing information where the error happened.
+     */
+    public void renderLayout(String name, Map<String, Object> params, Map<String, String> layoutDefinitions, TemplateOutput output) throws TemplateException {
+        params.put(TemplateCompiler.LAYOUT_DEFINITIONS_PARAM, layoutDefinitions);
+        render(name, params, output);
     }
 
     public List<String> getTemplatesUsing(String name) {

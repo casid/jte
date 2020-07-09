@@ -16,6 +16,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public class TemplateCompiler {
 
@@ -26,6 +27,7 @@ public class TemplateCompiler {
     public static final String CLASS_PREFIX = "Jte";
     public static final String CLASS_SUFFIX = "Generated";
     public static final String PACKAGE_NAME = "org.jusecase.jte.generated";
+    public static final String LAYOUT_DEFINITIONS_PARAM = "__jteLayoutDefinitions";
     public static final String LINE_INFO_FIELD = "LINE_INFO";
     public static final boolean DEBUG = false;
 
@@ -58,19 +60,18 @@ public class TemplateCompiler {
 
         ClassInfo templateInfo = new ClassInfo(name, PACKAGE_NAME);
 
-        if (isTag(name)) {
-            try {
-                Class<?> tagClass = getClassLoader().loadClass(templateInfo.fullName);
-                return new TemplateTagWrapper(name, tagClass);
-            } catch (Exception e) {
-                throw new TemplateException("Failed to load " + name, e);
+        TemplateType templateType = getTemplateType(name);
+
+        try {
+            Class<?> clazz = getClassLoader().loadClass(templateInfo.fullName);
+
+            if (templateType == TemplateType.Template) {
+                return (Template<?>) clazz.getConstructor().newInstance();
             }
-        } else {
-            try {
-                return (Template<?>) getClassLoader().loadClass(templateInfo.fullName).getConstructor().newInstance();
-            } catch (Exception e) {
-                throw new TemplateException("Failed to load " + name, e);
-            }
+
+            return new TemplateWrapper(name, templateType, clazz);
+        } catch (Exception e) {
+            throw new TemplateException("Failed to load " + name, e);
         }
     }
 
@@ -100,17 +101,16 @@ public class TemplateCompiler {
     public void precompile(List<String> names, List<String> compilePath) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
-            if (isTag(name)) {
-                LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
-
-                ClassInfo templateInfo = generateTag(name, classDefinitions, templateDependencies, null);
-
-                this.templateDependencies.put(name, templateDependencies);
-
-                templateByClassName.put(templateInfo.name, templateInfo);
-
-            } else {
-                generateTemplate(name, classDefinitions);
+            switch (getTemplateType(name)) {
+                case Template:
+                    generateTemplate(name, classDefinitions);
+                    break;
+                case Tag:
+                    generateTemplateFromTag(name, classDefinitions);
+                    break;
+                case Layout:
+                    generateTemplateFromLayout(name, classDefinitions);
+                    break;
             }
         }
 
@@ -131,9 +131,16 @@ public class TemplateCompiler {
         ClassFilesCompiler.compile(files, compilePath, classDirectory, templateByClassName);
     }
 
-    private boolean isTag(String name) {
-        // TODO better check!
-        return name.startsWith(TAG_DIRECTORY);
+    private TemplateType getTemplateType(String name) {
+        if (name.startsWith(TAG_DIRECTORY)) {
+            return TemplateType.Tag;
+        }
+
+        if (name.startsWith(LAYOUT_DIRECTORY)) {
+            return TemplateType.Layout;
+        }
+
+        return TemplateType.Template;
     }
 
     private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
@@ -157,6 +164,26 @@ public class TemplateCompiler {
         if (DEBUG) {
             System.out.println(templateDefinition.getCode());
         }
+    }
+
+    private void generateTemplateFromTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+        LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
+
+        ClassInfo templateInfo = generateTag(name, classDefinitions, templateDependencies, null);
+
+        this.templateDependencies.put(name, templateDependencies);
+
+        templateByClassName.put(templateInfo.name, templateInfo);
+    }
+
+    private void generateTemplateFromLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
+        LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
+
+        ClassInfo templateInfo = generateLayout(name, classDefinitions, templateDependencies, null);
+
+        this.templateDependencies.put(name, templateDependencies);
+
+        templateByClassName.put(templateInfo.name, templateInfo);
     }
 
     private ClassInfo generateTag(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
@@ -686,26 +713,39 @@ public class TemplateCompiler {
         }
     }
 
-    private class TemplateTagWrapper implements Template<Map<String, Object>> {
+    private class TemplateWrapper implements Template<Map<String, Object>> {
         private final String name;
-        private final Class<?> tagClass;
+        private final TemplateType type;
+        private final Class<?> clazz;
 
-        public TemplateTagWrapper(String name, Class<?> tagClass) {
+        public TemplateWrapper(String name, TemplateType type, Class<?> clazz) {
             this.name = name;
-            this.tagClass = tagClass;
+            this.type = type;
+            this.clazz = clazz;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void render(TemplateOutput output, Map<String, Object> model) {
             List<ParamInfo> paramInfos = paramOrder.get(name);
 
-            Method renderMethod = tagClass.getDeclaredMethods()[0];
+            Method renderMethod = clazz.getDeclaredMethods()[0];
 
             Class<?>[] parameterTypes = renderMethod.getParameterTypes();
             Object[] arguments = new Object[parameterTypes.length];
 
             int i = 0;
             arguments[i++] = output;
+
+            if (type == TemplateType.Layout) {
+                Map<String, String> layoutDefinitions = (Map<String, String>)model.get(LAYOUT_DEFINITIONS_PARAM);
+                arguments[i++] = (Function<String, Runnable>) definitionName -> () -> {
+                    String layoutDefinition = layoutDefinitions.get(definitionName);
+                    if (layoutDefinition != null) {
+                        output.writeContent(layoutDefinition);
+                    }
+                };
+            }
 
             for (ParamInfo paramInfo : paramInfos) {
                 Object param = model.get(paramInfo.name);

@@ -729,7 +729,7 @@ public class TemplateCompiler {
         public void render(TemplateOutput output, Map<String, Object> model) {
             List<ParamInfo> paramInfos = paramOrder.get(name);
 
-            Method renderMethod = clazz.getDeclaredMethods()[0];
+            Method renderMethod = findRenderMethod();
 
             Class<?>[] parameterTypes = renderMethod.getParameterTypes();
             Object[] arguments = new Object[parameterTypes.length];
@@ -764,6 +764,15 @@ public class TemplateCompiler {
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new TemplateException("Failed to dynamically invoke tag " + name, e);
             }
+        }
+
+        private Method findRenderMethod() {
+            for (Method declaredMethod : clazz.getDeclaredMethods()) {
+                if ("render".equals(declaredMethod.getName())) {
+                    return declaredMethod;
+                }
+            }
+            throw new IllegalStateException("No method named 'render' found in " + clazz);
         }
 
         private Object convertDefaultValue(Class<?> parameterType, String defaultValue) {

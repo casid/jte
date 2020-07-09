@@ -10,9 +10,12 @@ final class TemplateParser {
 
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
+    private final String htmlTags[] = {"form", "input"}; // TODO make configurable!
     private final Deque<Mode> stack = new ArrayDeque<>();
+    private final Deque<HtmlTag> htmlStack = new ArrayDeque<>();
 
     private Mode currentMode;
+    private HtmlTag currentHtmlTag;
     private int depth;
     private boolean paramsComplete;
 
@@ -295,6 +298,51 @@ final class TemplateParser {
                 extract(templateCode, lastIndex, i, visitor::onLayoutRender);
                 lastIndex = i + 1;
                 pop();
+            } else if (htmlTags != null && currentMode == Mode.Text) {
+                if (currentChar == '<') {
+                    for (String name : htmlTags) {
+                        if (templateCode.startsWith(name, i + 1) && Character.isWhitespace(templateCode.charAt(i + name.length() + 1))) {
+                            HtmlTag htmlTag = new HtmlTag(name);
+                            pushHtmlTag(htmlTag);
+                        }
+                    }
+                } else if (currentHtmlTag != null) {
+                    if (currentChar == '=') {
+                        HtmlAttribute attribute = new HtmlAttribute(parseHtmlAttributeName(templateCode, i));
+                        currentHtmlTag.attributes.add(attribute);
+                    } else if (currentChar == '\"') {
+                        HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
+                        if (currentAttribute != null) {
+                            currentAttribute.quoteCount++;
+                            if (currentAttribute.quoteCount == 1) {
+                                currentAttribute.startIndex = i + 1;
+                            } else if (currentAttribute.quoteCount == 2) {
+                                currentAttribute.value = templateCode.substring(currentAttribute.startIndex, i);
+                            }
+                        }
+                    } else if (previousChar0 == '/' && currentChar == '>') {
+                        extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                        lastIndex = i - 1;
+                        visitor.onHtmlTagOpened(depth, currentHtmlTag);
+
+                        popHtmlTag();
+                    } else if (currentChar == '>') {
+                        extract(templateCode, lastIndex, i, visitor::onTextPart);
+                        lastIndex = i;
+                        visitor.onHtmlTagOpened(depth, currentHtmlTag);
+
+                        if (!"form".equals(currentHtmlTag.name)) {
+                            popHtmlTag();
+                        }
+                    } else if (previousChar0 == '<' && currentChar == '/') {
+                        if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
+                            extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                            lastIndex = i - 1;
+                            visitor.onHtmlTagClosed(depth, currentHtmlTag);
+                            popHtmlTag();
+                        }
+                    }
+                }
             }
 
             if (currentChar == '\n') {
@@ -308,6 +356,30 @@ final class TemplateParser {
 
         completeParamsIfRequired();
         visitor.onComplete();
+    }
+
+    private void pushHtmlTag(HtmlTag htmlTag) {
+        htmlStack.push(htmlTag);
+        currentHtmlTag = htmlTag;
+    }
+
+    private void popHtmlTag() {
+        htmlStack.pop();
+        currentHtmlTag = htmlStack.peek();
+    }
+
+    private String parseHtmlAttributeName(String templateCode, int index) {
+        while (Character.isWhitespace(templateCode.charAt(index))) {
+            --index;
+        }
+
+        int endIndex = index--;
+
+        while (!Character.isWhitespace(templateCode.charAt(index))) {
+            --index;
+        }
+
+        return templateCode.substring(index + 1, endIndex);
     }
 
     private void push(Mode mode) {
@@ -413,5 +485,34 @@ final class TemplateParser {
     }
 
     private static class LayoutMode extends TagOrLayoutMode {
+    }
+
+    public static class HtmlTag {
+
+        public final String name;
+        public final List<HtmlAttribute> attributes = new ArrayList<>();
+
+        public HtmlTag(String name) {
+            this.name = name;
+        }
+
+        public HtmlAttribute getCurrentAttribute() {
+            if (attributes.isEmpty()) {
+                return null;
+            }
+            return attributes.get(attributes.size() - 1);
+        }
+    }
+
+    public static class HtmlAttribute {
+        public final String name;
+        public String value;
+
+        public int quoteCount;
+        public int startIndex;
+
+        private HtmlAttribute(String name) {
+            this.name = name;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.jusecase.jte;
 
 import org.jusecase.jte.internal.*;
+import org.jusecase.jte.support.HtmlTagSupport;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -22,6 +23,8 @@ public final class TemplateEngine {
     private final TemplateCompiler compiler;
     private final TemplateMode templateMode;
     private final ConcurrentMap<String, Template> templateCache;
+
+    private HtmlTagSupport htmlTagSupport;
 
     /**
      * Creates a new template engine.
@@ -88,7 +91,7 @@ public final class TemplateEngine {
     public void render(String name, Object model, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.render(output, model);
+            template.render(output, htmlTagSupport, model);
         } catch (Exception e) {
             DebugInfo debugInfo = compiler.resolveDebugInfo(template.getClass().getClassLoader(), e.getStackTrace());
             String message = "Failed to render " + name;
@@ -188,5 +191,9 @@ public final class TemplateEngine {
      */
     public void setNullSafeTemplateCode(boolean value) {
         compiler.setNullSafeTemplateCode(value);
+    }
+
+    public void setHtmlTagSupport(HtmlTagSupport htmlTagSupport) {
+        this.htmlTagSupport = htmlTagSupport;
     }
 }

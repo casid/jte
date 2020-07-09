@@ -4,6 +4,7 @@ import org.jusecase.jte.CodeResolver;
 import org.jusecase.jte.TemplateException;
 import org.jusecase.jte.TemplateOutput;
 import org.jusecase.jte.output.FileOutput;
+import org.jusecase.jte.support.HtmlTagSupport;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -345,7 +346,7 @@ public class TemplateCompiler {
         private void writeTemplateClass(ParamInfo parameter) {
             javaCode.append("public final class ").append(classInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(parameter.type).append("> {\n");
             javaCode.markFieldsIndex();
-            javaCode.append("\tpublic void render(org.jusecase.jte.TemplateOutput output");
+            javaCode.append("\tpublic void render(org.jusecase.jte.TemplateOutput output, org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
 
             hasWrittenClass = true;
         }
@@ -539,6 +540,34 @@ public class TemplateCompiler {
             layoutStack.push(new LayoutStack(layoutName, params));
         }
 
+        @Override
+        public void onHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
+            writeIndentation(depth);
+            javaCode.append("htmlTagSupport.onHtmlTagOpened(\"").append(htmlTag.name).append("\", ");
+            javaCode.append("org.jusecase.jte.internal.IoUtils.toMap(");
+            boolean firstWritten = false;
+            for (TemplateParser.HtmlAttribute attribute : htmlTag.attributes) {
+                if (firstWritten) {
+                    javaCode.append(",");
+                } else {
+                    firstWritten = true;
+                }
+                javaCode.append("\"").append(attribute.name).append("\",");
+                if (attribute.value.startsWith("${") && attribute.value.endsWith("}")) {
+                    javaCode.append(attribute.value.substring(2, attribute.value.length() - 1));
+                } else {
+                    javaCode.append("\"").append(attribute.value).append("\"");
+                }
+            }
+            javaCode.append("), output);\n");
+        }
+
+        @Override
+        public void onHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
+            writeIndentation(depth);
+            javaCode.append("htmlTagSupport.onHtmlTagClosed(\"").append(htmlTag.name).append("\", output);\n");
+        }
+
         private DebugInfo getCurrentDebugInfo() {
             return new DebugInfo(classInfo.name, javaCode.getCurrentTemplateLine() + 1);
         }
@@ -726,7 +755,7 @@ public class TemplateCompiler {
 
         @SuppressWarnings("unchecked")
         @Override
-        public void render(TemplateOutput output, Map<String, Object> model) {
+        public void render(TemplateOutput output, HtmlTagSupport htmlTagSupport, Map<String, Object> model) {
             List<ParamInfo> paramInfos = paramOrder.get(name);
 
             Method renderMethod = findRenderMethod();

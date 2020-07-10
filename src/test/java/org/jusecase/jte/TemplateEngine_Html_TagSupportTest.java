@@ -46,8 +46,8 @@ class TemplateEngine_Html_TagSupportTest {
         templateEngine.render("page.jte", "hello.htm", output);
 
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
-                "<input name=\"param1\">\n" +
-                "<input name=\"param2\">\n" +
+                "<input name=\"param1\" value=\"?\">\n" +
+                "<input name=\"param2\" value=\"?\">\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
     }
 
@@ -62,8 +62,8 @@ class TemplateEngine_Html_TagSupportTest {
         templateEngine.render("page.jte", "hello.htm", output);
 
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
-                "<input name=\"param1\"/>\n" +
-                "<input name=\"param2\"/>\n" +
+                "<input name=\"param1\" value=\"?\"/>\n" +
+                "<input name=\"param2\" value=\"?\"/>\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
     }
 
@@ -78,8 +78,8 @@ class TemplateEngine_Html_TagSupportTest {
         templateEngine.render("page.jte", "hello.htm", output);
 
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
-                "<input name=\"param1\"></input>\n" +
-                "<input name=\"param2\"></input>\n" +
+                "<input name=\"param1\" value=\"?\"></input>\n" +
+                "<input name=\"param2\" value=\"?\"></input>\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
     }
 
@@ -110,6 +110,7 @@ class TemplateEngine_Html_TagSupportTest {
             }
             if ("input".equals(name)) {
                 fieldNames.add(attributes.get("name"));
+                output.writeStaticContent(" value=\"?\"");
             }
         }
 

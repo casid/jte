@@ -10,7 +10,7 @@ final class TemplateParser {
 
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
-    private final String htmlTags[] = {"form", "input"}; // TODO make configurable!
+    private final String htmlTags[] = {"form", "input", "select", "option"}; // TODO make configurable!
     private final Deque<Mode> stack = new ArrayDeque<>();
     private final Deque<HtmlTag> htmlStack = new ArrayDeque<>();
 

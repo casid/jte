@@ -11,16 +11,16 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TemplateEngine_Html_TagSupportTest {
+public class TemplateEngine_Html_TagSupportTest {
 
     StringOutput output = new StringOutput();
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
     TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver);
-    MySampleFrameworkTagSupport htmlTagSupport;
+    Controller controller = new Controller();
+    MySampleFrameworkTagSupport htmlTagSupport = new MySampleFrameworkTagSupport();
 
     @BeforeEach
     void setUp() {
-        htmlTagSupport = new MySampleFrameworkTagSupport();
         templateEngine.setHtmlTagSupport(htmlTagSupport);
     }
 
@@ -85,7 +85,25 @@ class TemplateEngine_Html_TagSupportTest {
 
     @Test
     void select() {
-        // TODO support for <select> and <option>
+        dummyCodeResolver.givenCode("page.jte", "@param org.jusecase.jte.TemplateEngine_Html_TagSupportTest.Controller controller\n" +
+                "<form action=\"${controller.getUrl()}\">\n" +
+                "<select name=\"foodOption\">\n" +
+                "@for(var foodOption : controller.getFoodOptions())" +
+                "<option value=\"${foodOption}\">Mmmh, ${foodOption}</option>\n" +
+                "@endfor" +
+                "</select>\n" +
+                "</form>");
+
+        controller.setFoodOption("Onion");
+        templateEngine.render("page.jte", controller, output);
+
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
+                "<select name=\"foodOption\">\n" +
+                "<option value=\"Cheese\">Mmmh, Cheese</option>\n" +
+                "<option value=\"Onion\" selected>Mmmh, Onion</option>\n" +
+                "<option value=\"Chili\">Mmmh, Chili</option>\n" +
+                "</select>\n" +
+                "<input name=\"__fp\" value=\"a:hello.htm, p:foodOption\"></form>");
     }
 
     @Test
@@ -98,7 +116,28 @@ class TemplateEngine_Html_TagSupportTest {
         // TODO ensure htmlTagSupport is passed to layouts
     }
 
-    private static class MySampleFrameworkTagSupport implements HtmlTagSupport {
+    @SuppressWarnings("unused")
+    public static class Controller {
+        private String foodOption;
+
+        public String getUrl() {
+            return "hello.htm";
+        }
+
+        public String getFoodOption() {
+            return foodOption;
+        }
+
+        public void setFoodOption(String foodOption) {
+            this.foodOption = foodOption;
+        }
+
+        public List<String> getFoodOptions() {
+            return List.of("Cheese", "Onion", "Chili");
+        }
+    }
+
+    public class MySampleFrameworkTagSupport implements HtmlTagSupport {
 
         private String action;
         private final List<String> fieldNames = new ArrayList<>();
@@ -107,10 +146,16 @@ class TemplateEngine_Html_TagSupportTest {
         public void onHtmlTagOpened(String name, Map<String, String> attributes, TemplateOutput output) {
             if ("form".equals(name)) {
                 action = attributes.get("action");
-            }
-            if ("input".equals(name)) {
+            } else if ("input".equals(name)) {
                 fieldNames.add(attributes.get("name"));
                 output.writeStaticContent(" value=\"?\"");
+            } else if ("select".equals(name)) {
+                fieldNames.add(attributes.get("name"));
+            } else if ("option".equals(name)) {
+                String value = attributes.get("value");
+                if (value != null && value.equals(controller.getFoodOption())) {
+                    output.writeStaticContent(" selected");
+                }
             }
         }
 

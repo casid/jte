@@ -193,6 +193,21 @@ public final class TemplateEngine {
         compiler.setNullSafeTemplateCode(value);
     }
 
+    /**
+     * Experimental mode, that intercepts the given html tags during template compilation
+     * and calls the configured htmlTagSupport during template rendering.
+     * @param htmlTags tags to be intercepted, for instance setHtmlTags("form", "input");
+     */
+    public void setHtmlTags(String ... htmlTags) {
+        compiler.setHtmlTags(htmlTags);
+    }
+
+    /**
+     * Experimental listener that is called during template rendering when one of the
+     * configured htmlTags is rendered.
+     * This allows to integrate existing frameworks into jte.
+     * @param htmlTagSupport the listener
+     */
     public void setHtmlTagSupport(HtmlTagSupport htmlTagSupport) {
         this.htmlTagSupport = htmlTagSupport;
     }

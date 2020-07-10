@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TemplateEngine_Html_TagSupportTest {
+public class TemplateEngine_HtmlTagSupportTest {
 
     StringOutput output = new StringOutput();
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
@@ -21,6 +21,7 @@ public class TemplateEngine_Html_TagSupportTest {
 
     @BeforeEach
     void setUp() {
+        templateEngine.setHtmlTags("form", "input", "select", "option");
         templateEngine.setHtmlTagSupport(htmlTagSupport);
     }
 
@@ -85,7 +86,7 @@ public class TemplateEngine_Html_TagSupportTest {
 
     @Test
     void select() {
-        dummyCodeResolver.givenCode("page.jte", "@param org.jusecase.jte.TemplateEngine_Html_TagSupportTest.Controller controller\n" +
+        dummyCodeResolver.givenCode("page.jte", "@param org.jusecase.jte.TemplateEngine_HtmlTagSupportTest.Controller controller\n" +
                 "<form action=\"${controller.getUrl()}\">\n" +
                 "<select name=\"foodOption\">\n" +
                 "@for(var foodOption : controller.getFoodOptions())" +

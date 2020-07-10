@@ -10,7 +10,7 @@ final class TemplateParser {
 
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
-    private final String htmlTags[] = {"form", "input", "select", "option"}; // TODO make configurable!
+    private final String[] htmlTags;
     private final Deque<Mode> stack = new ArrayDeque<>();
     private final Deque<HtmlTag> htmlStack = new ArrayDeque<>();
 
@@ -19,9 +19,10 @@ final class TemplateParser {
     private int depth;
     private boolean paramsComplete;
 
-    TemplateParser(TemplateType type, TemplateParserVisitor visitor) {
+    TemplateParser(TemplateType type, TemplateParserVisitor visitor, String[] htmlTags) {
         this.type = type;
         this.visitor = visitor;
+        this.htmlTags = htmlTags;
     }
 
     public void parse(String templateCode) {

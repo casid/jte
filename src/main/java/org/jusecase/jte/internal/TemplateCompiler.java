@@ -41,6 +41,7 @@ public class TemplateCompiler {
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
     private boolean nullSafeTemplateCode;
+    private String[] htmlTags;
 
     public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, TemplateMode templateMode) {
         this.codeResolver = codeResolver;
@@ -152,7 +153,7 @@ public class TemplateCompiler {
         ClassInfo templateInfo = new ClassInfo(name, PACKAGE_NAME);
 
         CodeGenerator codeGenerator = new CodeGenerator(templateInfo, TemplateType.Template, classDefinitions, templateDependencies);
-        new TemplateParser(TemplateType.Template, codeGenerator).parse(templateCode);
+        new TemplateParser(TemplateType.Template, codeGenerator, htmlTags).parse(templateCode);
 
         this.templateDependencies.put(name, templateDependencies);
 
@@ -209,7 +210,7 @@ public class TemplateCompiler {
         classDefinitions.add(classDefinition);
 
         CodeGenerator codeGenerator = new CodeGenerator(classInfo, type, classDefinitions, templateDependencies);
-        new TemplateParser(type, codeGenerator).parse(code);
+        new TemplateParser(type, codeGenerator, htmlTags).parse(code);
 
         classDefinition.setCode(codeGenerator.getCode());
         templateByClassName.put(classDefinition.getName(), classInfo);
@@ -265,6 +266,10 @@ public class TemplateCompiler {
 
     public void setNullSafeTemplateCode(boolean nullSafeTemplateCode) {
         this.nullSafeTemplateCode = nullSafeTemplateCode;
+    }
+
+    public void setHtmlTags(String[] htmlTags) {
+        this.htmlTags = htmlTags;
     }
 
     public DebugInfo resolveDebugInfo(ClassLoader classLoader, StackTraceElement[] stackTrace) {

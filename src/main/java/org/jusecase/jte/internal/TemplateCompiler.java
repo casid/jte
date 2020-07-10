@@ -354,7 +354,7 @@ public class TemplateCompiler {
         private void writeTagOrLayoutClass() {
             javaCode.append("public final class ").append(classInfo.className).append(" {\n");
             javaCode.markFieldsIndex();
-            javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output");
+            javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output, org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
 
             if (type == TemplateType.Layout) {
                 javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
@@ -521,7 +521,7 @@ public class TemplateCompiler {
 
             writeIndentation(depth);
 
-            javaCode.append(tagInfo.fullName).append(".render(output");
+            javaCode.append(tagInfo.fullName).append(".render(output, htmlTagSupport");
 
             appendParams(tagName, params);
             javaCode.append(");\n");
@@ -533,7 +533,7 @@ public class TemplateCompiler {
             ClassInfo layoutInfo = generateLayout(layoutName, classDefinitions, templateDependencies, getCurrentDebugInfo());
 
             writeIndentation(depth);
-            javaCode.append(layoutInfo.fullName).append(".render(output");
+            javaCode.append(layoutInfo.fullName).append(".render(output, htmlTagSupport");
 
             javaCode.append(", jteLayoutDefinition -> {\n");
 
@@ -765,6 +765,7 @@ public class TemplateCompiler {
 
             int i = 0;
             arguments[i++] = output;
+            arguments[i++] = htmlTagSupport;
 
             if (type == TemplateType.Layout) {
                 Map<String, String> layoutDefinitions = (Map<String, String>)model.get(LAYOUT_DEFINITIONS_PARAM);

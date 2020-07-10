@@ -108,12 +108,45 @@ public class TemplateEngine_Html_TagSupportTest {
 
     @Test
     void tag() {
-        // TODO ensure htmlTagSupport is passed to tags
+        dummyCodeResolver.givenCode("tag/formContent.jte",
+                "<input name=\"param1\"></input>\n" +
+                "<input name=\"param2\"></input>\n");
+
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "<form action=\"${url}\">\n" +
+                "@tag.formContent()" +
+                "</form>");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
+                "<input name=\"param1\" value=\"?\"></input>\n" +
+                "<input name=\"param2\" value=\"?\"></input>\n" +
+                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
     }
 
     @Test
     void layout() {
-        // TODO ensure htmlTagSupport is passed to layouts
+        dummyCodeResolver.givenCode("layout/formContent.jte",
+                        "@param String url\n" +
+                        "<form action=\"${url}\">\n" +
+                        "@render(content)" +
+                        "</form>");
+
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "@layout.formContent(url)\n" +
+                "@define(content)" +
+                "<input name=\"param1\"></input>\n" +
+                "<input name=\"param2\"></input>\n" +
+                "@enddefine" +
+                "@endlayout");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
+                "<input name=\"param1\" value=\"?\"></input>\n" +
+                "<input name=\"param2\" value=\"?\"></input>\n" +
+                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
     }
 
     @SuppressWarnings("unused")

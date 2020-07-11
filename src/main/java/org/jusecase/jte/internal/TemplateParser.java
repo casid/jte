@@ -18,6 +18,7 @@ final class TemplateParser {
     private HtmlTag currentHtmlTag;
     private int depth;
     private boolean paramsComplete;
+    private boolean tagClosed;
 
     TemplateParser(TemplateType type, TemplateParserVisitor visitor, String[] htmlTags) {
         this.type = type;
@@ -328,20 +329,29 @@ final class TemplateParser {
 
                         popHtmlTag();
                     } else if (currentChar == '>') {
-                        extract(templateCode, lastIndex, i, visitor::onTextPart);
-                        lastIndex = i;
-                        visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                        if (tagClosed) {
+                            tagClosed = false;
+                        } else {
+                            extract(templateCode, lastIndex, i, visitor::onTextPart);
+                            lastIndex = i;
+                            visitor.onHtmlTagOpened(depth, currentHtmlTag);
 
-                        if (!"form".equals(currentHtmlTag.name)) {
-                            popHtmlTag();
+                            if ( isBodyIgnored() ) {
+                                popHtmlTag();
+                            }
                         }
                     } else if (previousChar0 == '<' && currentChar == '/') {
                         if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
-                            extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
-                            lastIndex = i - 1;
-                            visitor.onHtmlTagClosed(depth, currentHtmlTag);
-                            popHtmlTag();
+                            if (!isBodyIgnored()) {
+                                extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                                lastIndex = i - 1;
+                                visitor.onHtmlTagClosed(depth, currentHtmlTag);
+
+                                popHtmlTag();
+                            }
+
                         }
+                        tagClosed = true;
                     }
                 }
             }
@@ -357,6 +367,11 @@ final class TemplateParser {
 
         completeParamsIfRequired();
         visitor.onComplete();
+    }
+
+    private boolean isBodyIgnored() {
+        // TODO fill in https://www.lifewire.com/html-singleton-tags-3468620
+        return "input".equals(currentHtmlTag.name);
     }
 
     private void pushHtmlTag(HtmlTag htmlTag) {

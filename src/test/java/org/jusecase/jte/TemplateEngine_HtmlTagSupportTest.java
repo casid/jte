@@ -33,7 +33,7 @@ public class TemplateEngine_HtmlTagSupportTest {
 
         templateEngine.render("page.jte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n<input name=\"__fp\" value=\"a:hello.htm, p:\"></form>");
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n<input name=\"__fp\" value=\"a:hello.htm, p:\"></form>");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class TemplateEngine_HtmlTagSupportTest {
 
         templateEngine.render("page.jte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"param1\" value=\"?\">\n" +
                 "<input name=\"param2\" value=\"?\">\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
@@ -62,7 +62,7 @@ public class TemplateEngine_HtmlTagSupportTest {
 
         templateEngine.render("page.jte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"param1\" value=\"?\"/>\n" +
                 "<input name=\"param2\" value=\"?\"/>\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
@@ -78,7 +78,7 @@ public class TemplateEngine_HtmlTagSupportTest {
 
         templateEngine.render("page.jte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"param1\" value=\"?\"></input>\n" +
                 "<input name=\"param2\" value=\"?\"></input>\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
@@ -98,7 +98,7 @@ public class TemplateEngine_HtmlTagSupportTest {
         controller.setFoodOption("Onion");
         templateEngine.render("page.jte", controller, output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<select name=\"foodOption\">\n" +
                 "<option value=\"Cheese\">Mmmh, Cheese</option>\n" +
                 "<option value=\"Onion\" selected>Mmmh, Onion</option>\n" +
@@ -120,7 +120,7 @@ public class TemplateEngine_HtmlTagSupportTest {
 
         templateEngine.render("page.jte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"param1\" value=\"?\"></input>\n" +
                 "<input name=\"param2\" value=\"?\"></input>\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
@@ -144,7 +144,7 @@ public class TemplateEngine_HtmlTagSupportTest {
 
         templateEngine.render("page.jte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\">\n" +
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"param1\" value=\"?\"></input>\n" +
                 "<input name=\"param2\" value=\"?\"></input>\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
@@ -180,6 +180,7 @@ public class TemplateEngine_HtmlTagSupportTest {
         public void onHtmlTagOpened(String name, Map<String, String> attributes, TemplateOutput output) {
             if ("form".equals(name)) {
                 action = attributes.get("action");
+                output.writeStaticContent(" data-form=\"x\"");
             } else if ("input".equals(name)) {
                 fieldNames.add(attributes.get("name"));
                 output.writeStaticContent(" value=\"?\"");

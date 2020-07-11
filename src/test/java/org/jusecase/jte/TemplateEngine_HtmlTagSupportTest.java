@@ -150,6 +150,26 @@ public class TemplateEngine_HtmlTagSupportTest {
                 "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
     }
 
+    @Test
+    void form() {
+        dummyCodeResolver.givenCode("page.jte", "@param org.jusecase.jte.TemplateEngine_HtmlTagSupportTest.Controller controller\n"
+              + "<body>\n" + "   <h1>Hello</h1>\n" + "\n" + "   <form action=\"${controller.getUrl()}\" method=\"POST\">\n" + "\n"
+              + "      <label>\n" + "         Food option:\n" + "         <select name=\"foodOption\">\n" + "            <option value=\"\">-</option>\n"
+              + "            @for(var foodOption : controller.getFoodOptions())\n" + "               <option value=\"${foodOption}\">${foodOption}</option>\n"
+              + "            @endfor\n" + "         </select>\n" + "      </label>\n" + "\n" + "      <button type=\"submit\">Submit</button>\n"
+              + "   </form>\n" + "</body>");
+
+        templateEngine.render("page.jte", controller, output);
+
+        assertThat(output.toString()).isEqualTo("<body>\n" + "   <h1>Hello</h1>\n" + "\n" + "   <form action=\"hello.htm\" method=\"POST\" data-form=\"x\">\n"
+              + "\n" + "      <label>\n" + "         Food option:\n" + "         <select name=\"foodOption\">\n"
+              + "            <option value=\"\">-</option>\n" + "            \n" + "               <option value=\"Cheese\">Cheese</option>\n"
+              + "            \n" + "               <option value=\"Onion\">Onion</option>\n" + "            \n"
+              + "               <option value=\"Chili\">Chili</option>\n" + "            \n" + "         </select>\n" + "      </label>\n" + "\n"
+              + "      <button type=\"submit\">Submit</button>\n" + "   <input name=\"__fp\" value=\"a:hello.htm, p:foodOption\"></form>\n"
+              + "</body>");
+    }
+
     @SuppressWarnings("unused")
     public static class Controller {
         private String foodOption;

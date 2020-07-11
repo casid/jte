@@ -303,13 +303,15 @@ final class TemplateParser {
                         if (templateCode.startsWith(name, i + 1) && Character.isWhitespace(templateCode.charAt(i + name.length() + 1))) {
                             HtmlTag htmlTag = new HtmlTag(name);
                             pushHtmlTag(htmlTag);
+                            tagClosed = false;
+                            break;
                         }
                     }
                 } else if (currentHtmlTag != null) {
-                    if (currentChar == '=') {
+                    if (!currentHtmlTag.attributesProcessed && currentChar == '=') {
                         HtmlAttribute attribute = new HtmlAttribute(parseHtmlAttributeName(templateCode, i));
                         currentHtmlTag.attributes.add(attribute);
-                    } else if (currentChar == '\"') {
+                    } else if (!currentHtmlTag.attributesProcessed && currentChar == '\"') {
                         HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
                         if (currentAttribute != null) {
                             currentAttribute.quoteCount++;
@@ -323,15 +325,17 @@ final class TemplateParser {
                         extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
                         lastIndex = i - 1;
                         visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                        currentHtmlTag.attributesProcessed = true;
 
                         popHtmlTag();
-                    } else if (currentChar == '>') {
+                    } else if (!currentHtmlTag.attributesProcessed && currentChar == '>') {
                         if (tagClosed) {
                             tagClosed = false;
                         } else {
                             extract(templateCode, lastIndex, i, visitor::onTextPart);
                             lastIndex = i;
                             visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                            currentHtmlTag.attributesProcessed = true;
 
                             if ( currentHtmlTag.bodyIgnored ) {
                                 popHtmlTag();
@@ -503,6 +507,7 @@ final class TemplateParser {
         public final String name;
         public final List<HtmlAttribute> attributes = new ArrayList<>();
         public final boolean bodyIgnored;
+        public boolean attributesProcessed;
 
         public HtmlTag(String name) {
             this.name = name;

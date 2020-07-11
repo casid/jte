@@ -1,9 +1,6 @@
 package org.jusecase.jte.internal;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 final class TemplateParser {
     private static final int LAYOUT_DEFINITION_DEPTH = 2;
@@ -336,13 +333,13 @@ final class TemplateParser {
                             lastIndex = i;
                             visitor.onHtmlTagOpened(depth, currentHtmlTag);
 
-                            if ( isBodyIgnored() ) {
+                            if ( currentHtmlTag.bodyIgnored ) {
                                 popHtmlTag();
                             }
                         }
                     } else if (previousChar0 == '<' && currentChar == '/') {
                         if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
-                            if (!isBodyIgnored()) {
+                            if (!currentHtmlTag.bodyIgnored) {
                                 extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
                                 lastIndex = i - 1;
                                 visitor.onHtmlTagClosed(depth, currentHtmlTag);
@@ -367,11 +364,6 @@ final class TemplateParser {
 
         completeParamsIfRequired();
         visitor.onComplete();
-    }
-
-    private boolean isBodyIgnored() {
-        // TODO fill in https://www.lifewire.com/html-singleton-tags-3468620
-        return "input".equals(currentHtmlTag.name);
     }
 
     private void pushHtmlTag(HtmlTag htmlTag) {
@@ -505,11 +497,16 @@ final class TemplateParser {
 
     public static class HtmlTag {
 
+        // See https://www.lifewire.com/html-singleton-tags-3468620
+        private static final Set<String> VOID_HTML_TAGS = Set.of("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
+
         public final String name;
         public final List<HtmlAttribute> attributes = new ArrayList<>();
+        public final boolean bodyIgnored;
 
         public HtmlTag(String name) {
             this.name = name;
+            this.bodyIgnored = VOID_HTML_TAGS.contains(name);
         }
 
         public HtmlAttribute getCurrentAttribute() {

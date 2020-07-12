@@ -113,7 +113,7 @@ jte is available on <a href="http://mvnrepository.com/artifact/org.jusecase/jte"
 <dependency>
     <groupId>org.jusecase</groupId>
     <artifactId>jte</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 

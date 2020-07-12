@@ -22,6 +22,7 @@ public class TemplateEngine_HtmlTagSupportTest {
     @BeforeEach
     void setUp() {
         templateEngine.setHtmlTags("form", "input", "select", "option");
+        templateEngine.setHtmlAttributes("class");
         templateEngine.setHtmlTagSupport(htmlTagSupport);
     }
 
@@ -184,6 +185,20 @@ public class TemplateEngine_HtmlTagSupportTest {
               + "</body>");
     }
 
+    @Test
+    void errorClass() {
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "<form action=\"${url}\">\n" +
+                "<input name=\"error\" class=\"foo\">\n" +
+                "</form>");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
+                "<input name=\"error\" class=\"error foo\" value=\"?\">\n" +
+                "<input name=\"__fp\" value=\"a:hello.htm, p:error\"></form>");
+    }
+
     @SuppressWarnings("unused")
     public static class Controller {
         private String foodOption;
@@ -227,6 +242,13 @@ public class TemplateEngine_HtmlTagSupportTest {
                 if (value != null && value.equals(controller.getFoodOption())) {
                     output.writeStaticContent(" selected");
                 }
+            }
+        }
+
+        @Override
+        public void onHtmlAttributeStarted(String name, Map<String, Object> attributesBefore, TemplateOutput output) {
+            if ("class".equals(name) && "error".equals(attributesBefore.get("name"))) {
+                output.writeStaticContent("error ");
             }
         }
 

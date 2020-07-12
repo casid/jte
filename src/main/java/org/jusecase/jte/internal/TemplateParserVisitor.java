@@ -47,5 +47,7 @@ interface TemplateParserVisitor {
 
     void onHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag);
 
+    void onHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute);
+
     void onHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag);
 }

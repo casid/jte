@@ -42,6 +42,7 @@ public class TemplateCompiler {
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
     private boolean nullSafeTemplateCode;
     private String[] htmlTags;
+    private String[] htmlAttributes;
 
     public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, TemplateMode templateMode) {
         this.codeResolver = codeResolver;
@@ -153,7 +154,7 @@ public class TemplateCompiler {
         ClassInfo templateInfo = new ClassInfo(name, PACKAGE_NAME);
 
         CodeGenerator codeGenerator = new CodeGenerator(templateInfo, TemplateType.Template, classDefinitions, templateDependencies);
-        new TemplateParser(TemplateType.Template, codeGenerator, htmlTags).parse(templateCode);
+        new TemplateParser(TemplateType.Template, codeGenerator, htmlTags, htmlAttributes).parse(templateCode);
 
         this.templateDependencies.put(name, templateDependencies);
 
@@ -210,7 +211,7 @@ public class TemplateCompiler {
         classDefinitions.add(classDefinition);
 
         CodeGenerator codeGenerator = new CodeGenerator(classInfo, type, classDefinitions, templateDependencies);
-        new TemplateParser(type, codeGenerator, htmlTags).parse(code);
+        new TemplateParser(type, codeGenerator, htmlTags, htmlAttributes).parse(code);
 
         classDefinition.setCode(codeGenerator.getCode());
         templateByClassName.put(classDefinition.getName(), classInfo);
@@ -270,6 +271,10 @@ public class TemplateCompiler {
 
     public void setHtmlTags(String[] htmlTags) {
         this.htmlTags = htmlTags;
+    }
+
+    public void setHtmlAttributes(String[] htmlAttributes) {
+        this.htmlAttributes = htmlAttributes;
     }
 
     public DebugInfo resolveDebugInfo(ClassLoader classLoader, StackTraceElement[] stackTrace) {
@@ -549,9 +554,32 @@ public class TemplateCompiler {
         public void onHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
             writeIndentation(depth);
             javaCode.append("htmlTagSupport.onHtmlTagOpened(\"").append(htmlTag.name).append("\", ");
+            writeAttributeMap(htmlTag);
+            javaCode.append(", output);\n");
+        }
+
+        @Override
+        public void onHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
+            writeIndentation(depth);
+            javaCode.append("htmlTagSupport.onHtmlAttributeStarted(\"").append(htmlAttribute.name).append("\", ");
+            writeAttributeMap(currentHtmlTag);
+            javaCode.append(", output);\n");
+        }
+
+        @Override
+        public void onHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
+            writeIndentation(depth);
+            javaCode.append("htmlTagSupport.onHtmlTagClosed(\"").append(htmlTag.name).append("\", output);\n");
+        }
+
+        private void writeAttributeMap(TemplateParser.HtmlTag htmlTag) {
             javaCode.append("org.jusecase.jte.internal.IoUtils.toMap(");
             boolean firstWritten = false;
             for (TemplateParser.HtmlAttribute attribute : htmlTag.attributes) {
+                if (attribute.value == null) {
+                    continue;
+                }
+
                 if (firstWritten) {
                     javaCode.append(",");
                 } else {
@@ -564,13 +592,7 @@ public class TemplateCompiler {
                     javaCode.append("\"").append(attribute.value).append("\"");
                 }
             }
-            javaCode.append("), output);\n");
-        }
-
-        @Override
-        public void onHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
-            writeIndentation(depth);
-            javaCode.append("htmlTagSupport.onHtmlTagClosed(\"").append(htmlTag.name).append("\", output);\n");
+            javaCode.append(")");
         }
 
         private DebugInfo getCurrentDebugInfo() {

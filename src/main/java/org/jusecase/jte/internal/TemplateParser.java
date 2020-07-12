@@ -8,6 +8,8 @@ final class TemplateParser {
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
     private final String[] htmlTags;
+    private final String[] htmlAttributes;
+
     private final Deque<Mode> stack = new ArrayDeque<>();
     private final Deque<HtmlTag> htmlStack = new ArrayDeque<>();
 
@@ -17,10 +19,11 @@ final class TemplateParser {
     private boolean paramsComplete;
     private boolean tagClosed;
 
-    TemplateParser(TemplateType type, TemplateParserVisitor visitor, String[] htmlTags) {
+    TemplateParser(TemplateType type, TemplateParserVisitor visitor, String[] htmlTags, String[] htmlAttributes) {
         this.type = type;
         this.visitor = visitor;
         this.htmlTags = htmlTags;
+        this.htmlAttributes = htmlAttributes;
     }
 
     public void parse(String templateCode) {
@@ -317,6 +320,13 @@ final class TemplateParser {
                             currentAttribute.quoteCount++;
                             if (currentAttribute.quoteCount == 1) {
                                 currentAttribute.startIndex = i + 1;
+
+                                if (isHtmlAttributeIntercepted(currentAttribute.name)) {
+                                    extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
+                                    lastIndex = i + 1;
+
+                                    visitor.onHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
+                                }
                             } else if (currentAttribute.quoteCount == 2) {
                                 currentAttribute.value = templateCode.substring(currentAttribute.startIndex, i);
                             }
@@ -392,6 +402,17 @@ final class TemplateParser {
         }
 
         return templateCode.substring(index + 1, endIndex);
+    }
+
+    private boolean isHtmlAttributeIntercepted(String name) {
+        if (htmlAttributes != null) {
+            for (String htmlAttribute : htmlAttributes) {
+                if (name.equals(htmlAttribute)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void push(Mode mode) {

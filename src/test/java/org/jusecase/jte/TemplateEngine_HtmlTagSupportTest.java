@@ -53,6 +53,20 @@ public class TemplateEngine_HtmlTagSupportTest {
     }
 
     @Test
+    void input_int() {
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "<form action=\"${url}\">\n" +
+                "<input name=\"age\" value=\"${23}\">\n" +
+                "</form>");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
+                "<input name=\"age\" value=\"23\">\n" +
+                "<input name=\"__fp\" value=\"a:hello.htm, p:age\"></form>");
+    }
+
+    @Test
     void input_closed1() {
         dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
                 "<form action=\"${url}\">\n" +
@@ -197,17 +211,19 @@ public class TemplateEngine_HtmlTagSupportTest {
         private final List<String> fieldNames = new ArrayList<>();
 
         @Override
-        public void onHtmlTagOpened(String name, Map<String, String> attributes, TemplateOutput output) {
+        public void onHtmlTagOpened(String name, Map<String, Object> attributes, TemplateOutput output) {
             if ("form".equals(name)) {
-                action = attributes.get("action");
+                action = (String)attributes.get("action");
                 output.writeStaticContent(" data-form=\"x\"");
             } else if ("input".equals(name)) {
-                fieldNames.add(attributes.get("name"));
-                output.writeStaticContent(" value=\"?\"");
+                fieldNames.add((String)attributes.get("name"));
+                if (!attributes.containsKey("value")) {
+                    output.writeStaticContent(" value=\"?\"");
+                }
             } else if ("select".equals(name)) {
-                fieldNames.add(attributes.get("name"));
+                fieldNames.add((String)attributes.get("name"));
             } else if ("option".equals(name)) {
-                String value = attributes.get("value");
+                String value = (String)attributes.get("value");
                 if (value != null && value.equals(controller.getFoodOption())) {
                     output.writeStaticContent(" selected");
                 }

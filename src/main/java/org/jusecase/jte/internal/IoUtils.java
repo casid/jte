@@ -38,10 +38,10 @@ public final class IoUtils {
     }
 
     @SuppressWarnings("unused") // by template code
-    public static Map<String, String> toMap(String ... pairs) {
-        Map<String, String> map = new HashMap<>();
+    public static Map<String, Object> toMap(Object ... pairs) {
+        Map<String, Object> map = new HashMap<>();
         for (int i = 0; i < pairs.length; i += 2) {
-            map.put(pairs[i], pairs[i + 1]);
+            map.put((String)pairs[i], pairs[i + 1]);
         }
         return map;
     }

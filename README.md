@@ -119,7 +119,7 @@ jte is available on <a href="http://mvnrepository.com/artifact/org.jusecase/jte"
 
 ### Gradle
 ```groovy
-compile group: 'org.jusecase', name: 'jte', version: '0.4.0'
+compile group: 'org.jusecase', name: 'jte', version: '0.5.0'
 ```
 
 No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)

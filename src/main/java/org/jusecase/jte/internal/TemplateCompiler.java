@@ -407,6 +407,41 @@ public class TemplateCompiler {
             javaCode.insertFields(fields);
 
             javaCode.append("\t}\n");
+
+            if (type != TemplateType.Template) {
+                javaCode.append("\tpublic static void renderMap(org.jusecase.jte.TemplateOutput output, org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
+                if (type == TemplateType.Layout) {
+                    javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
+                }
+                javaCode.append(", java.util.Map<String, Object> params) {\n");
+                for (ParamInfo parameter : parameters) {
+                    if (parameter.varargs) {
+                        continue;
+                    }
+
+                    javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = (").append(parameter.type);
+                    if (parameter.defaultValue != null) {
+                        javaCode.append(")params.getOrDefault(\"").append(parameter.name).append("\", ");
+                        javaCode.append(parameter.defaultValue).append(");\n");
+                    } else {
+                        javaCode.append(")params.get(\"").append(parameter.name).append("\");\n");
+                    }
+                }
+                javaCode.append("\t\trender(output, htmlTagSupport");
+                if (type == TemplateType.Layout) {
+                    javaCode.append(", jteLayoutDefinitionLookup");
+                }
+                for (ParamInfo parameter : parameters) {
+                    if (parameter.varargs) {
+                        continue;
+                    }
+
+                    javaCode.append(", ").append(parameter.name);
+                }
+                javaCode.append(");\n");
+                javaCode.append("\t}\n");
+            }
+
             javaCode.append("}\n");
 
             this.classInfo.lineInfo = javaCode.getLineInfo();
@@ -769,7 +804,7 @@ public class TemplateCompiler {
         }
     }
 
-    private class TemplateWrapper implements Template<Map<String, Object>> {
+    private static class TemplateWrapper implements Template<Map<String, Object>> {
         private final String name;
         private final TemplateType type;
         private final Class<?> clazz;
@@ -783,41 +818,21 @@ public class TemplateCompiler {
         @SuppressWarnings("unchecked")
         @Override
         public void render(TemplateOutput output, HtmlTagSupport htmlTagSupport, Map<String, Object> model) {
-            List<ParamInfo> paramInfos = paramOrder.get(name);
-
-            Method renderMethod = findRenderMethod();
-
-            Class<?>[] parameterTypes = renderMethod.getParameterTypes();
-            Object[] arguments = new Object[parameterTypes.length];
-
-            int i = 0;
-            arguments[i++] = output;
-            arguments[i++] = htmlTagSupport;
-
-            if (type == TemplateType.Layout) {
-                Map<String, String> layoutDefinitions = (Map<String, String>)model.get(LAYOUT_DEFINITIONS_PARAM);
-                arguments[i++] = (Function<String, Runnable>) definitionName -> () -> {
-                    String layoutDefinition = layoutDefinitions.get(definitionName);
-                    if (layoutDefinition != null) {
-                        output.writeContent(layoutDefinition);
-                    }
-                };
-            }
-
-            for (ParamInfo paramInfo : paramInfos) {
-                Object param = model.get(paramInfo.name);
-                if (param != null) {
-                    arguments[i++] = param;
-                } else if (paramInfo.defaultValue != null) {
-                    Class<?> parameterType = parameterTypes[i];
-                    arguments[i++] = convertDefaultValue(parameterType, paramInfo.defaultValue);
-                } else {
-                    throw new TemplateException("Missing parameter " + paramInfo.name + " while rendering tag " + name);
-                }
-            }
 
             try {
-                renderMethod.invoke(null, arguments);
+                Method renderMethod = findRenderMethod();
+                if (type == TemplateType.Layout) {
+                    Map<String, String> layoutDefinitions = (Map<String, String>)model.get(LAYOUT_DEFINITIONS_PARAM);
+
+                    renderMethod.invoke(null, output, htmlTagSupport, (Function<String, Runnable>) definitionName -> () -> {
+                        String layoutDefinition = layoutDefinitions.get(definitionName);
+                        if (layoutDefinition != null) {
+                            output.writeContent(layoutDefinition);
+                        }
+                    }, model);
+                } else {
+                    renderMethod.invoke(null, output, htmlTagSupport, model);
+                }
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new TemplateException("Failed to dynamically invoke tag " + name, e);
             }
@@ -825,37 +840,11 @@ public class TemplateCompiler {
 
         private Method findRenderMethod() {
             for (Method declaredMethod : clazz.getDeclaredMethods()) {
-                if ("render".equals(declaredMethod.getName())) {
+                if ("renderMap".equals(declaredMethod.getName())) {
                     return declaredMethod;
                 }
             }
-            throw new IllegalStateException("No method named 'render' found in " + clazz);
-        }
-
-        private Object convertDefaultValue(Class<?> parameterType, String defaultValue) {
-            if ("null".equals(defaultValue)) {
-                return null;
-            }
-
-            try {
-                if (parameterType == String.class) {
-                    return defaultValue.replace("\"", "");
-                } else if (parameterType == boolean.class || parameterType == Boolean.class) {
-                    return Boolean.parseBoolean(defaultValue);
-                } else if (parameterType == int.class || parameterType == Integer.class) {
-                    return Integer.parseInt(defaultValue);
-                } else if (parameterType == long.class || parameterType == Long.class) {
-                    return Long.parseLong(defaultValue);
-                } else if (parameterType == float.class || parameterType == Float.class) {
-                    return Float.parseFloat(defaultValue);
-                } else if (parameterType == double.class || parameterType == Double.class) {
-                    return Double.parseDouble(defaultValue);
-                }
-            } catch (Exception e) {
-                throw new TemplateException("Unsupported default value '" + defaultValue + "' (" + parameterType + ") for dynamic tag invocation.");
-            }
-
-            throw new TemplateException("Unsupported default value '" + defaultValue + "' (" + parameterType + ") for dynamic tag invocation.");
+            throw new IllegalStateException("No method named 'renderMap' found in " + clazz);
         }
     }
 }

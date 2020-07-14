@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class TemplateEngine_DynamicTagOrLayoutTest {
     StringOutput output = new StringOutput();
@@ -19,7 +18,7 @@ public class TemplateEngine_DynamicTagOrLayoutTest {
 
     @Test
     void tag() {
-        givenTag("card", "@param java.lang.String firstParam\n" +
+        givenTag("card", "@param String firstParam\n" +
                 "@param int secondParam\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
@@ -55,8 +54,8 @@ public class TemplateEngine_DynamicTagOrLayoutTest {
 
     @Test
     void tag_defaultParamLong() {
-        givenTag("card", "@param long firstParam = 1\n" +
-                "@param Long secondParam = 3\n" +
+        givenTag("card", "@param long firstParam = 1L\n" +
+                "@param Long secondParam = 3L\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
         whenTagIsRendered("tag/card.jte");
@@ -87,25 +86,25 @@ public class TemplateEngine_DynamicTagOrLayoutTest {
     }
 
     @Test
-    void tag_defaultParamTypeNotSupported() {
-        givenTag("card", "@param byte firstParam = 1\n" +
+    void tag_defaultParamTypeNeedsCast() {
+        givenTag("card", "@param byte firstParam = (byte)1\n" +
                 "@param Double secondParam = 3.0\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        Throwable throwable = catchThrowable(() -> whenTagIsRendered("tag/card.jte"));
+        whenTagIsRendered("tag/card.jte");
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasRootCauseMessage("Unsupported default value '1' (byte) for dynamic tag invocation.");
+        thenOutputIs("One: 1, two: 3.0");
     }
 
     @Test
-    void tag_defaultParamNotSupported() {
+    void tag_defaultParamIsExpression() {
         givenTag("card", "@param int firstParam = Integer.MIN_VALUE\n" +
                 "@param Double secondParam = 3.0\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        Throwable throwable = catchThrowable(() -> whenTagIsRendered("tag/card.jte"));
+        whenTagIsRendered("tag/card.jte");
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasRootCauseMessage("Unsupported default value 'Integer.MIN_VALUE' (int) for dynamic tag invocation.");
+        thenOutputIs("One: -2147483648, two: 3.0");
     }
 
     @Test

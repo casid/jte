@@ -4,6 +4,7 @@ final class ParamInfo {
     final String type;
     final String name;
     final String defaultValue;
+    final boolean varargs;
 
     ParamInfo(String parameterString) {
         int typeStartIndex = -1;
@@ -67,5 +68,7 @@ final class ParamInfo {
         } else {
             this.defaultValue = parameterString.substring(defaultValueStartIndex);
         }
+
+        this.varargs = varArgsIndex != -1;
     }
 }

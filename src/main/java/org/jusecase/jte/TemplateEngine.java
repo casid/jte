@@ -104,7 +104,7 @@ public final class TemplateEngine {
 
     /**
      * Renders a tag with the given name.
-     * This comes at the cost of a dynamic method invocation and losing the type safety for params that jte usually provides.
+     * This comes at the cost of an extra method invocation and losing the type safety for params that jte usually provides.
      * However, this is useful while migrating to jte.
      * For instance, you can port a JSP tag to a jte tag and invoke the new jte tag from all other JSPs,
      * so that there are no redundant implementations during the migration.
@@ -119,7 +119,7 @@ public final class TemplateEngine {
 
     /**
      * Renders a layout with the given name.
-     * This comes at the cost of a dynamic method invocation and losing the type safety for params that jte usually provides.
+     * This comes at the cost of an extra method invocation and losing the type safety for params that jte usually provides.
      * However, this is useful while migrating to jte.
      * For instance, you can port a JSP layout to a jte layout and invoke the new jte layout from all other JSPs,
      * so that there are no redundant implementations during the migration.

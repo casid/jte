@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentMap;
  *
  * Read more at the official documentation at https://github.com/casid/jte/blob/master/DOCUMENTATION.md
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
 public final class TemplateEngine {
     private final TemplateCompiler compiler;
     private final TemplateMode templateMode;
@@ -83,22 +82,36 @@ public final class TemplateEngine {
 
     /**
      * Renders the template with the given name.
+     * It is preferred to use this method, if all your templates have exactly one parameter.
      * @param name the template name relative to the specified root directory, for instance "pages/welcome.jte".
-     * @param model the model instance passed to the template.
+     * @param param the param passed to the template.
      * @param output any implementation of {@link TemplateOutput}, where the template will be written to.
      * @throws TemplateException in case the template failed to render, containing information where the error happened.
      */
-    public void render(String name, Object model, TemplateOutput output) throws TemplateException {
+    public void render(String name, Object param, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.render(output, htmlTagSupport, model);
-        } catch (Exception e) {
-            DebugInfo debugInfo = compiler.resolveDebugInfo(template.getClass().getClassLoader(), e.getStackTrace());
-            String message = "Failed to render " + name;
-            if (debugInfo != null) {
-                message += ", error at " + debugInfo.name + ":" + debugInfo.line;
-            }
-            throw new TemplateException(message, e);
+            template.render(output, htmlTagSupport, param);
+        } catch (Throwable e) {
+            handleRenderException(name, template, e);
+        }
+    }
+
+    /**
+     * Renders the template with the given name.
+     * Parameters in the params map are mapped to the corresponding parameters in the template.
+     * Template parameters with a default value don't have to be provided in the map.
+     * @param name the template name relative to the specified root directory, for instance "pages/welcome.jte".
+     * @param params the parameters passed to the template as key value pairs.
+     * @param output any implementation of {@link TemplateOutput}, where the template will be written to.
+     * @throws TemplateException in case the template failed to render, containing information where the error happened.
+     */
+    public void render(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
+        Template template = resolveTemplate(name);
+        try {
+            template.renderMap(output, htmlTagSupport, params);
+        } catch (Throwable e) {
+            handleRenderException(name, template, e);
         }
     }
 
@@ -114,7 +127,12 @@ public final class TemplateEngine {
      * @throws TemplateException in case the tag failed to render, containing information where the error happened.
      */
     public void renderTag(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
-        render(name, params, output); // Currently there's no difference to a regular render call...
+        Template template = resolveTemplate(name);
+        try {
+            template.renderMap(output, htmlTagSupport, params);
+        } catch (Throwable e) {
+            handleRenderException(name, template, e);
+        }
     }
 
     /**
@@ -130,8 +148,22 @@ public final class TemplateEngine {
      * @throws TemplateException in case the layout failed to render, containing information where the error happened.
      */
     public void renderLayout(String name, Map<String, Object> params, Map<String, String> layoutDefinitions, TemplateOutput output) throws TemplateException {
-        params.put(TemplateCompiler.LAYOUT_DEFINITIONS_PARAM, layoutDefinitions);
-        render(name, params, output);
+        Template template = resolveTemplate(name);
+        try {
+            params.put(TemplateCompiler.LAYOUT_DEFINITIONS_PARAM, layoutDefinitions);
+            template.renderMap(output, htmlTagSupport, params);
+        } catch (Throwable e) {
+            handleRenderException(name, template, e);
+        }
+    }
+
+    private void handleRenderException(String name, Template template, Throwable e) {
+        DebugInfo debugInfo = compiler.resolveDebugInfo(template.getClassLoader(), e.getStackTrace());
+        String message = "Failed to render " + name;
+        if (debugInfo != null) {
+            message += ", error at " + debugInfo.name + ":" + debugInfo.line;
+        }
+        throw new TemplateException(message, e);
     }
 
     public List<String> getTemplatesUsing(String name) {
@@ -176,7 +208,7 @@ public final class TemplateEngine {
         if (templateMode == TemplateMode.OnDemand && compiler.hasChanged(name)) {
             synchronized (templateCache) {
                 if (compiler.hasChanged(name)) {
-                    Template<?> template = compiler.compile(name);
+                    Template template = compiler.compile(name);
                     templateCache.put(name, template);
                     return template;
                 }

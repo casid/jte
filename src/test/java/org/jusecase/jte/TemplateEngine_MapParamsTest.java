@@ -9,12 +9,26 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TemplateEngine_DynamicTagOrLayoutTest {
+public class TemplateEngine_MapParamsTest {
     StringOutput output = new StringOutput();
     Map<String, Object> params = new HashMap<>();
     Map<String, String> layoutDefinitions = new HashMap<>();
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
     TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver);
+
+    @Test
+    void template() {
+        givenTemplate("page.jte", "@param String firstParam\n" +
+                "@param int secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+
+        params.put("firstParam", "Hello");
+        params.put("secondParam", 42);
+
+        whenTemplateIsRendered("page.jte");
+
+        thenOutputIs("One: Hello, two: 42");
+    }
 
     @Test
     void tag() {
@@ -160,6 +174,11 @@ public class TemplateEngine_DynamicTagOrLayoutTest {
     }
 
     @SuppressWarnings("SameParameterValue")
+    private void givenTemplate(String name, String code) {
+        dummyCodeResolver.givenCode(name, code);
+    }
+
+    @SuppressWarnings("SameParameterValue")
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + TemplateCompiler.TAG_EXTENSION, code);
     }
@@ -167,6 +186,11 @@ public class TemplateEngine_DynamicTagOrLayoutTest {
     @SuppressWarnings("SameParameterValue")
     private void givenLayout(String name, String code) {
         dummyCodeResolver.givenCode("layout/" + name + TemplateCompiler.LAYOUT_EXTENSION, code);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private void whenTemplateIsRendered(String name) {
+        templateEngine.render(name, params, output);
     }
 
     @SuppressWarnings("SameParameterValue")

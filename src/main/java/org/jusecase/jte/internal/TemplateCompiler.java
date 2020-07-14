@@ -2,22 +2,17 @@ package org.jusecase.jte.internal;
 
 import org.jusecase.jte.CodeResolver;
 import org.jusecase.jte.TemplateException;
-import org.jusecase.jte.TemplateOutput;
 import org.jusecase.jte.output.FileOutput;
-import org.jusecase.jte.support.HtmlTagSupport;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 public class TemplateCompiler {
 
@@ -56,7 +51,7 @@ public class TemplateCompiler {
         }
     }
 
-    public Template<?> compile(String name) {
+    public Template compile(String name) {
         if (templateMode == TemplateMode.OnDemand) {
             precompile(List.of(name), null);
         }
@@ -67,12 +62,7 @@ public class TemplateCompiler {
 
         try {
             Class<?> clazz = getClassLoader().loadClass(templateInfo.fullName);
-
-            if (templateType == TemplateType.Template) {
-                return (Template<?>) clazz.getConstructor().newInstance();
-            }
-
-            return new TemplateWrapper(name, templateType, clazz);
+            return new Template(name, templateType, clazz);
         } catch (Exception e) {
             throw new TemplateException("Failed to load " + name, e);
         }
@@ -341,11 +331,7 @@ public class TemplateCompiler {
         public void onParam(ParamInfo parameter) {
             writePackageIfRequired();
             if (!hasWrittenClass) {
-                if (type == TemplateType.Template) {
-                    writeTemplateClass(parameter);
-                } else {
-                    writeTagOrLayoutClass();
-                }
+                writeClass();
             }
 
             javaCode.append(", ").append(parameter.type).append(' ').append(parameter.name);
@@ -353,15 +339,7 @@ public class TemplateCompiler {
             parameters.add(parameter);
         }
 
-        private void writeTemplateClass(ParamInfo parameter) {
-            javaCode.append("public final class ").append(classInfo.className).append(" implements org.jusecase.jte.internal.Template<").append(parameter.type).append("> {\n");
-            javaCode.markFieldsIndex();
-            javaCode.append("\tpublic void render(org.jusecase.jte.TemplateOutput output, org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
-
-            hasWrittenClass = true;
-        }
-
-        private void writeTagOrLayoutClass() {
+        private void writeClass() {
             javaCode.append("public final class ").append(classInfo.className).append(" {\n");
             javaCode.markFieldsIndex();
             javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output, org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
@@ -377,14 +355,7 @@ public class TemplateCompiler {
         public void onParamsComplete() {
             writePackageIfRequired();
             if (!hasWrittenClass) {
-                if (type == TemplateType.Template) {
-                    // The user wrote a base template without any parameters
-                    ParamInfo dummyParameter = new ParamInfo("Object model");
-                    writeTemplateClass(dummyParameter);
-                    onParam(dummyParameter);
-                } else {
-                    writeTagOrLayoutClass();
-                }
+                writeClass();
             }
 
             javaCode.append(") {\n");
@@ -408,39 +379,37 @@ public class TemplateCompiler {
 
             javaCode.append("\t}\n");
 
-            if (type != TemplateType.Template) {
-                javaCode.append("\tpublic static void renderMap(org.jusecase.jte.TemplateOutput output, org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
-                if (type == TemplateType.Layout) {
-                    javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
-                }
-                javaCode.append(", java.util.Map<String, Object> params) {\n");
-                for (ParamInfo parameter : parameters) {
-                    if (parameter.varargs) {
-                        continue;
-                    }
-
-                    javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = (").append(parameter.type);
-                    if (parameter.defaultValue != null) {
-                        javaCode.append(")params.getOrDefault(\"").append(parameter.name).append("\", ");
-                        javaCode.append(parameter.defaultValue).append(");\n");
-                    } else {
-                        javaCode.append(")params.get(\"").append(parameter.name).append("\");\n");
-                    }
-                }
-                javaCode.append("\t\trender(output, htmlTagSupport");
-                if (type == TemplateType.Layout) {
-                    javaCode.append(", jteLayoutDefinitionLookup");
-                }
-                for (ParamInfo parameter : parameters) {
-                    if (parameter.varargs) {
-                        continue;
-                    }
-
-                    javaCode.append(", ").append(parameter.name);
-                }
-                javaCode.append(");\n");
-                javaCode.append("\t}\n");
+            javaCode.append("\tpublic static void renderMap(org.jusecase.jte.TemplateOutput output, org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
+            if (type == TemplateType.Layout) {
+                javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
             }
+            javaCode.append(", java.util.Map<String, Object> params) {\n");
+            for (ParamInfo parameter : parameters) {
+                if (parameter.varargs) {
+                    continue;
+                }
+
+                javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = (").append(parameter.type);
+                if (parameter.defaultValue != null) {
+                    javaCode.append(")params.getOrDefault(\"").append(parameter.name).append("\", ");
+                    javaCode.append(parameter.defaultValue).append(");\n");
+                } else {
+                    javaCode.append(")params.get(\"").append(parameter.name).append("\");\n");
+                }
+            }
+            javaCode.append("\t\trender(output, htmlTagSupport");
+            if (type == TemplateType.Layout) {
+                javaCode.append(", jteLayoutDefinitionLookup");
+            }
+            for (ParamInfo parameter : parameters) {
+                if (parameter.varargs) {
+                    continue;
+                }
+
+                javaCode.append(", ").append(parameter.name);
+            }
+            javaCode.append(");\n");
+            javaCode.append("\t}\n");
 
             javaCode.append("}\n");
 
@@ -801,50 +770,6 @@ public class TemplateCompiler {
         public LayoutStack(String name, List<String> params) {
             this.name = name;
             this.params = params;
-        }
-    }
-
-    private static class TemplateWrapper implements Template<Map<String, Object>> {
-        private final String name;
-        private final TemplateType type;
-        private final Class<?> clazz;
-
-        public TemplateWrapper(String name, TemplateType type, Class<?> clazz) {
-            this.name = name;
-            this.type = type;
-            this.clazz = clazz;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void render(TemplateOutput output, HtmlTagSupport htmlTagSupport, Map<String, Object> model) {
-
-            try {
-                Method renderMethod = findRenderMethod();
-                if (type == TemplateType.Layout) {
-                    Map<String, String> layoutDefinitions = (Map<String, String>)model.get(LAYOUT_DEFINITIONS_PARAM);
-
-                    renderMethod.invoke(null, output, htmlTagSupport, (Function<String, Runnable>) definitionName -> () -> {
-                        String layoutDefinition = layoutDefinitions.get(definitionName);
-                        if (layoutDefinition != null) {
-                            output.writeContent(layoutDefinition);
-                        }
-                    }, model);
-                } else {
-                    renderMethod.invoke(null, output, htmlTagSupport, model);
-                }
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new TemplateException("Failed to dynamically invoke tag " + name, e);
-            }
-        }
-
-        private Method findRenderMethod() {
-            for (Method declaredMethod : clazz.getDeclaredMethods()) {
-                if ("renderMap".equals(declaredMethod.getName())) {
-                    return declaredMethod;
-                }
-            }
-            throw new IllegalStateException("No method named 'renderMap' found in " + clazz);
         }
     }
 }

@@ -31,7 +31,7 @@ TemplateOutput output = new StringOutput();
 templateEngine.render("example.jte", model, output);
 ```
 
-Where `output` specifies where the template is rendered to and `model` is the data passed to this template, which can be an instance of any class. Root templates must have exactly one data parameter passed to them.
+Where `output` specifies where the template is rendered to and `model` is the data passed to this template, which can be an instance of any class. Ideally, root templates have exactly one data parameter passed to them. If multiple parameters are required, there is a `render` method overload that takes a `Map<String, Object>`.
 
 > Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required. Currently the following implementations are available:
 > - `StringOutput` - writes to a string
@@ -96,7 +96,7 @@ public final class JtetemplateGenerated implements org.jusecase.jte.internal.Tem
 }
 ```
 
-Note the difference of static und user content. All static parts of a template are considered safe and must not be escaped. All dynamic parts are considered unsafe to avoid cross-site scripting (XSS) attacks.
+Note the difference of static and user content. All static parts of a template are considered safe and must not be escaped. All dynamic parts are considered unsafe to avoid cross-site scripting (XSS) attacks.
 
 > **Caution!** All core `TemplateOutput` implementations make **no difference** between handling static and user content. Output escaping comes in many flavours and jte doesn't want to force an opinion on you. See the section [Output Escaping](#output-escaping) for more details.
 

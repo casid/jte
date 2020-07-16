@@ -63,6 +63,12 @@ final class CodeBuilder {
         fields.append("};\n");
     }
 
+    public void addNameField(StringBuilder fields, String name) {
+        fields.append("\tpublic static final String ").append(Constants.NAME_FIELD).append(" = \"");
+        fields.append(name);
+        fields.append("\";\n");
+    }
+
     public void markFieldsIndex() {
         fieldsIndex = javaCode.length();
         fieldsJavaLine = currentJavaLine;

@@ -35,7 +35,7 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     @Override
-    protected ClassInfo getClassInfo(String className) {
+    protected ClassInfo getClassInfo(ClassLoader classLoader, String className) {
         return templateByClassName.get(className);
     }
 
@@ -296,10 +296,11 @@ public class TemplateCompiler extends TemplateLoader {
 
         @Override
         public void onComplete() {
-            int lineCount = 1;
+            int lineCount = 2;
             javaCode.insertFieldLines(lineCount);
 
             StringBuilder fields = new StringBuilder(64 + 32 * lineCount);
+            javaCode.addNameField(fields, classInfo.name);
             javaCode.addLineInfoField(fields);
             javaCode.insertFields(fields);
 

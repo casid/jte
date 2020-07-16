@@ -8,5 +8,6 @@ public interface Constants {
     String CLASS_PREFIX = "Jte";
     String CLASS_SUFFIX = "Generated";
     String PACKAGE_NAME = "org.jusecase.jte.generated";
-    String LINE_INFO_FIELD = "LINE_INFO";
+    String NAME_FIELD = "JTE_NAME";
+    String LINE_INFO_FIELD = "JTE_LINE_INFO";
 }

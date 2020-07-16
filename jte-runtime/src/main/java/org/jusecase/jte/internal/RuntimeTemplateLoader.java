@@ -13,8 +13,16 @@ public class RuntimeTemplateLoader extends TemplateLoader {
     }
 
     @Override
-    protected ClassInfo getClassInfo(String className) {
-        return null; // TODO fix
+    protected ClassInfo getClassInfo(ClassLoader classLoader, String className) {
+        try {
+            Class<?> clazz = classLoader.loadClass(className);
+
+            ClassInfo classInfo = new ClassInfo((String)clazz.getField(Constants.NAME_FIELD).get(null), "");
+            classInfo.lineInfo = (int[]) clazz.getField(Constants.LINE_INFO_FIELD).get(null);
+            return classInfo;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

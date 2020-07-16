@@ -36,7 +36,7 @@ public final class TemplateEngine {
      * @return a fresh TemplateEngine instance
      */
     public static TemplateEngine create(CodeResolver codeResolver) {
-        return create(codeResolver, Path.of("jte"));
+        return create(codeResolver, Path.of("jte-classes"));
     }
 
     /**
@@ -86,7 +86,6 @@ public final class TemplateEngine {
         } else {
             try {
                 Class<?> compilerClass = Class.forName("org.jusecase.jte.internal.TemplateCompiler");
-                //noinspection JavaReflectionMemberAccess
                 return (TemplateLoader)compilerClass.getConstructor(CodeResolver.class, Path.class).newInstance(codeResolver, classDirectory);
             } catch (Exception e) {
                 throw new TemplateException("TemplateCompiler could not be located. Maybe jte isn't on your classpath?", e);

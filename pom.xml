@@ -46,6 +46,7 @@
         <module>jte-runtime</module>
         <module>jte</module>
         <module>jte-maven-plugin</module>
+        <module>jte-runtime-test</module>
     </modules>
 
     <dependencies>

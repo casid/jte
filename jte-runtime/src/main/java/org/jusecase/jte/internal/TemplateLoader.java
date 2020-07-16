@@ -2,7 +2,6 @@ package org.jusecase.jte.internal;
 
 import org.jusecase.jte.TemplateException;
 
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -36,9 +35,9 @@ public abstract class TemplateLoader {
 
         for (StackTraceElement stackTraceElement : stackTrace) {
             if (stackTraceElement.getClassName().startsWith(Constants.PACKAGE_NAME)) {
-                ClassInfo classInfo = getClassInfo(stackTraceElement.getClassName());
+                ClassInfo classInfo = getClassInfo(classLoader, stackTraceElement.getClassName());
                 if (classInfo != null) {
-                    return new DebugInfo(classInfo.name, resolveLineNumber(classLoader, classInfo, stackTraceElement.getLineNumber()));
+                    return new DebugInfo(classInfo.name, resolveLineNumber(classInfo, stackTraceElement.getLineNumber()));
                 }
             }
         }
@@ -46,17 +45,11 @@ public abstract class TemplateLoader {
         return null;
     }
 
-    protected abstract ClassInfo getClassInfo(String className);
+    protected abstract ClassInfo getClassInfo(ClassLoader classLoader, String className);
 
-    private int resolveLineNumber(ClassLoader classLoader, ClassInfo classInfo, int lineNumber) {
-        try {
-            Class<?> clazz = classLoader.loadClass(classInfo.fullName);
-            Field lineInfoField = clazz.getField(Constants.LINE_INFO_FIELD);
-            int[] javaLineToTemplateLine = (int[]) lineInfoField.get(null);
-            return javaLineToTemplateLine[lineNumber - 1] + 1;
-        } catch (Exception e) {
-            return 0;
-        }
+    private int resolveLineNumber(ClassInfo classInfo, int lineNumber) {
+        int[] javaLineToTemplateLine = classInfo.lineInfo;
+        return javaLineToTemplateLine[lineNumber - 1] + 1;
     }
 
     protected TemplateType getTemplateType(String name) {

@@ -5,11 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jusecase</groupId>
-    <artifactId>jte</artifactId>
-    <version>0.6.0</version> <!-- Also bump version in jte-maven-compiler-plugin -->
-    <packaging>jar</packaging>
+    <artifactId>jte-parent</artifactId>
+    <version>0.7.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <name>jte</name>
     <description>A template engine using plain Java code.</description>
     <url>http://jusecase.org</url>
     <developers>
@@ -40,13 +39,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <junit.jupiter.version>5.6.2</junit.jupiter.version>
     </properties>
+
+    <modules>
+        <module>jte-runtime</module>
+        <module>jte</module>
+        <module>jte-maven-plugin</module>
+    </modules>
 
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.0.0</version>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -62,19 +68,7 @@
             <!-- Test -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>1.0.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.0.0</version>
-                    </dependency>
-                </dependencies>
+                <version>2.22.2</version>
             </plugin>
 
             <!-- Javadoc -->
@@ -82,6 +76,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
+                <configuration>
+                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>

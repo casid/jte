@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>org.jusecase</groupId>
-            <artifactId>jte-rt</artifactId>
+            <artifactId>jte-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

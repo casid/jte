@@ -8,6 +8,7 @@ import org.jusecase.jte.output.StringOutput;
 import test.Model;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -48,6 +49,12 @@ public class TemplateEngineTest {
         thenRenderingFailsWithException("exceptionLineNumber1.jte")
                 .hasCauseInstanceOf(NullPointerException.class)
                 .hasMessage("Failed to render exceptionLineNumber1.jte, error at exceptionLineNumber1.jte:5");
+    }
+
+    @Test
+    void unusedTag() {
+        templateEngine.renderTag("tag/unused.jte", Map.of("param1", "One", "param2", "Two"), output);
+        thenOutputIs("One is One, two is Two.");
     }
 
     private void whenTemplateIsRendered(String templateName) {

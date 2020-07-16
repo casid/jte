@@ -3,7 +3,6 @@ package org.jusecase.jte.resolve;
 import com.sun.nio.file.SensitivityWatchEventModifier;
 import org.jusecase.jte.CodeResolver;
 import org.jusecase.jte.TemplateEngine;
-import org.jusecase.jte.internal.Constants;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -57,7 +56,6 @@ public class DirectoryCodeResolver implements CodeResolver {
             return stream
                     .filter(p -> !Files.isDirectory(p))
                     .map(p -> root.relativize(p).toString().replace('\\', '/'))
-                    .filter(s -> !s.startsWith(Constants.TAG_DIRECTORY) && !s.startsWith(Constants.LAYOUT_DIRECTORY))
                     .filter(s -> s.endsWith(".jte"))
                     .collect(Collectors.toList());
         } catch (IOException e) {

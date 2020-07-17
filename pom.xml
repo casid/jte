@@ -6,7 +6,7 @@
 
     <groupId>org.jusecase</groupId>
     <artifactId>jte-parent</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.7.0</version>
     <packaging>pom</packaging>
 
     <description>A template engine using plain Java code.</description>

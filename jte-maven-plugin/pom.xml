@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.jusecase</groupId>
         <artifactId>jte-parent</artifactId>
-        <version>0.7.0-SNAPSHOT</version>
+        <version>0.7.0</version>
     </parent>
 
     <name>jte-maven-plugin</name>

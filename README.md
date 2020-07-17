@@ -113,13 +113,13 @@ jte is available on <a href="http://mvnrepository.com/artifact/org.jusecase/jte"
 <dependency>
     <groupId>org.jusecase</groupId>
     <artifactId>jte</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-compile group: 'org.jusecase', name: 'jte', version: '0.6.0'
+compile group: 'org.jusecase', name: 'jte', version: '0.7.0'
 ```
 
 No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)

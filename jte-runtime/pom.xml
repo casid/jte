@@ -7,6 +7,12 @@
     <artifactId>jte-runtime</artifactId>
     <packaging>jar</packaging>
 
+    <name>jte-runtime</name>
+
+    <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
     <parent>
         <groupId>org.jusecase</groupId>
         <artifactId>jte-parent</artifactId>

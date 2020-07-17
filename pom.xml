@@ -9,6 +9,7 @@
     <version>0.7.0</version>
     <packaging>pom</packaging>
 
+    <name>jte</name>
     <description>A template engine using plain Java code.</description>
     <url>http://jusecase.org</url>
     <developers>
@@ -40,6 +41,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <junit.jupiter.version>5.6.2</junit.jupiter.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <modules>

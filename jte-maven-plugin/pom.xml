@@ -16,6 +16,10 @@
     <name>jte-maven-plugin</name>
     <description>Precompile all jte templates to Java classes during maven build</description>
 
+    <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.jusecase</groupId>

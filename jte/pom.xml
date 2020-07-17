@@ -13,6 +13,12 @@
         <version>0.7.0</version>
     </parent>
 
+    <name>jte</name>
+
+    <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.jusecase</groupId>

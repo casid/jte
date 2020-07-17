@@ -291,7 +291,7 @@ When using the `DirectoryCodeResolver`, hot reloading is supported out of the bo
 
 > It makes sense to do this on your local development environment only. When running in production, for maximum performance and security [precompiled templates](#precompiling-templates) are recommended instead.
 
-If you clone this repository, you can launch the [SimpleWebServer](src/test/java/org/jusecase/jte/benchmark/SimpleWebServer.java) example's main method. It will fire up a tiny webserver with one page to play with at http://localhost:8080.
+If you clone this repository, you can launch the [SimpleWebServer](jte/src/test/java/org/jusecase/jte/benchmark/SimpleWebServer.java) example's main method. It will fire up a tiny webserver with one page to play with at http://localhost:8080.
 
 ### For a statically rendered website
 
@@ -316,7 +316,7 @@ To speed up the startup of your production server, it is possible to precompile 
 To do this, you need to create a `TemplateEngine` with the `createPrecompiled` factory method and specify where compiled template classes are located:
 
 ```java
-Path targetDirectory = Path.of("jte"); // This is the directoy where compiled templates are located.
+Path targetDirectory = Path.of("jte-classes"); // This is the directoy where compiled templates are located.
 
 TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory);
 ```
@@ -328,11 +328,11 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
 ```xml
 <plugin>
     <groupId>org.jusecase</groupId>
-    <artifactId>jte-maven-compiler-plugin</artifactId>
+    <artifactId>jte-maven-plugin</artifactId>
     <version>${jte.version}</version>
     <configuration>
         <sourceDirectory>src/main/jte</sourceDirectory> <!-- This is the directory where your .jte files are located. -->
-        <targetDirectory>jte</targetDirectory> <!-- This is the directoy where compiled templates are located. -->
+        <targetDirectory>jte-classes</targetDirectory> <!-- This is the directoy where compiled templates are located. -->
     </configuration>
     <executions>
         <execution>

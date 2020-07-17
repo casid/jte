@@ -21,7 +21,7 @@ public class SimpleWebServer implements HttpHandler {
         new SimpleWebServer().start();
     }
 
-    private final DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "test", "resources", "benchmark"));
+    private final DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte", "src", "test", "resources", "benchmark"));
     private final TemplateEngine templateEngine = TemplateEngine.create(codeResolver);
     private final StringOutputPool stringOutputPool = new StringOutputPool();
     private final AtomicInteger visits = new AtomicInteger();

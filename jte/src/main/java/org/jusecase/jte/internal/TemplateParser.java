@@ -5,6 +5,7 @@ import java.util.*;
 final class TemplateParser {
     private static final int LAYOUT_DEFINITION_DEPTH = 2;
 
+    private final String templateCode;
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
     private final String[] htmlTags;
@@ -19,26 +20,29 @@ final class TemplateParser {
     private boolean paramsComplete;
     private boolean tagClosed;
 
-    TemplateParser(TemplateType type, TemplateParserVisitor visitor, String[] htmlTags, String[] htmlAttributes) {
+    private int lastIndex = 0;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private char previousChar8;
+    private char previousChar7;
+    private char previousChar6;
+    private char previousChar5;
+    private char previousChar4;
+    private char previousChar3;
+    private char previousChar2;
+    private char previousChar1;
+    private char previousChar0;
+    private char currentChar;
+
+    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, String[] htmlTags, String[] htmlAttributes) {
+        this.templateCode = templateCode;
         this.type = type;
         this.visitor = visitor;
         this.htmlTags = htmlTags;
         this.htmlAttributes = htmlAttributes;
     }
 
-    public void parse(String templateCode) {
-        int lastIndex = 0;
-
-        char previousChar8;
-        char previousChar7 = 0;
-        char previousChar6 = 0;
-        char previousChar5 = 0;
-        char previousChar4 = 0;
-        char previousChar3 = 0;
-        char previousChar2 = 0;
-        char previousChar1 = 0;
-        char previousChar0 = 0;
-        char currentChar = 0;
+    public void parse() {
         currentMode = Mode.Text;
         stack.push(currentMode);
         depth = 0;
@@ -152,12 +156,12 @@ final class TemplateParser {
                     lastIndex = i + 1;
                     push(Mode.Text);
                 } else if (currentMode instanceof TagMode) {
-                    TagMode tagMode = (TagMode)currentMode;
+                    TagMode tagMode = (TagMode) currentMode;
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, tagMode.name.toString(), tagMode.params));
                     lastIndex = i + 1;
                     pop();
                 } else if (currentMode instanceof LayoutMode) {
-                    LayoutMode layoutMode = (LayoutMode)currentMode;
+                    LayoutMode layoutMode = (LayoutMode) currentMode;
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, layoutMode.name.toString(), layoutMode.params));
                 }
             } else if (currentChar == ',' && currentMode == Mode.JavaCodeParam) {
@@ -178,7 +182,7 @@ final class TemplateParser {
 
                 visitor.onConditionElse(depth);
                 push(Mode.Text);
-            } else if(previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f') {
+            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f') {
                 if (currentMode == Mode.Text) {
                     extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
                 }
@@ -300,70 +304,9 @@ final class TemplateParser {
                 extract(templateCode, lastIndex, i, visitor::onLayoutRender);
                 lastIndex = i + 1;
                 pop();
-            } else if (htmlTags != null && currentMode == Mode.Text) {
-                if (currentChar == '<') {
-                    for (String name : htmlTags) {
-                        if (templateCode.startsWith(name, i + 1) && Character.isWhitespace(templateCode.charAt(i + name.length() + 1))) {
-                            HtmlTag htmlTag = new HtmlTag(name);
-                            pushHtmlTag(htmlTag);
-                            tagClosed = false;
-                            break;
-                        }
-                    }
-                } else if (currentHtmlTag != null) {
-                    if (!currentHtmlTag.attributesProcessed && currentChar == '=') {
-                        HtmlAttribute attribute = new HtmlAttribute(parseHtmlAttributeName(templateCode, i));
-                        currentHtmlTag.attributes.add(attribute);
-                    } else if (!currentHtmlTag.attributesProcessed && currentChar == '\"') {
-                        HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
-                        if (currentAttribute != null) {
-                            currentAttribute.quoteCount++;
-                            if (currentAttribute.quoteCount == 1) {
-                                currentAttribute.startIndex = i + 1;
-
-                                if (isHtmlAttributeIntercepted(currentAttribute.name)) {
-                                    extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
-                                    lastIndex = i + 1;
-
-                                    visitor.onHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
-                                }
-                            } else if (currentAttribute.quoteCount == 2) {
-                                currentAttribute.value = templateCode.substring(currentAttribute.startIndex, i);
-                            }
-                        }
-                    } else if (previousChar0 == '/' && currentChar == '>') {
-                        extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
-                        lastIndex = i - 1;
-                        visitor.onHtmlTagOpened(depth, currentHtmlTag);
-                        currentHtmlTag.attributesProcessed = true;
-
-                        popHtmlTag();
-                    } else if (!currentHtmlTag.attributesProcessed && currentChar == '>') {
-                        if (tagClosed) {
-                            tagClosed = false;
-                        } else {
-                            extract(templateCode, lastIndex, i, visitor::onTextPart);
-                            lastIndex = i;
-                            visitor.onHtmlTagOpened(depth, currentHtmlTag);
-                            currentHtmlTag.attributesProcessed = true;
-
-                            if ( currentHtmlTag.bodyIgnored ) {
-                                popHtmlTag();
-                            }
-                        }
-                    } else if (previousChar0 == '<' && currentChar == '/') {
-                        if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
-                            if (!currentHtmlTag.bodyIgnored) {
-                                extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
-                                lastIndex = i - 1;
-                                visitor.onHtmlTagClosed(depth, currentHtmlTag);
-
-                                popHtmlTag();
-                            }
-
-                        }
-                        tagClosed = true;
-                    }
+            } else if (currentMode == Mode.Text) {
+                if (htmlTags != null) {
+                    interceptHtmlTags(i);
                 }
             }
 
@@ -378,6 +321,73 @@ final class TemplateParser {
 
         completeParamsIfRequired();
         visitor.onComplete();
+    }
+
+    private void interceptHtmlTags(int i) {
+        if (currentChar == '<') {
+            for (String name : htmlTags) {
+                if (templateCode.startsWith(name, i + 1) && Character.isWhitespace(templateCode.charAt(i + name.length() + 1))) {
+                    HtmlTag htmlTag = new HtmlTag(name);
+                    pushHtmlTag(htmlTag);
+                    tagClosed = false;
+                    break;
+                }
+            }
+        } else if (currentHtmlTag != null) {
+            if (!currentHtmlTag.attributesProcessed && currentChar == '=') {
+                HtmlAttribute attribute = new HtmlAttribute(parseHtmlAttributeName(templateCode, i));
+                currentHtmlTag.attributes.add(attribute);
+            } else if (!currentHtmlTag.attributesProcessed && currentChar == '\"') {
+                HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
+                if (currentAttribute != null) {
+                    currentAttribute.quoteCount++;
+                    if (currentAttribute.quoteCount == 1) {
+                        currentAttribute.startIndex = i + 1;
+
+                        if (isHtmlAttributeIntercepted(currentAttribute.name)) {
+                            extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
+                            lastIndex = i + 1;
+
+                            visitor.onHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
+                        }
+                    } else if (currentAttribute.quoteCount == 2) {
+                        currentAttribute.value = templateCode.substring(currentAttribute.startIndex, i);
+                    }
+                }
+            } else if (previousChar0 == '/' && currentChar == '>') {
+                extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                lastIndex = i - 1;
+                visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                currentHtmlTag.attributesProcessed = true;
+
+                popHtmlTag();
+            } else if (!currentHtmlTag.attributesProcessed && currentChar == '>') {
+                if (tagClosed) {
+                    tagClosed = false;
+                } else {
+                    extract(templateCode, lastIndex, i, visitor::onTextPart);
+                    lastIndex = i;
+                    visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                    currentHtmlTag.attributesProcessed = true;
+
+                    if (currentHtmlTag.bodyIgnored) {
+                        popHtmlTag();
+                    }
+                }
+            } else if (previousChar0 == '<' && currentChar == '/') {
+                if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
+                    if (!currentHtmlTag.bodyIgnored) {
+                        extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                        lastIndex = i - 1;
+                        visitor.onHtmlTagClosed(depth, currentHtmlTag);
+
+                        popHtmlTag();
+                    }
+
+                }
+                tagClosed = true;
+            }
+        }
     }
 
     private void pushHtmlTag(HtmlTag htmlTag) {
@@ -436,7 +446,7 @@ final class TemplateParser {
     private <T extends Mode> T getPreviousMode(Class<T> modeClass) {
         for (Mode mode : stack) {
             if (modeClass.isAssignableFrom(mode.getClass())) {
-                return (T)mode;
+                return (T) mode;
             }
         }
         throw new IllegalStateException("Expected mode of type " + modeClass + " on the stack, but found nothing!");

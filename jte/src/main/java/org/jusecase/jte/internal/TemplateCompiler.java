@@ -86,14 +86,14 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
-        String templateCode = resolveCode(TemplateType.Template, name, null);
+        String code = resolveCode(TemplateType.Template, name, null);
 
         LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
 
         ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
         CodeGenerator codeGenerator = new CodeGenerator(templateInfo, TemplateType.Template, classDefinitions, templateDependencies);
-        new TemplateParser(TemplateType.Template, codeGenerator, htmlTags, htmlAttributes).parse(templateCode);
+        new TemplateParser(code, TemplateType.Template, codeGenerator, htmlTags, htmlAttributes).parse();
 
         this.templateDependencies.put(name, templateDependencies);
 
@@ -150,7 +150,7 @@ public class TemplateCompiler extends TemplateLoader {
         classDefinitions.add(classDefinition);
 
         CodeGenerator codeGenerator = new CodeGenerator(classInfo, type, classDefinitions, templateDependencies);
-        new TemplateParser(type, codeGenerator, htmlTags, htmlAttributes).parse(code);
+        new TemplateParser(code, type, codeGenerator, htmlTags, htmlAttributes).parse();
 
         classDefinition.setCode(codeGenerator.getCode());
         templateByClassName.put(classDefinition.getName(), classInfo);

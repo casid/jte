@@ -10,12 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class TemplateEngine_HtmlTagSupportTest {
 
     StringOutput output = new StringOutput();
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver);
+    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, ContentType.Html);
     Controller controller = new Controller();
     MySampleFrameworkTagSupport htmlTagSupport = new MySampleFrameworkTagSupport();
 
@@ -84,19 +85,16 @@ public class TemplateEngine_HtmlTagSupportTest {
     }
 
     @Test
-    void input_closed2() {
+    void input_closedWrongly() {
         dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
                 "<form action=\"${url}\">\n" +
                 "<input name=\"param1\"></input>\n" +
                 "<input name=\"param2\"></input>\n" +
                 "</form>");
 
-        templateEngine.render("page.jte", "hello.htm", output);
+        Throwable throwable = catchThrowable(() -> templateEngine.render("page.jte", "hello.htm", output));
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"param1\" value=\"?\"></input>\n" +
-                "<input name=\"param2\" value=\"?\"></input>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile page.jte, error at line 3: Unclosed tag <form>, expected </form>, got </input>.");
     }
 
     @Test
@@ -229,18 +227,18 @@ public class TemplateEngine_HtmlTagSupportTest {
         public void onHtmlTagOpened(String name, Map<String, Object> attributes, TemplateOutput output) {
             if ("form".equals(name)) {
                 action = (String)attributes.get("action");
-                output.writeStaticContent(" data-form=\"x\"");
+                output.writeContent(" data-form=\"x\"");
             } else if ("input".equals(name)) {
                 fieldNames.add((String)attributes.get("name"));
                 if (!attributes.containsKey("value")) {
-                    output.writeStaticContent(" value=\"?\"");
+                    output.writeContent(" value=\"?\"");
                 }
             } else if ("select".equals(name)) {
                 fieldNames.add((String)attributes.get("name"));
             } else if ("option".equals(name)) {
                 String value = (String)attributes.get("value");
                 if (value != null && value.equals(controller.getFoodOption())) {
-                    output.writeStaticContent(" selected");
+                    output.writeContent(" selected");
                 }
             }
         }
@@ -248,14 +246,14 @@ public class TemplateEngine_HtmlTagSupportTest {
         @Override
         public void onHtmlAttributeStarted(String name, Map<String, Object> attributesBefore, TemplateOutput output) {
             if ("class".equals(name) && "error".equals(attributesBefore.get("name"))) {
-                output.writeStaticContent("error ");
+                output.writeContent("error ");
             }
         }
 
         @Override
         public void onHtmlTagClosed(String name, TemplateOutput output) {
             if ("form".equals(name)) {
-                output.writeStaticContent("<input name=\"__fp\" value=\"a:" + action + ", p:" + String.join(",", fieldNames) + "\">");
+                output.writeContent("<input name=\"__fp\" value=\"a:" + action + ", p:" + String.join(",", fieldNames) + "\">");
             }
         }
     }

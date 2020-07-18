@@ -25,7 +25,7 @@ class TemplateEngine_HotReloadTest {
     @BeforeEach
     void setUp() throws IOException {
         tempDirectory = Files.createTempDirectory("temp-code");
-        templateEngine = TemplateEngine.create(new DirectoryCodeResolver(tempDirectory));
+        templateEngine = TemplateEngine.create(new DirectoryCodeResolver(tempDirectory), ContentType.Plain);
     }
 
     @AfterEach

@@ -3,6 +3,7 @@ package org.jusecase.jte.maven;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.jusecase.jte.ContentType;
 import org.jusecase.jte.TemplateEngine;
 import org.jusecase.jte.resolve.DirectoryCodeResolver;
 
@@ -31,6 +32,9 @@ public class CompilerMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.compileClasspathElements}", readonly = true, required = true)
     public List<String> compilePath;
 
+    @Parameter(readonly = true, required = true)
+    public String contentType;
+
     @Parameter(readonly = true)
     public String[] htmlTags;
 
@@ -47,12 +51,19 @@ public class CompilerMojo extends AbstractMojo {
         long start = System.nanoTime();
         getLog().info("Precompiling jte templates found in " + source);
 
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target);
+        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target, ContentType.valueOf(contentType));
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);
 
-        templateEngine.cleanAll();
-        templateEngine.precompileAll(compilePath);
+        try {
+            templateEngine.cleanAll();
+            templateEngine.precompileAll(compilePath);
+        } catch (Exception e) {
+            getLog().error("Failed to precompile templates.");
+            getLog().error(e);
+
+            throw e;
+        }
 
         long end = System.nanoTime();
         long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);

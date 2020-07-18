@@ -6,10 +6,10 @@
 
     <groupId>org.jusecase</groupId>
     <artifactId>jte-parent</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>jte</name>
+    <name>jte-parent</name>
     <description>A template engine using plain Java code.</description>
     <url>http://jusecase.org</url>
     <developers>

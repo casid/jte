@@ -2,10 +2,7 @@ package org.jusecase.jte.output;
 
 import org.jusecase.jte.TemplateOutput;
 
-import java.io.BufferedWriter;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -26,11 +23,18 @@ public class FileOutput implements TemplateOutput, Closeable {
     }
 
     @Override
+    public Writer getWriter() {
+        return writer;
+    }
+
+    @Override
     public void writeContent(String value) {
-        try {
-            writer.write(value);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        if (value != null) {
+            try {
+                writer.write(value);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
     }
 

@@ -2,12 +2,15 @@ package org.jusecase.jte.internal;
 
 import java.util.*;
 
+import org.jusecase.jte.ContentType;
+
 final class TemplateParser {
     private static final int LAYOUT_DEFINITION_DEPTH = 2;
 
     private final String templateCode;
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
+    private final ContentType contentType;
     private final String[] htmlTags;
     private final String[] htmlAttributes;
 
@@ -34,10 +37,11 @@ final class TemplateParser {
     private char previousChar0;
     private char currentChar;
 
-    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, String[] htmlTags, String[] htmlAttributes) {
+    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, ContentType contentType, String[] htmlTags, String[] htmlAttributes) {
         this.templateCode = templateCode;
         this.type = type;
         this.visitor = visitor;
+        this.contentType = contentType;
         this.htmlTags = htmlTags;
         this.htmlAttributes = htmlAttributes;
     }
@@ -114,8 +118,7 @@ final class TemplateParser {
             } else if (currentChar == '}' && currentMode == Mode.Code) {
                 pop();
                 if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i, visitor::onCodePart);
-                    lastIndex = i + 1;
+                    extractCodePart(i);
                 }
             } else if (currentChar == '}' && currentMode == Mode.UnsafeCode) {
                 pop();
@@ -304,10 +307,8 @@ final class TemplateParser {
                 extract(templateCode, lastIndex, i, visitor::onLayoutRender);
                 lastIndex = i + 1;
                 pop();
-            } else if (currentMode == Mode.Text) {
-                if (htmlTags != null) {
-                    interceptHtmlTags(i);
-                }
+            } else if (currentMode == Mode.Text && contentType == ContentType.Html) {
+                interceptHtmlTags(i);
             }
 
             if (currentChar == '\n') {
@@ -323,19 +324,49 @@ final class TemplateParser {
         visitor.onComplete();
     }
 
+    private void extractCodePart(int i) {
+        if (contentType == ContentType.Html) {
+            extractHtmlCodePart(i);
+        } else {
+            extractPlainCodePart(i);
+        }
+        lastIndex = i + 1;
+    }
+
+    private void extractPlainCodePart(int i) {
+        extract(templateCode, lastIndex, i, visitor::onCodePart);
+    }
+
+    private void extractHtmlCodePart(int i) {
+        if (currentHtmlTag != null) {
+            if (currentHtmlTag.attributesProcessed) {
+                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, currentHtmlTag.name));
+                return;
+            }
+
+            HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
+            if (currentAttribute != null && currentAttribute.quoteCount < 2) {
+                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagAttributeCodePart(depth, codePart, currentHtmlTag.name, currentAttribute.name));
+                return;
+            }
+        }
+
+        extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, "html"));
+    }
+
     private void interceptHtmlTags(int i) {
-        if (currentChar == '<') {
-            for (String name : htmlTags) {
-                if (templateCode.startsWith(name, i + 1) && Character.isWhitespace(templateCode.charAt(i + name.length() + 1))) {
-                    HtmlTag htmlTag = new HtmlTag(name);
-                    pushHtmlTag(htmlTag);
-                    tagClosed = false;
-                    break;
-                }
+        if ( isOpeningHtmlTag(i) ) {
+            String name = parseHtmlTagName(i + 1);
+            if (!name.isEmpty()) {
+                validateHtmlTag(name);
+
+                HtmlTag htmlTag = new HtmlTag(name, isHtmlTagIntercepted(name));
+                pushHtmlTag(htmlTag);
+                tagClosed = false;
             }
         } else if (currentHtmlTag != null) {
             if (!currentHtmlTag.attributesProcessed && currentChar == '=') {
-                HtmlAttribute attribute = new HtmlAttribute(parseHtmlAttributeName(templateCode, i));
+                HtmlAttribute attribute = new HtmlAttribute(parseHtmlAttributeName(i));
                 currentHtmlTag.attributes.add(attribute);
             } else if (!currentHtmlTag.attributesProcessed && currentChar == '\"') {
                 HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
@@ -354,10 +385,12 @@ final class TemplateParser {
                         currentAttribute.value = templateCode.substring(currentAttribute.startIndex, i);
                     }
                 }
-            } else if (previousChar0 == '/' && currentChar == '>') {
-                extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
-                lastIndex = i - 1;
-                visitor.onHtmlTagOpened(depth, currentHtmlTag);
+            } else if (!currentHtmlTag.attributesProcessed && previousChar0 == '/' && currentChar == '>') {
+                if (currentHtmlTag.intercepted) {
+                    extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                    lastIndex = i - 1;
+                    visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                }
                 currentHtmlTag.attributesProcessed = true;
 
                 popHtmlTag();
@@ -365,9 +398,11 @@ final class TemplateParser {
                 if (tagClosed) {
                     tagClosed = false;
                 } else {
-                    extract(templateCode, lastIndex, i, visitor::onTextPart);
-                    lastIndex = i;
-                    visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                    if (currentHtmlTag.intercepted) {
+                        extract(templateCode, lastIndex, i, visitor::onTextPart);
+                        lastIndex = i;
+                        visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                    }
                     currentHtmlTag.attributesProcessed = true;
 
                     if (currentHtmlTag.bodyIgnored) {
@@ -377,16 +412,46 @@ final class TemplateParser {
             } else if (previousChar0 == '<' && currentChar == '/') {
                 if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
                     if (!currentHtmlTag.bodyIgnored) {
-                        extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
-                        lastIndex = i - 1;
-                        visitor.onHtmlTagClosed(depth, currentHtmlTag);
+                        if (currentHtmlTag.intercepted) {
+                            extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                            lastIndex = i - 1;
+                            visitor.onHtmlTagClosed(depth, currentHtmlTag);
+                        }
 
                         popHtmlTag();
                     }
-
+                } else if (!currentHtmlTag.script) {
+                    String tagName = parseHtmlTagName(i + 1);
+                    visitor.onError("Unclosed tag <" + currentHtmlTag.name + ">, expected " + "</" + currentHtmlTag.name + ">, got </" + tagName + ">.");
                 }
                 tagClosed = true;
             }
+        }
+    }
+
+    private boolean isOpeningHtmlTag(int i) {
+        if (currentChar != '<') {
+            return false;
+        }
+
+        if (templateCode.startsWith("<%--", i)) {
+            return false;
+        }
+
+        if (currentHtmlTag == null) {
+            return true;
+        }
+
+        if (currentHtmlTag.script) {
+            return false;
+        }
+
+        return currentHtmlTag.attributesProcessed;
+    }
+
+    private void validateHtmlTag( String name ) {
+        if ( name.contains("$") ) {
+            visitor.onError("Illegal tag name " + name + "! Expressions in tag names are not allowed.");
         }
     }
 
@@ -400,7 +465,19 @@ final class TemplateParser {
         currentHtmlTag = htmlStack.peek();
     }
 
-    private String parseHtmlAttributeName(String templateCode, int index) {
+    private String parseHtmlTagName(int index) {
+        int startIndex = index;
+        while (index < templateCode.length()) {
+            char c = templateCode.charAt(index);
+            if (Character.isWhitespace(c) || c == '/' || c == '>') {
+                break;
+            }
+            ++index;
+        }
+        return templateCode.substring(startIndex, index);
+    }
+
+    private String parseHtmlAttributeName(int index) {
         while (Character.isWhitespace(templateCode.charAt(index))) {
             --index;
         }
@@ -414,8 +491,19 @@ final class TemplateParser {
         return templateCode.substring(index + 1, endIndex);
     }
 
+    private boolean isHtmlTagIntercepted(String name) {
+        if (htmlTags != null) {
+            for (String htmlTag : htmlTags) {
+                if (name.equals(htmlTag)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private boolean isHtmlAttributeIntercepted(String name) {
-        if (htmlAttributes != null) {
+        if (htmlAttributes != null && currentHtmlTag.intercepted) {
             for (String htmlAttribute : htmlAttributes) {
                 if (name.equals(htmlAttribute)) {
                     return true;
@@ -536,13 +624,17 @@ final class TemplateParser {
         private static final Set<String> VOID_HTML_TAGS = Set.of("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
 
         public final String name;
-        public final List<HtmlAttribute> attributes = new ArrayList<>();
+        public final boolean intercepted;
         public final boolean bodyIgnored;
+        public final boolean script;
+        public final List<HtmlAttribute> attributes = new ArrayList<>();
         public boolean attributesProcessed;
 
-        public HtmlTag(String name) {
+        public HtmlTag(String name, boolean intercepted) {
             this.name = name;
+            this.intercepted = intercepted;
             this.bodyIgnored = VOID_HTML_TAGS.contains(name);
+            this.script = "script".equals(name);
         }
 
         public HtmlAttribute getCurrentAttribute() {

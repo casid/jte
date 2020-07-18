@@ -1,6 +1,8 @@
 package org.jusecase.jte;
 
 import org.jusecase.jte.internal.*;
+import org.jusecase.jte.output.HtmlTemplateOutput;
+import org.jusecase.jte.output.OwaspHtmlTemplateOutput;
 import org.jusecase.jte.support.HtmlTagSupport;
 
 import java.nio.file.Path;
@@ -22,6 +24,7 @@ public final class TemplateEngine {
     private final TemplateLoader templateLoader;
     private final TemplateMode templateMode;
     private final ConcurrentMap<String, Template> templateCache;
+    private final ContentType contentType;
 
     private HtmlTagSupport htmlTagSupport;
 
@@ -33,10 +36,11 @@ public final class TemplateEngine {
      * This is recommended when running templates on your developer machine.
      *
      * @param codeResolver to lookup jte templates
+     * @param contentType the content type of all templates this engine manages
      * @return a fresh TemplateEngine instance
      */
-    public static TemplateEngine create(CodeResolver codeResolver) {
-        return create(codeResolver, Path.of("jte-classes"));
+    public static TemplateEngine create(CodeResolver codeResolver, ContentType contentType) {
+        return create(codeResolver, Path.of("jte-classes"), contentType);
     }
 
     /**
@@ -48,10 +52,11 @@ public final class TemplateEngine {
      *
      * @param codeResolver to lookup jte templates
      * @param classDirectory where template class files are compiled to
+     * @param contentType the content type of all templates this engine manages
      * @return a fresh TemplateEngine instance
      */
-    public static TemplateEngine create(CodeResolver codeResolver, Path classDirectory) {
-        return new TemplateEngine(codeResolver, classDirectory, TemplateMode.OnDemand);
+    public static TemplateEngine create(CodeResolver codeResolver, Path classDirectory, ContentType contentType) {
+        return new TemplateEngine(codeResolver, classDirectory, contentType, TemplateMode.OnDemand);
     }
 
     /**
@@ -64,29 +69,36 @@ public final class TemplateEngine {
      * How to precompile templates: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates
      *
      * @param classDirectory where template class files are located
+     * @param contentType the content type of all templates this engine manages
      * @return a fresh TemplateEngine instance
      */
-    public static TemplateEngine createPrecompiled(Path classDirectory) {
-        return new TemplateEngine(null, classDirectory, TemplateMode.Precompiled);
+    public static TemplateEngine createPrecompiled(Path classDirectory, ContentType contentType) {
+        return new TemplateEngine(null, classDirectory, contentType, TemplateMode.Precompiled);
     }
 
-    private TemplateEngine(CodeResolver codeResolver, Path classDirectory, TemplateMode templateMode) {
-        this.templateLoader = createTemplateLoader(codeResolver, classDirectory, templateMode);
+    private TemplateEngine(CodeResolver codeResolver, Path classDirectory, ContentType contentType, TemplateMode templateMode) {
+        if (contentType == null) {
+            throw new NullPointerException("Content type must be specified.");
+        }
+        
+        this.templateLoader = createTemplateLoader(codeResolver, classDirectory, contentType, templateMode);
         this.templateMode = templateMode;
         this.templateCache = new ConcurrentHashMap<>();
+        this.contentType = contentType;
 
         if (templateMode == TemplateMode.OnDemand) {
             cleanAll();
         }
     }
 
-    private static TemplateLoader createTemplateLoader(CodeResolver codeResolver, Path classDirectory, TemplateMode templateMode) {
+    private static TemplateLoader createTemplateLoader(CodeResolver codeResolver, Path classDirectory, ContentType contentType, TemplateMode templateMode) {
         if (templateMode == TemplateMode.Precompiled) {
             return new RuntimeTemplateLoader(classDirectory);
         } else {
             try {
                 Class<?> compilerClass = Class.forName("org.jusecase.jte.internal.TemplateCompiler");
-                return (TemplateLoader)compilerClass.getConstructor(CodeResolver.class, Path.class).newInstance(codeResolver, classDirectory);
+                //noinspection JavaReflectionMemberAccess
+                return (TemplateLoader)compilerClass.getConstructor(CodeResolver.class, Path.class, ContentType.class).newInstance(codeResolver, classDirectory, contentType);
             } catch (Exception e) {
                 throw new TemplateException("TemplateCompiler could not be located. Maybe jte isn't on your classpath?", e);
             }
@@ -104,7 +116,7 @@ public final class TemplateEngine {
     public void render(String name, Object param, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.render(output, htmlTagSupport, param);
+            template.render(checkOutput(output), htmlTagSupport, param);
         } catch (Throwable e) {
             handleRenderException(name, template, e);
         }
@@ -122,7 +134,7 @@ public final class TemplateEngine {
     public void render(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.renderMap(output, htmlTagSupport, params);
+            template.renderMap(checkOutput(output), htmlTagSupport, params);
         } catch (Throwable e) {
             handleRenderException(name, template, e);
         }
@@ -142,7 +154,7 @@ public final class TemplateEngine {
     public void renderTag(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.renderMap(output, htmlTagSupport, params);
+            template.renderMap(checkOutput(output), htmlTagSupport, params);
         } catch (Throwable e) {
             handleRenderException(name, template, e);
         }
@@ -163,10 +175,17 @@ public final class TemplateEngine {
     public void renderLayout(String name, Map<String, Object> params, Map<String, String> layoutDefinitions, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.renderMap(output, htmlTagSupport, params, layoutDefinitions);
+            template.renderMap(checkOutput(output), htmlTagSupport, params, layoutDefinitions);
         } catch (Throwable e) {
             handleRenderException(name, template, e);
         }
+    }
+
+    private TemplateOutput checkOutput(TemplateOutput templateOutput) {
+        if (contentType == ContentType.Html && !(templateOutput instanceof HtmlTemplateOutput)) {
+            return new OwaspHtmlTemplateOutput(templateOutput);
+        }
+        return templateOutput;
     }
 
     private void handleRenderException(String name, Template template, Throwable e) {

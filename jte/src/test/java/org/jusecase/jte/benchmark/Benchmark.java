@@ -1,5 +1,6 @@
 package org.jusecase.jte.benchmark;
 
+import org.jusecase.jte.ContentType;
 import org.jusecase.jte.output.StringOutputPool;
 import org.jusecase.jte.resolve.ResourceCodeResolver;
 import org.jusecase.jte.TemplateEngine;
@@ -17,7 +18,7 @@ class Benchmark {
     }
 
     Benchmark() {
-        templateEngine = TemplateEngine.create(new ResourceCodeResolver("benchmark"));
+        templateEngine = TemplateEngine.create(new ResourceCodeResolver("benchmark"), ContentType.Html);
     }
 
     public void run() {

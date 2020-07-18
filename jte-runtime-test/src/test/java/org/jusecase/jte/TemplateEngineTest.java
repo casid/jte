@@ -24,7 +24,7 @@ public class TemplateEngineTest {
 
     @BeforeAll
     static void beforeAll() {
-        templateEngine = TemplateEngine.createPrecompiled(Path.of("jte-classes"));
+        templateEngine = TemplateEngine.createPrecompiled(Path.of("jte-classes"), ContentType.Html);
     }
 
     @BeforeEach

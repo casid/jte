@@ -14,7 +14,7 @@ public class PrintWriterOutputTest {
         PrintWriter printWriter = new PrintWriter(writer);
         PrintWriterOutput output = new PrintWriterOutput(printWriter);
 
-        output.writeStaticContent("Hello world");
+        output.writeContent("Hello world");
 
         assertThat(writer.toString()).isEqualTo("Hello world");
     }

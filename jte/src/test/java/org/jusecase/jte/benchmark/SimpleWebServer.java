@@ -3,6 +3,7 @@ package org.jusecase.jte.benchmark;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.jusecase.jte.ContentType;
 import org.jusecase.jte.TemplateEngine;
 import org.jusecase.jte.output.StringOutput;
 import org.jusecase.jte.output.StringOutputPool;
@@ -22,7 +23,7 @@ public class SimpleWebServer implements HttpHandler {
     }
 
     private final DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte", "src", "test", "resources", "benchmark"));
-    private final TemplateEngine templateEngine = TemplateEngine.create(codeResolver);
+    private final TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
     private final StringOutputPool stringOutputPool = new StringOutputPool();
     private final AtomicInteger visits = new AtomicInteger();
 

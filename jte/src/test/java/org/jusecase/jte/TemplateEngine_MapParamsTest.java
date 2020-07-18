@@ -14,7 +14,7 @@ public class TemplateEngine_MapParamsTest {
     Map<String, Object> params = new HashMap<>();
     Map<String, String> layoutDefinitions = new HashMap<>();
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver);
+    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, ContentType.Plain);
 
     @Test
     void template() {

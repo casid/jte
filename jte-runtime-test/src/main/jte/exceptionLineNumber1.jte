@@ -1,5 +1,5 @@
 @import test.Model
 
-@param test.Model model
+@param Model model
 
 ${model.getThatThrows()}

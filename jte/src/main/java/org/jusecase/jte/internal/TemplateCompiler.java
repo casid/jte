@@ -1,6 +1,7 @@
 package org.jusecase.jte.internal;
 
 import org.jusecase.jte.CodeResolver;
+import org.jusecase.jte.ContentType;
 import org.jusecase.jte.TemplateException;
 import org.jusecase.jte.output.FileOutput;
 
@@ -15,6 +16,7 @@ public class TemplateCompiler extends TemplateLoader {
     public static final boolean DEBUG = false;
 
     private final CodeResolver codeResolver;
+    private final ContentType contentType;
 
     private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
@@ -23,9 +25,10 @@ public class TemplateCompiler extends TemplateLoader {
     private String[] htmlTags;
     private String[] htmlAttributes;
 
-    public TemplateCompiler(CodeResolver codeResolver, Path classDirectory) {
+    public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, ContentType contentType) {
         super(classDirectory);
         this.codeResolver = codeResolver;
+        this.contentType = contentType;
     }
 
     @Override
@@ -93,7 +96,7 @@ public class TemplateCompiler extends TemplateLoader {
         ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
         CodeGenerator codeGenerator = new CodeGenerator(templateInfo, TemplateType.Template, classDefinitions, templateDependencies);
-        new TemplateParser(code, TemplateType.Template, codeGenerator, htmlTags, htmlAttributes).parse();
+        new TemplateParser(code, TemplateType.Template, codeGenerator, contentType, htmlTags, htmlAttributes).parse();
 
         this.templateDependencies.put(name, templateDependencies);
 
@@ -150,7 +153,7 @@ public class TemplateCompiler extends TemplateLoader {
         classDefinitions.add(classDefinition);
 
         CodeGenerator codeGenerator = new CodeGenerator(classInfo, type, classDefinitions, templateDependencies);
-        new TemplateParser(code, type, codeGenerator, htmlTags, htmlAttributes).parse();
+        new TemplateParser(code, type, codeGenerator, contentType, htmlTags, htmlAttributes).parse();
 
         classDefinition.setCode(codeGenerator.getCode());
         templateByClassName.put(classDefinition.getName(), classInfo);
@@ -268,13 +271,23 @@ public class TemplateCompiler extends TemplateLoader {
         private void writeClass() {
             javaCode.append("public final class ").append(classInfo.className).append(" {\n");
             javaCode.markFieldsIndex();
-            javaCode.append("\tpublic static void render(org.jusecase.jte.TemplateOutput output, org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
+            javaCode.append("\tpublic static void render(");
+            writeTemplateOutputParam();
+            javaCode.append(", org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
 
             if (type == TemplateType.Layout) {
                 javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
             }
 
             hasWrittenClass = true;
+        }
+
+        private void writeTemplateOutputParam() {
+            if (contentType == ContentType.Html) {
+                javaCode.append("org.jusecase.jte.output.HtmlTemplateOutput output");
+            } else {
+                javaCode.append("org.jusecase.jte.TemplateOutput output");
+            }
         }
 
         @Override
@@ -306,7 +319,9 @@ public class TemplateCompiler extends TemplateLoader {
 
             javaCode.append("\t}\n");
 
-            javaCode.append("\tpublic static void renderMap(org.jusecase.jte.TemplateOutput output, org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
+            javaCode.append("\tpublic static void renderMap(");
+            writeTemplateOutputParam();
+            javaCode.append(", org.jusecase.jte.support.HtmlTagSupport htmlTagSupport");
             if (type == TemplateType.Layout) {
                 javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
             }
@@ -344,25 +359,41 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
+        public void onError( String message ) {
+            DebugInfo debugInfo = getCurrentDebugInfo();
+            throw new TemplateException("Failed to compile " + debugInfo.name + ", error at line " + debugInfo.line + ": " + message);
+        }
+
+        @Override
         public void onTextPart(int depth, String textPart) {
             if (textPart.isEmpty()) {
                 return;
             }
 
             writeIndentation(depth);
-            javaCode.append("output.writeStaticContent(\"");
+            javaCode.append("output.writeContent(\"");
             appendEscaped(javaCode.getStringBuilder(), textPart);
             javaCode.append("\");\n");
         }
 
         @Override
         public void onCodePart(int depth, String codePart) {
-            writeCodePart(depth, codePart, "output.writeSafe(");
+            writeCodePart(depth, codePart, "output.writeContent(");
+        }
+
+        @Override
+        public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
+            writeCodePart(depth, codePart + ", \"" + tagName + "\"", "output.writeTagBodyUserContent(");
+        }
+
+        @Override
+        public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
+            writeCodePart(depth, codePart + ", \"" + tagName + "\", \"" + attributeName + "\"", "output.writeTagAttributeUserContent(");
         }
 
         @Override
         public void onUnsafeCodePart(int depth, String codePart) {
-            writeCodePart(depth, codePart, "output.writeUnsafe(");
+            writeCodePart(depth, codePart, "output.writeContent(");
         }
 
         private void writeCodePart(int depth, String codePart, String method) {

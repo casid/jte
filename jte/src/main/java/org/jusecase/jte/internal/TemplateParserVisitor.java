@@ -13,6 +13,10 @@ interface TemplateParserVisitor {
 
     void onCodePart(int depth, String codePart);
 
+    void onHtmlTagBodyCodePart(int depth, String codePart, String tagName);
+
+    void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName);
+
     void onUnsafeCodePart(int depth, String codePart);
 
     void onCodeStatement(int depth, String codePart);
@@ -44,6 +48,8 @@ interface TemplateParserVisitor {
     void onLineFinished();
 
     void onComplete();
+
+    void onError(String message);
 
     void onHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag);
 

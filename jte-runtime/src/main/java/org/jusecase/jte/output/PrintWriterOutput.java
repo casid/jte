@@ -3,6 +3,7 @@ package org.jusecase.jte.output;
 import org.jusecase.jte.TemplateOutput;
 
 import java.io.PrintWriter;
+import java.io.Writer;
 
 public class PrintWriterOutput implements TemplateOutput {
     private final PrintWriter writer;
@@ -12,7 +13,14 @@ public class PrintWriterOutput implements TemplateOutput {
     }
 
     @Override
+    public Writer getWriter() {
+        return writer;
+    }
+
+    @Override
     public void writeContent(String value) {
-        writer.write(value);
+        if (value != null) {
+            writer.write(value);
+        }
     }
 }

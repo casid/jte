@@ -15,7 +15,7 @@ public class TemplateEngineTest {
     String templateName = "test/template.jte";
 
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver);
+    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, ContentType.Plain);
     Model model = new Model();
 
     @BeforeEach
@@ -226,7 +226,7 @@ public class TemplateEngineTest {
     @Test
     void tagWithGenericParam() {
         givenTag("entry", "@param java.util.Map.Entry<String, java.util.List<String>> entry\n" +
-                "${entry.getKey()}: ${entry.getValue()}");
+                "${entry.getKey()}: ${entry.getValue().toString()}");
         givenRawTemplate("@param java.util.Map<String, java.util.List<String>> map\n" +
                 "@for(var entry : map.entrySet())@tag.entry(entry)\n@endfor");
 
@@ -632,7 +632,7 @@ public class TemplateEngineTest {
     void npe_nullSafe_output_object() {
         templateEngine.setNullSafeTemplateCode(true);
         model = null;
-        givenTemplate("This is ${model.type} world");
+        givenTemplate("This is ${model.type.toString()} world");
 
         thenOutputIs("This is  world");
     }

@@ -32,7 +32,7 @@ class TemplateEngine_TemplateFilesListenerTest {
     void setUp() throws IOException {
         tempDirectory = Files.createTempDirectory("temp-code");
         codeResolver = new DirectoryCodeResolver(tempDirectory);
-        templateEngine = TemplateEngine.create(codeResolver);
+        templateEngine = TemplateEngine.create(codeResolver, ContentType.Plain);
 
         givenHotReloadIsActivated();
     }

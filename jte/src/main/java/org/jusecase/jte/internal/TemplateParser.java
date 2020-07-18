@@ -420,7 +420,7 @@ final class TemplateParser {
 
                         popHtmlTag();
                     }
-                } else if (!currentHtmlTag.script) {
+                } else if (!currentHtmlTag.innerTagsIgnored) {
                     String tagName = parseHtmlTagName(i + 1);
                     visitor.onError("Unclosed tag <" + currentHtmlTag.name + ">, expected " + "</" + currentHtmlTag.name + ">, got </" + tagName + ">.");
                 }
@@ -442,7 +442,7 @@ final class TemplateParser {
             return true;
         }
 
-        if (currentHtmlTag.script) {
+        if (currentHtmlTag.innerTagsIgnored) {
             return false;
         }
 
@@ -626,7 +626,7 @@ final class TemplateParser {
         public final String name;
         public final boolean intercepted;
         public final boolean bodyIgnored;
-        public final boolean script;
+        public final boolean innerTagsIgnored;
         public final List<HtmlAttribute> attributes = new ArrayList<>();
         public boolean attributesProcessed;
 
@@ -634,7 +634,7 @@ final class TemplateParser {
             this.name = name;
             this.intercepted = intercepted;
             this.bodyIgnored = VOID_HTML_TAGS.contains(name);
-            this.script = "script".equals(name);
+            this.innerTagsIgnored = "script".equals(name) || "style".equals(name);
         }
 
         public HtmlAttribute getCurrentAttribute() {

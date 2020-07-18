@@ -136,6 +136,39 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void css() {
+        dummyCodeResolver.givenCode("template.jte", "<style type=\"text/css\">\n" +
+                "/*<![CDATA[*/\n" +
+                "body {\n" +
+                "\tcolor: #333333;\n" +
+                "\tline-height: 150%;\n" +
+                "}\n" +
+                "\n" +
+                "thead {\n" +
+                "\tfont-weight: bold;\n" +
+                "\tbackground-color: #CCCCCC;\n" +
+                "}\n" +
+                "/*]]>*/\n" +
+                "</style>");
+
+        templateEngine.render("template.jte", null, stringOutput);
+
+        assertThat(stringOutput.toString()).isEqualTo("<style type=\"text/css\">\n" +
+                "/*<![CDATA[*/\n" +
+                "body {\n" +
+                "\tcolor: #333333;\n" +
+                "\tline-height: 150%;\n" +
+                "}\n" +
+                "\n" +
+                "thead {\n" +
+                "\tfont-weight: bold;\n" +
+                "\tbackground-color: #CCCCCC;\n" +
+                "}\n" +
+                "/*]]>*/\n" +
+                "</style>");
+    }
+
+    @Test
+    void inlineScript() {
         // TODO
     }
 

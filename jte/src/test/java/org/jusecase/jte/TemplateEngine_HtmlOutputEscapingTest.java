@@ -3,6 +3,7 @@ package org.jusecase.jte;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -242,6 +243,33 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", TemplateEngineTest.ModelType.Two, output);
 
         assertThat(output.toString()).isEqualTo("<div data-type=\"Two\"></div>");
+    }
+
+    @Test
+    void nullInTagBody() {
+        codeResolver.givenCode("template.jte", "@param String type\n<div>${type}</div>");
+
+        templateEngine.render("template.jte", Collections.singletonMap("type", null), output);
+
+        assertThat(output.toString()).isEqualTo("<div></div>");
+    }
+
+    @Test
+    void nullInTagAttribute() {
+        codeResolver.givenCode("template.jte", "@param String type\n<div data-type=\"${type}\"></div>");
+
+        templateEngine.render("template.jte", Collections.singletonMap("type", null), output);
+
+        assertThat(output.toString()).isEqualTo("<div data-type=\"\"></div>");
+    }
+
+    @Test
+    void javascriptUrl() {
+        codeResolver.givenCode("template.jte", "@param String url\n<a href=\"${url}\">Click me!</a>");
+
+        templateEngine.render("template.jte", "javascript:alert(1)", output);
+
+        assertThat(output.toString()).isEqualTo("<a href=\"\">Click me!</a>");
     }
 
     @Test

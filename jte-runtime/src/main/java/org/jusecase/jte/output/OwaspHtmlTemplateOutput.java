@@ -19,6 +19,10 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
 
     @Override
     public void writeTagBodyUserContent(String value, String tagName) {
+        if (value == null) {
+            return;
+        }
+
         try {
             if ("script".equals(tagName)) {
                 Encode.forJavaScriptBlock(getWriter(), value);
@@ -32,6 +36,14 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
 
     @Override
     public void writeTagAttributeUserContent(String value, String tagName, String attributeName) {
+        if (value == null) {
+            return;
+        }
+
+        if ("a".equals(tagName) && "href".equals(attributeName) && value.contains("javascript:")) {
+            return;
+        }
+
         try {
             Encode.forHtmlAttribute(getWriter(), value);
         } catch (IOException e) {

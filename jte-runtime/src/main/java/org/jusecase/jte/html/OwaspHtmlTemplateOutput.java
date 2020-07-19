@@ -1,6 +1,7 @@
 package org.jusecase.jte.html;
 
 import org.jusecase.jte.TemplateOutput;
+import org.jusecase.jte.internal.StringUtils;
 import org.owasp.encoder.Encode;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
             return;
         }
 
-        if ("a".equals(tagName) && "href".equals(attributeName) && value.contains("javascript:")) {
+        if ("a".equals(tagName) && "href".equals(attributeName) && StringUtils.containsIgnoreCase(value, "javascript:")) {
             return;
         }
 

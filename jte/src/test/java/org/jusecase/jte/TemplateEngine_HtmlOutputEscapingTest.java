@@ -84,6 +84,33 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void htmlComment() {
+        codeResolver.givenCode("template.jte", "@param String name\n\n<!--Comment here with ${name}-->\n<span>Test</span>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "Hello", output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Expressions in HTML comments are not allowed.");
+    }
+
+    @Test
+    void htmlComment_unsafe() {
+        codeResolver.givenCode("template.jte", "@param String name\n\n<!--Comment here with $unsafe{name}-->\n<span>Test</span>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("\n<!--Comment here with Hello-->\n<span>Test</span>");
+    }
+
+    @Test
+    void htmlComment_ignoredIfInAttribute() {
+        codeResolver.givenCode("template.jte", "@param String name\n\n<span name=\"<!--this is not a comment ${name}-->\">Test</span>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("\n<span name=\"<!--this is not a comment Hello-->\">Test</span>");
+    }
+
+    @Test
     void script1() {
         codeResolver.givenCode("template.jte", "@param String userName\n<script>var x = 'Hello, ${userName}';</script>");
 

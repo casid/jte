@@ -347,6 +347,10 @@ final class TemplateParser {
 
     private void extractHtmlCodePart(int i) {
         if (currentHtmlTag != null) {
+            if (currentHtmlTag.comment) {
+                visitor.onError("Expressions in HTML comments are not allowed.");
+            }
+
             if (currentHtmlTag.attributesProcessed) {
                 extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, currentHtmlTag.name));
                 return;
@@ -373,7 +377,12 @@ final class TemplateParser {
                 tagClosed = false;
             }
         } else if (currentHtmlTag != null) {
-            if (!currentHtmlTag.attributesProcessed && currentChar == '=' && currentHtmlTag.isCurrentAttributeComplete()) {
+            if (currentHtmlTag.comment) {
+                if (previousChar1 == '-' && previousChar0 == '-' && currentChar == '>') {
+                    popHtmlTag();
+                    tagClosed = true;
+                }
+            } else if (!currentHtmlTag.attributesProcessed && currentChar == '=' && currentHtmlTag.isCurrentAttributeComplete()) {
                 String name = parseHtmlAttributeName(i);
                 validateHtmlAttribute(name);
 
@@ -490,6 +499,10 @@ final class TemplateParser {
     }
 
     private String parseHtmlTagName(int index) {
+        if (templateCode.startsWith("!--", index)) {
+            return "!--";
+        }
+
         int startIndex = index;
         while (index < templateCode.length()) {
             char c = templateCode.charAt(index);
@@ -659,6 +672,7 @@ final class TemplateParser {
         public final boolean intercepted;
         public final boolean bodyIgnored;
         public final boolean innerTagsIgnored;
+        public final boolean comment;
         public final List<HtmlAttribute> attributes = new ArrayList<>();
         public boolean attributesProcessed;
 
@@ -666,6 +680,7 @@ final class TemplateParser {
             this.name = name;
             this.intercepted = intercepted;
             this.bodyIgnored = VOID_HTML_TAGS.contains(name);
+            this.comment = "!--".equals(name);
             this.innerTagsIgnored = "script".equals(name) || "style".equals(name);
         }
 

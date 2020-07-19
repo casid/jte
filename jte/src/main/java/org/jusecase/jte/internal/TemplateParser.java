@@ -365,25 +365,29 @@ final class TemplateParser {
                 tagClosed = false;
             }
         } else if (currentHtmlTag != null) {
-            if (!currentHtmlTag.attributesProcessed && currentChar == '=') {
-                HtmlAttribute attribute = new HtmlAttribute(parseHtmlAttributeName(i));
+            if (!currentHtmlTag.attributesProcessed && currentChar == '=' && currentHtmlTag.isCurrentAttributeComplete()) {
+                String name = parseHtmlAttributeName(i);
+                validateHtmlAttribute(name);
+
+                char quotes = parseHtmlAttributeQuotes(i + 1);
+                validateHtmlAttributeQuotes(quotes);
+
+                HtmlAttribute attribute = new HtmlAttribute(name, quotes);
                 currentHtmlTag.attributes.add(attribute);
-            } else if (!currentHtmlTag.attributesProcessed && currentChar == '\"') {
+            } else if (!currentHtmlTag.attributesProcessed && currentHtmlTag.isCurrentAttributeQuote(currentChar)) {
                 HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
-                if (currentAttribute != null) {
-                    currentAttribute.quoteCount++;
-                    if (currentAttribute.quoteCount == 1) {
-                        currentAttribute.startIndex = i + 1;
+                currentAttribute.quoteCount++;
+                if (currentAttribute.quoteCount == 1) {
+                    currentAttribute.startIndex = i + 1;
 
-                        if (isHtmlAttributeIntercepted(currentAttribute.name)) {
-                            extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
-                            lastIndex = i + 1;
+                    if (isHtmlAttributeIntercepted(currentAttribute.name)) {
+                        extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
+                        lastIndex = i + 1;
 
-                            visitor.onHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
-                        }
-                    } else if (currentAttribute.quoteCount == 2) {
-                        currentAttribute.value = templateCode.substring(currentAttribute.startIndex, i);
+                        visitor.onHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
                     }
+                } else if (currentAttribute.quoteCount == 2) {
+                    currentAttribute.value = templateCode.substring(currentAttribute.startIndex, i);
                 }
             } else if (!currentHtmlTag.attributesProcessed && previousChar0 == '/' && currentChar == '>') {
                 if (currentHtmlTag.intercepted) {
@@ -450,8 +454,20 @@ final class TemplateParser {
     }
 
     private void validateHtmlTag( String name ) {
-        if ( name.contains("$") ) {
+        if ( name.contains("${") ) {
             visitor.onError("Illegal tag name " + name + "! Expressions in tag names are not allowed.");
+        }
+    }
+
+    private void validateHtmlAttribute( String name ) {
+        if ( name.contains("${") ) {
+            visitor.onError("Illegal attribute name " + name + "! Expressions in attribute names are not allowed.");
+        }
+    }
+
+    private void validateHtmlAttributeQuotes(char quotes) {
+        if (quotes != '\"' && quotes != '\'') {
+            visitor.onError("Unquoted attribute values are not allowed.");
         }
     }
 
@@ -489,6 +505,14 @@ final class TemplateParser {
         }
 
         return templateCode.substring(index + 1, endIndex);
+    }
+
+    private char parseHtmlAttributeQuotes(int index) {
+        while (Character.isWhitespace(templateCode.charAt(index))) {
+            ++index;
+        }
+
+        return templateCode.charAt(index);
     }
 
     private boolean isHtmlTagIntercepted(String name) {
@@ -643,17 +667,37 @@ final class TemplateParser {
             }
             return attributes.get(attributes.size() - 1);
         }
+
+        public boolean isCurrentAttributeComplete() {
+            HtmlAttribute currentAttribute = getCurrentAttribute();
+            if (currentAttribute == null) {
+                return true;
+            }
+
+            return currentAttribute.quoteCount != 1;
+        }
+
+        public boolean isCurrentAttributeQuote(char currentChar) {
+            HtmlAttribute currentAttribute = getCurrentAttribute();
+            if (currentAttribute == null) {
+                return false;
+            }
+
+            return currentChar == currentAttribute.quotes;
+        }
     }
 
     public static class HtmlAttribute {
         public final String name;
+        public final char quotes;
         public String value;
 
         public int quoteCount;
         public int startIndex;
 
-        private HtmlAttribute(String name) {
+        private HtmlAttribute(String name, char quotes) {
             this.name = name;
+            this.quotes = quotes;
         }
     }
 }

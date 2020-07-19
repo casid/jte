@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 
+/**
+ * See https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+ */
 public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     private final TemplateOutput templateOutput;
 
@@ -19,8 +22,6 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         try {
             if ("script".equals(tagName)) {
                 Encode.forJavaScriptBlock(getWriter(), value);
-            } else if ("style".equals(tagName)) {
-                Encode.forCssString(getWriter(), value);
             } else {
                 Encode.forHtml(getWriter(), value);
             }

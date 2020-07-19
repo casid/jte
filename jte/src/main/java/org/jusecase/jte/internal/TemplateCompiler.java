@@ -273,7 +273,7 @@ public class TemplateCompiler extends TemplateLoader {
             javaCode.markFieldsIndex();
             javaCode.append("\tpublic static void render(");
             writeTemplateOutputParam();
-            javaCode.append(", org.jusecase.jte.html.HtmlInterceptor __htmlInterceptor");
+            javaCode.append(", org.jusecase.jte.html.HtmlInterceptor jteHtmlInterceptor");
 
             if (type == TemplateType.Layout) {
                 javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
@@ -284,9 +284,9 @@ public class TemplateCompiler extends TemplateLoader {
 
         private void writeTemplateOutputParam() {
             if (contentType == ContentType.Html) {
-                javaCode.append("org.jusecase.jte.html.HtmlTemplateOutput output");
+                javaCode.append("org.jusecase.jte.html.HtmlTemplateOutput jteOutput");
             } else {
-                javaCode.append("org.jusecase.jte.TemplateOutput output");
+                javaCode.append("org.jusecase.jte.TemplateOutput jteOutput");
             }
         }
 
@@ -321,7 +321,7 @@ public class TemplateCompiler extends TemplateLoader {
 
             javaCode.append("\tpublic static void renderMap(");
             writeTemplateOutputParam();
-            javaCode.append(", org.jusecase.jte.html.HtmlInterceptor __htmlInterceptor");
+            javaCode.append(", org.jusecase.jte.html.HtmlInterceptor jteHtmlInterceptor");
             if (type == TemplateType.Layout) {
                 javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
             }
@@ -339,7 +339,7 @@ public class TemplateCompiler extends TemplateLoader {
                     javaCode.append(")params.get(\"").append(parameter.name).append("\");\n");
                 }
             }
-            javaCode.append("\t\trender(output, __htmlInterceptor");
+            javaCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
             if (type == TemplateType.Layout) {
                 javaCode.append(", jteLayoutDefinitionLookup");
             }
@@ -371,29 +371,29 @@ public class TemplateCompiler extends TemplateLoader {
             }
 
             writeIndentation(depth);
-            javaCode.append("output.writeContent(\"");
+            javaCode.append("jteOutput.writeContent(\"");
             appendEscaped(javaCode.getStringBuilder(), textPart);
             javaCode.append("\");\n");
         }
 
         @Override
         public void onCodePart(int depth, String codePart) {
-            writeCodePart(depth, codePart, "output.writeContent(");
+            writeCodePart(depth, codePart, "jteOutput.writeContent(");
         }
 
         @Override
         public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
-            writeCodePart(depth, codePart + ", \"" + tagName + "\"", "output.writeTagBodyUserContent(");
+            writeCodePart(depth, codePart + ", \"" + tagName + "\"", "jteOutput.writeTagBodyUserContent(");
         }
 
         @Override
         public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
-            writeCodePart(depth, codePart + ", \"" + tagName + "\", \"" + attributeName + "\"", "output.writeTagAttributeUserContent(");
+            writeCodePart(depth, codePart + ", \"" + tagName + "\", \"" + attributeName + "\"", "jteOutput.writeTagAttributeUserContent(");
         }
 
         @Override
         public void onUnsafeCodePart(int depth, String codePart) {
-            writeCodePart(depth, codePart, "output.writeContent(");
+            writeCodePart(depth, codePart, "jteOutput.writeContent(");
         }
 
         private void writeCodePart(int depth, String codePart, String method) {
@@ -405,9 +405,9 @@ public class TemplateCompiler extends TemplateLoader {
             javaCode.append(method).append(codePart).append(");\n");
             if (nullSafeTemplateCode) {
                 writeIndentation(depth);
-                javaCode.append("} catch (NullPointerException outputNpe) {\n");
+                javaCode.append("} catch (NullPointerException jteOutputNpe) {\n");
                 writeIndentation(depth + 1);
-                javaCode.append("org.jusecase.jte.internal.NullCheck.handleNullOutput(outputNpe);\n");
+                javaCode.append("org.jusecase.jte.internal.NullCheck.handleNullOutput(jteOutputNpe);\n");
                 writeIndentation(depth);
                 javaCode.append("}\n");
             }
@@ -493,7 +493,7 @@ public class TemplateCompiler extends TemplateLoader {
 
             writeIndentation(depth);
 
-            javaCode.append(tagInfo.fullName).append(".render(output, __htmlInterceptor");
+            javaCode.append(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
 
             appendParams(tagName, params);
             javaCode.append(");\n");
@@ -505,7 +505,7 @@ public class TemplateCompiler extends TemplateLoader {
             ClassInfo layoutInfo = generateLayout(layoutName, classDefinitions, templateDependencies, getCurrentDebugInfo());
 
             writeIndentation(depth);
-            javaCode.append(layoutInfo.fullName).append(".render(output, __htmlInterceptor");
+            javaCode.append(layoutInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
 
             javaCode.append(", jteLayoutDefinition -> {\n");
 
@@ -515,23 +515,23 @@ public class TemplateCompiler extends TemplateLoader {
         @Override
         public void onHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
             writeIndentation(depth);
-            javaCode.append("__htmlInterceptor.onHtmlTagOpened(\"").append(htmlTag.name).append("\", ");
+            javaCode.append("jteHtmlInterceptor.onHtmlTagOpened(\"").append(htmlTag.name).append("\", ");
             writeAttributeMap(htmlTag);
-            javaCode.append(", output);\n");
+            javaCode.append(", jteOutput);\n");
         }
 
         @Override
         public void onHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
             writeIndentation(depth);
-            javaCode.append("__htmlInterceptor.onHtmlAttributeStarted(\"").append(htmlAttribute.name).append("\", ");
+            javaCode.append("jteHtmlInterceptor.onHtmlAttributeStarted(\"").append(htmlAttribute.name).append("\", ");
             writeAttributeMap(currentHtmlTag);
-            javaCode.append(", output);\n");
+            javaCode.append(", jteOutput);\n");
         }
 
         @Override
         public void onHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
             writeIndentation(depth);
-            javaCode.append("__htmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", output);\n");
+            javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput);\n");
         }
 
         private void writeAttributeMap(TemplateParser.HtmlTag htmlTag) {

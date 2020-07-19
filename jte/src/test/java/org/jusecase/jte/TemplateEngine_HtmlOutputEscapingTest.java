@@ -227,6 +227,24 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void enumInTagBody() {
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngineTest.ModelType type\n<div>${type}</div>");
+
+        templateEngine.render("template.jte", TemplateEngineTest.ModelType.Two, output);
+
+        assertThat(output.toString()).isEqualTo("<div>Two</div>");
+    }
+
+    @Test
+    void enumInTagAttribute() {
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngineTest.ModelType type\n<div data-type=\"${type}\"></div>");
+
+        templateEngine.render("template.jte", TemplateEngineTest.ModelType.Two, output);
+
+        assertThat(output.toString()).isEqualTo("<div data-type=\"Two\"></div>");
+    }
+
+    @Test
     void forbidMoreThanOneOutputPerAttribute() {
         // TODO check if we really want to do this
     }

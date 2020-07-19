@@ -520,6 +520,13 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void enumOutput() {
+        givenTemplate("${model.type}");
+        model.type = ModelType.One;
+        thenOutputIs("One");
+    }
+
+    @Test
     void nestedJavascript() {
         givenTemplate("@if (model.isCaseA() && model.isCaseB())\n" +
                 "        <meta name=\"robots\" content=\"a, b\">\n" +
@@ -632,7 +639,7 @@ public class TemplateEngineTest {
     void npe_nullSafe_output_object() {
         templateEngine.setNullSafeTemplateCode(true);
         model = null;
-        givenTemplate("This is ${model.type.toString()} world");
+        givenTemplate("This is ${model.type} world");
 
         thenOutputIs("This is  world");
     }

@@ -8,6 +8,12 @@ public interface TemplateOutput {
 
     void writeContent(String value);
 
+    default void writeContent(Enum<?> value) {
+        if (value != null) {
+            writeContent(value.toString());
+        }
+    }
+
     default void writeContent(boolean value) {
         writeContent(String.valueOf(value));
     }

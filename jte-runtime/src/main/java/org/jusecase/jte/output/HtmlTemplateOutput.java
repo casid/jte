@@ -7,6 +7,12 @@ public interface HtmlTemplateOutput extends TemplateOutput {
 
     void writeTagBodyUserContent(String value, String tagName);
 
+    default void writeTagBodyUserContent(Enum<?> value, String tagName) {
+        if (value != null) {
+            writeContent(value.toString());
+        }
+    }
+
     default void writeTagBodyUserContent(boolean value, String tagName) {
         writeContent(String.valueOf(value));
     }
@@ -40,6 +46,12 @@ public interface HtmlTemplateOutput extends TemplateOutput {
     }
 
     void writeTagAttributeUserContent(String value, String tagName, String attributeName);
+
+    default void writeTagAttributeUserContent(Enum<?> value, String tagName, String attributeName) {
+        if (value != null) {
+            writeContent(value.toString());
+        }
+    }
 
     default void writeTagAttributeUserContent(boolean value, String tagName, String attributeName) {
         writeContent(String.valueOf(value));

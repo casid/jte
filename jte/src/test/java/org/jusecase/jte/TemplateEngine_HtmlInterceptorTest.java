@@ -3,7 +3,7 @@ package org.jusecase.jte;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jusecase.jte.output.StringOutput;
-import org.jusecase.jte.support.HtmlTagSupport;
+import org.jusecase.jte.html.HtmlInterceptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,19 +12,19 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-public class TemplateEngine_HtmlTagSupportTest {
+public class TemplateEngine_HtmlInterceptorTest {
 
     StringOutput output = new StringOutput();
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
     TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, ContentType.Html);
     Controller controller = new Controller();
-    MySampleFrameworkTagSupport htmlTagSupport = new MySampleFrameworkTagSupport();
+    MySampleFrameworkInterceptor htmlInterceptor = new MySampleFrameworkInterceptor();
 
     @BeforeEach
     void setUp() {
         templateEngine.setHtmlTags("form", "input", "select", "option");
         templateEngine.setHtmlAttributes("class");
-        templateEngine.setHtmlTagSupport(htmlTagSupport);
+        templateEngine.setHtmlInterceptor(htmlInterceptor);
     }
 
     @Test
@@ -99,7 +99,7 @@ public class TemplateEngine_HtmlTagSupportTest {
 
     @Test
     void select() {
-        dummyCodeResolver.givenCode("page.jte", "@param org.jusecase.jte.TemplateEngine_HtmlTagSupportTest.Controller controller\n" +
+        dummyCodeResolver.givenCode("page.jte", "@param org.jusecase.jte.TemplateEngine_HtmlInterceptorTest.Controller controller\n" +
                 "<form action=\"${controller.getUrl()}\">\n" +
                 "<select name=\"foodOption\">\n" +
                 "@for(var foodOption : controller.getFoodOptions())" +
@@ -165,7 +165,7 @@ public class TemplateEngine_HtmlTagSupportTest {
 
     @Test
     void form() {
-        dummyCodeResolver.givenCode("page.jte", "@param org.jusecase.jte.TemplateEngine_HtmlTagSupportTest.Controller controller\n"
+        dummyCodeResolver.givenCode("page.jte", "@param org.jusecase.jte.TemplateEngine_HtmlInterceptorTest.Controller controller\n"
               + "<body>\n" + "   <h1>Hello</h1>\n" + "\n" + "   <form action=\"${controller.getUrl()}\" method=\"POST\">\n" + "\n"
               + "      <label>\n" + "         Food option:\n" + "         <select name=\"foodOption\">\n" + "            <option value=\"\">-</option>\n"
               + "            @for(var foodOption : controller.getFoodOptions())\n" + "               <option value=\"${foodOption}\">${foodOption}</option>\n"
@@ -218,7 +218,7 @@ public class TemplateEngine_HtmlTagSupportTest {
         }
     }
 
-    public class MySampleFrameworkTagSupport implements HtmlTagSupport {
+    public class MySampleFrameworkInterceptor implements HtmlInterceptor {
 
         private String action;
         private final List<String> fieldNames = new ArrayList<>();

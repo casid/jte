@@ -1,7 +1,7 @@
 package org.jusecase.jte.internal;
 
 import org.jusecase.jte.TemplateOutput;
-import org.jusecase.jte.support.HtmlTagSupport;
+import org.jusecase.jte.html.HtmlInterceptor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,29 +24,29 @@ public final class Template {
         parameterCount = resolveParameterCount();
     }
 
-    public void render(TemplateOutput output, HtmlTagSupport htmlTagSupport, Object param) throws Throwable {
+    public void render(TemplateOutput output, HtmlInterceptor htmlInterceptor, Object param) throws Throwable {
         try {
             if (parameterCount == 0) {
-                render.invoke(null, output, htmlTagSupport);
+                render.invoke(null, output, htmlInterceptor);
             } else {
-                render.invoke(null, output, htmlTagSupport, param);
+                render.invoke(null, output, htmlInterceptor, param);
             }
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
     }
 
-    public void renderMap(TemplateOutput output, HtmlTagSupport htmlTagSupport, Map<String, Object> params) throws Throwable {
+    public void renderMap(TemplateOutput output, HtmlInterceptor htmlInterceptor, Map<String, Object> params) throws Throwable {
         try {
-            renderMap.invoke(null, output, htmlTagSupport, params);
+            renderMap.invoke(null, output, htmlInterceptor, params);
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
     }
 
-    public void renderMap(TemplateOutput output, HtmlTagSupport htmlTagSupport, Map<String, Object> params, Map<String, String> layoutDefinitions) throws Throwable {
+    public void renderMap(TemplateOutput output, HtmlInterceptor htmlInterceptor, Map<String, Object> params, Map<String, String> layoutDefinitions) throws Throwable {
         try {
-            renderMap.invoke(null, output, htmlTagSupport, (Function<String, Runnable>) definitionName -> () -> {
+            renderMap.invoke(null, output, htmlInterceptor, (Function<String, Runnable>) definitionName -> () -> {
                 String layoutDefinition = layoutDefinitions.get(definitionName);
                 if (layoutDefinition != null) {
                     output.writeContent(layoutDefinition);

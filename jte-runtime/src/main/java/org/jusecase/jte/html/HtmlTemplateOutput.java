@@ -1,4 +1,4 @@
-package org.jusecase.jte.output;
+package org.jusecase.jte.html;
 
 import org.jusecase.jte.TemplateOutput;
 

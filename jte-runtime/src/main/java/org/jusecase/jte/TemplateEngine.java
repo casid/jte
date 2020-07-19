@@ -1,9 +1,9 @@
 package org.jusecase.jte;
 
 import org.jusecase.jte.internal.*;
-import org.jusecase.jte.output.HtmlTemplateOutput;
-import org.jusecase.jte.output.OwaspHtmlTemplateOutput;
-import org.jusecase.jte.support.HtmlTagSupport;
+import org.jusecase.jte.html.HtmlTemplateOutput;
+import org.jusecase.jte.html.OwaspHtmlTemplateOutput;
+import org.jusecase.jte.html.HtmlInterceptor;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -26,7 +26,7 @@ public final class TemplateEngine {
     private final ConcurrentMap<String, Template> templateCache;
     private final ContentType contentType;
 
-    private HtmlTagSupport htmlTagSupport;
+    private HtmlInterceptor htmlInterceptor;
 
     /**
      * Creates a new template engine.
@@ -97,7 +97,6 @@ public final class TemplateEngine {
         } else {
             try {
                 Class<?> compilerClass = Class.forName("org.jusecase.jte.internal.TemplateCompiler");
-                //noinspection JavaReflectionMemberAccess
                 return (TemplateLoader)compilerClass.getConstructor(CodeResolver.class, Path.class, ContentType.class).newInstance(codeResolver, classDirectory, contentType);
             } catch (Exception e) {
                 throw new TemplateException("TemplateCompiler could not be located. Maybe jte isn't on your classpath?", e);
@@ -116,7 +115,7 @@ public final class TemplateEngine {
     public void render(String name, Object param, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.render(checkOutput(output), htmlTagSupport, param);
+            template.render(checkOutput(output), htmlInterceptor, param);
         } catch (Throwable e) {
             handleRenderException(name, template, e);
         }
@@ -134,7 +133,7 @@ public final class TemplateEngine {
     public void render(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.renderMap(checkOutput(output), htmlTagSupport, params);
+            template.renderMap(checkOutput(output), htmlInterceptor, params);
         } catch (Throwable e) {
             handleRenderException(name, template, e);
         }
@@ -154,7 +153,7 @@ public final class TemplateEngine {
     public void renderTag(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.renderMap(checkOutput(output), htmlTagSupport, params);
+            template.renderMap(checkOutput(output), htmlInterceptor, params);
         } catch (Throwable e) {
             handleRenderException(name, template, e);
         }
@@ -175,7 +174,7 @@ public final class TemplateEngine {
     public void renderLayout(String name, Map<String, Object> params, Map<String, String> layoutDefinitions, TemplateOutput output) throws TemplateException {
         Template template = resolveTemplate(name);
         try {
-            template.renderMap(checkOutput(output), htmlTagSupport, params, layoutDefinitions);
+            template.renderMap(checkOutput(output), htmlInterceptor, params, layoutDefinitions);
         } catch (Throwable e) {
             handleRenderException(name, template, e);
         }
@@ -258,7 +257,7 @@ public final class TemplateEngine {
 
     /**
      * Experimental mode, that intercepts the given html tags during template compilation
-     * and calls the configured htmlTagSupport during template rendering.
+     * and calls the configured htmlInterceptor during template rendering.
      * @param htmlTags tags to be intercepted, for instance setHtmlTags("form", "input");
      */
     public void setHtmlTags(String ... htmlTags) {
@@ -267,7 +266,7 @@ public final class TemplateEngine {
 
     /**
      * Experimental mode, that intercepts the given html attributes for configured htmlTags
-     * during template compilation and calls the configured htmlTagSupport during template
+     * during template compilation and calls the configured htmlInterceptor during template
      * rendering.
      * @param htmlAttributes attributes to be intercepted, for instance setHtmlAttributes("class");
      */
@@ -276,12 +275,12 @@ public final class TemplateEngine {
     }
 
     /**
-     * Experimental listener that is called during template rendering when one of the
+     * Interceptor that is called during template rendering when one of the
      * configured htmlTags is rendered.
      * This allows to integrate existing frameworks into jte.
-     * @param htmlTagSupport the listener
+     * @param htmlInterceptor the interceptor
      */
-    public void setHtmlTagSupport(HtmlTagSupport htmlTagSupport) {
-        this.htmlTagSupport = htmlTagSupport;
+    public void setHtmlInterceptor(HtmlInterceptor htmlInterceptor) {
+        this.htmlInterceptor = htmlInterceptor;
     }
 }

@@ -402,6 +402,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void commentBeforeParams() {
+        givenRawTemplate("<%--This is a comment--%>@param org.jusecase.jte.TemplateEngineTest.Model model\n" + "!{model.setX(12)}${model.x}");
+        thenOutputIs("12");
+    }
+
+    @Test
     void layout() {
         givenLayout("main", "@param org.jusecase.jte.TemplateEngineTest.Model model\n" +
                 "\n" +

@@ -78,7 +78,7 @@ final class TemplateParser {
                 pop();
                 lastIndex = i + 1;
             } else if (currentMode != Mode.Comment && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
-                if (currentMode == Mode.Text) {
+                if (currentMode == Mode.Text && paramsComplete) {
                     extract(templateCode, lastIndex, i - 3, visitor::onTextPart);
                 }
                 push(Mode.Comment);

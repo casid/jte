@@ -159,11 +159,19 @@ final class TemplateParser {
                     lastIndex = i + 1;
                     push(Mode.Text);
                 } else if (currentMode instanceof TagMode) {
+                    if (contentType == ContentType.Html && currentHtmlTag != null && currentHtmlTag.innerTagsIgnored) {
+                        visitor.onError("@tag calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
+                    }
+
                     TagMode tagMode = (TagMode) currentMode;
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, tagMode.name.toString(), tagMode.params));
                     lastIndex = i + 1;
                     pop();
                 } else if (currentMode instanceof LayoutMode) {
+                    if (contentType == ContentType.Html && currentHtmlTag != null && currentHtmlTag.innerTagsIgnored) {
+                        visitor.onError("@layout calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
+                    }
+
                     LayoutMode layoutMode = (LayoutMode) currentMode;
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, layoutMode.name.toString(), layoutMode.params));
                 }

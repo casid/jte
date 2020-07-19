@@ -273,6 +273,26 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void tagCallInScript() {
+        codeResolver.givenCode("tag/snippet.jte", "var x = y;");
+        codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@tag.snippet()\n}\n</script>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "ignored", output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 4: @tag calls in <script> blocks are not allowed.");
+    }
+
+    @Test
+    void layoutCallInScript() {
+        codeResolver.givenCode("layout/snippet.jte", "var x = y;");
+        codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@layout.snippet()\n@endlayout\n}\n</script>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "ignored", output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 4: @layout calls in <script> blocks are not allowed.");
+    }
+
+    @Test
     void forbidMoreThanOneOutputPerAttribute() {
         // TODO check if we really want to do this
     }

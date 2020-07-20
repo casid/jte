@@ -84,6 +84,51 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void booleanAttributes_true() {
+        codeResolver.givenCode("template.jte", "@param boolean disabled\n<button disabled=\"${disabled}\">Click</button>");
+
+        templateEngine.render("template.jte", true, output);
+
+        assertThat(output.toString()).isEqualTo("<button disabled>Click</button>");
+    }
+
+    @Test
+    void booleanAttributes_false() {
+        codeResolver.givenCode("template.jte", "@param boolean disabled\n<button disabled=\"${disabled}\">Click</button>");
+
+        templateEngine.render("template.jte", false, output);
+
+        assertThat(output.toString()).isEqualTo("<button >Click</button>");
+    }
+
+    @Test
+    void booleanAttributes_noParams() {
+        codeResolver.givenCode("template.jte", "@param String cssClass\n<button disabled class=\"${cssClass}\">Click</button>");
+
+        templateEngine.render("template.jte", "dummy", output);
+
+        assertThat(output.toString()).isEqualTo("<button disabled class=\"dummy\">Click</button>");
+    }
+
+    @Test
+    void booleanAttributes_expression1() {
+        codeResolver.givenCode("template.jte", "@param String disabled\n<button disabled=\"${\"true\".equals(disabled)}\">Click</button>");
+
+        templateEngine.render("template.jte", "true", output);
+
+        assertThat(output.toString()).isEqualTo("<button disabled>Click</button>");
+    }
+
+    @Test
+    void booleanAttributes_expression2() {
+        codeResolver.givenCode("template.jte", "@param String disabled\n<button disabled=\"${\"true\".equals(disabled)}\">Click</button>");
+
+        templateEngine.render("template.jte", (Object)null, output);
+
+        assertThat(output.toString()).isEqualTo("<button >Click</button>");
+    }
+
+    @Test
     void htmlComment() {
         codeResolver.givenCode("template.jte", "@param String name\n\n<!--Comment here with ${name}-->\n<span>Test</span>");
 

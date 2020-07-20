@@ -1,8 +1,8 @@
 package org.jusecase.jte.internal;
 
-import java.util.*;
-
 import org.jusecase.jte.ContentType;
+
+import java.util.*;
 
 final class TemplateParser {
     private static final int LAYOUT_DEFINITION_DEPTH = 2;
@@ -21,6 +21,7 @@ final class TemplateParser {
     private HtmlTag currentHtmlTag;
     private int depth;
     private boolean paramsComplete;
+    private boolean outputPrevented;
     private boolean tagClosed;
 
     private int lastIndex = 0;
@@ -88,10 +89,12 @@ final class TemplateParser {
                     lastIndex = i + 1;
                 }
             } else if (previousChar0 == '$' && currentChar == '{') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                if (!outputPrevented) {
+                    if (currentMode == Mode.Text) {
+                        extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                    }
+                    lastIndex = i + 1;
                 }
-                lastIndex = i + 1;
                 push(Mode.Code);
             } else if (previousChar6 == '$' && previousChar5 == 'u' && previousChar4 == 'n' && previousChar3 == 's' && previousChar2 == 'a' && previousChar1 == 'f' && previousChar0 == 'e' && currentChar == '{') {
                 if (currentMode == Mode.Text) {
@@ -117,7 +120,7 @@ final class TemplateParser {
                 pop();
             } else if (currentChar == '}' && currentMode == Mode.Code) {
                 pop();
-                if (currentMode == Mode.Text) {
+                if (currentMode == Mode.Text && !outputPrevented) {
                     extractCodePart(i);
                 }
             } else if (currentChar == '}' && currentMode == Mode.UnsafeCode) {
@@ -372,39 +375,39 @@ final class TemplateParser {
             if (!name.isEmpty()) {
                 validateHtmlTag(name);
 
-                HtmlTag htmlTag = new HtmlTag(name, isHtmlTagIntercepted(name));
+                HtmlTag htmlTag = new HtmlTag(name, isHtmlTagIntercepted(name), i + name.length());
                 pushHtmlTag(htmlTag);
                 tagClosed = false;
             }
-        } else if (currentHtmlTag != null) {
+        } else if (currentHtmlTag != null && i > currentHtmlTag.attributeStartIndex) {
             if (currentHtmlTag.comment) {
                 if (previousChar1 == '-' && previousChar0 == '-' && currentChar == '>') {
                     popHtmlTag();
                     tagClosed = true;
                 }
-            } else if (!currentHtmlTag.attributesProcessed && currentChar == '=' && currentHtmlTag.isCurrentAttributeComplete()) {
-                String name = parseHtmlAttributeName(i);
-                validateHtmlAttribute(name);
-
-                char quotes = parseHtmlAttributeQuotes(i + 1);
-                validateHtmlAttributeQuotes(quotes);
-
-                HtmlAttribute attribute = new HtmlAttribute(name, quotes);
-                currentHtmlTag.attributes.add(attribute);
             } else if (!currentHtmlTag.attributesProcessed && currentHtmlTag.isCurrentAttributeQuote(currentChar)) {
                 HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
                 currentAttribute.quoteCount++;
                 if (currentAttribute.quoteCount == 1) {
-                    currentAttribute.startIndex = i + 1;
+                    currentAttribute.valueStartIndex = i + 1;
 
-                    if (isHtmlAttributeIntercepted(currentAttribute.name)) {
+                    if (!currentAttribute.bool && isHtmlAttributeIntercepted(currentAttribute.name)) {
                         extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
                         lastIndex = i + 1;
 
                         visitor.onHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
                     }
                 } else if (currentAttribute.quoteCount == 2) {
-                    currentAttribute.value = templateCode.substring(currentAttribute.startIndex, i);
+                    currentAttribute.value = templateCode.substring(currentAttribute.valueStartIndex, i);
+
+                    if (currentAttribute.bool) {
+                        extract(templateCode, lastIndex, currentAttribute.startIndex, visitor::onTextPart);
+                        lastIndex = i + 1;
+
+                        visitor.onHtmlBooleanAttributeStarted(depth, currentHtmlTag, currentAttribute);
+
+                        outputPrevented = false;
+                    }
                 }
             } else if (!currentHtmlTag.attributesProcessed && previousChar0 == '/' && currentChar == '>') {
                 if (currentHtmlTag.intercepted) {
@@ -446,6 +449,17 @@ final class TemplateParser {
                     visitor.onError("Unclosed tag <" + currentHtmlTag.name + ">, expected " + "</" + currentHtmlTag.name + ">, got </" + tagName + ">.");
                 }
                 tagClosed = true;
+            } else if (!currentHtmlTag.attributesProcessed && !Character.isWhitespace(currentChar) && currentChar != '/' && currentHtmlTag.isCurrentAttributeComplete()) {
+                HtmlAttribute attribute = parseHtmlAttribute(i);
+                if (attribute != null) {
+                    validateHtmlAttribute(attribute);
+
+                    currentHtmlTag.attributes.add(attribute);
+
+                    outputPrevented = attribute.bool;
+                } else {
+                    outputPrevented = false;
+                }
             }
         }
     }
@@ -476,14 +490,11 @@ final class TemplateParser {
         }
     }
 
-    private void validateHtmlAttribute( String name ) {
-        if ( name.contains("${") ) {
-            visitor.onError("Illegal attribute name " + name + "! Expressions in attribute names are not allowed.");
+    private void validateHtmlAttribute( HtmlAttribute attribute ) {
+        if ( attribute.name.contains("${") ) {
+            visitor.onError("Illegal attribute name " + attribute.name + "! Expressions in attribute names are not allowed.");
         }
-    }
-
-    private void validateHtmlAttributeQuotes(char quotes) {
-        if (quotes != '\"' && quotes != '\'') {
+        if (attribute.quotes != 0 && attribute.quotes != '\"' && attribute.quotes != '\'') {
             visitor.onError("Unquoted attribute values are not allowed.");
         }
     }
@@ -514,18 +525,30 @@ final class TemplateParser {
         return templateCode.substring(startIndex, index);
     }
 
-    private String parseHtmlAttributeName(int index) {
-        while (Character.isWhitespace(templateCode.charAt(index))) {
-            --index;
+    private HtmlAttribute parseHtmlAttribute(int index) {
+        int nameEndIndex = -1;
+        char quotes = 0;
+        for (int j = index; j < templateCode.length(); ++j) {
+            char c = templateCode.charAt(j);
+
+            if (c == '=') {
+                quotes = parseHtmlAttributeQuotes(j + 1);
+            }
+
+            if (nameEndIndex == -1) {
+                if (c == '=' || c == '/' || c == '>' || Character.isWhitespace(c)) {
+                    nameEndIndex = j;
+                }
+            } else if (!Character.isWhitespace(c)) {
+                break;
+            }
         }
 
-        int endIndex = index--;
-
-        while (!Character.isWhitespace(templateCode.charAt(index))) {
-            --index;
+        if (nameEndIndex == -1) {
+            return null;
         }
 
-        return templateCode.substring(index + 1, endIndex);
+        return new HtmlAttribute(templateCode.substring(index, nameEndIndex), quotes, index);
     }
 
     private char parseHtmlAttributeQuotes(int index) {
@@ -670,15 +693,17 @@ final class TemplateParser {
 
         public final String name;
         public final boolean intercepted;
+        public final int attributeStartIndex;
         public final boolean bodyIgnored;
         public final boolean innerTagsIgnored;
         public final boolean comment;
         public final List<HtmlAttribute> attributes = new ArrayList<>();
         public boolean attributesProcessed;
 
-        public HtmlTag(String name, boolean intercepted) {
+        public HtmlTag(String name, boolean intercepted, int attributeStartIndex) {
             this.name = name;
             this.intercepted = intercepted;
+            this.attributeStartIndex = attributeStartIndex;
             this.bodyIgnored = VOID_HTML_TAGS.contains(name);
             this.comment = "!--".equals(name);
             this.innerTagsIgnored = "script".equals(name) || "style".equals(name);
@@ -697,7 +722,11 @@ final class TemplateParser {
                 return true;
             }
 
-            return currentAttribute.quoteCount != 1;
+            if (currentAttribute.bool && currentAttribute.quotes == 0) {
+                return true;
+            }
+
+            return currentAttribute.quoteCount > 1;
         }
 
         public boolean isCurrentAttributeQuote(char currentChar) {
@@ -711,16 +740,23 @@ final class TemplateParser {
     }
 
     public static class HtmlAttribute {
+        // See https://meiert.com/en/blog/boolean-attributes-of-html/
+        private static final Set<String> BOOLEAN_HTML_ATTRIBUTES = Set.of("allowfullscreen", "allowpaymentrequest", "async", "autofocus", "autoplay", "checked", "controls", "default", "disabled", "formnovalidate", "hidden", "ismap", "itemscope", "loop", "multiple", "muted", "nomodule", "novalidate", "open", "playsinline", "readonly", "required", "reversed", "selected", "truespeed");
+
         public final String name;
         public final char quotes;
+        public final int startIndex;
+        public final boolean bool;
         public String value;
 
         public int quoteCount;
-        public int startIndex;
+        public int valueStartIndex;
 
-        private HtmlAttribute(String name, char quotes) {
+        private HtmlAttribute(String name, char quotes, int startIndex) {
             this.name = name;
             this.quotes = quotes;
+            this.startIndex = startIndex;
+            this.bool = BOOLEAN_HTML_ATTRIBUTES.contains(name);
         }
     }
 }

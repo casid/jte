@@ -529,6 +529,18 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
+        public void onHtmlBooleanAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
+            String javaExpression = extractJavaExpression(htmlAttribute.value);
+            if (javaExpression == null) {
+                onTextPart(depth, htmlAttribute.name);
+            } else {
+                onConditionStart(depth, javaExpression);
+                onCodePart(depth + 1, "\"" + htmlAttribute.name + "\"");
+                onConditionEnd(depth);
+            }
+        }
+
+        @Override
         public void onHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
             writeIndentation(depth);
             javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput);\n");
@@ -548,13 +560,28 @@ public class TemplateCompiler extends TemplateLoader {
                     firstWritten = true;
                 }
                 javaCode.append("\"").append(attribute.name).append("\",");
-                if (attribute.value.startsWith("${") && attribute.value.endsWith("}")) {
-                    javaCode.append(attribute.value.substring(2, attribute.value.length() - 1));
+                String javaExpression = extractJavaExpression(attribute.value);
+                if (javaExpression != null) {
+                    javaCode.append(javaExpression);
                 } else {
                     javaCode.append("\"").append(attribute.value).append("\"");
                 }
             }
             javaCode.append(")");
+        }
+
+        private String extractJavaExpression(String value) {
+            int startIndex = value.indexOf("${");
+            if (startIndex == -1) {
+                return null;
+            }
+
+            int endIndex = value.lastIndexOf('}');
+            if (endIndex == -1) {
+                return null;
+            }
+
+            return value.substring(startIndex + 2, endIndex);
         }
 
         private DebugInfo getCurrentDebugInfo() {

@@ -184,9 +184,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void onMethods() {
-        // TODO
-        // onclick
-        // onmouseover
+        codeResolver.givenCode("template.jte", "@param String name\n\n<span onclick=\"showName('${name}')\">Click me</span>");
+
+        templateEngine.render("template.jte", "'); alert('xss", output);
+
+        assertThat(output.toString()).isEqualTo("\n<span onclick=\"showName('\\x27); alert(\\x27xss')\">Click me</span>");
     }
 
     @Test

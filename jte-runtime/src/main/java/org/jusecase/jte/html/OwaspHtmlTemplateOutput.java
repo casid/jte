@@ -46,7 +46,11 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         }
 
         try {
-            Encode.forHtmlAttribute(getWriter(), value);
+            if (attributeName.startsWith("on")) {
+                Encode.forJavaScriptAttribute(getWriter(), value);
+            } else {
+                Encode.forHtmlAttribute(getWriter(), value);
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

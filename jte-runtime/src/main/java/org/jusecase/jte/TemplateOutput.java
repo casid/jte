@@ -1,5 +1,7 @@
 package org.jusecase.jte;
 
+import org.jusecase.jte.output.TemplateOutputSupplier;
+
 import java.io.Writer;
 
 @SuppressWarnings("unused") // Methods are called by generated templates
@@ -11,6 +13,12 @@ public interface TemplateOutput {
     default void writeContent(Enum<?> value) {
         if (value != null) {
             writeContent(value.toString());
+        }
+    }
+
+    default void writeContent(TemplateOutputSupplier supplier) {
+        if (supplier != null) {
+            supplier.writeContent(this);
         }
     }
 

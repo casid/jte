@@ -13,6 +13,12 @@ public interface HtmlTemplateOutput extends TemplateOutput {
         }
     }
 
+    default void writeTagBodyUserContent(HtmlTemplateOutputSupplier supplier, String tagName) {
+        if (supplier != null) {
+            supplier.writeTagBodyUserContent(this, tagName);
+        }
+    }
+
     default void writeTagBodyUserContent(boolean value, String tagName) {
         writeContent(String.valueOf(value));
     }
@@ -50,6 +56,12 @@ public interface HtmlTemplateOutput extends TemplateOutput {
     default void writeTagAttributeUserContent(Enum<?> value, String tagName, String attributeName) {
         if (value != null) {
             writeContent(value.toString());
+        }
+    }
+
+    default void writeTagAttributeUserContent(HtmlTemplateOutputSupplier supplier, String tagName, String attributeName) {
+        if (supplier != null) {
+            supplier.writeTagAttributeUserContent(this, tagName, attributeName);
         }
     }
 

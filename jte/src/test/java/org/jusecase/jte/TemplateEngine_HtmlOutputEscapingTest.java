@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.jusecase.jte.output.StringOutput;
-import org.jusecase.jte.support.TemplateLocalizer;
+import org.jusecase.jte.html.HtmlTemplateLocalizer;
 
 
 public class TemplateEngine_HtmlOutputEscapingTest {
@@ -442,7 +442,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", Map.of("localizer", new MyLocalizer(), "param", "<script>evil()</script>"), output);
 
-        assertThat(output.toString()).isEqualTo("<span>Hello <i></i>, <b></b>, </span>");
+        assertThat(output.toString()).isEqualTo("<span>Hello <i>{0}</i>, <b>{1}</b>, {2}</span>");
     }
 
     @Test
@@ -479,7 +479,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @SuppressWarnings("unused")
-    public static class MyLocalizer implements TemplateLocalizer {
+    public static class MyLocalizer implements HtmlTemplateLocalizer {
         Map<String, String> resources = Map.of(
                 "no-params", "This is a key without params",
                 "no-params-html", "This is a key without params but with <b>html content</b>",

@@ -1,16 +1,36 @@
-package org.jusecase.jte.support;
+package org.jusecase.jte.html;
 
-import org.jusecase.jte.html.HtmlTemplateOutput;
-import org.jusecase.jte.html.HtmlTemplateOutputSupplier;
 import org.jusecase.jte.output.TemplateOutputSupplier;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public interface TemplateLocalizer {
+public interface HtmlTemplateLocalizer {
     Pattern pattern = Pattern.compile("\\{(\\d+)}");
 
     String lookup(String key);
+
+    @SuppressWarnings("unused") // Called by template code
+    default HtmlTemplateOutputSupplier localize(String key) {
+        String value = lookup(key);
+
+        return new HtmlTemplateOutputSupplier() {
+            @Override
+            public void writeContent(HtmlTemplateOutput output) {
+                output.writeContent(value);
+            }
+
+            @Override
+            public void writeTagBodyUserContent(HtmlTemplateOutput output, String tagName) {
+                output.writeContent(value);
+            }
+
+            @Override
+            public void writeTagAttributeUserContent(HtmlTemplateOutput output, String tagName, String attributeName) {
+                output.writeContent(value);
+            }
+        };
+    }
 
     @SuppressWarnings("unused") // Called by template code
     default HtmlTemplateOutputSupplier localize(String key, Object ... params) {

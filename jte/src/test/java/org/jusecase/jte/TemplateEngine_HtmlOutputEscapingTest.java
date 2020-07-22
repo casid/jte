@@ -405,11 +405,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void localization_noParams() {
         codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
-                "<span>${localizer.localize(\"no-params\")}</span>");
+                "<span alt=\"${localizer.localize(\"no-params\")}\">${localizer.localize(\"no-params\")}</span> $unsafe{localizer.localize(\"no-params\")}");
 
         templateEngine.render("template.jte", localizer, output);
 
-        assertThat(output.toString()).isEqualTo("<span>This is a key without params</span>");
+        assertThat(output.toString()).isEqualTo("<span alt=\"This is a key without params\">This is a key without params</span> This is a key without params");
     }
 
     @Test

@@ -16,6 +16,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     DummyCodeResolver codeResolver = new DummyCodeResolver();
     TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
 
+    HtmlTemplateLocalizer localizer = new MyLocalizer();
     StringOutput output = new StringOutput();
 
     @Test
@@ -382,100 +383,172 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void localization_notFound_noParams() {
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+                "<span>${localizer.localize(\"unknown\")}</span>");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<span></span>");
+    }
+
+    @Test
+    void localization_notFound_withParams() {
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+                "<span>${localizer.localize(\"unknown\", 1)}</span>");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<span></span>");
+    }
+
+    @Test
     void localization_noParams() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
                 "<span>${localizer.localize(\"no-params\")}</span>");
 
-        templateEngine.render("template.jte", new MyLocalizer(), output);
+        templateEngine.render("template.jte", localizer, output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key without params</span>");
     }
 
     @Test
     void localization_html() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
                 "<span>${localizer.localize(\"no-params-html\")}</span>");
 
-        templateEngine.render("template.jte", new MyLocalizer(), output);
+        templateEngine.render("template.jte", localizer, output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key without params but with <b>html content</b></span>");
     }
 
     @Test
     void localization_oneParam() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"one-param\", param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", new MyLocalizer(), "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: &lt;script&gt;evil()&lt;/script&gt;.</span>");
     }
 
     @Test
     void localization_html_oneParam() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"one-param-html\", param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", new MyLocalizer(), "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>&lt;script&gt;evil()&lt;/script&gt;</b>. Including HTML in key!</span>");
     }
 
     @Test
     void localization_inception() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"one-param-html\", localizer.localize(\"one-param-html\", param))}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", new MyLocalizer(), "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>This is a key with user content: <b>&lt;script&gt;evil()&lt;/script&gt;</b>. Including HTML in key!</b>. Including HTML in key!</span>");
     }
 
     @Test
     void localization_manyParams_noneSet() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\")}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", new MyLocalizer(), "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
+
+        assertThat(output.toString()).isEqualTo("<span>Hello <i>{0}</i>, <b>{1}</b>, {2}</span>");
+    }
+
+    @Test
+    void localization_manyParams_primitives() {
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+                "@param String param\n" +
+                "<span>${localizer.localize(\"many-params-html\")}</span>");
+
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "p1", true, "p2", 1, "p3", 2), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello <i>{0}</i>, <b>{1}</b>, {2}</span>");
     }
 
     @Test
     void localization_manyParams_oneSet() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\", param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", new MyLocalizer(), "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello <i>&lt;script&gt;evil()&lt;/script&gt;</i>, <b></b>, </span>");
     }
 
     @Test
     void localization_manyParams_allSame() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\", param, param, param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", new MyLocalizer(), "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello <i>&lt;script&gt;evil()&lt;/script&gt;</i>, <b>&lt;script&gt;evil()&lt;/script&gt;</b>, &lt;script&gt;evil()&lt;/script&gt;</span>");
     }
 
     @Test
     void localization_badPattern() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"bad-pattern\", param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", new MyLocalizer(), "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello {foo}</span>");
+    }
+
+    @Test
+    void localization_primitives() {
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+                "<span>${localizer.localize(\"all-primitives\", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}</span>");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<span>boolean: false, byte: 1, short: 2, int: 3, long: 4, float: 5.0, double: 6.0, char: c</span>");
+    }
+
+    @Test
+    void localization_primitives_inAttribute() {
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+                "<span alt=\"${localizer.localize(\"all-primitives\", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}\"></span>");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<span alt=\"boolean: false, byte: 1, short: 2, int: 3, long: 4, float: 5.0, double: 6.0, char: c\"></span>");
+    }
+
+    @Test
+    void localization_primitives_unsafe() {
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+                "<span>$unsafe{localizer.localize(\"all-primitives\", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}</span>");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<span>boolean: false, byte: 1, short: 2, int: 3, long: 4, float: 5.0, double: 6.0, char: c</span>");
+    }
+
+    @Test
+    void localization_enum() {
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+                "@param org.jusecase.jte.ContentType contentType\n" +
+                "<span alt=\"${localizer.localize(\"enum\", contentType)}\">${localizer.localize(\"enum\", contentType)}</span> Unsafe: $unsafe{localizer.localize(\"enum\", contentType)}");
+
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "contentType", ContentType.Html), output);
+
+        assertThat(output.toString()).isEqualTo("<span alt=\"Content type is: Html\">Content type is: Html</span> Unsafe: Content type is: Html");
     }
 
     @SuppressWarnings("unused")
@@ -486,7 +559,9 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "one-param", "This is a key with user content: {0}.",
                 "one-param-html", "This is a key with user content: <b>{0}</b>. Including HTML in key!",
                 "many-params-html", "Hello <i>{0}</i>, <b>{1}</b>, {2}",
-                "bad-pattern", "Hello {foo}"
+                "bad-pattern", "Hello {foo}",
+                "all-primitives", "boolean: {0}, byte: {1}, short: {2}, int: {3}, long: {4}, float: {5}, double: {6}, char: {7}",
+                "enum", "Content type is: {0}"
         );
 
         @Override

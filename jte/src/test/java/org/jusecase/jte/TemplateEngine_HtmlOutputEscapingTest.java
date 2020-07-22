@@ -273,7 +273,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void inlineStyle() {
-        // TODO
+        // We will probably forbid this by HtmlPolicy, so not needed atm
     }
 
     @Test
@@ -375,11 +375,6 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "ignored", output));
 
         assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 4: @layout calls in <script> blocks are not allowed.");
-    }
-
-    @Test
-    void forbidMoreThanOneOutputPerAttribute() {
-        // TODO check if we really want to do this
     }
 
     @Test

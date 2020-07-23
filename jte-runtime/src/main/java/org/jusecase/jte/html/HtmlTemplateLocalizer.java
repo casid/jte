@@ -17,22 +17,7 @@ public interface HtmlTemplateLocalizer {
             return null;
         }
 
-        return new HtmlTemplateOutputSupplier() {
-            @Override
-            public void writeContent(HtmlTemplateOutput output) {
-                output.writeContent(value);
-            }
-
-            @Override
-            public void writeTagBodyUserContent(HtmlTemplateOutput output, String tagName) {
-                output.writeContent(value);
-            }
-
-            @Override
-            public void writeTagAttributeUserContent(HtmlTemplateOutput output, String tagName, String attributeName) {
-                output.writeContent(value);
-            }
-        };
+        return new HtmlUnescapedTemplateOutputSupplier(value);
     }
 
     @SuppressWarnings("unused") // Called by template code

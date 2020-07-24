@@ -48,9 +48,13 @@ final class TemplateParser {
     }
 
     public void parse() {
+        parse(0);
+    }
+
+    public void parse(int startingDepth) {
         currentMode = Mode.Text;
         stack.push(currentMode);
-        depth = 0;
+        depth = startingDepth;
 
         for (int i = 0; i < templateCode.length(); ++i) {
             previousChar8 = previousChar7;
@@ -88,11 +92,9 @@ final class TemplateParser {
                     pop();
                     lastIndex = i + 1;
                 }
-            } else if (previousChar0 == '$' && currentChar == '{') {
+            } else if (previousChar0 == '$' && currentChar == '{' && currentMode == Mode.Text) {
                 if (!outputPrevented) {
-                    if (currentMode == Mode.Text) {
-                        extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
-                    }
+                    extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
                     lastIndex = i + 1;
                 }
                 push(Mode.Code);
@@ -331,8 +333,10 @@ final class TemplateParser {
             extract(templateCode, lastIndex, templateCode.length(), visitor::onTextPart);
         }
 
-        completeParamsIfRequired();
-        visitor.onComplete();
+        if (type != TemplateType.Content) {
+            completeParamsIfRequired();
+            visitor.onComplete();
+        }
     }
 
     private void extractCodePart(int i) {
@@ -621,7 +625,7 @@ final class TemplateParser {
     }
 
     private void completeParamsIfRequired() {
-        if (!paramsComplete && currentMode != Mode.Param && currentMode != Mode.Import) {
+        if (!paramsComplete && currentMode != Mode.Param && currentMode != Mode.Import && type != TemplateType.Content) {
             visitor.onParamsComplete();
             paramsComplete = true;
         }

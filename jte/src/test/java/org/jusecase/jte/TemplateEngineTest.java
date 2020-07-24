@@ -224,6 +224,14 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tag_content() {
+        givenTag("card", "@param org.jusecase.jte.Content content\n" +
+                "<span>${content}</span>");
+        givenTemplate("@tag.card(@{<b>${model.hello}</b>}, That was a tag!");
+        thenOutputIs("<span><b>Hello</b></span>, That was a tag!");
+    }
+
+    @Test
     void tagWithGenericParam() {
         givenTag("entry", "@param java.util.Map.Entry<String, java.util.List<String>> entry\n" +
                 "${entry.getKey()}: ${entry.getValue().toString()}");

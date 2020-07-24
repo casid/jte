@@ -1,8 +1,6 @@
 package org.jusecase.jte.internal;
 
-import org.jusecase.jte.CodeResolver;
-import org.jusecase.jte.ContentType;
-import org.jusecase.jte.TemplateException;
+import org.jusecase.jte.*;
 import org.jusecase.jte.output.FileOutput;
 
 import java.io.IOException;
@@ -282,6 +280,14 @@ public class TemplateCompiler extends TemplateLoader {
             hasWrittenClass = true;
         }
 
+        private String getContentClass() {
+            if (contentType == ContentType.Html) {
+                return "org.jusecase.jte.html.HtmlContent";
+            } else {
+                return "org.jusecase.jte.Content";
+            }
+        }
+
         private void writeTemplateOutputParam() {
             if (contentType == ContentType.Html) {
                 javaCode.append("org.jusecase.jte.html.HtmlTemplateOutput jteOutput");
@@ -506,7 +512,7 @@ public class TemplateCompiler extends TemplateLoader {
 
             javaCode.append(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
 
-            appendParams(tagName, params);
+            appendParams(depth, tagName, params);
             javaCode.append(");\n");
         }
 
@@ -599,7 +605,7 @@ public class TemplateCompiler extends TemplateLoader {
             return new DebugInfo(classInfo.name, javaCode.getCurrentTemplateLine() + 1);
         }
 
-        private void appendParams(String name, List<String> params) {
+        private void appendParams(int depth, String name, List<String> params) {
             List<ParamInfo> paramInfos = paramOrder.get(name);
             if (paramInfos == null) {
                 throw new IllegalStateException("No parameter information for " + name);
@@ -625,13 +631,36 @@ public class TemplateCompiler extends TemplateLoader {
             for (int i = 0; i < paramCallInfos.length; i++) {
                 ParamCallInfo paramCallInfo = paramCallInfos[i];
                 if (paramCallInfo != null) {
-                    javaCode.append(", ").append(paramCallInfo.data);
+                    appendParam(depth, paramCallInfo.data);
                 } else {
                     ParamInfo paramInfo = paramInfos.get(i);
                     if (paramInfo.defaultValue != null) {
-                        javaCode.append(", ").append(paramInfo.defaultValue);
+                        appendParam(depth, paramInfo.defaultValue);
                     }
                 }
+            }
+        }
+
+        private void appendParam(int depth, String param) {
+            javaCode.append(", ");
+            if (param.startsWith("@{") && param.endsWith("}")) {
+                javaCode.append("new ").append(getContentClass()).append("() {\n");
+
+                writeIndentation(depth + 1);
+                javaCode.append("public void writeTo(");
+                writeTemplateOutputParam();
+                javaCode.append(") {\n");
+
+                TemplateParser parser = new TemplateParser(param.substring(2, param.length() - 1), TemplateType.Content, this, contentType, htmlTags, htmlAttributes);
+                parser.parse(depth + 2);
+
+                writeIndentation(depth + 1);
+                javaCode.append("}\n");
+
+                writeIndentation(depth);
+                javaCode.append("}");
+            } else {
+                javaCode.append(param);
             }
         }
 
@@ -683,7 +712,7 @@ public class TemplateCompiler extends TemplateLoader {
 
             if (!layoutStack.isEmpty()) {
                 LayoutStack stack = layoutStack.pop();
-                appendParams(stack.name, stack.params);
+                appendParams(depth, stack.name, stack.params);
             }
 
             javaCode.append(");\n");

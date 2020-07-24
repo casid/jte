@@ -546,6 +546,32 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         assertThat(output.toString()).isEqualTo("<span alt=\"Content type is: Html\">Content type is: Html</span> Unsafe: Content type is: Html");
     }
 
+    @Test
+    void localization_tag() {
+        codeResolver.givenCode("tag/card.jte", "@param org.jusecase.jte.Content content\n" +
+                    "<span>${content}</span>");
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "@param String name\n" +
+                "@tag.card(content = @{<b>${localizer.localize(\"one-param\", name)}</b>})");
+
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+
+        assertThat(output.toString()).isEqualTo("<span><b>This is a key with user content: &lt;script&gt;.</b></span>");
+    }
+
+    @Test
+    void localization_tag2() {
+        codeResolver.givenCode("tag/card.jte", "@param org.jusecase.jte.Content content\n" +
+                "<span>${content}</span>");
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "@param String name\n" +
+                "@tag.card(content = localizer.localize(\"one-param\", name))");
+
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+
+        assertThat(output.toString()).isEqualTo("<span>This is a key with user content: &lt;script&gt;.</span>");
+    }
+
     @SuppressWarnings("unused")
     public static class MyLocalizer implements LocalizationSupport {
         Map<String, String> resources = Map.of(

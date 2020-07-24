@@ -1,10 +1,10 @@
 package org.jusecase.jte.html;
 
-public final class HtmlUnescapedTemplateOutputSupplier implements HtmlTemplateOutputSupplier {
+public final class HtmlUnescapedContent implements HtmlContent {
 
     private final String value;
 
-    public HtmlUnescapedTemplateOutputSupplier(String value) {
+    public HtmlUnescapedContent(String value) {
         this.value = value;
     }
 

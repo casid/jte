@@ -1,9 +1,9 @@
 package org.jusecase.jte.html;
 
 import org.jusecase.jte.TemplateOutput;
-import org.jusecase.jte.output.TemplateOutputSupplier;
+import org.jusecase.jte.Content;
 
-public interface HtmlTemplateOutputSupplier extends TemplateOutputSupplier {
+public interface HtmlContent extends Content {
     void writeContent(HtmlTemplateOutput output);
 
     void writeTagBodyUserContent(HtmlTemplateOutput output, String tagName);

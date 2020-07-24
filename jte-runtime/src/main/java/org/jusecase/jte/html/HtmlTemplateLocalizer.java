@@ -1,6 +1,6 @@
 package org.jusecase.jte.html;
 
-import org.jusecase.jte.output.TemplateOutputSupplier;
+import org.jusecase.jte.Content;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,23 +11,23 @@ public interface HtmlTemplateLocalizer {
     String lookup(String key);
 
     @SuppressWarnings("unused") // Called by template code
-    default HtmlTemplateOutputSupplier localize(String key) {
+    default HtmlContent localize(String key) {
         String value = lookup(key);
         if (value == null) {
             return null;
         }
 
-        return new HtmlUnescapedTemplateOutputSupplier(value);
+        return new HtmlUnescapedContent(value);
     }
 
     @SuppressWarnings("unused") // Called by template code
-    default HtmlTemplateOutputSupplier localize(String key, Object ... params) {
+    default HtmlContent localize(String key, Object ... params) {
         String value = lookup(key);
         if (value == null) {
             return null;
         }
 
-        return new HtmlTemplateOutputSupplier() {
+        return new HtmlContent() {
             @Override
             public void writeTagBodyUserContent(HtmlTemplateOutput output, String tagName) {
                 process(output, tagName, null);
@@ -71,8 +71,8 @@ public interface HtmlTemplateLocalizer {
                 if (tagName == null && attributeName == null) {
                     if (param instanceof String) {
                         output.writeContent((String) param);
-                    } else if (param instanceof TemplateOutputSupplier) {
-                        output.writeContent((TemplateOutputSupplier) param);
+                    } else if (param instanceof Content) {
+                        output.writeContent((Content) param);
                     } else if (param instanceof Enum) {
                         output.writeContent((Enum<?>) param);
                     } else if (param instanceof Boolean) {
@@ -95,8 +95,8 @@ public interface HtmlTemplateLocalizer {
                 } else if (tagName != null && attributeName == null) {
                     if (param instanceof String) {
                         output.writeTagBodyUserContent((String) param, tagName);
-                    } else if (param instanceof HtmlTemplateOutputSupplier) {
-                        output.writeTagBodyUserContent((HtmlTemplateOutputSupplier) param, tagName);
+                    } else if (param instanceof HtmlContent) {
+                        output.writeTagBodyUserContent((HtmlContent) param, tagName);
                     } else if (param instanceof Enum) {
                         output.writeTagBodyUserContent((Enum<?>) param, tagName);
                     } else if (param instanceof Boolean) {
@@ -119,8 +119,8 @@ public interface HtmlTemplateLocalizer {
                 } else {
                     if (param instanceof String) {
                         output.writeTagAttributeUserContent((String) param, tagName, attributeName);
-                    } else if (param instanceof HtmlTemplateOutputSupplier) {
-                        output.writeTagAttributeUserContent((HtmlTemplateOutputSupplier) param, tagName, attributeName);
+                    } else if (param instanceof HtmlContent) {
+                        output.writeTagAttributeUserContent((HtmlContent) param, tagName, attributeName);
                     } else if (param instanceof Enum) {
                         output.writeTagAttributeUserContent((Enum<?>) param, tagName, attributeName);
                     } else if (param instanceof Boolean) {

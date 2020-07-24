@@ -13,7 +13,7 @@ public interface HtmlTemplateOutput extends TemplateOutput {
         }
     }
 
-    default void writeTagBodyUserContent(HtmlTemplateOutputSupplier supplier, String tagName) {
+    default void writeTagBodyUserContent(HtmlContent supplier, String tagName) {
         if (supplier != null) {
             supplier.writeTagBodyUserContent(this, tagName);
         }
@@ -59,7 +59,7 @@ public interface HtmlTemplateOutput extends TemplateOutput {
         }
     }
 
-    default void writeTagAttributeUserContent(HtmlTemplateOutputSupplier supplier, String tagName, String attributeName) {
+    default void writeTagAttributeUserContent(HtmlContent supplier, String tagName, String attributeName) {
         if (supplier != null) {
             supplier.writeTagAttributeUserContent(this, tagName, attributeName);
         }

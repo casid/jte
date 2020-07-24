@@ -1,7 +1,5 @@
 package org.jusecase.jte;
 
-import org.jusecase.jte.output.TemplateOutputSupplier;
-
 import java.io.Writer;
 
 @SuppressWarnings("unused") // Methods are called by generated templates
@@ -16,7 +14,7 @@ public interface TemplateOutput {
         }
     }
 
-    default void writeContent(TemplateOutputSupplier supplier) {
+    default void writeContent(Content supplier) {
         if (supplier != null) {
             supplier.writeContent(this);
         }

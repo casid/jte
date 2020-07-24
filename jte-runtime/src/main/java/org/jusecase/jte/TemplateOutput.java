@@ -8,47 +8,53 @@ public interface TemplateOutput {
 
     void writeContent(String value);
 
-    default void writeContent(Enum<?> value) {
+    default void writeUserContent(String value) {
+        if (value != null) {
+            writeContent(value);
+        }
+    }
+
+    default void writeUserContent(Enum<?> value) {
         if (value != null) {
             writeContent(value.toString());
         }
     }
 
-    default void writeContent(Content supplier) {
-        if (supplier != null) {
-            supplier.writeContent(this);
+    default void writeUserContent(Content content) {
+        if (content != null) {
+            content.writeTo(this);
         }
     }
 
-    default void writeContent(boolean value) {
+    default void writeUserContent(boolean value) {
         writeContent(String.valueOf(value));
     }
 
-    default void writeContent(byte value) {
+    default void writeUserContent(byte value) {
         writeContent(String.valueOf(value));
     }
 
-    default void writeContent(short value) {
+    default void writeUserContent(short value) {
         writeContent(String.valueOf(value));
     }
 
-    default void writeContent(int value) {
+    default void writeUserContent(int value) {
         writeContent(String.valueOf(value));
     }
 
-    default void writeContent(long value) {
+    default void writeUserContent(long value) {
         writeContent(String.valueOf(value));
     }
 
-    default void writeContent(float value) {
+    default void writeUserContent(float value) {
         writeContent(String.valueOf(value));
     }
 
-    default void writeContent(double value) {
+    default void writeUserContent(double value) {
         writeContent(String.valueOf(value));
     }
 
-    default void writeContent(char value) {
-        writeContent(String.valueOf(value));
+    default void writeUserContent(char value) {
+        writeUserContent(String.valueOf(value));
     }
 }

@@ -19,8 +19,6 @@ public class PrintWriterOutput implements TemplateOutput {
 
     @Override
     public void writeContent(String value) {
-        if (value != null) {
-            writer.write(value);
-        }
+        writer.write(value);
     }
 }

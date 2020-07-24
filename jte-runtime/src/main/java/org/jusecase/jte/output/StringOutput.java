@@ -22,48 +22,41 @@ public class StringOutput extends Writer implements TemplateOutput {
 
     @Override
     public void writeContent(String value) {
-        if (value != null) {
-            stringBuilder.append(value);
-        }
-    }
-
-    @Override
-    public void writeContent(boolean value) {
         stringBuilder.append(value);
     }
 
     @Override
-    public void writeContent(byte value) {
+    public void writeUserContent(boolean value) {
         stringBuilder.append(value);
     }
 
     @Override
-    public void writeContent(short value) {
+    public void writeUserContent(byte value) {
         stringBuilder.append(value);
     }
 
     @Override
-    public void writeContent(int value) {
+    public void writeUserContent(short value) {
         stringBuilder.append(value);
     }
 
     @Override
-    public void writeContent(long value) {
+    public void writeUserContent(int value) {
         stringBuilder.append(value);
     }
 
     @Override
-    public void writeContent(float value) {
+    public void writeUserContent(long value) {
         stringBuilder.append(value);
     }
 
     @Override
-    public void writeContent(double value) {
+    public void writeUserContent(float value) {
         stringBuilder.append(value);
     }
 
     @Override
-    public void writeContent(char value) {
+    public void writeUserContent(double value) {
         stringBuilder.append(value);
     }
 

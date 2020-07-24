@@ -378,31 +378,42 @@ public class TemplateCompiler extends TemplateLoader {
 
         @Override
         public void onCodePart(int depth, String codePart) {
-            writeCodePart(depth, codePart, "jteOutput.writeContent(");
+            writeCodePart(depth, codePart);
         }
 
         @Override
         public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
-            writeCodePart(depth, codePart + ", \"" + tagName + "\"", "jteOutput.writeTagBodyUserContent(");
+            writeIndentation(depth);
+            javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", null);\n");
+
+            writeCodePart(depth, codePart);
         }
 
         @Override
         public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
-            writeCodePart(depth, codePart + ", \"" + tagName + "\", \"" + attributeName + "\"", "jteOutput.writeTagAttributeUserContent(");
+            writeIndentation(depth);
+            javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\");\n");
+
+            writeCodePart(depth, codePart);
         }
 
         @Override
         public void onUnsafeCodePart(int depth, String codePart) {
-            writeCodePart(depth, codePart, "jteOutput.writeContent(");
+            if (contentType == ContentType.Html) {
+                writeIndentation(depth);
+                javaCode.append("jteOutput.setContext(null, null);\n");
+            }
+
+            writeCodePart(depth, codePart);
         }
 
-        private void writeCodePart(int depth, String codePart, String method) {
+        private void writeCodePart(int depth, String codePart) {
             writeIndentation(depth);
             if (nullSafeTemplateCode) {
                 javaCode.append("try {\n");
                 writeIndentation(depth + 1);
             }
-            javaCode.append(method).append(codePart).append(");\n");
+            javaCode.append("jteOutput.writeUserContent(").append(codePart).append(");\n");
             if (nullSafeTemplateCode) {
                 writeIndentation(depth);
                 javaCode.append("} catch (NullPointerException jteOutputNpe) {\n");

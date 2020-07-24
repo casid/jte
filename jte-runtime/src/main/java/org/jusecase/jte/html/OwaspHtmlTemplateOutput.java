@@ -14,12 +14,33 @@ import java.io.Writer;
 public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     private final TemplateOutput templateOutput;
 
+    private String tagName;
+    private String attributeName;
+
     public OwaspHtmlTemplateOutput(TemplateOutput templateOutput) {
         this.templateOutput = templateOutput;
     }
 
     @Override
-    public void writeTagBodyUserContent(String value, String tagName) {
+    public void setContext(String tagName, String attributeName) {
+        this.tagName = tagName;
+        this.attributeName = attributeName;
+    }
+
+    @Override
+    public void writeUserContent(String value) {
+        if (value != null) {
+            if (tagName != null && attributeName != null) {
+                writeTagAttributeUserContent(value);
+            } else if (tagName != null) {
+                writeTagBodyUserContent(value);
+            } else {
+                writeContent(value);
+            }
+        }
+    }
+
+    public void writeTagBodyUserContent(String value) {
         if (value == null) {
             return;
         }
@@ -35,12 +56,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         }
     }
 
-    @Override
-    public void writeTagAttributeUserContent(String value, String tagName, String attributeName) {
-        if (value == null) {
-            return;
-        }
-
+    public void writeTagAttributeUserContent(String value) {
         if ("a".equals(tagName) && "href".equals(attributeName) && StringUtils.containsIgnoreCase(value, "javascript:")) {
             return;
         }

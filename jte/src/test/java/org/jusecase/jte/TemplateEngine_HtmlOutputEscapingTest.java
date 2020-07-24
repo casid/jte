@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.jusecase.jte.output.StringOutput;
-import org.jusecase.jte.html.HtmlTemplateLocalizer;
+import org.jusecase.jte.support.LocalizationSupport;
 
 
 public class TemplateEngine_HtmlOutputEscapingTest {
@@ -16,7 +16,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     DummyCodeResolver codeResolver = new DummyCodeResolver();
     TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
 
-    HtmlTemplateLocalizer localizer = new MyLocalizer();
+    MyLocalizer localizer = new MyLocalizer();
     StringOutput output = new StringOutput();
 
     @Test
@@ -379,7 +379,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_notFound_noParams() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span>${localizer.localize(\"unknown\")}</span>");
 
         templateEngine.render("template.jte", localizer, output);
@@ -389,7 +389,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_notFound_withParams() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span>${localizer.localize(\"unknown\", 1)}</span>");
 
         templateEngine.render("template.jte", localizer, output);
@@ -399,7 +399,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_noParams() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span alt=\"${localizer.localize(\"no-params\")}\">${localizer.localize(\"no-params\")}</span> $unsafe{localizer.localize(\"no-params\")}");
 
         templateEngine.render("template.jte", localizer, output);
@@ -409,7 +409,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_html() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span>${localizer.localize(\"no-params-html\")}</span>");
 
         templateEngine.render("template.jte", localizer, output);
@@ -419,7 +419,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_oneParam() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"one-param\", param)}</span>");
 
@@ -430,7 +430,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_html_oneParam() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"one-param-html\", param)}</span>");
 
@@ -441,7 +441,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_inception() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"one-param-html\", localizer.localize(\"one-param-html\", param))}</span>");
 
@@ -452,7 +452,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_manyParams_noneSet() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\")}</span>");
 
@@ -463,7 +463,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_manyParams_primitives() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\")}</span>");
 
@@ -474,7 +474,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_manyParams_oneSet() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\", param)}</span>");
 
@@ -485,7 +485,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_manyParams_allSame() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\", param, param, param)}</span>");
 
@@ -496,7 +496,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_badPattern() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String param\n" +
                 "<span>${localizer.localize(\"bad-pattern\", param)}</span>");
 
@@ -507,7 +507,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_primitives() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span>${localizer.localize(\"all-primitives\", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}</span>");
 
         templateEngine.render("template.jte", localizer, output);
@@ -517,7 +517,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_primitives_inAttribute() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span alt=\"${localizer.localize(\"all-primitives\", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}\"></span>");
 
         templateEngine.render("template.jte", localizer, output);
@@ -527,7 +527,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_primitives_unsafe() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span>$unsafe{localizer.localize(\"all-primitives\", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}</span>");
 
         templateEngine.render("template.jte", localizer, output);
@@ -537,7 +537,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_enum() {
-        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.html.HtmlTemplateLocalizer localizer\n" +
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param org.jusecase.jte.ContentType contentType\n" +
                 "<span alt=\"${localizer.localize(\"enum\", contentType)}\">${localizer.localize(\"enum\", contentType)}</span> Unsafe: $unsafe{localizer.localize(\"enum\", contentType)}");
 
@@ -547,7 +547,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @SuppressWarnings("unused")
-    public static class MyLocalizer implements HtmlTemplateLocalizer {
+    public static class MyLocalizer implements LocalizationSupport {
         Map<String, String> resources = Map.of(
                 "no-params", "This is a key without params",
                 "no-params-html", "This is a key without params but with <b>html content</b>",

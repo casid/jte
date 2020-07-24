@@ -227,7 +227,7 @@ public class TemplateEngineTest {
     void tag_content() {
         givenTag("card", "@param org.jusecase.jte.Content content\n" +
                 "<span>${content}</span>");
-        givenTemplate("@tag.card(@{<b>${model.hello}</b>}, That was a tag!");
+        givenTemplate("@tag.card(@{<b>${model.hello}</b>}), That was a tag!");
         thenOutputIs("<span><b>Hello</b></span>, That was a tag!");
     }
 

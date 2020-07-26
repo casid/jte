@@ -23,6 +23,8 @@ final class TemplateParser {
     private boolean paramsComplete;
     private boolean outputPrevented;
     private boolean tagClosed;
+    private int startIndex;
+    private int endIndex;
 
     private int lastIndex = 0;
 
@@ -45,6 +47,18 @@ final class TemplateParser {
         this.contentType = contentType;
         this.htmlTags = htmlTags;
         this.htmlAttributes = htmlAttributes;
+
+        this.startIndex = 0;
+        this.endIndex = templateCode.length();
+    }
+
+    public void setStartIndex(int startIndex) {
+        this.startIndex = startIndex;
+        this.lastIndex = startIndex;
+    }
+
+    public void setEndIndex(int endIndex) {
+        this.endIndex = endIndex;
     }
 
     public void parse() {
@@ -56,7 +70,7 @@ final class TemplateParser {
         stack.push(currentMode);
         depth = startingDepth;
 
-        for (int i = 0; i < templateCode.length(); ++i) {
+        for (int i = startIndex; i < endIndex; ++i) {
             previousChar8 = previousChar7;
             previousChar7 = previousChar6;
             previousChar6 = previousChar5;
@@ -333,8 +347,8 @@ final class TemplateParser {
             }
         }
 
-        if (lastIndex < templateCode.length()) {
-            extract(templateCode, lastIndex, templateCode.length(), visitor::onTextPart);
+        if (lastIndex < endIndex) {
+            extract(templateCode, lastIndex, endIndex, visitor::onTextPart);
         }
 
         if (type != TemplateType.Content) {
@@ -523,7 +537,7 @@ final class TemplateParser {
         }
 
         int startIndex = index;
-        while (index < templateCode.length()) {
+        while (index < endIndex) {
             char c = templateCode.charAt(index);
             if (Character.isWhitespace(c) || c == '/' || c == '>') {
                 break;
@@ -536,7 +550,7 @@ final class TemplateParser {
     private HtmlAttribute parseHtmlAttribute(int index) {
         int nameEndIndex = -1;
         char quotes = 0;
-        for (int j = index; j < templateCode.length(); ++j) {
+        for (int j = index; j < endIndex; ++j) {
             char c = templateCode.charAt(j);
 
             if (c == '=') {

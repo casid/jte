@@ -572,6 +572,32 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: &lt;script&gt;.</span>");
     }
 
+    @Test
+    void localization_tag3() {
+        codeResolver.givenCode("tag/card.jte", "@param org.jusecase.jte.Content content\n" +
+                "<span>${content}</span>");
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "@param String name\n" +
+                "@tag.card(content = localizer.localize(\"one-param\", @`<b>${name}</b>`))");
+
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+
+        assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>&lt;script&gt;</b>.</span>");
+    }
+
+    @Test
+    void localization_tag4() {
+        codeResolver.givenCode("tag/card.jte", "@param org.jusecase.jte.Content content\n" +
+                "<span>${content}</span>");
+        codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "@param String name\n" +
+                "@tag.card(content = localizer.localize(\"many-params-html\", @`<span>${name}</span>`, @`<span>${name}</span>`, @`<span>${name}</span>`))");
+
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+
+        assertThat(output.toString()).isEqualTo("<span>Hello <i><span>&lt;script&gt;</span></i>, <b><span>&lt;script&gt;</span></b>, <span>&lt;script&gt;</span></span>");
+    }
+
     @SuppressWarnings("unused")
     public static class MyLocalizer implements LocalizationSupport {
         Map<String, String> resources = Map.of(

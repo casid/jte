@@ -643,22 +643,8 @@ public class TemplateCompiler extends TemplateLoader {
 
         private void appendParam(int depth, String param) {
             javaCode.append(", ");
-            if (param.startsWith("@`") && param.endsWith("`")) {
-                javaCode.append("new ").append(getContentClass()).append("() {\n");
-
-                writeIndentation(depth + 1);
-                javaCode.append("public void writeTo(");
-                writeTemplateOutputParam();
-                javaCode.append(") {\n");
-
-                TemplateParser parser = new TemplateParser(param.substring(2, param.length() - 1), TemplateType.Content, this, contentType, htmlTags, htmlAttributes);
-                parser.parse(depth + 2);
-
-                writeIndentation(depth + 1);
-                javaCode.append("}\n");
-
-                writeIndentation(depth);
-                javaCode.append("}");
+            if (param.contains("@`")) {
+                new ContentParamProcessor(depth, param).process();
             } else {
                 javaCode.append(param);
             }
@@ -749,6 +735,78 @@ public class TemplateCompiler extends TemplateLoader {
 
         public String getCode() {
             return javaCode.getCode();
+        }
+
+        class ContentParamProcessor {
+            private final int depth;
+            private final String param;
+
+            private int startIndex = -1;
+            private int endIndex = -1;
+            private int lastWrittenIndex = -1;
+            private int nestedCount;
+
+            @SuppressWarnings("FieldCanBeLocal")
+            private char previousChar0;
+            private char currentChar;
+
+            ContentParamProcessor(int depth, String param) {
+                this.depth = depth;
+                this.param = param;
+            }
+
+            public void process() {
+                for (int i = 0; i < param.length(); ++i) {
+                    previousChar0 = currentChar;
+                    currentChar = param.charAt(i);
+
+                    if (previousChar0 == '@' && currentChar == '`') {
+                        if (startIndex == -1) {
+                            startIndex = i + 1;
+                        } else {
+                            ++nestedCount;
+                        }
+                    } else if (currentChar == '`') {
+                        if (nestedCount == 0) {
+                            endIndex = i;
+                            writeJavaCode();
+                        } else {
+                            --nestedCount;
+                        }
+                    }
+                }
+
+                if (lastWrittenIndex + 1 < param.length()) {
+                    javaCode.append(param, lastWrittenIndex + 1, param.length());
+                }
+            }
+
+            private void writeJavaCode() {
+                javaCode.append(param, lastWrittenIndex + 1, startIndex - 2);
+
+                javaCode.append("new ").append(getContentClass()).append("() {\n");
+
+                writeIndentation(depth + 1);
+                javaCode.append("public void writeTo(");
+                writeTemplateOutputParam();
+                javaCode.append(") {\n");
+
+                TemplateParser parser = new TemplateParser(param, TemplateType.Content, CodeGenerator.this, contentType, htmlTags, htmlAttributes);
+                parser.setStartIndex(startIndex);
+                parser.setEndIndex(endIndex);
+                parser.parse(depth + 2);
+
+                writeIndentation(depth + 1);
+                javaCode.append("}\n");
+
+                writeIndentation(depth);
+                javaCode.append("}");
+
+                lastWrittenIndex = endIndex;
+
+                startIndex = -1;
+                endIndex = -1;
+            }
         }
     }
 

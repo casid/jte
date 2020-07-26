@@ -44,19 +44,6 @@ public final class Template {
         }
     }
 
-    public void renderMap(TemplateOutput output, HtmlInterceptor htmlInterceptor, Map<String, Object> params, Map<String, String> layoutDefinitions) throws Throwable {
-        try {
-            renderMap.invoke(null, output, htmlInterceptor, (Function<String, Runnable>) definitionName -> () -> {
-                String layoutDefinition = layoutDefinitions.get(definitionName);
-                if (layoutDefinition != null) {
-                    output.writeContent(layoutDefinition);
-                }
-            }, params);
-        } catch (InvocationTargetException e) {
-            throw e.getCause();
-        }
-    }
-
     public ClassLoader getClassLoader() {
         return clazz.getClassLoader();
     }

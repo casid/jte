@@ -205,6 +205,20 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void unsafeInContentBlock() {
+        model.array = new int[]{1, 2, 3};
+        givenTemplate("${@`$unsafe{model.array.length}`}");
+        thenOutputIs("3");
+    }
+
+    @Test
+    void commentInContentBlock() {
+        model.array = new int[]{1, 2, 3};
+        givenTemplate("${@`<%--$unsafe{model.array.length}--%>`}");
+        thenOutputIs("");
+    }
+
+    @Test
     void statement() {
         givenTemplate("!{model.setX(12)}${model.x}");
         thenOutputIs("12");
@@ -448,29 +462,28 @@ public class TemplateEngineTest {
     @Test
     void layout() {
         givenLayout("main", "@param org.jusecase.jte.TemplateEngineTest.Model model\n" +
-                "\n" +
+                "@param org.jusecase.jte.Content content\n" +
+                "@param org.jusecase.jte.Content footer\n" +
                 "<body>\n" +
                 "<b>Welcome to my site - you are on page ${model.x}</b>\n" +
                 "\n" +
                 "<div class=\"content\">\n" +
-                "    @render(content)\n" +
+                "    ${content}\n" +
                 "</div>\n" +
                 "\n" +
                 "<div class=\"footer\">\n" +
-                "    @render(footer)\n" +
+                "    ${footer}\n" +
                 "</div>\n" +
                 "</body>");
 
-        givenTemplate("@layout.main(model)\n" +
-                "    @define(content)\n" +
+        givenTemplate("@layout.main(model, content = @`\n" +
                 "        ${model.hello}, enjoy this great content\n" +
-                "    @enddefine\n" +
-                "    @define(footer)\n" +
+                "    `,\n" +
+                "    footer = @`\n" +
                 "        Come again!\n" +
-                "    @enddefine\n" +
-                "@endlayout");
+                "    `)");
 
-        thenOutputIs("\n" +
+        thenOutputIs(
                 "<body>\n" +
                 "<b>Welcome to my site - you are on page 42</b>\n" +
                 "\n" +
@@ -491,46 +504,51 @@ public class TemplateEngineTest {
     @Test
     void nestedLayouts() {
         givenLayout("main",
-                "<header>@render(header)</header>" +
-                        "<content>@render(content)</content>" +
-                        "<footer>@render(footer)</footer>");
-        givenLayout("mainExtended", "@layout.main()" +
-                "@define(content)" +
-                "@render(contentPrefix)" +
-                "<b>@render(content)</b>" +
-                "@render(contentSuffix)" +
-                "@enddefine" +
-                "@endlayout");
-        givenTemplate("@layout.mainExtended()" +
-                "@define(header)" +
+                "@param org.jusecase.jte.Content header = null\n" +
+                "@param org.jusecase.jte.Content content\n" +
+                "@param org.jusecase.jte.Content footer = null\n" +
+                "@if(header != null)<header>${header}</header>@endif" +
+                "<content>${content}</content>" +
+                "@if(footer != null)<footer>${footer}</footer>@endif");
+        givenLayout("mainExtended",
+                "@param org.jusecase.jte.Content header = null\n" +
+                "@param org.jusecase.jte.Content contentPrefix = null\n" +
+                "@param org.jusecase.jte.Content content\n" +
+                "@param org.jusecase.jte.Content contentSuffix = null\n" +
+                "@param org.jusecase.jte.Content footer = null\n" +
+                "@layout.main(header = header, content = @`" +
+                "@if(contentPrefix != null)${contentPrefix}@endif" +
+                "<b>${content}</b>" +
+                "@if(contentSuffix != null)${contentSuffix}@endif" +
+                "`, footer = footer)");
+        givenTemplate("@layout.mainExtended(" +
+                "header = @`" +
                 "this is the header" +
-                "@enddefine" +
-                "@define(contentPrefix)" +
+                "`," +
+                "contentPrefix = @`" +
                 "<content-prefix>" +
-                "@enddefine" +
-                "@define(content)" +
+                "`," +
+                "content = @`" +
                 "this is the content" +
-                "@enddefine" +
-                "@define(contentSuffix)" +
+                "`, " +
+                "contentSuffix=@`" +
                 "<content-suffix>" +
-                "@enddefine" +
-                "@endlayout");
+                "`)");
 
         thenOutputIs("<header>this is the header</header>" +
-                "<content><content-prefix><b>this is the content</b><content-suffix></content>" +
-                "<footer></footer>");
+                "<content><content-prefix><b>this is the content</b><content-suffix></content>");
     }
 
     @Test
     void layoutWithNamedParams() {
         givenLayout("main",
                 "@param int status = 5\n" +
-                        "@param int duration = -1\n" +
-                        "Hello, @render(content) your status is ${status}, the duration is ${duration}");
+                "@param int duration = -1\n" +
+                "@param org.jusecase.jte.Content content\n" +
+                "Hello, ${content} your status is ${status}, the duration is ${duration}");
 
-        givenTemplate("@layout.main()" +
-                "@define(content)Sir@enddefine" +
-                "@endlayout");
+        givenTemplate("@layout.main(content = @`" +
+                "Sir`)");
 
         thenOutputIs("Hello, Sir your status is 5, the duration is -1");
     }
@@ -540,7 +558,7 @@ public class TemplateEngineTest {
         givenLayout("varargs",
                 "@param String ... values\n" +
                         "@for(String value : values)${value} @endfor");
-        givenTemplate("@layout.varargs(\"Hello\", \"World\")@endlayout");
+        givenTemplate("@layout.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
     }
 
@@ -830,29 +848,28 @@ public class TemplateEngineTest {
     void emptyLayout() {
         givenLayout("test", "");
         givenTemplate(
-                "@layout.test()\n" +
-                "@endlayout");
+                "@layout.test()");
         thenOutputIs("");
     }
 
     @Test
     void compileError0() {
         thenRenderingFailsWithException()
-            .hasMessage("Template not found: test/template.jte");
+            .hasMessage("test/template.jte not found");
     }
 
     @Test
     void compileError1() {
         givenTemplate("@tag.model(model)");
         thenRenderingFailsWithException()
-            .hasMessage("Tag not found: tag/model.jte, referenced at test/template.jte:2");
+            .hasMessage("tag/model.jte not found, referenced at test/template.jte:2");
     }
 
     @Test
     void compileError2() {
         givenTemplate("Hello\n@layout.page(model)");
         thenRenderingFailsWithException()
-                .hasMessage("Layout not found: layout/page.jte, referenced at test/template.jte:3");
+                .hasMessage("layout/page.jte not found, referenced at test/template.jte:3");
     }
 
     @Test
@@ -891,7 +908,7 @@ public class TemplateEngineTest {
     }
 
     private void givenLayout(String name, String code) {
-        dummyCodeResolver.givenCode("layout/" + name + Constants.LAYOUT_EXTENSION, code);
+        dummyCodeResolver.givenCode("layout/" + name + Constants.TAG_EXTENSION, code);
     }
 
     private void thenOutputIs(String expected) {

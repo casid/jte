@@ -167,17 +167,11 @@ public final class TemplateEngine {
      * so that there are no redundant implementations during the migration.
      * @param name the template name relative to the specified root directory, for instance "layout/myLayout.jte".
      * @param params map of parameters that should be passed to the layout.
-     * @param layoutDefinitions map of layout definitions that should be passed to the layout.
      * @param output any implementation of {@link TemplateOutput}, where the template will be written to.
      * @throws TemplateException in case the layout failed to render, containing information where the error happened.
      */
-    public void renderLayout(String name, Map<String, Object> params, Map<String, String> layoutDefinitions, TemplateOutput output) throws TemplateException {
-        Template template = resolveTemplate(name);
-        try {
-            template.renderMap(checkOutput(output), htmlInterceptor, params, layoutDefinitions);
-        } catch (Throwable e) {
-            handleRenderException(name, template, e);
-        }
+    public void renderLayout(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
+        renderTag(name, params, output);
     }
 
     private TemplateOutput checkOutput(TemplateOutput templateOutput) {

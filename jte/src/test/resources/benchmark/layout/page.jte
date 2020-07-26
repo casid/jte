@@ -1,6 +1,8 @@
+@import org.jusecase.jte.Content
 @import org.jusecase.jte.benchmark.Page
 
 @param Page page
+@param Content content
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +23,7 @@
     </div>
     <div class="content">
         <h1>${page.getTitle()}</h1>
-        @render(content)
+        ${content}
     </div>
     <div class="footer">
         This page has ${page.getVisits()} visits already.

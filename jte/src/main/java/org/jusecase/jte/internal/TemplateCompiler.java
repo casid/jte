@@ -87,13 +87,13 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
-        String code = resolveCode(TemplateType.Template, name, null);
+        String code = resolveCode(name, null);
 
         LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
 
         ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
-        CodeGenerator codeGenerator = new CodeGenerator(templateInfo, TemplateType.Template, classDefinitions, templateDependencies);
+        CodeGenerator codeGenerator = new CodeGenerator(templateInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, TemplateType.Template, codeGenerator, contentType, htmlTags, htmlAttributes).parse();
 
         this.templateDependencies.put(name, templateDependencies);
@@ -112,7 +112,7 @@ public class TemplateCompiler extends TemplateLoader {
     private void generateTemplateFromTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
         LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
 
-        ClassInfo templateInfo = generateTag(name, classDefinitions, templateDependencies, null);
+        ClassInfo templateInfo = generateTagOrLayout(TemplateType.Tag, name, classDefinitions, templateDependencies, null);
 
         this.templateDependencies.put(name, templateDependencies);
 
@@ -122,19 +122,11 @@ public class TemplateCompiler extends TemplateLoader {
     private void generateTemplateFromLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
         LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
 
-        ClassInfo templateInfo = generateLayout(name, classDefinitions, templateDependencies, null);
+        ClassInfo templateInfo = generateTagOrLayout(TemplateType.Layout, name, classDefinitions, templateDependencies, null);
 
         this.templateDependencies.put(name, templateDependencies);
 
         templateByClassName.put(templateInfo.name, templateInfo);
-    }
-
-    private ClassInfo generateTag(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
-        return generateTagOrLayout(TemplateType.Tag, name, classDefinitions, templateDependencies, debugInfo);
-    }
-
-    private ClassInfo generateLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
-        return generateTagOrLayout(TemplateType.Layout, name, classDefinitions, templateDependencies, debugInfo);
     }
 
     private ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
@@ -146,11 +138,11 @@ public class TemplateCompiler extends TemplateLoader {
             return classInfo;
         }
 
-        String code = resolveCode(type, name, debugInfo);
+        String code = resolveCode(name, debugInfo);
 
         classDefinitions.add(classDefinition);
 
-        CodeGenerator codeGenerator = new CodeGenerator(classInfo, type, classDefinitions, templateDependencies);
+        CodeGenerator codeGenerator = new CodeGenerator(classInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, type, codeGenerator, contentType, htmlTags, htmlAttributes).parse();
 
         classDefinition.setCode(codeGenerator.getCode());
@@ -163,10 +155,10 @@ public class TemplateCompiler extends TemplateLoader {
         return classInfo;
     }
 
-    private String resolveCode(TemplateType type, String name, DebugInfo debugInfo) {
+    private String resolveCode(String name, DebugInfo debugInfo) {
         String code = codeResolver.resolve(name);
         if (code == null) {
-            String message = type + " not found: " + name;
+            String message = name + " not found";
             if (debugInfo != null) {
                 message += ", referenced at " + debugInfo.name + ":" + debugInfo.line;
             }
@@ -224,19 +216,16 @@ public class TemplateCompiler extends TemplateLoader {
 
     private class CodeGenerator implements TemplateParserVisitor {
         private final ClassInfo classInfo;
-        private final TemplateType type;
         private final CodeBuilder javaCode = new CodeBuilder();
         private final LinkedHashSet<ClassDefinition> classDefinitions;
         private final LinkedHashSet<String> templateDependencies;
         private final List<ParamInfo> parameters = new ArrayList<>();
-        private final Deque<LayoutStack> layoutStack = new ArrayDeque<>();
 
         private boolean hasWrittenPackage;
         private boolean hasWrittenClass;
 
-        private CodeGenerator(ClassInfo classInfo, TemplateType type, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+        private CodeGenerator(ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
             this.classInfo = classInfo;
-            this.type = type;
             this.classDefinitions = classDefinitions;
             this.templateDependencies = templateDependencies;
         }
@@ -272,10 +261,6 @@ public class TemplateCompiler extends TemplateLoader {
             javaCode.append("\tpublic static void render(");
             writeTemplateOutputParam();
             javaCode.append(", org.jusecase.jte.html.HtmlInterceptor jteHtmlInterceptor");
-
-            if (type == TemplateType.Layout) {
-                javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
-            }
 
             hasWrittenClass = true;
         }
@@ -328,9 +313,7 @@ public class TemplateCompiler extends TemplateLoader {
             javaCode.append("\tpublic static void renderMap(");
             writeTemplateOutputParam();
             javaCode.append(", org.jusecase.jte.html.HtmlInterceptor jteHtmlInterceptor");
-            if (type == TemplateType.Layout) {
-                javaCode.append(", java.util.function.Function<String, Runnable> jteLayoutDefinitionLookup");
-            }
+
             javaCode.append(", java.util.Map<String, Object> params) {\n");
             for (ParamInfo parameter : parameters) {
                 if (parameter.varargs) {
@@ -347,9 +330,7 @@ public class TemplateCompiler extends TemplateLoader {
                 }
             }
             javaCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
-            if (type == TemplateType.Layout) {
-                javaCode.append(", jteLayoutDefinitionLookup");
-            }
+
             for (ParamInfo parameter : parameters) {
                 if (parameter.varargs) {
                     continue;
@@ -507,9 +488,10 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
-        public void onTag(int depth, String name, List<String> params) {
-            String tagName = Constants.TAG_DIRECTORY + name.replace('.', '/') + Constants.TAG_EXTENSION;
-            ClassInfo tagInfo = generateTag(tagName, classDefinitions, templateDependencies, getCurrentDebugInfo());
+        public void onTag(int depth, TemplateType type, String name, List<String> params) {
+            String directory = type == TemplateType.Layout ? Constants.LAYOUT_DIRECTORY : Constants.TAG_DIRECTORY;
+            String tagName = directory + name.replace('.', '/') + Constants.TAG_EXTENSION;
+            ClassInfo tagInfo = generateTagOrLayout(type, tagName, classDefinitions, templateDependencies, getCurrentDebugInfo());
 
             writeIndentation(depth);
 
@@ -517,19 +499,6 @@ public class TemplateCompiler extends TemplateLoader {
 
             appendParams(depth, tagName, params);
             javaCode.append(");\n");
-        }
-
-        @Override
-        public void onLayout(int depth, String name, List<String> params) {
-            String layoutName = Constants.LAYOUT_DIRECTORY + name.replace('.', '/') + Constants.LAYOUT_EXTENSION;
-            ClassInfo layoutInfo = generateLayout(layoutName, classDefinitions, templateDependencies, getCurrentDebugInfo());
-
-            writeIndentation(depth);
-            javaCode.append(layoutInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
-
-            javaCode.append(", jteLayoutDefinition -> {\n");
-
-            layoutStack.push(new LayoutStack(layoutName, params));
         }
 
         @Override
@@ -668,47 +637,6 @@ public class TemplateCompiler extends TemplateLoader {
                 }
             }
             throw new IllegalStateException("No parameter with name " + paramCallInfo.name + " is defined in " + name);
-        }
-
-        @Override
-        public void onLayoutRender(int depth, String name) {
-            writeIndentation(depth);
-            javaCode.append("jteLayoutDefinitionLookup.apply(\"").append(name.trim()).append("\").run();\n");
-        }
-
-        @Override
-        public void onLayoutDefine(int depth, String name) {
-            writeIndentation(depth + 1);
-            javaCode.append("if (\"").append(name.trim()).append("\".equals(jteLayoutDefinition)) {\n");
-            writeIndentation(depth + 2);
-            javaCode.append("return () -> {\n");
-        }
-
-        @Override
-        public void onLayoutDefineEnd(int depth) {
-            writeIndentation(depth + 2);
-            javaCode.append("};\n");
-            writeIndentation(depth + 1);
-            javaCode.append("}\n");
-        }
-
-        @Override
-        public void onLayoutEnd(int depth) {
-            writeIndentation(depth + 1);
-            if (type == TemplateType.Layout) {
-                javaCode.append("return jteLayoutDefinitionLookup.apply(jteLayoutDefinition);\n");
-            } else {
-                javaCode.append("return () -> {};\n");
-            }
-            writeIndentation(depth);
-            javaCode.append("}");
-
-            if (!layoutStack.isEmpty()) {
-                LayoutStack stack = layoutStack.pop();
-                appendParams(depth, stack.name, stack.params);
-            }
-
-            javaCode.append(");\n");
         }
 
         private void writeIndentation(int depth) {
@@ -850,16 +778,6 @@ public class TemplateCompiler extends TemplateLoader {
                 name = null;
                 data = param;
             }
-        }
-    }
-
-    private static class LayoutStack {
-        public final String name;
-        public final List<String> params;
-
-        public LayoutStack(String name, List<String> params) {
-            this.name = name;
-            this.params = params;
         }
     }
 }

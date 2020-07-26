@@ -143,17 +143,16 @@ public class TemplateEngine_HtmlInterceptorTest {
     void layout() {
         dummyCodeResolver.givenCode("layout/formContent.jte",
                         "@param String url\n" +
+                        "@param org.jusecase.jte.Content content\n" +
                         "<form action=\"${url}\">\n" +
-                        "@render(content)" +
+                        "${content}" +
                         "</form>");
 
         dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
-                "@layout.formContent(url)\n" +
-                "@define(content)" +
+                "@layout.formContent(url, content = @`" +
                 "<input name=\"param1\"></input>\n" +
                 "<input name=\"param2\"></input>\n" +
-                "@enddefine" +
-                "@endlayout");
+                "`)");
 
         templateEngine.render("page.jte", "hello.htm", output);
 

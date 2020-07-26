@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TemplateEngine_MapParamsTest {
     StringOutput output = new StringOutput();
     Map<String, Object> params = new HashMap<>();
-    Map<String, String> layoutDefinitions = new HashMap<>();
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
     TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, ContentType.Plain);
 
@@ -145,15 +144,16 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void layout_noParamsAndDefinitions() {
-        givenLayout("page", "Hello @render(content)!!");
+        givenLayout("page", "Hello !!");
         whenLayoutIsRendered("layout/page.jte");
         thenOutputIs("Hello !!");
     }
 
     @Test
     void layout_noParamsAndOneDefinition() {
-        givenLayout("page", "Hello @render(content)!!");
-        layoutDefinitions.put("content", "<p>world</p>");
+        givenLayout("page", "@param org.jusecase.jte.Content content\n" +
+                "Hello ${content}!!");
+        params.put("content", (Content) output -> output.writeContent("<p>world</p>"));
 
         whenLayoutIsRendered("layout/page.jte");
 
@@ -163,10 +163,12 @@ public class TemplateEngine_MapParamsTest {
     @Test
     void layout_oneParamAndTwoDefinitions() {
         givenLayout("page", "@param String name\n" +
-                "Hello ${name} @render(content), @render(footer)");
+                        "@param org.jusecase.jte.Content content\n" +
+                        "@param org.jusecase.jte.Content footer\n" +
+                "Hello ${name} ${content}, ${footer}");
         params.put("name", "jte");
-        layoutDefinitions.put("content", "<p>content</p>");
-        layoutDefinitions.put("footer", "<p>footer</p>");
+        params.put("content", (Content) output -> output.writeContent("<p>content</p>"));
+        params.put("footer", (Content) output -> output.writeContent("<p>footer</p>"));
 
         whenLayoutIsRendered("layout/page.jte");
 
@@ -185,7 +187,7 @@ public class TemplateEngine_MapParamsTest {
 
     @SuppressWarnings("SameParameterValue")
     private void givenLayout(String name, String code) {
-        dummyCodeResolver.givenCode("layout/" + name + Constants.LAYOUT_EXTENSION, code);
+        dummyCodeResolver.givenCode("layout/" + name + Constants.TAG_EXTENSION, code);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -200,7 +202,7 @@ public class TemplateEngine_MapParamsTest {
 
     @SuppressWarnings("SameParameterValue")
     private void whenLayoutIsRendered(String name) {
-        templateEngine.renderLayout(name, params, layoutDefinitions, output);
+        templateEngine.renderLayout(name, params, output);
     }
 
     private void thenOutputIs(String expected) {

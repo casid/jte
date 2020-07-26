@@ -5,8 +5,6 @@ import org.jusecase.jte.ContentType;
 import java.util.*;
 
 final class TemplateParser {
-    private static final int LAYOUT_DEFINITION_DEPTH = 2;
-
     private final String templateCode;
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
@@ -29,8 +27,6 @@ final class TemplateParser {
     private int lastIndex = 0;
 
     @SuppressWarnings("FieldCanBeLocal")
-    private char previousChar8;
-    private char previousChar7;
     private char previousChar6;
     private char previousChar5;
     private char previousChar4;
@@ -71,8 +67,6 @@ final class TemplateParser {
         depth = startingDepth;
 
         for (int i = startIndex; i < endIndex; ++i) {
-            previousChar8 = previousChar7;
-            previousChar7 = previousChar6;
             previousChar6 = previousChar5;
             previousChar5 = previousChar4;
             previousChar4 = previousChar3;
@@ -96,7 +90,7 @@ final class TemplateParser {
                 extract(templateCode, lastIndex, i, (depth, content) -> visitor.onParam(new ParamInfo(content.trim())));
                 pop();
                 lastIndex = i + 1;
-            } else if (currentMode != Mode.Comment && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
+            } else if (currentMode != Mode.Comment && currentMode != Mode.Content && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
                 if (currentMode == Mode.Text && paramsComplete) {
                     extract(templateCode, lastIndex, i - 3, visitor::onTextPart);
                 }
@@ -112,10 +106,8 @@ final class TemplateParser {
                     lastIndex = i + 1;
                 }
                 push(Mode.Code);
-            } else if (previousChar6 == '$' && previousChar5 == 'u' && previousChar4 == 'n' && previousChar3 == 's' && previousChar2 == 'a' && previousChar1 == 'f' && previousChar0 == 'e' && currentChar == '{') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
-                }
+            } else if (previousChar6 == '$' && previousChar5 == 'u' && previousChar4 == 'n' && previousChar3 == 's' && previousChar2 == 'a' && previousChar1 == 'f' && previousChar0 == 'e' && currentChar == '{' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
                 lastIndex = i + 1;
                 push(Mode.UnsafeCode);
             } else if (previousChar0 == '!' && currentChar == '{') {
@@ -156,7 +148,7 @@ final class TemplateParser {
                 push(Mode.JavaCode);
             } else if (currentChar == ')' && currentMode.isJava()) {
                 if (currentMode == Mode.JavaCodeParam) {
-                    TagOrLayoutMode previousMode = getPreviousMode(TagOrLayoutMode.class);
+                    TagMode previousMode = getPreviousMode(TagMode.class);
                     extract(templateCode, lastIndex, i, (d, c) -> {
                         if (c != null && !c.isBlank()) {
                             previousMode.params.add(c);
@@ -175,28 +167,21 @@ final class TemplateParser {
                     lastIndex = i + 1;
                     push(Mode.Text);
                 } else if (currentMode instanceof TagMode) {
+                    TagMode tagMode = (TagMode) currentMode;
                     if (contentType == ContentType.Html && currentHtmlTag != null && currentHtmlTag.innerTagsIgnored) {
-                        visitor.onError("@tag calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
+                        visitor.onError("@" + tagMode.type.toString().toLowerCase() + " calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
                     }
 
-                    TagMode tagMode = (TagMode) currentMode;
-                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, tagMode.name.toString(), tagMode.params));
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, tagMode.type, tagMode.name.toString(), tagMode.params));
                     lastIndex = i + 1;
                     pop();
-                } else if (currentMode instanceof LayoutMode) {
-                    if (contentType == ContentType.Html && currentHtmlTag != null && currentHtmlTag.innerTagsIgnored) {
-                        visitor.onError("@layout calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
-                    }
-
-                    LayoutMode layoutMode = (LayoutMode) currentMode;
-                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, layoutMode.name.toString(), layoutMode.params));
                 }
             } else if (previousChar0 == '@' && currentChar == '`' && isContentExpressionAllowed()) {
                 push(Mode.Content);
             } else if (currentChar == '`' && currentMode == Mode.Content) {
                 pop();
             } else if (currentChar == ',' && currentMode == Mode.JavaCodeParam) {
-                TagOrLayoutMode previousMode = getPreviousMode(TagOrLayoutMode.class);
+                TagMode previousMode = getPreviousMode(TagMode.class);
                 extract(templateCode, lastIndex, i, (d, c) -> {
                     if (c != null && !c.isBlank()) {
                         previousMode.params.add(c);
@@ -263,7 +248,13 @@ final class TemplateParser {
                 extract(templateCode, lastIndex, i - 4, visitor::onTextPart);
                 lastIndex = i + 1;
 
-                push(new TagMode());
+                push(new TagMode(TemplateType.Tag));
+                push(Mode.TagName);
+            } else if (previousChar6 == '@' && previousChar5 == 'l' && previousChar4 == 'a' && previousChar3 == 'y' && previousChar2 == 'o' && previousChar1 == 'u' && previousChar0 == 't' && currentChar == '.' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
+                lastIndex = i + 1;
+
+                push(new TagMode(TemplateType.Layout));
                 push(Mode.TagName);
             } else if (currentMode == Mode.TagName) {
                 if (currentChar == '(') {
@@ -271,54 +262,8 @@ final class TemplateParser {
                     push(Mode.JavaCodeParam);
                     lastIndex = i + 1;
                 } else if (currentChar != ' ') {
-                    getPreviousMode(TagOrLayoutMode.class).name.append(currentChar);
+                    getPreviousMode(TagMode.class).name.append(currentChar);
                 }
-            } else if (previousChar6 == '@' && previousChar5 == 'l' && previousChar4 == 'a' && previousChar3 == 'y' && previousChar2 == 'o' && previousChar1 == 'u' && previousChar0 == 't' && currentChar == '.' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
-                lastIndex = i + 1;
-                push(new LayoutMode());
-                push(Mode.TagName);
-            } else if (previousChar8 == '@' && previousChar7 == 'e' && previousChar6 == 'n' && previousChar5 == 'd' && previousChar4 == 'l' && previousChar3 == 'a' && previousChar2 == 'y' && previousChar1 == 'o' && previousChar0 == 'u' && currentChar == 't') {
-                pop();
-                lastIndex = i + 1;
-
-                visitor.onLayoutEnd(depth);
-            } else if (previousChar5 == '@' && previousChar4 == 'd' && previousChar3 == 'e' && previousChar2 == 'f' && previousChar1 == 'i' && previousChar0 == 'n' && currentChar == 'e') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
-                    lastIndex = i + 1;
-                }
-                push(Mode.LayoutDefine);
-            } else if (currentChar == '(' && currentMode == Mode.LayoutDefine) {
-                lastIndex = i + 1;
-            } else if (currentChar == ')' && currentMode == Mode.LayoutDefine) {
-                extract(templateCode, lastIndex, i, visitor::onLayoutDefine);
-                lastIndex = i + 1;
-                push(Mode.Text);
-                depth += LAYOUT_DEFINITION_DEPTH;
-            } else if (previousChar8 == '@' && previousChar7 == 'e' && previousChar6 == 'n' && previousChar5 == 'd' && previousChar4 == 'd' && previousChar3 == 'e' && previousChar2 == 'f' && previousChar1 == 'i' && previousChar0 == 'n' && currentChar == 'e') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 9, visitor::onTextPart);
-                }
-
-                pop();
-                pop();
-                depth -= LAYOUT_DEFINITION_DEPTH;
-                lastIndex = i + 1;
-
-                visitor.onLayoutDefineEnd(depth);
-            } else if (previousChar5 == '@' && previousChar4 == 'r' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'e' && currentChar == 'r') {
-                if (type == TemplateType.Layout && currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
-                    lastIndex = i + 1;
-                }
-                push(Mode.LayoutRender);
-            } else if (currentChar == '(' && currentMode == Mode.LayoutRender) {
-                lastIndex = i + 1;
-            } else if (currentChar == ')' && currentMode == Mode.LayoutRender) {
-                extract(templateCode, lastIndex, i, visitor::onLayoutRender);
-                lastIndex = i + 1;
-                pop();
             } else if (currentMode == Mode.Text && contentType == ContentType.Html) {
                 interceptHtmlTags(i);
             }
@@ -653,8 +598,6 @@ final class TemplateParser {
         Mode ForLoop = new StatelessMode("ForLoop");
         Mode ForLoopCode = new StatelessMode("ForLoopCode");
         Mode TagName = new StatelessMode("TagName");
-        Mode LayoutDefine = new StatelessMode("LayoutDefine");
-        Mode LayoutRender = new StatelessMode("LayoutRender");
         Mode Comment = new StatelessMode("Comment");
         Mode Content = new StatelessMode("Content");
 
@@ -685,20 +628,19 @@ final class TemplateParser {
         }
     }
 
-    private static abstract class TagOrLayoutMode implements Mode {
+    private static class TagMode implements Mode {
+        final TemplateType type;
         final StringBuilder name = new StringBuilder();
         final List<String> params = new ArrayList<>();
+
+        private TagMode(TemplateType type) {
+            this.type = type;
+        }
 
         @Override
         public boolean isJava() {
             return false;
         }
-    }
-
-    private static class TagMode extends TagOrLayoutMode {
-    }
-
-    private static class LayoutMode extends TagOrLayoutMode {
     }
 
     public static class HtmlTag {

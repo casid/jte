@@ -33,17 +33,7 @@ interface TemplateParserVisitor {
 
     void onForLoopEnd(int depth);
 
-    void onTag(int depth, String name, List<String> params);
-
-    void onLayout(int depth, String name, List<String> params);
-
-    void onLayoutRender(int depth, String name);
-
-    void onLayoutDefine(int depth, String name);
-
-    void onLayoutDefineEnd(int depth);
-
-    void onLayoutEnd(int depth);
+    void onTag(int depth, TemplateType type, String name, List<String> params);
 
     void onLineFinished();
 

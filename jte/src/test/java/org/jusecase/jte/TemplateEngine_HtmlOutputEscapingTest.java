@@ -370,7 +370,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void layoutCallInScript() {
         codeResolver.givenCode("layout/snippet.jte", "var x = y;");
-        codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@layout.snippet()\n@endlayout\n}\n</script>");
+        codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@layout.snippet()\n}\n</script>");
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "ignored", output));
 

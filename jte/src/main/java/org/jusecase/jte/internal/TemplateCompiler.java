@@ -643,7 +643,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         private void appendParam(int depth, String param) {
             javaCode.append(", ");
-            if (param.startsWith("@{") && param.endsWith("}")) {
+            if (param.startsWith("@`") && param.endsWith("`")) {
                 javaCode.append("new ").append(getContentClass()).append("() {\n");
 
                 writeIndentation(depth + 1);

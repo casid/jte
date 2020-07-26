@@ -180,6 +180,10 @@ final class TemplateParser {
                     LayoutMode layoutMode = (LayoutMode) currentMode;
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, layoutMode.name.toString(), layoutMode.params));
                 }
+            } else if (previousChar0 == '@' && currentChar == '`' && currentMode == Mode.JavaCodeParam) {
+                push(Mode.Content);
+            } else if (currentChar == '`' && currentMode == Mode.Content) {
+                pop();
             } else if (currentChar == ',' && currentMode == Mode.JavaCodeParam) {
                 TagOrLayoutMode previousMode = getPreviousMode(TagOrLayoutMode.class);
                 extract(templateCode, lastIndex, i, (d, c) -> {
@@ -653,6 +657,7 @@ final class TemplateParser {
         Mode LayoutDefine = new StatelessMode();
         Mode LayoutRender = new StatelessMode();
         Mode Comment = new StatelessMode();
+        Mode Content = new StatelessMode();
 
         boolean isJava();
     }

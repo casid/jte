@@ -552,7 +552,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                     "<span>${content}</span>");
         codeResolver.givenCode("template.jte", "@param org.jusecase.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String name\n" +
-                "@tag.card(content = @{<b>${localizer.localize(\"one-param\", name)}</b>})");
+                "@tag.card(content = @`<b>${localizer.localize(\"one-param\", name)}</b>`)");
 
         templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
 

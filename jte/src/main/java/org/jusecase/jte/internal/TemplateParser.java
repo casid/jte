@@ -194,7 +194,7 @@ final class TemplateParser {
                     LayoutMode layoutMode = (LayoutMode) currentMode;
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, layoutMode.name.toString(), layoutMode.params));
                 }
-            } else if (previousChar0 == '@' && currentChar == '`' && currentMode == Mode.JavaCodeParam) {
+            } else if (previousChar0 == '@' && currentChar == '`' && (currentMode == Mode.Content || currentMode == Mode.JavaCodeParam || currentMode == Mode.Code || currentMode == Mode.CodeStatement)) {
                 push(Mode.Content);
             } else if (currentChar == '`' && currentMode == Mode.Content) {
                 pop();
@@ -273,11 +273,9 @@ final class TemplateParser {
                     visitor.onForLoopEnd(depth);
                     pop();
                 }
-            } else if (previousChar3 == '@' && previousChar2 == 't' && previousChar1 == 'a' && previousChar0 == 'g' && currentChar == '.') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 4, visitor::onTextPart);
-                    lastIndex = i + 1;
-                }
+            } else if (previousChar3 == '@' && previousChar2 == 't' && previousChar1 == 'a' && previousChar0 == 'g' && currentChar == '.' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 4, visitor::onTextPart);
+                lastIndex = i + 1;
 
                 push(new TagMode());
                 push(Mode.TagName);
@@ -289,12 +287,9 @@ final class TemplateParser {
                 } else if (currentChar != ' ') {
                     getPreviousMode(TagOrLayoutMode.class).name.append(currentChar);
                 }
-            } else if (previousChar6 == '@' && previousChar5 == 'l' && previousChar4 == 'a' && previousChar3 == 'y' && previousChar2 == 'o' && previousChar1 == 'u' && previousChar0 == 't' && currentChar == '.') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
-                    lastIndex = i + 1;
-                }
-
+            } else if (previousChar6 == '@' && previousChar5 == 'l' && previousChar4 == 'a' && previousChar3 == 'y' && previousChar2 == 'o' && previousChar1 == 'u' && previousChar0 == 't' && currentChar == '.' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
+                lastIndex = i + 1;
                 push(new LayoutMode());
                 push(Mode.TagName);
             } else if (previousChar8 == '@' && previousChar7 == 'e' && previousChar6 == 'n' && previousChar5 == 'd' && previousChar4 == 'l' && previousChar3 == 'a' && previousChar2 == 'y' && previousChar1 == 'o' && previousChar0 == 'u' && currentChar == 't') {
@@ -654,42 +649,49 @@ final class TemplateParser {
     }
 
     private interface Mode {
-        Mode Import = new StatelessMode();
-        Mode Param = new StatelessMode();
-        Mode Text = new StatelessMode();
-        Mode Code = new StatelessMode();
-        Mode UnsafeCode = new StatelessMode();
-        Mode CodeStatement = new StatelessMode();
-        Mode Condition = new StatelessMode();
-        Mode JavaCode = new StatelessMode(true);
-        Mode JavaCodeParam = new StatelessMode(true);
-        Mode JavaCodeString = new StatelessMode();
-        Mode ConditionElse = new StatelessMode();
-        Mode ForLoop = new StatelessMode();
-        Mode ForLoopCode = new StatelessMode();
-        Mode TagName = new StatelessMode();
-        Mode LayoutDefine = new StatelessMode();
-        Mode LayoutRender = new StatelessMode();
-        Mode Comment = new StatelessMode();
-        Mode Content = new StatelessMode();
+        Mode Import = new StatelessMode("Import");
+        Mode Param = new StatelessMode("Param");
+        Mode Text = new StatelessMode("Text");
+        Mode Code = new StatelessMode("Code");
+        Mode UnsafeCode = new StatelessMode("UnsafeCode");
+        Mode CodeStatement = new StatelessMode("CodeStatement");
+        Mode Condition = new StatelessMode("Condition");
+        Mode JavaCode = new StatelessMode("JavaCode", true);
+        Mode JavaCodeParam = new StatelessMode("JavaCodeParam", true);
+        Mode JavaCodeString = new StatelessMode("JavaCodeString");
+        Mode ConditionElse = new StatelessMode("ConditionElse");
+        Mode ForLoop = new StatelessMode("ForLoop");
+        Mode ForLoopCode = new StatelessMode("ForLoopCode");
+        Mode TagName = new StatelessMode("TagName");
+        Mode LayoutDefine = new StatelessMode("LayoutDefine");
+        Mode LayoutRender = new StatelessMode("LayoutRender");
+        Mode Comment = new StatelessMode("Comment");
+        Mode Content = new StatelessMode("Content");
 
         boolean isJava();
     }
 
     private static class StatelessMode implements Mode {
+        private final String debugName;
         private final boolean java;
 
-        private StatelessMode() {
-            this(false);
+        private StatelessMode(String debugName) {
+            this(debugName, false);
         }
 
-        private StatelessMode(boolean java) {
+        private StatelessMode(String debugName, boolean java) {
+            this.debugName = debugName;
             this.java = java;
         }
 
         @Override
         public boolean isJava() {
             return java;
+        }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "[" + debugName + "]";
         }
     }
 

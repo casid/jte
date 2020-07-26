@@ -419,7 +419,9 @@ public class TemplateCompiler extends TemplateLoader {
                 javaCode.append("try {\n");
                 writeIndentation(depth + 1);
             }
-            javaCode.append("jteOutput.writeUserContent(").append(codePart).append(");\n");
+            javaCode.append("jteOutput.writeUserContent(");
+            writeJavaCodeWithContentSupport(depth, codePart);
+            javaCode.append(");\n");
             if (nullSafeTemplateCode) {
                 writeIndentation(depth);
                 javaCode.append("} catch (NullPointerException jteOutputNpe) {\n");
@@ -437,16 +439,16 @@ public class TemplateCompiler extends TemplateLoader {
                 int index = codePart.indexOf('=');
                 if (index == -1) {
                     javaCode.append("org.jusecase.jte.internal.NullCheck.evaluate(() -> ");
-                    javaCode.append(codePart);
+                    javaCode.append(codePart); // TODO check with @``
                     javaCode.append(")");
                 } else {
                     javaCode.append(codePart, 0, index + 1);
                     javaCode.append(" org.jusecase.jte.internal.NullCheck.evaluate(() -> ");
-                    javaCode.append(codePart, index + 2, codePart.length());
+                    javaCode.append(codePart, index + 2, codePart.length()); // TODO check with @``
                     javaCode.append(")");
                 }
             } else {
-                javaCode.append(codePart);
+                writeJavaCodeWithContentSupport(depth, codePart);
             }
             javaCode.append(";\n");
         }
@@ -587,6 +589,14 @@ public class TemplateCompiler extends TemplateLoader {
             javaCode.append(")");
         }
 
+        private void writeJavaCodeWithContentSupport(int depth, String code) {
+            if (code.contains("@`")) {
+                new ContentProcessor(depth, code).process();
+            } else {
+                javaCode.append(code);
+            }
+        }
+
         private String extractJavaExpression(String value) {
             int startIndex = value.indexOf("${");
             if (startIndex == -1) {
@@ -643,11 +653,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         private void appendParam(int depth, String param) {
             javaCode.append(", ");
-            if (param.contains("@`")) {
-                new ContentParamProcessor(depth, param).process();
-            } else {
-                javaCode.append(param);
-            }
+            writeJavaCodeWithContentSupport(depth, param);
         }
 
         private int getParameterIndex(String name, List<ParamInfo> paramInfos, ParamCallInfo paramCallInfo) {
@@ -737,7 +743,7 @@ public class TemplateCompiler extends TemplateLoader {
             return javaCode.getCode();
         }
 
-        class ContentParamProcessor {
+        class ContentProcessor {
             private final int depth;
             private final String param;
 
@@ -750,7 +756,7 @@ public class TemplateCompiler extends TemplateLoader {
             private char previousChar0;
             private char currentChar;
 
-            ContentParamProcessor(int depth, String param) {
+            ContentProcessor(int depth, String param) {
                 this.depth = depth;
                 this.param = param;
             }

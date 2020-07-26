@@ -644,6 +644,17 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>This is a key with user content: <b><i>&lt;script&gt;</i></b>. Including HTML in key!</b>.</span>");
     }
 
+    @Test
+    void localization_tag8() {
+        codeResolver.givenCode("tag/card.jte", "@param org.jusecase.jte.Content content = @`My default is ${42}`\n" +
+                "<span>${content}</span>");
+        codeResolver.givenCode("template.jte", "@tag.card()");
+
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+
+        assertThat(output.toString()).isEqualTo("<span>My default is 42</span>");
+    }
+
     @SuppressWarnings("unused")
     public static class MyLocalizer implements LocalizationSupport {
         Map<String, String> resources = Map.of(

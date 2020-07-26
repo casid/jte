@@ -194,7 +194,7 @@ final class TemplateParser {
                     LayoutMode layoutMode = (LayoutMode) currentMode;
                     extract(templateCode, lastIndex, i, (d, c) -> visitor.onLayout(d, layoutMode.name.toString(), layoutMode.params));
                 }
-            } else if (previousChar0 == '@' && currentChar == '`' && (currentMode == Mode.Content || currentMode == Mode.JavaCodeParam || currentMode == Mode.Code || currentMode == Mode.CodeStatement)) {
+            } else if (previousChar0 == '@' && currentChar == '`' && isContentExpressionAllowed()) {
                 push(Mode.Content);
             } else if (currentChar == '`' && currentMode == Mode.Content) {
                 pop();
@@ -350,6 +350,10 @@ final class TemplateParser {
             completeParamsIfRequired();
             visitor.onComplete();
         }
+    }
+
+    private boolean isContentExpressionAllowed() {
+        return currentMode == Mode.Content || currentMode == Mode.JavaCodeParam || currentMode == Mode.Code || currentMode == Mode.CodeStatement || currentMode == Mode.Param;
     }
 
     private void extractCodePart(int i) {

@@ -340,7 +340,8 @@ public class TemplateCompiler extends TemplateLoader {
                 javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = (").append(parameter.type);
                 if (parameter.defaultValue != null) {
                     javaCode.append(")params.getOrDefault(\"").append(parameter.name).append("\", ");
-                    javaCode.append(parameter.defaultValue).append(");\n");
+                    writeJavaCodeWithContentSupport(0, parameter.defaultValue);
+                    javaCode.append(");\n");
                 } else {
                     javaCode.append(")params.get(\"").append(parameter.name).append("\");\n");
                 }

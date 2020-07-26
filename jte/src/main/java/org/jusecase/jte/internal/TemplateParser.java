@@ -145,12 +145,9 @@ final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onUnsafeCodePart);
                     lastIndex = i + 1;
                 }
-            } else if (previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 2, visitor::onTextPart);
-                    lastIndex = i + 1;
-                }
-
+            } else if (previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 2, visitor::onTextPart);
+                lastIndex = i + 1;
                 push(Mode.Condition);
             } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
                 lastIndex = i + 1;
@@ -206,20 +203,16 @@ final class TemplateParser {
                     }
                 });
                 lastIndex = i + 1;
-            } else if (previousChar3 == '@' && previousChar2 == 'e' && previousChar1 == 'l' && previousChar0 == 's' && currentChar == 'e' && templateCode.charAt(i + 1) != 'i') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 4, visitor::onTextPart);
-                }
+            } else if (previousChar3 == '@' && previousChar2 == 'e' && previousChar1 == 'l' && previousChar0 == 's' && currentChar == 'e' && templateCode.charAt(i + 1) != 'i' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 4, visitor::onTextPart);
                 lastIndex = i + 1;
 
                 pop();
 
                 visitor.onConditionElse(depth);
                 push(Mode.Text);
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
-                }
+            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
                 lastIndex = i + 1;
 
                 pop();
@@ -230,10 +223,8 @@ final class TemplateParser {
 
                 push(Mode.ConditionElse);
 
-            } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 5, visitor::onTextPart);
-                }
+            } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 5, visitor::onTextPart);
                 lastIndex = i + 1;
 
                 pop();
@@ -242,12 +233,9 @@ final class TemplateParser {
                     visitor.onConditionEnd(depth);
                     pop();
                 }
-            } else if (previousChar2 == '@' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 3, visitor::onTextPart);
-                    lastIndex = i + 1;
-                }
-
+            } else if (previousChar2 == '@' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 3, visitor::onTextPart);
+                lastIndex = i + 1;
                 push(Mode.ForLoop);
             } else if (currentChar == '(' && currentMode == Mode.ForLoop) {
                 lastIndex = i + 1;
@@ -261,10 +249,8 @@ final class TemplateParser {
                     lastIndex = i + 1;
                     push(Mode.Text);
                 }
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
-                }
+            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
                 lastIndex = i + 1;
 
                 pop();

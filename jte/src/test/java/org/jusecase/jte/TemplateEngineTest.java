@@ -141,6 +141,19 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void conditionInContentBlock() {
+        model.x = 0;
+        givenTemplate("x is ${@`@if (model.x > 0)" +
+                "positive!" +
+                "@elseif(model.x < 0)" +
+                "negative!" +
+                "@else" +
+                "zero!" +
+                "@endif`}");
+        thenOutputIs("x is zero!");
+    }
+
+    @Test
     void loop() {
         model.array = new int[]{1, 2, 3};
         givenTemplate("@for (int i : model.array)" +
@@ -180,6 +193,15 @@ public class TemplateEngineTest {
                 "${y}" +
                 "@endfor");
         thenOutputIs("234");
+    }
+
+    @Test
+    void loopInContentBlock() {
+        model.array = new int[]{1, 2, 3};
+        givenTemplate("${@`@for (int i : model.array)" +
+                "${i}" +
+                "@endfor`}");
+        thenOutputIs("123");
     }
 
     @Test

@@ -218,6 +218,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void commentInContentBlock_textBeforeAndAfterIsWritten() {
+        givenTemplate("${@`before<%--$unsafe{model.array.length}--%>after`}");
+        thenOutputIs("beforeafter");
+    }
+
+    @Test
     void variableInContentBlock() {
         givenTemplate("${@`!{var x = 5;}${x}`}");
         thenOutputIs("5");

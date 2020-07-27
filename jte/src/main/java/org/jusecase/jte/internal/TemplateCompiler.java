@@ -729,6 +729,7 @@ public class TemplateCompiler extends TemplateLoader {
                 TemplateParser parser = new TemplateParser(param, TemplateType.Content, CodeGenerator.this, contentType, htmlTags, htmlAttributes);
                 parser.setStartIndex(startIndex);
                 parser.setEndIndex(endIndex);
+                parser.setParamsComplete(true);
                 parser.parse(depth + 2);
 
                 writeIndentation(depth + 1);

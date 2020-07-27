@@ -61,6 +61,10 @@ final class TemplateParser {
         parse(0);
     }
 
+    public void setParamsComplete(boolean paramsComplete) {
+        this.paramsComplete = paramsComplete;
+    }
+
     public void parse(int startingDepth) {
         currentMode = Mode.Text;
         stack.push(currentMode);

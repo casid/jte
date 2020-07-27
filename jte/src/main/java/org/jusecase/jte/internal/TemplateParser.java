@@ -110,10 +110,8 @@ final class TemplateParser {
                 extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
                 lastIndex = i + 1;
                 push(Mode.UnsafeCode);
-            } else if (previousChar0 == '!' && currentChar == '{') {
-                if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
-                }
+            } else if (previousChar0 == '!' && currentChar == '{' && currentMode == Mode.Text) {
+                extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
                 lastIndex = i + 1;
                 push(Mode.CodeStatement);
             } else if (currentChar == '}' && currentMode == Mode.CodeStatement) {

@@ -213,9 +213,14 @@ public class TemplateEngineTest {
 
     @Test
     void commentInContentBlock() {
-        model.array = new int[]{1, 2, 3};
         givenTemplate("${@`<%--$unsafe{model.array.length}--%>`}");
         thenOutputIs("");
+    }
+
+    @Test
+    void variableInContentBlock() {
+        givenTemplate("${@`!{var x = 5;}${x}`}");
+        thenOutputIs("5");
     }
 
     @Test

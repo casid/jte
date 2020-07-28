@@ -29,12 +29,13 @@ class TemplateEngine_TemplateFilesListenerTest {
     private TemplateEngine templateEngine;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() throws Exception {
         tempDirectory = Files.createTempDirectory("temp-code");
         codeResolver = new DirectoryCodeResolver(tempDirectory);
         templateEngine = TemplateEngine.create(codeResolver, ContentType.Plain);
 
-        givenHotReloadIsActivated();
+        codeResolver.startTemplateFilesListener(templateEngine, this::onTemplatesInvalidated);
+        Thread.sleep(100); // Give the listener thread some time to start
     }
 
     @AfterEach
@@ -84,10 +85,6 @@ class TemplateEngine_TemplateFilesListenerTest {
 
     private void thenListenerIsCalledWith(String ... invalidatedTemplateNames) {
         assertThat(templatesInvalidated).containsExactlyInAnyOrder(invalidatedTemplateNames);
-    }
-
-    private void givenHotReloadIsActivated() {
-        codeResolver.startTemplateFilesListener(templateEngine, this::onTemplatesInvalidated);
     }
 
     private void whenFileIsWritten(String name, String content) {

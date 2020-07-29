@@ -1,6 +1,8 @@
 package org.jusecase.jte.internal;
 
 import org.jusecase.jte.ContentType;
+import org.jusecase.jte.html.HtmlPolicy;
+import org.jusecase.jte.html.HtmlPolicyException;
 
 import java.util.*;
 
@@ -9,6 +11,7 @@ final class TemplateParser {
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
     private final ContentType contentType;
+    private final HtmlPolicy htmlPolicy;
     private final String[] htmlTags;
     private final String[] htmlAttributes;
 
@@ -21,6 +24,7 @@ final class TemplateParser {
     private boolean paramsComplete;
     private boolean outputPrevented;
     private boolean tagClosed;
+    private int i;
     private int startIndex;
     private int endIndex;
 
@@ -36,11 +40,12 @@ final class TemplateParser {
     private char previousChar0;
     private char currentChar;
 
-    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, ContentType contentType, String[] htmlTags, String[] htmlAttributes) {
+    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, ContentType contentType, HtmlPolicy htmlPolicy, String[] htmlTags, String[] htmlAttributes) {
         this.templateCode = templateCode;
         this.type = type;
         this.visitor = visitor;
         this.contentType = contentType;
+        this.htmlPolicy = htmlPolicy;
         this.htmlTags = htmlTags;
         this.htmlAttributes = htmlAttributes;
 
@@ -57,20 +62,28 @@ final class TemplateParser {
         this.endIndex = endIndex;
     }
 
-    public void parse() {
-        parse(0);
-    }
-
     public void setParamsComplete(boolean paramsComplete) {
         this.paramsComplete = paramsComplete;
     }
 
+    public void parse() {
+        parse(0);
+    }
+
     public void parse(int startingDepth) {
+        try {
+            doParse(startingDepth);
+        } catch (HtmlPolicyException e) {
+            visitor.onError(e.getMessage());
+        }
+    }
+
+    private void doParse(int startingDepth) {
         currentMode = Mode.Text;
         stack.push(currentMode);
         depth = startingDepth;
 
-        for (int i = startIndex; i < endIndex; ++i) {
+        for (i = startIndex; i < endIndex; ++i) {
             previousChar6 = previousChar5;
             previousChar5 = previousChar4;
             previousChar4 = previousChar3;
@@ -131,7 +144,7 @@ final class TemplateParser {
             } else if (currentChar == '}' && currentMode == Mode.Code) {
                 pop();
                 if (currentMode == Mode.Text && !outputPrevented) {
-                    extractCodePart(i);
+                    extractCodePart();
                 }
             } else if (currentChar == '}' && currentMode == Mode.UnsafeCode) {
                 pop();
@@ -267,7 +280,7 @@ final class TemplateParser {
                     getPreviousMode(TagMode.class).name.append(currentChar);
                 }
             } else if (currentMode == Mode.Text && contentType == ContentType.Html) {
-                interceptHtmlTags(i);
+                interceptHtmlTags();
             }
 
             if (currentChar == '\n') {
@@ -289,20 +302,20 @@ final class TemplateParser {
         return currentMode == Mode.Content || currentMode == Mode.JavaCodeParam || currentMode == Mode.Code || currentMode == Mode.CodeStatement || currentMode == Mode.Param;
     }
 
-    private void extractCodePart(int i) {
+    private void extractCodePart() {
         if (contentType == ContentType.Html) {
-            extractHtmlCodePart(i);
+            extractHtmlCodePart();
         } else {
-            extractPlainCodePart(i);
+            extractPlainCodePart();
         }
         lastIndex = i + 1;
     }
 
-    private void extractPlainCodePart(int i) {
+    private void extractPlainCodePart() {
         extract(templateCode, lastIndex, i, visitor::onCodePart);
     }
 
-    private void extractHtmlCodePart(int i) {
+    private void extractHtmlCodePart() {
         if (currentHtmlTag != null) {
             if (currentHtmlTag.comment) {
                 visitor.onError("Expressions in HTML comments are not allowed.");
@@ -323,13 +336,12 @@ final class TemplateParser {
         extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, "html"));
     }
 
-    private void interceptHtmlTags(int i) {
-        if ( isOpeningHtmlTag(i) ) {
+    private void interceptHtmlTags() {
+        if ( isOpeningHtmlTag() ) {
             String name = parseHtmlTagName(i + 1);
             if (!name.isEmpty()) {
-                validateHtmlTag(name);
-
                 HtmlTag htmlTag = new HtmlTag(name, isHtmlTagIntercepted(name), i + name.length());
+                htmlPolicy.validateHtmlTag(htmlTag);
                 pushHtmlTag(htmlTag);
                 tagClosed = false;
             }
@@ -404,13 +416,17 @@ final class TemplateParser {
                 }
                 tagClosed = true;
             } else if (!currentHtmlTag.attributesProcessed && !Character.isWhitespace(currentChar) && currentChar != '/' && currentHtmlTag.isCurrentAttributeComplete()) {
-                HtmlAttribute attribute = parseHtmlAttribute(i);
+                HtmlAttribute attribute = parseHtmlAttribute();
                 if (attribute != null) {
-                    validateHtmlAttribute(attribute);
+                    htmlPolicy.validateHtmlAttribute(currentHtmlTag, attribute);
 
                     currentHtmlTag.attributes.add(attribute);
 
                     outputPrevented = attribute.bool;
+
+                    if (attribute.bool && attribute.quotes == 0) {
+                        i += attribute.name.length();
+                    }
                 } else {
                     outputPrevented = false;
                 }
@@ -418,12 +434,16 @@ final class TemplateParser {
         }
     }
 
-    private boolean isOpeningHtmlTag(int i) {
+    private boolean isOpeningHtmlTag() {
         if (currentChar != '<') {
             return false;
         }
 
         if (templateCode.startsWith("<%--", i)) {
+            return false;
+        }
+
+        if (templateCode.startsWith("<!", i) && !templateCode.startsWith("<!--", i)) {
             return false;
         }
 
@@ -436,21 +456,6 @@ final class TemplateParser {
         }
 
         return currentHtmlTag.attributesProcessed;
-    }
-
-    private void validateHtmlTag( String name ) {
-        if ( name.contains("${") ) {
-            visitor.onError("Illegal tag name " + name + "! Expressions in tag names are not allowed.");
-        }
-    }
-
-    private void validateHtmlAttribute( HtmlAttribute attribute ) {
-        if ( attribute.name.contains("${") ) {
-            visitor.onError("Illegal attribute name " + attribute.name + "! Expressions in attribute names are not allowed.");
-        }
-        if (attribute.quotes != 0 && attribute.quotes != '\"' && attribute.quotes != '\'') {
-            visitor.onError("Unquoted attribute values are not allowed.");
-        }
     }
 
     private void pushHtmlTag(HtmlTag htmlTag) {
@@ -479,10 +484,10 @@ final class TemplateParser {
         return templateCode.substring(startIndex, index);
     }
 
-    private HtmlAttribute parseHtmlAttribute(int index) {
+    private HtmlAttribute parseHtmlAttribute() {
         int nameEndIndex = -1;
         char quotes = 0;
-        for (int j = index; j < endIndex; ++j) {
+        for (int j = i; j < endIndex; ++j) {
             char c = templateCode.charAt(j);
 
             if (c == '=') {
@@ -502,7 +507,7 @@ final class TemplateParser {
             return null;
         }
 
-        return new HtmlAttribute(templateCode.substring(index, nameEndIndex), quotes, index);
+        return new HtmlAttribute(templateCode.substring(i, nameEndIndex), quotes, i);
     }
 
     private char parseHtmlAttributeQuotes(int index) {
@@ -645,7 +650,7 @@ final class TemplateParser {
         }
     }
 
-    public static class HtmlTag {
+    public static class HtmlTag implements org.jusecase.jte.html.HtmlTag {
 
         // See https://www.lifewire.com/html-singleton-tags-3468620
         private static final Set<String> VOID_HTML_TAGS = Set.of("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
@@ -696,9 +701,14 @@ final class TemplateParser {
 
             return currentChar == currentAttribute.quotes;
         }
+
+        @Override
+        public String getName() {
+            return name;
+        }
     }
 
-    public static class HtmlAttribute {
+    public static class HtmlAttribute implements org.jusecase.jte.html.HtmlAttribute {
         // See https://meiert.com/en/blog/boolean-attributes-of-html/
         private static final Set<String> BOOLEAN_HTML_ATTRIBUTES = Set.of("allowfullscreen", "allowpaymentrequest", "async", "autofocus", "autoplay", "checked", "controls", "default", "disabled", "formnovalidate", "hidden", "ismap", "itemscope", "loop", "multiple", "muted", "nomodule", "novalidate", "open", "playsinline", "readonly", "required", "reversed", "selected", "truespeed");
 
@@ -716,6 +726,21 @@ final class TemplateParser {
             this.quotes = quotes;
             this.startIndex = startIndex;
             this.bool = BOOLEAN_HTML_ATTRIBUTES.contains(name);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public char getQuotes() {
+            return quotes;
+        }
+
+        @Override
+        public boolean isBoolean() {
+            return bool;
         }
     }
 }

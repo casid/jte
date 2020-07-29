@@ -1,6 +1,7 @@
 package org.jusecase.jte.internal;
 
 import org.jusecase.jte.TemplateException;
+import org.jusecase.jte.html.HtmlPolicy;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -73,6 +74,8 @@ public abstract class TemplateLoader {
             throw new TemplateException("Failed to create class loader for " + classDirectory, e);
         }
     }
+
+    public abstract void setHtmlPolicy(HtmlPolicy htmlPolicy);
 
     public abstract void setNullSafeTemplateCode(boolean value);
 

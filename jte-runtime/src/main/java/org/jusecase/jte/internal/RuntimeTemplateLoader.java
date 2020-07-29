@@ -1,5 +1,7 @@
 package org.jusecase.jte.internal;
 
+import org.jusecase.jte.html.HtmlPolicy;
+
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +34,11 @@ public class RuntimeTemplateLoader extends TemplateLoader {
 
     @Override
     public void setNullSafeTemplateCode(boolean value) {
+        // ignored
+    }
+
+    @Override
+    public void setHtmlPolicy(HtmlPolicy htmlPolicy) {
         // ignored
     }
 

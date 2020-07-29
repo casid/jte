@@ -1,5 +1,6 @@
 package org.jusecase.jte;
 
+import org.jusecase.jte.html.HtmlPolicy;
 import org.jusecase.jte.internal.*;
 import org.jusecase.jte.html.HtmlTemplateOutput;
 import org.jusecase.jte.html.OwaspHtmlTemplateOutput;
@@ -250,7 +251,19 @@ public final class TemplateEngine {
     }
 
     /**
-     * Experimental mode, that intercepts the given html tags during template compilation
+     * Policy that checks the parsed HTML at compile time.
+     * @param htmlPolicy the policy
+     * @throws NullPointerException if policy is null
+     */
+    public void setHtmlPolicy(HtmlPolicy htmlPolicy) {
+        if (htmlPolicy == null) {
+            throw new NullPointerException("htmlPolicy must not be null");
+        }
+        templateLoader.setHtmlPolicy(htmlPolicy);
+    }
+
+    /**
+     * Intercepts the given html tags during template compilation
      * and calls the configured htmlInterceptor during template rendering.
      * @param htmlTags tags to be intercepted, for instance setHtmlTags("form", "input");
      */
@@ -259,7 +272,7 @@ public final class TemplateEngine {
     }
 
     /**
-     * Experimental mode, that intercepts the given html attributes for configured htmlTags
+     * Intercepts the given html attributes for configured htmlTags
      * during template compilation and calls the configured htmlInterceptor during template
      * rendering.
      * @param htmlAttributes attributes to be intercepted, for instance setHtmlAttributes("class");

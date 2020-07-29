@@ -1,6 +1,8 @@
 package org.jusecase.jte.internal;
 
 import org.jusecase.jte.*;
+import org.jusecase.jte.html.HtmlPolicy;
+import org.jusecase.jte.html.OwaspHtmlPolicy;
 import org.jusecase.jte.output.FileOutput;
 
 import java.io.IOException;
@@ -20,6 +22,7 @@ public class TemplateCompiler extends TemplateLoader {
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
     private boolean nullSafeTemplateCode;
+    private HtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
     private String[] htmlTags;
     private String[] htmlAttributes;
 
@@ -94,7 +97,7 @@ public class TemplateCompiler extends TemplateLoader {
         ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
         CodeGenerator codeGenerator = new CodeGenerator(templateInfo, classDefinitions, templateDependencies);
-        new TemplateParser(code, TemplateType.Template, codeGenerator, contentType, htmlTags, htmlAttributes).parse();
+        new TemplateParser(code, TemplateType.Template, codeGenerator, contentType, htmlPolicy, htmlTags, htmlAttributes).parse();
 
         this.templateDependencies.put(name, templateDependencies);
 
@@ -143,7 +146,7 @@ public class TemplateCompiler extends TemplateLoader {
         classDefinitions.add(classDefinition);
 
         CodeGenerator codeGenerator = new CodeGenerator(classInfo, classDefinitions, templateDependencies);
-        new TemplateParser(code, type, codeGenerator, contentType, htmlTags, htmlAttributes).parse();
+        new TemplateParser(code, type, codeGenerator, contentType, htmlPolicy, htmlTags, htmlAttributes).parse();
 
         classDefinition.setCode(codeGenerator.getCode());
         templateByClassName.put(classDefinition.getName(), classInfo);
@@ -202,6 +205,11 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public void setNullSafeTemplateCode(boolean nullSafeTemplateCode) {
         this.nullSafeTemplateCode = nullSafeTemplateCode;
+    }
+
+    @Override
+    public void setHtmlPolicy(HtmlPolicy htmlPolicy) {
+        this.htmlPolicy = htmlPolicy;
     }
 
     @Override
@@ -726,7 +734,7 @@ public class TemplateCompiler extends TemplateLoader {
                 writeTemplateOutputParam();
                 javaCode.append(") {\n");
 
-                TemplateParser parser = new TemplateParser(param, TemplateType.Content, CodeGenerator.this, contentType, htmlTags, htmlAttributes);
+                TemplateParser parser = new TemplateParser(param, TemplateType.Content, CodeGenerator.this, contentType, htmlPolicy, htmlTags, htmlAttributes);
                 parser.setStartIndex(startIndex);
                 parser.setEndIndex(endIndex);
                 parser.setParamsComplete(true);

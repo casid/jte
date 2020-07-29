@@ -131,6 +131,13 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void doctype() {
+        codeResolver.givenCode("template.jte", "@param String x\n<!DOCTYPE html>");
+        templateEngine.render("template.jte", (Object)null, output);
+        assertThat(output.toString()).isEqualTo("<!DOCTYPE html>");
+    }
+
+    @Test
     void htmlComment() {
         codeResolver.givenCode("template.jte", "@param String name\n\n<!--Comment here with ${name}-->\n<span>Test</span>");
 
@@ -273,7 +280,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void inlineStyle() {
-        // We will probably forbid this by HtmlPolicy, so not needed atm
+        // TODO We will probably forbid this by HtmlPolicy, so not needed atm
     }
 
     @Test
@@ -365,6 +372,13 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "ignored", output));
 
         assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 4: @tag calls in <script> blocks are not allowed.");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test
+    void customPolicy_null() {
+        Throwable throwable = catchThrowable(() -> templateEngine.setHtmlPolicy(null));
+        assertThat(throwable).isInstanceOf(NullPointerException.class);
     }
 
     @Test

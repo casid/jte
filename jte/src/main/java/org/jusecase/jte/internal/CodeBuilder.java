@@ -17,20 +17,22 @@ final class CodeBuilder {
 
     public CodeBuilder append(String code) {
         javaCode.append(code);
-        if (code.endsWith("\n")) {
-            addLine(currentTemplateLine);
-        }
+        addLines(code, 0, code.length());
         return this;
     }
 
     @SuppressWarnings("UnusedReturnValue")
     public CodeBuilder append(String code, int start, int end) {
         javaCode.append(code, start, end);
+        addLines(code, start, end);
         return this;
     }
 
     public CodeBuilder append(char code) {
         javaCode.append(code);
+        if (code == '\n') {
+            addLine(currentTemplateLine);
+        }
         return this;
     }
 
@@ -97,6 +99,14 @@ final class CodeBuilder {
         Arrays.fill(lineInfo, fromJavaLine, fromJavaLine + count, templateLine);
 
         currentJavaLine += count;
+    }
+
+    private void addLines(String code, int start, int end) {
+        for (int i = start; i < end; ++i) {
+            if (code.charAt(i) == '\n') {
+                addLine(currentTemplateLine);
+            }
+        }
     }
 
     public int[] getLineInfo() {

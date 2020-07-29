@@ -13,6 +13,9 @@ public class OwaspHtmlPolicy implements HtmlPolicy {
         if ( htmlAttribute.getName().contains("${") ) {
             throw new HtmlPolicyException("Illegal attribute name " + htmlAttribute.getName() + "! Expressions in attribute names are not allowed.");
         }
+        if (htmlAttribute.getName().contains("@")) {
+            throw new HtmlPolicyException("Illegal attribute name " + htmlAttribute.getName() + "! Expressions in attribute names are not allowed.");
+        }
         if (!htmlAttribute.isBoolean() && htmlAttribute.getQuotes() != '\"' && htmlAttribute.getQuotes() != '\'') {
             throw new HtmlPolicyException("Unquoted attribute values are not allowed.");
         }

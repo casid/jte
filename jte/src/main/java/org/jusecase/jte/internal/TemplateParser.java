@@ -283,7 +283,7 @@ final class TemplateParser {
                 interceptHtmlTags();
             }
 
-            if (currentChar == '\n') {
+            if (currentChar == '\n' && currentMode != Mode.Content) {
                 visitor.onLineFinished();
             }
         }
@@ -425,7 +425,7 @@ final class TemplateParser {
                     outputPrevented = attribute.bool;
 
                     if (attribute.bool && attribute.quotes == 0) {
-                        i += attribute.name.length();
+                        i += attribute.name.length() - 1;
                     }
                 } else {
                     outputPrevented = false;

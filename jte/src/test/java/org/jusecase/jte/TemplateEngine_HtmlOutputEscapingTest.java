@@ -113,6 +113,34 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void booleanAttributes_noParams2() {
+        codeResolver.givenCode("template.jte", "@param String placeholder\n<input id=\"login-email\" type=\"text\" placeholder=\"${placeholder}\" required>\n<input id=\"login-password\" type=\"password\" placeholder=\"Savecode\" required>");
+
+        templateEngine.render("template.jte", "dummy", output);
+
+        assertThat(output.toString()).isEqualTo("<input id=\"login-email\" type=\"text\" placeholder=\"dummy\" required>\n" +
+                "<input id=\"login-password\" type=\"password\" placeholder=\"Savecode\" required>");
+    }
+
+    @Test
+    void booleanAttributes_condition() {
+        codeResolver.givenCode("template.jte", "@param boolean disabled\n<button class=\"submit cta\" @if(disabled)disabled=\"disabled\"@endif data-item=\"${id}\">Do it</button>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", true, output));
+
+        assertThat(throwable).hasMessage("Failed to compile template.jte, error at line 2: Illegal attribute name @if(disabled)disabled! Expressions in attribute names are not allowed.");
+    }
+
+    @Test
+    void booleanAttributes_withoutCondition() {
+        codeResolver.givenCode("template.jte", "@param boolean disabled\n<button class=\"submit cta\" disabled=\"${disabled}\" data-item=\"id\">Do it</button>");
+
+        templateEngine.render("template.jte", true, output);
+
+        assertThat(output.toString()).isEqualTo("<button class=\"submit cta\" disabled data-item=\"id\">Do it</button>");
+    }
+
+    @Test
     void booleanAttributes_expression1() {
         codeResolver.givenCode("template.jte", "@param String disabled\n<button disabled=\"${\"true\".equals(disabled)}\">Click</button>");
 

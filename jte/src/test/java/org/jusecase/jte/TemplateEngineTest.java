@@ -905,6 +905,20 @@ public class TemplateEngineTest {
                 .hasMessageContaining("model.helloUnknown");
     }
 
+    @Test
+    void compileError5() {
+        givenTag("test", "@param org.jusecase.jte.TemplateEngineTest.Model model\n" +
+                "${\n" +
+                "@`\n" +
+                "This will not compile!\n${model.helloUnknown}\n!!\n" +
+                "`}");
+        givenTemplate("@tag.test(model)");
+        thenRenderingFailsWithException()
+                .hasMessageStartingWith("Failed to compile template, error at tag/test.jte:5\n")
+                .hasMessageContaining("cannot find symbol")
+                .hasMessageContaining("model.helloUnknown");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + Constants.TAG_EXTENSION, code);
     }

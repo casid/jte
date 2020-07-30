@@ -40,11 +40,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         }
     }
 
-    public void writeTagBodyUserContent(String value) {
-        if (value == null) {
-            return;
-        }
-
+    private void writeTagBodyUserContent(String value) {
         try {
             if ("script".equals(tagName)) {
                 Encode.forJavaScriptBlock(getWriter(), value);
@@ -56,7 +52,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         }
     }
 
-    public void writeTagAttributeUserContent(String value) {
+    private void writeTagAttributeUserContent(String value) {
         if ("a".equals(tagName) && "href".equals(attributeName) && StringUtils.containsIgnoreCase(value, "javascript:")) {
             return;
         }

@@ -87,7 +87,7 @@ public abstract class TemplateLoader {
 
     public abstract void cleanAll();
 
-    public abstract void precompileAll(List<String> compilePath);
+    public abstract int precompileAll(List<String> compilePath);
 
     public abstract boolean hasChanged(String name);
 }

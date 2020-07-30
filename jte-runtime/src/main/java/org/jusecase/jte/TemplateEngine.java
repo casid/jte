@@ -216,17 +216,19 @@ public final class TemplateEngine {
 
     /**
      * Compiles all templates located in the sources directory, to the compiled template classes directory.
+     * @return amount of templates that were compiled
      */
-    public void precompileAll() {
-        precompileAll(null);
+    public int precompileAll() {
+        return precompileAll(null);
     }
 
     /**
      * Compiles all templates located in the sources directory, to the compiled template classes directory.
      * @param compilePath additional compile path arguments for the Java compiler.
+     * @return amount of templates that were compiled
      */
-    public void precompileAll(List<String> compilePath) {
-        templateLoader.precompileAll(compilePath);
+    public int precompileAll(List<String> compilePath) {
+        return templateLoader.precompileAll(compilePath);
     }
 
     private Template resolveTemplate(String name) {

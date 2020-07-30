@@ -45,19 +45,21 @@ public class CompilerMojo extends AbstractMojo {
     @Override
     public void execute() {
 
+        long start = System.nanoTime();
+
         Path source = Path.of(sourceDirectory);
         Path target = Path.of(targetDirectory);
 
-        long start = System.nanoTime();
         getLog().info("Precompiling jte templates found in " + source);
 
         TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target, ContentType.valueOf(contentType));
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);
 
+        int amount;
         try {
             templateEngine.cleanAll();
-            templateEngine.precompileAll(compilePath);
+            amount = templateEngine.precompileAll(compilePath);
         } catch (Exception e) {
             getLog().error("Failed to precompile templates.");
             getLog().error(e);
@@ -67,6 +69,6 @@ public class CompilerMojo extends AbstractMojo {
 
         long end = System.nanoTime();
         long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
-        getLog().info("Successfully precompiled jte templates in " + duration + "s to " + target);
+        getLog().info("Successfully precompiled " + amount + " jte file" + (amount == 1 ? "" : "s") + " in " + duration + "s to " + target);
     }
 }

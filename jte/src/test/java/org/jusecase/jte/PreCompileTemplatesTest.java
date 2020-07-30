@@ -21,11 +21,12 @@ public class PreCompileTemplatesTest {
     void precompileAll() {
         TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Path.of("src/test/resources/benchmark")), Path.of("jte-classes"), ContentType.Plain);
         templateEngine.cleanAll();
-        templateEngine.precompileAll();
+        int amount = templateEngine.precompileAll();
 
         StringOutput output = new StringOutput();
         templateEngine.render("welcome.jte", new WelcomePage(12), output);
         assertThat(output.toString()).contains("This page has 12 visits already.");
+        assertThat(amount).isEqualTo(2);
     }
 
     @Test

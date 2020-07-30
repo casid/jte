@@ -52,11 +52,11 @@ public class TemplateCompiler extends TemplateLoader {
         IoUtils.deleteDirectoryContent(classDirectory);
     }
 
-    public void precompileAll(List<String> compilePath) {
-        precompile(codeResolver.resolveAllTemplateNames(), compilePath);
+    public int precompileAll(List<String> compilePath) {
+        return precompile(codeResolver.resolveAllTemplateNames(), compilePath);
     }
 
-    public void precompile(List<String> names, List<String> compilePath) {
+    public int precompile(List<String> names, List<String> compilePath) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
             switch (getTemplateType(name)) {
@@ -87,6 +87,8 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         ClassFilesCompiler.compile(files, compilePath, classDirectory, templateByClassName);
+
+        return files.length;
     }
 
     private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {

@@ -9,9 +9,10 @@ jte is a simple, yet powerful template engine for Java. All jte templates are co
 ## Features
 - Intuitive, easy to learn [syntax](DOCUMENTATION.md).
 - Blazing fast execution, about [100k templates rendered per second](#performance) on a MacBook Pro 2015.
-- Small footprint, no external dependencies. The jar is ~60 KB.
+- Very small footprint, just <a href="https://github.com/OWASP/owasp-java-encoder/">one external dependency for output escaping</a>.
 - <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offering completion and refactoring support.
 - Hot reloading of templates during development.
+- Compile time checked, context-sensitive, high performance HTML output escaping (since 0.8.0).
 
 ## TLDR
 

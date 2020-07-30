@@ -43,13 +43,15 @@ So what is going on here?
 - `@import` directly translates to Java imports, in this case so that `org.example.Page` is known to the template.
 - `@param Page page` is the parameter that needs to be passed to this template.
 - `@if`/`@endif` is an if-block. The stuff inside the braces (`page.getDescription() != null`) is plain Java code. @JSP users: Yes, there is `@elseif()` and `@else` in jte ❤️.
-- `${}` finally writes to the underlying template output, as known from various other template engines.
+- `${}` writes to the underlying template output, as known from various other template engines.
 
 To render this template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):
 ```java
 CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This is the directory where your .jte files are located.
-TemplateEngine templateEngine = TemplateEngine.create(codeResolver);
+TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html); // Two choices: Plain or Html
 ```
+
+The content type passed to the engine, determines how user output will be escaped. If you render HTML files `Html` is highly recommended. This enables the engine to analyse HTML templates at compile time and perform context sensitive output escaping of user data, to prevent you from XSS attacks.
 
 With the `TemplateEngine` ready, templates are rendered like this:
 ```java
@@ -60,7 +62,7 @@ System.out.println(output);
 
 > Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required.
 
-In most cases you have multiple pages that share a lot of common html. This is where jte layouts shine! 
+In most cases you have multiple pages that share a lot of common html. This is where jte layouts are very helpful!
 
 > All layouts must be created in a directory called `layout` in your template root directory.
 
@@ -68,8 +70,10 @@ Let's move stuff from our example page to `layout/page.jte`:
 
 ```htm
 @import org.example.Page
+@import org.jusecase.jte.Content
 
 @param Page page
+@param Content content
 
 <head>
     @if(page.getDescription() != null)
@@ -79,23 +83,23 @@ Let's move stuff from our example page to `layout/page.jte`:
 </head>
 <body>
     <h1>${page.getTitle()}</h1>
-    @render(content)
+    ${content}
 </body>
 ```
 
-`@render` is what makes layouts very powerful. The `@render(content)` is a placeholder that can be provided by callers of the template. Let's refactor `example.jte` to use the new layout:
+The `@param Content content` is a placeholder that can be provided by callers of the template. `${content}` renders this placeholder. Let's refactor `example.jte` to use the new layout:
 
 ```htm
 @import org.example.Page
 
 @param Page page
 
-@layout.page(page)
-    @define(content)
-        <p>Welcome to my example page!</p>
-    @enddefine
-@endlayout
+@layout.page(page = page, content = @`
+    <p>Welcome to my example page!</p>
+`)
 ```
+
+The shorthand to create content blocks within jte templates is an `@`followed by two backticks. For advanced stuff, you can even create a `Content` implementation by calling a Java method!
 
 Check out the [syntax documentation](DOCUMENTATION.md), for a more comprehensive introduction.
 
@@ -113,13 +117,13 @@ jte is available on <a href="http://mvnrepository.com/artifact/org.jusecase/jte"
 <dependency>
     <groupId>org.jusecase</groupId>
     <artifactId>jte</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.0</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-compile group: 'org.jusecase', name: 'jte', version: '0.7.0'
+compile group: 'org.jusecase', name: 'jte', version: '0.8.0'
 ```
 
 No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)

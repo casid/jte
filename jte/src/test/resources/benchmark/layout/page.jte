@@ -17,7 +17,7 @@
 
 <body>
     <div class="menu">
-        @for (org.jusecase.jte.benchmark.MenuItem menuItem : page.getMenu())
+        @for (var menuItem : page.getMenu())
             <a href="${menuItem.url}">${menuItem.name}</a>
         @endfor
     </div>

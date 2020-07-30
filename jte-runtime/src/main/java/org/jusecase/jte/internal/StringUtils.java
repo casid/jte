@@ -1,14 +1,22 @@
 package org.jusecase.jte.internal;
 
 public class StringUtils {
-    public static boolean containsIgnoreCase(String str, String searchStr) {
-        final int len = searchStr.length();
-        final int max = str.length() - len;
-        for (int i = 0; i <= max; i++) {
-            if (str.regionMatches(true, i, searchStr, 0, len)) {
-                return true;
+    public static boolean startsWithIgnoringCaseAndWhitespaces(String url, String protocol) {
+        int j = 0;
+        for (int i = 0; i < url.length() && j < protocol.length(); ++i) {
+            char c = url.charAt(i);
+
+            if (j == 0 && Character.isWhitespace(c)) {
+                continue;
+            }
+
+            char p =  protocol.charAt(j++);
+
+            if (p != Character.toLowerCase(c)) {
+                return false;
             }
         }
-        return false;
+
+        return true;
     }
 }

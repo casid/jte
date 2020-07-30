@@ -53,7 +53,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     }
 
     private void writeTagAttributeUserContent(String value) {
-        if ("a".equals(tagName) && "href".equals(attributeName) && StringUtils.containsIgnoreCase(value, "javascript:")) {
+        if ("a".equals(tagName) && "href".equals(attributeName) && StringUtils.startsWithIgnoringCaseAndWhitespaces(value, "javascript:")) {
             return;
         }
 

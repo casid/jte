@@ -393,6 +393,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void javascriptUrl_mixedcase() {
+        codeResolver.givenCode("template.jte", "@param String url\n<a href=\"${url}\">Click me!</a>");
+
+        templateEngine.render("template.jte", " \n\t jAvaScRipT:alert(1)", output);
+
+        assertThat(output.toString()).isEqualTo("<a href=\"\">Click me!</a>");
+    }
+
+    @Test
     void tagCallInScript() {
         codeResolver.givenCode("tag/snippet.jte", "var x = y;");
         codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@tag.snippet()\n}\n</script>");

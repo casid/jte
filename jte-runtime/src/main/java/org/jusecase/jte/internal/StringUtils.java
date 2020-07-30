@@ -19,4 +19,13 @@ public class StringUtils {
 
         return true;
     }
+
+    public static boolean containsUpperCase(String string) {
+        for (int i = 0; i < string.length(); ++i) {
+            if (Character.isUpperCase(string.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

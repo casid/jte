@@ -46,7 +46,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "br", output));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Illegal tag name ${tag}! Expressions in tag names are not allowed.");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Illegal HTML tag name ${tag}! Expressions in HTML tag names are not allowed.");
     }
 
     @Test
@@ -64,7 +64,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "class", output));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Illegal attribute name ${attribute}! Expressions in attribute names are not allowed.");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Illegal HTML attribute name ${attribute}! Expressions in HTML attribute names are not allowed.");
     }
 
     @Test
@@ -128,7 +128,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", true, output));
 
-        assertThat(throwable).hasMessage("Failed to compile template.jte, error at line 2: Illegal attribute name @if(disabled)disabled! Expressions in attribute names are not allowed.");
+        assertThat(throwable).hasMessage("Failed to compile template.jte, error at line 2: Illegal HTML attribute name @if(disabled)disabled! Expressions in HTML attribute names are not allowed.");
     }
 
     @Test
@@ -317,7 +317,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "test", output));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Unquoted attribute values are not allowed.");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Unquoted HTML attribute values are not allowed.");
     }
 
     @Test
@@ -372,6 +372,24 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", Collections.singletonMap("type", null), output);
 
         assertThat(output.toString()).isEqualTo("<div data-type=\"\"></div>");
+    }
+
+    @Test
+    void uppercaseTag() {
+        codeResolver.givenCode("template.jte", "@param String url\n<A href=\"${url}\">Click me!</A>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "javascript:alert(1)", output));
+
+        assertThat(throwable.getMessage()).isEqualTo("Failed to compile template.jte, error at line 2: HTML tags are expected to be lowercase.");
+    }
+
+    @Test
+    void uppercaseAttribute() {
+        codeResolver.givenCode("template.jte", "@param String url\n<a HREF=\"${url}\">Click me!</a>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "javascript:alert(1)", output));
+
+        assertThat(throwable.getMessage()).isEqualTo("Failed to compile template.jte, error at line 2: HTML attributes are expected to be lowercase.");
     }
 
     @Test

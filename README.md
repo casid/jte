@@ -18,7 +18,7 @@ jte is a simple, yet powerful template engine for Java. All jte templates are co
 
 jte is a lot of fun to work with! Have a look how it feels like in IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
 
-<img alt="jte in IntelliJ" src="jte-intellij.gif" width="50%" />
+<img alt="jte in IntelliJ" src="jte-intellij.gif" />
 
 ## 5 minutes example
 

@@ -10,7 +10,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
   - [Loops](#loops)
 - [Comments](#comments)
 - [Tags](#tags)
-- [Layouts](#layouts)
+- [Content](#content)
 - [Hot Reloading](#hot-reloading)
 - [Precompiling Templates](#precompiling-templates)
 - [Output Escaping](#output-escaping)
@@ -21,7 +21,7 @@ To render any template, an instance of `TemplateEngine` is required. Typically y
 
 ```java
 CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This is the directory where your .jte files are located.
-TemplateEngine templateEngine = TemplateEngine.create(codeResolver);
+TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
 ```
 
 With the TemplateEngine ready, templates are rendered like this:
@@ -41,25 +41,10 @@ Where `output` specifies where the template is rendered to and `model` is the da
 A minimal template would look like this.
 
 ```xml
-@import my.Model
-@param Model model
-
 Hello world!
 ```
 
-Behind the scenes, this will be translated to the following Java class:
-
-```java
-package org.jusecase.jte.generated.test;
-import my.Model;
-public final class JteexampleGenerated implements org.jusecase.jte.internal.Template<Model> {
-    public void render(Model model, org.jusecase.jte.TemplateOutput output) {
-        output.writeStaticContent("Hello world!");
-    }
-}
-```
-
-As you can see, all the heavy lifting is eventually done by Java, in a very transparent way.
+Rendering it with `templateEngine.render("example.jte", null, output);` will return `Hello world!`.
 
 
 ## Displaying data
@@ -82,27 +67,11 @@ public class Model {
 }
 ```
 
-The output of the above template would be `Hello jte!`. Behind the scenes, the following Java would be generated from this template:
-
-```java
-package org.jusecase.jte.generated.test;
-import my.Model;
-public final class JtetemplateGenerated implements org.jusecase.jte.internal.Template<Model> {
-    public void render(org.jusecase.jte.TemplateOutput output, Model model) {
-        output.writeStaticContent("Hello ");
-        output.writeUserContent(model.name);
-        output.writeStaticContent("!");
-    }
-}
-```
-
-Note the difference of static and user content. All static parts of a template are considered safe and must not be escaped. All dynamic parts are considered unsafe to avoid cross-site scripting (XSS) attacks.
-
-> **Caution!** All core `TemplateOutput` implementations make **no difference** between handling static and user content. Output escaping comes in many flavours and jte doesn't want to force an opinion on you. See the section [Output Escaping](#output-escaping) for more details.
+The output of the above template would be `Hello jte!`.
 
 ## Control structures
 
-jte provides convenient shortcuts for common Java control structures, such as conditional statements and loops. These shortcuts provide a very clean, terse way of working with Java control structures, while also remaining familiar to their Java counterparts.
+jte provides convenient shortcuts for common Java control structures, such as conditional statements and loops. These shortcuts provide a very clean, terse way of working with  control structures, while also remaining familiar to their Java counterparts.
 
 ### If Statements
 
@@ -239,16 +208,19 @@ And call it like this:
 @tag.list(title = "Things to do", "Cook dinner", "Eat", "Netflix and Chill")
 ```
 
-## Layouts
+## Content
 
-Layouts provide all features of tags, plus render sections. They are particularly useful to share structure between different templates. All layouts must be located within the `layout` directory in the jte root directory.
+`org.jusecase.jte.Content` is a special parameter type to pass template code to tags, much like lambdas in Java. They are particularly useful to share structure between different templates.
 
-Here is an example layout, located in `layout/page.jte`
+Here is an example tag with a content block:
 
 ```htm
 @import org.example.Page
+@import org.jusecase.jte.Content
 
 @param Page page
+@param Content content
+@param Content footer = null
 
 <head>
     @if(page.getDescription() != null)
@@ -259,28 +231,31 @@ Here is an example layout, located in `layout/page.jte`
 <body>
     <h1>${page.getTitle()}</h1>
     <div class="content">
-        @render(content)
+        ${content}
     </div>
-    <div class="footer">
-        @render(footer)
-    </div>
+    @if (footer != null)
+        <div class="footer">
+            ${footer}
+        </div>
+    @endif
 </body>
 ```
 
-Layouts are called like tags, but you can define what content should be put in the `@render` slots declared in the layout. Here is an example using the above page layout:
+The shorthand to create content blocks within jte templates is an `@`followed by two backticks. Let's call the tag we just created and pass a a page content and footer:
 
 ```htm
 @import org.example.WelcomePage
 @param WelcomePage welcomePage
 
-@layout.page(welcomePage)
-    @define(content)
+@tag.page(
+    page = welcomePage,
+    content = @`
         <p>Welcome, ${welcomePage.getUserName()}.</p>
-    @enddefine
-    @define(footer)
+    `,
+    footer = @`
         <p>Thanks for visiting, come again soon!</p>
-    @enddefine
-@endlayout
+    `
+)
 ```
 
 ## Hot Reloading

@@ -52,7 +52,7 @@ CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This i
 TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html); // Two choices: Plain or Html
 ```
 
-The content type passed to the engine, determines how user output will be escaped. If you render HTML files `Html` is highly recommended. This enables the engine to analyse HTML templates at compile time and perform context sensitive output escaping of user data, to prevent you from XSS attacks.
+The content type passed to the engine, determines how user output will be escaped. If you render HTML files, `Html` is highly recommended. This enables the engine to analyse HTML templates at compile time and perform context sensitive output escaping of user data, to prevent you from XSS attacks.
 
 With the `TemplateEngine` ready, templates are rendered like this:
 ```java
@@ -63,11 +63,11 @@ System.out.println(output);
 
 > Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required.
 
-In most cases you have multiple pages that share a lot of common html. This is where jte layouts are very helpful!
+`example.jte` works, but imagine you have more than one page. You would have to duplicate a lot of shared template code. Let's extract the shared code into a tag. Tags are template snippets that can be called by other templates.
 
-> All layouts must be created in a directory called `layout` in your template root directory.
+> All tags must be created in a directory called `tag` in your template root directory.
 
-Let's move stuff from our example page to `layout/page.jte`:
+Let's move stuff from our example page to `tag/page.jte`:
 
 ```htm
 @import org.example.Page
@@ -88,19 +88,19 @@ Let's move stuff from our example page to `layout/page.jte`:
 </body>
 ```
 
-The `@param Content content` is a placeholder that can be provided by callers of the template. `${content}` renders this placeholder. Let's refactor `example.jte` to use the new layout:
+The `@param Content content` is a content block that can be provided by callers of the template. `${content}` renders this content block. Let's refactor `example.jte` to use the new tag:
 
 ```htm
 @import org.example.Page
 
 @param Page page
 
-@layout.page(page = page, content = @`
+@tag.page(page = page, content = @`
     <p>Welcome to my example page!</p>
 `)
 ```
 
-The shorthand to create content blocks within jte templates is an `@`followed by two backticks. For advanced stuff, you can even create a `Content` implementation by calling a Java method!
+The shorthand to create content blocks within jte templates is an `@`followed by two backticks. For advanced stuff, you can even create Java methods that return custom `Content` implementation and call it from your template code!
 
 Check out the [syntax documentation](DOCUMENTATION.md), for a more comprehensive introduction.
 

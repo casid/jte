@@ -293,7 +293,7 @@ To do this, you need to create a `TemplateEngine` with the `createPrecompiled` f
 ```java
 Path targetDirectory = Path.of("jte-classes"); // This is the directoy where compiled templates are located.
 
-TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory);
+TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory, ContentType.Html);
 ```
 
 There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
@@ -308,6 +308,7 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
     <configuration>
         <sourceDirectory>src/main/jte</sourceDirectory> <!-- This is the directory where your .jte files are located. -->
         <targetDirectory>jte-classes</targetDirectory> <!-- This is the directoy where compiled templates are located. -->
+        <contentType>Html</contentType>
     </configuration>
     <executions>
         <execution>
@@ -322,37 +323,44 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
 
 ## Output Escaping
 
-It is recommended to wrap `TemplateOutput` when output escaping is needed. For instance, if you already have <a href="https://jsoup.org/cookbook/cleaning-html/whitelist-sanitizer">jsoup</a> in your project you could do this:
+Output escaping depends on the `ContentType` the engine is created with:
+- With `ContentType.Plain` not output escaping takes place.
+- With `ContentType.Html`, the [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/org/jusecase/jte/html/OwaspHtmlTemplateOutput.java) is used for context sensitive output escaping.
 
-```java
-public class SecureOutput implements TemplateOutput {
+In `Html` mode, user content `${}` is automatically escaped, depending what part of the template it is placed into:
+- JavaScript attributes, e.g. `onclick`
+- `<script>` blocks
+- HMTL attributes
+- HTML tag bodies
 
-    private final TemplateOutput output;
+For example, if you have this template:
 
-    public SecureOutput(TemplateOutput output) {
-        this.output = output;
-    }
-
-    @Override
-    public void writeContent(String value) {
-        output.writeContent(value);
-    }
-
-    @Override
-    public void writeUserContent(String value) {
-        output.writeContent(Jsoup.clean(value, Whitelist.basic()));
-    }
-}
+```xml
+<div>${userName}</div>
 ```
+
+With `userName` being `<script>alert('hello');</script>`,
+
+the output would be `<div>&lt;script&gt;alert(&#39;hello&#39;);&lt;/script&gt;</div>`.
+
+For more examples, you may want to check out the [TemplateEngine_HtmlOutputEscapingTest](jte/src/test/java/org/jusecase/jte/TemplateEngine_HtmlOutputEscapingTest.java).
+
+### Unsafe
+
+In rare cases you may want to skip output escaping for a certain element. You can do this by using `$unsafe{}` instead of `${}`. For instance, to trust the user name, you would write:
+
+```xml
+<div>$unsafe{userName}</div>
+```
+
+The syntax `$unsafe{}` was picked on purpose. Whenever you use it, you're risking XSS attacks and you should carefully consider if it really is okay to trust the data you're outputting.
+
+### Custom output escaping
+
+It is possible to provide your own implementation of `HtmlTemplateOutput`. Maybe you want to extend the default [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/org/jusecase/jte/html/OwaspHtmlTemplateOutput.java), or use your own implementation.
 
 Before rendering, you'd simply wrap the actual `TemplateOutput` you are using:
 
 ```java
-TemplateOutput output = new SecureOutput(new StringOutput());
-```
-
-In rare cases you may want to skip output escaping for a certain element. You can do this by using `$unsafe{}` instead of `${}`. For instance, to trust the model name, you would write:
-
-```
-$unsafe{model.name}
+TemplateOutput output = new MySecureHtmlOutput(new StringOutput());
 ```

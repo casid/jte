@@ -77,4 +77,39 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     public void writeContent(String value) {
         templateOutput.writeContent(value);
     }
+
+    @Override
+    public void writeUserContent(boolean value) {
+        templateOutput.writeUserContent(value);
+    }
+
+    @Override
+    public void writeUserContent(byte value) {
+        templateOutput.writeUserContent(value);
+    }
+
+    @Override
+    public void writeUserContent(short value) {
+        templateOutput.writeUserContent(value);
+    }
+
+    @Override
+    public void writeUserContent(int value) {
+        templateOutput.writeUserContent(value);
+    }
+
+    @Override
+    public void writeUserContent(long value) {
+        templateOutput.writeUserContent(value);
+    }
+
+    @Override
+    public void writeUserContent(float value) {
+        templateOutput.writeUserContent(value);
+    }
+
+    @Override
+    public void writeUserContent(double value) {
+        templateOutput.writeUserContent(value);
+    }
 }

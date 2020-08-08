@@ -1,8 +1,13 @@
-# jte (Java Template Engine)
+
+<p align="center">
+<img alt="jte" src="jte.gif" style="max-width: 100%;" width="128">
+
 [![Build Status](https://travis-ci.org/casid/jte.svg?branch=master&v=2)](https://travis-ci.org/casid/jte)
 [![Coverage Status](https://coveralls.io/repos/github/casid/jte/badge.svg?branch=master&v=2)](https://coveralls.io/github/casid/jte?branch=master)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/casid/jte/master/LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/org.jusecase/jte.svg)](http://mvnrepository.com/artifact/org.jusecase/jte)
+
+</p>
 
 jte is a simple, yet powerful template engine for Java. All jte templates are compiled to Java class files, meaning jte adds essentially zero overhead to your application. jte is designed to introduce as few new keywords as possible and builds upon existing Java features, so that it is very easy to reason about what a template does. The <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offers full completion and refactoring support for Java parts as well as for jte keywords. Supports Java 11 or higher.
 

@@ -380,7 +380,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "javascript:alert(1)", output));
 
-        assertThat(throwable.getMessage()).isEqualTo("Failed to compile template.jte, error at line 2: HTML tags are expected to be lowercase.");
+        assertThat(throwable.getMessage()).isEqualTo("Failed to compile template.jte, error at line 2: HTML tags are expected to be lowercase: A");
     }
 
     @Test
@@ -389,7 +389,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "javascript:alert(1)", output));
 
-        assertThat(throwable.getMessage()).isEqualTo("Failed to compile template.jte, error at line 2: HTML attributes are expected to be lowercase.");
+        assertThat(throwable.getMessage()).isEqualTo("Failed to compile template.jte, error at line 2: HTML attributes are expected to be lowercase: HREF");
     }
 
     @Test

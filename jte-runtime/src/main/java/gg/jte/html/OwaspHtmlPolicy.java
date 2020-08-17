@@ -8,8 +8,8 @@ public class OwaspHtmlPolicy implements HtmlPolicy {
         if ( htmlTag.getName().contains("${") ) {
             throw new HtmlPolicyException("Illegal HTML tag name " + htmlTag.getName() + "! Expressions in HTML tag names are not allowed.");
         }
-        if (StringUtils.containsUpperCase(htmlTag.getName())) {
-            throw new HtmlPolicyException("HTML tags are expected to be lowercase.");
+        if (StringUtils.isAllUpperCase(htmlTag.getName())) {
+            throw new HtmlPolicyException("HTML tags are expected to be lowercase: " + htmlTag.getName());
         }
     }
 
@@ -24,8 +24,8 @@ public class OwaspHtmlPolicy implements HtmlPolicy {
         if (!htmlAttribute.isBoolean() && htmlAttribute.getQuotes() != '\"' && htmlAttribute.getQuotes() != '\'') {
             throw new HtmlPolicyException("Unquoted HTML attribute values are not allowed.");
         }
-        if (StringUtils.containsUpperCase(htmlAttribute.getName())) {
-            throw new HtmlPolicyException("HTML attributes are expected to be lowercase.");
+        if (StringUtils.isAllUpperCase(htmlAttribute.getName())) {
+            throw new HtmlPolicyException("HTML attributes are expected to be lowercase: " + htmlAttribute.getName());
         }
     }
 }

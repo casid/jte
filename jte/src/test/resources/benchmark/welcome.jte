@@ -1,4 +1,4 @@
-@import org.jusecase.jte.benchmark.WelcomePage
+@import gg.jte.benchmark.WelcomePage
 @param WelcomePage page
 
 @layout.page(page = page, content = @`

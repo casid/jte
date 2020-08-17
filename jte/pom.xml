@@ -8,9 +8,9 @@
     <packaging>jar</packaging>
 
     <parent>
-        <groupId>org.jusecase</groupId>
+        <groupId>gg.jte</groupId>
         <artifactId>jte-parent</artifactId>
-        <version>0.8.0</version>
+        <version>1.0.0</version>
     </parent>
 
     <name>jte</name>
@@ -21,7 +21,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jusecase</groupId>
+            <groupId>gg.jte</groupId>
             <artifactId>jte-runtime</artifactId>
             <version>${project.version}</version>
         </dependency>

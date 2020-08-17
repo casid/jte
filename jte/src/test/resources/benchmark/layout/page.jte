@@ -1,5 +1,5 @@
-@import org.jusecase.jte.Content
-@import org.jusecase.jte.benchmark.Page
+@import gg.jte.Content
+@import gg.jte.benchmark.Page
 
 @param Page page
 @param Content content

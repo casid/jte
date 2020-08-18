@@ -71,7 +71,7 @@ Let's move stuff from our example page to `tag/page.jte`:
 
 ```htm
 @import org.example.Page
-@import Content
+@import gg.jte.Content
 
 @param Page page
 @param Content content

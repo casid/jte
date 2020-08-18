@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/casid/jte.svg?branch=master&v=2)](https://travis-ci.org/casid/jte)
 [![Coverage Status](https://coveralls.io/repos/github/casid/jte/badge.svg?branch=master&v=2)](https://coveralls.io/github/casid/jte?branch=master)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/casid/jte/master/LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/org.jusecase/jte.svg)](http://mvnrepository.com/artifact/org.jusecase/jte)
+[![Maven Central](https://img.shields.io/maven-central/v/gg.jte/jte.svg)](http://mvnrepository.com/artifact/gg.jte/jte)
 
 ## Features
 - Intuitive, easy to learn [syntax](DOCUMENTATION.md).
@@ -71,7 +71,7 @@ Let's move stuff from our example page to `tag/page.jte`:
 
 ```htm
 @import org.example.Page
-@import org.jusecase.jte.Content
+@import Content
 
 @param Page page
 @param Content content
@@ -115,20 +115,20 @@ Note that the above is with `ContentType.Plain`, so no output escaping is done. 
 
 ## Getting started
 
-jte is available on <a href="http://mvnrepository.com/artifact/org.jusecase/jte">Maven Central</a>:
+jte is available on <a href="http://mvnrepository.com/artifact/gg.jte/jte">Maven Central</a>:
 
 ### Maven
 ```xml
 <dependency>
-    <groupId>org.jusecase</groupId>
+    <groupId>gg.jte</groupId>
     <artifactId>jte</artifactId>
-    <version>0.8.0</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-compile group: 'org.jusecase', name: 'jte', version: '0.8.0'
+compile group: 'gg.jte', name: 'jte', version: '1.0.0'
 ```
 
 No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)

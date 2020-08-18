@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.jusecase</groupId>
+    <groupId>gg.jte</groupId>
     <artifactId>jte-parent</artifactId>
-    <version>0.8.0</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <name>jte-parent</name>
     <description>A template engine using plain Java code.</description>
-    <url>http://jusecase.org</url>
+    <url>http://jte.gg</url>
     <developers>
         <developer>
             <id>casid</id>

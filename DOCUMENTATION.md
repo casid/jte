@@ -108,7 +108,7 @@ In addition to if statements, jte provides the `@for` and `@endfor` keywords to 
 When looping, you may use the `ForSupport`class to gain information about the loop, such as whether you are in the first or last iteration through the loop.
 
 ```xml
-@import org.jusecase.jte.support.ForSupport
+@import gg.jte.ForSupport
 <%-- ... --%>
 @for(var entryLoop : ForSupport.of(model.entries))
     <tr class="${(entryLoop.getIndex() + 1) % 2 == 0 ? "even" : "odd"}">
@@ -210,13 +210,13 @@ And call it like this:
 
 ## Content
 
-`org.jusecase.jte.Content` is a special parameter type to pass template code to tags, much like lambdas in Java. They are particularly useful to share structure between different templates.
+`gg.jte.Content` is a special parameter type to pass template code to tags, much like lambdas in Java. They are particularly useful to share structure between different templates.
 
 Here is an example tag with a content block:
 
 ```htm
 @import org.example.Page
-@import org.jusecase.jte.Content
+@import gg.jte.Content
 
 @param Page page
 @param Content content
@@ -266,7 +266,7 @@ When using the `DirectoryCodeResolver`, hot reloading is supported out of the bo
 
 > It makes sense to do this on your local development environment only. When running in production, for maximum performance and security [precompiled templates](#precompiling-templates) are recommended instead.
 
-If you clone this repository, you can launch the [SimpleWebServer](jte/src/test/java/org/jusecase/jte/benchmark/SimpleWebServer.java) example's main method. It will fire up a tiny webserver with one page to play with at http://localhost:8080.
+If you clone this repository, you can launch the [SimpleWebServer](jte/src/test/java/gg/jte/benchmark/SimpleWebServer.java) example's main method. It will fire up a tiny webserver with one page to play with at http://localhost:8080.
 
 ### For a statically rendered website
 
@@ -302,7 +302,7 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
 
 ```xml
 <plugin>
-    <groupId>org.jusecase</groupId>
+    <groupId>gg.jte</groupId>
     <artifactId>jte-maven-plugin</artifactId>
     <version>${jte.version}</version>
     <configuration>
@@ -325,7 +325,7 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
 
 Output escaping depends on the `ContentType` the engine is created with:
 - With `ContentType.Plain` not output escaping takes place.
-- With `ContentType.Html`, the [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/org/jusecase/jte/html/OwaspHtmlTemplateOutput.java) is used for context sensitive output escaping.
+- With `ContentType.Html`, the [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java) is used for context sensitive output escaping.
 
 In `Html` mode, user content `${}` is automatically escaped, depending what part of the template it is placed into:
 - JavaScript attributes, e.g. `onclick`
@@ -343,7 +343,7 @@ With `userName` being `<script>alert('hello');</script>`,
 
 the output would be `<div>&lt;script&gt;alert(&#39;hello&#39;);&lt;/script&gt;</div>`.
 
-For more examples, you may want to check out the [TemplateEngine_HtmlOutputEscapingTest](jte/src/test/java/org/jusecase/jte/TemplateEngine_HtmlOutputEscapingTest.java).
+For more examples, you may want to check out the [TemplateEngine_HtmlOutputEscapingTest](jte/src/test/java/gg/jte/TemplateEngine_HtmlOutputEscapingTest.java).
 
 ### Unsafe
 
@@ -357,7 +357,7 @@ The syntax `$unsafe{}` was picked on purpose. Whenever you use it, you're riskin
 
 ### Custom output escaping
 
-It is possible to provide your own implementation of `HtmlTemplateOutput`. Maybe you want to extend the default [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/org/jusecase/jte/html/OwaspHtmlTemplateOutput.java), or use your own implementation.
+It is possible to provide your own implementation of `HtmlTemplateOutput`. Maybe you want to extend the default [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java), or use your own implementation.
 
 Before rendering, you'd simply wrap the actual `TemplateOutput` you are using:
 

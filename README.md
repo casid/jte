@@ -7,12 +7,12 @@
 [![Maven Central](https://img.shields.io/maven-central/v/gg.jte/jte.svg)](http://mvnrepository.com/artifact/gg.jte/jte)
 
 ## Features
-- Intuitive, easy to learn [syntax](DOCUMENTATION.md).
-- Blazing fast execution, about [100k templates rendered per second](#performance) on a MacBook Pro 2015.
-- Very small footprint, just <a href="https://github.com/OWASP/owasp-java-encoder/">one external dependency for output escaping</a>.
-- <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offering completion and refactoring support.
-- Hot reloading of templates during development.
-- Compile time checked, context-sensitive, high performance HTML output escaping (since 0.8.0).
+- Compile time checked and context-sensitive
+- <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offering completion and refactoring support
+- Hot reloading of templates during development
+- Intuitive, easy to learn [syntax](DOCUMENTATION.md)
+- Blazing fast execution ([~100k renders/s](#performance) on a MacBook Pro 2015)
+- Very small footprint (just <a href="https://github.com/OWASP/owasp-java-encoder/">one external dependency for HTML escaping</a>)
 
 ## TLDR
 

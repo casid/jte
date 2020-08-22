@@ -136,3 +136,4 @@ No further dependencies required! Check out the [syntax documentation](DOCUMENTA
 ## Websites rendered with jte
 
 - <a href="https://mazebert.com">Mazebert TD (game website)</a>
+- <a href="https://github.com/casid/jte-javalin-tutorial>Javalin website example with login and multiple languages</a>

@@ -159,6 +159,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void booleanAttributes_followedByOutput() {
+        codeResolver.givenCode("template.jte", "@param String label\n<input required><label>${label}</label>");
+
+        templateEngine.render("template.jte", "Label", output);
+
+        assertThat(output.toString()).isEqualTo("<input required><label>Label</label>");
+    }
+
+    @Test
     void doctype() {
         codeResolver.givenCode("template.jte", "@param String x\n<!DOCTYPE html>");
         templateEngine.render("template.jte", (Object)null, output);

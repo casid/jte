@@ -422,10 +422,13 @@ final class TemplateParser {
 
                     currentHtmlTag.attributes.add(attribute);
 
-                    outputPrevented = attribute.bool;
-
-                    if (attribute.bool && attribute.quotes == 0) {
-                        i += attribute.name.length() - 1;
+                    if (attribute.bool) {
+                        if (attribute.quotes == 0) {
+                            i += attribute.name.length() - 1;
+                            outputPrevented = false;
+                        } else {
+                            outputPrevented = true;
+                        }
                     }
                 } else {
                     outputPrevented = false;

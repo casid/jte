@@ -133,7 +133,12 @@ compile group: 'gg.jte', name: 'jte', version: '1.0.0'
 
 No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)
 
+## Framework integration
+
+- [Javalin](https://javalin.io/tutorials/jte)
+
 ## Websites rendered with jte
 
+- <a href="https://jte.gg">The jte website</a>
 - <a href="https://mazebert.com">Mazebert TD (game website)</a>
 - <a href="https://github.com/casid/jte-javalin-tutorial">Javalin website example with login and multiple languages</a>

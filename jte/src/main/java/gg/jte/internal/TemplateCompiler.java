@@ -433,12 +433,12 @@ public class TemplateCompiler extends TemplateLoader {
                 int index = codePart.indexOf('=');
                 if (index == -1) {
                     javaCode.append("gg.jte.internal.NullCheck.evaluate(() -> ");
-                    javaCode.append(codePart); // TODO check with @``
+                    javaCode.append(codePart);
                     javaCode.append(")");
                 } else {
                     javaCode.append(codePart, 0, index + 1);
                     javaCode.append(" gg.jte.internal.NullCheck.evaluate(() -> ");
-                    javaCode.append(codePart, index + 2, codePart.length()); // TODO check with @``
+                    javaCode.append(codePart, index + 2, codePart.length());
                     javaCode.append(")");
                 }
             } else {

@@ -565,6 +565,19 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void layoutWithNamedParams_noNames() {
+        givenLayout("main",
+                "@param int status = 5\n" +
+                        "@param int duration = -1\n" +
+                        "@param gg.jte.Content content\n" +
+                        "Hello, ${content} your status is ${status}, the duration is ${duration}");
+
+        givenTemplate("@layout.main(42, 10, @`Sir`)");
+
+        thenOutputIs("Hello, Sir your status is 42, the duration is 10");
+    }
+
+    @Test
     void layoutWithVarArgs() {
         givenLayout("varargs",
                 "@param String ... values\n" +

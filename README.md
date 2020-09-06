@@ -52,7 +52,7 @@ CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This i
 TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html); // Two choices: Plain or Html
 ```
 
-The content type passed to the engine, determines how user output will be escaped. If you render HTML files, `Html` is highly recommended. This enables the engine to analyse HTML templates at compile time and perform context sensitive output escaping of user data, to prevent you from XSS attacks.
+The content type passed to the engine determines how user output will be escaped. If you render HTML files, `Html` is highly recommended. This enables the engine to analyze HTML templates at compile time and perform context sensitive output escaping of user data, to prevent you from XSS attacks.
 
 With the `TemplateEngine` ready, templates are rendered like this:
 ```java

@@ -1,3 +1,3 @@
 <%@ taglib tagdir="my" prefix="my" %>
 
-<my:simple name="Hello" greeting="World"/>
+<my:jte jte="tag/my/simple.jte" name="Hello" greeting="World"/>

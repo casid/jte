@@ -51,7 +51,7 @@ class JspToJteConverterTest {
     }
 
     void whenJspTagIsConverted(String jspTag, String jteTag) {
-        JspToJteConverter converter = new JspToJteConverter(jspRoot, jteRoot);
+        JspToJteConverter converter = new JspToJteConverter(jspRoot, jteRoot, "<my:jte");
         converter.setDefaultImports("@import static example.JteContext.*\n");
         converter.convertTag(jspTag, "tag/" + jteTag);
     }

@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * Dummy jte context, how you might use it in your project.
- * Contains helper methods
+ * Contains helper methods for a JSP migration
  */
 public class JteContext {
     /**

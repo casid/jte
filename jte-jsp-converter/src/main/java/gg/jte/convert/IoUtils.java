@@ -47,4 +47,12 @@ public class IoUtils {
             throw new UncheckedIOException(e);
         }
     }
+
+    public static void deleteFile(Path file) {
+        try {
+            Files.delete(file);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 }

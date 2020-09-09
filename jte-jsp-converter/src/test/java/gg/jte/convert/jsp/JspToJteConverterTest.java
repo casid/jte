@@ -1,7 +1,6 @@
 package gg.jte.convert.jsp;
 
 import gg.jte.convert.IoUtils;
-import gg.jte.convert.jsp.JspToJteConverter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 

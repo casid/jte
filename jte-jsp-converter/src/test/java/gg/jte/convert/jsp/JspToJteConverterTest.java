@@ -35,6 +35,13 @@ class JspToJteConverterTest {
         thenConversionIsAsExpected();
     }
 
+    @Test
+    void simpleTagWithUsages() {
+        givenUsecase("simpleTagWithUsages");
+        whenJspTagIsConverted("my/simple.tag", "my/simple.jte");
+        thenConversionIsAsExpected(); // TODO assert that usages of tag are replaced with jte-tag
+    }
+
     void givenUsecase(String usecase) {
         jspRoot = tempDir.resolve("jsp");
         jteRoot = tempDir.resolve("jte");

@@ -120,4 +120,12 @@ public class Parser {
 
         lastContentIndex = index;
     }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public String substring(int beginIndex, int endIndex) {
+        return content.substring(beginIndex, endIndex);
+    }
 }

@@ -30,6 +30,12 @@ public class JspExpressionConverter {
         visitorMap.put(AstDotSuffix.class, new AstDotSuffixVisitor());
         visitorMap.put(AstChoice.class, new AstChoiceVisitor());
         visitorMap.put(AstString.class, new AstStringVisitor());
+        visitorMap.put(AstFloatingPoint.class, new AstFloatingPointVisitor());
+        visitorMap.put(AstPlus.class, new AstPlusVisitor());
+        visitorMap.put(AstMinus.class, new AstMinusVisitor());
+        visitorMap.put(AstMult.class, new AstMultVisitor());
+        visitorMap.put(AstDiv.class, new AstDivVisitor());
+        visitorMap.put(AstMod.class, new AstModVisitor());
 
         process(root);
     }
@@ -103,7 +109,7 @@ public class JspExpressionConverter {
             }
 
             process(node.jjtGetChild(0));
-            result.append(' ').append(mapOperator()).append(' ');
+            result.append(' ').append(getOperator()).append(' ');
             process(node.jjtGetChild(1));
 
             if (parenthesisNeeded) {
@@ -111,7 +117,7 @@ public class JspExpressionConverter {
             }
         }
 
-        protected abstract String mapOperator();
+        protected abstract String getOperator();
 
         @SuppressWarnings("RedundantIfStatement")
         private boolean isParenthesisNeeded(Node node) {
@@ -129,14 +135,14 @@ public class JspExpressionConverter {
 
     private class AstOrVisitor extends AstBinaryOperatorVisitor {
         @Override
-        protected String mapOperator() {
+        protected String getOperator() {
             return "||";
         }
     }
 
     private class AstAndVisitor extends AstBinaryOperatorVisitor {
         @Override
-        protected String mapOperator() {
+        protected String getOperator() {
             return "&&";
         }
     }
@@ -166,7 +172,7 @@ public class JspExpressionConverter {
 
     private class AstEqualVisitor extends AstBinaryOperatorVisitor {
         @Override
-        protected String mapOperator() {
+        protected String getOperator() {
             return "==";
         }
     }
@@ -201,6 +207,49 @@ public class JspExpressionConverter {
             process(node.jjtGetChild(1));
             result.append(" : ");
             process(node.jjtGetChild(2));
+        }
+    }
+
+    private class AstFloatingPointVisitor implements Visitor {
+        @Override
+        public void visit(Node node) {
+            result.append(node.getImage());
+        }
+    }
+
+    private class AstPlusVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return "+";
+        }
+    }
+
+    private class AstMinusVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return "-";
+        }
+    }
+
+    @SuppressWarnings("SpellCheckingInspection")
+    private class AstMultVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return "*";
+        }
+    }
+
+    private class AstDivVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return "/";
+        }
+    }
+
+    private class AstModVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return "%";
         }
     }
 }

@@ -72,6 +72,36 @@ class JspExpressionConverterTest {
         assertConversion("${data.quality eq 'Good'}", "data.quality == \"Good\"");
     }
 
+    @Test
+    void addition() {
+        assertConversion("${x + 0.05}", "x + 0.05");
+    }
+
+    @Test
+    void subtraction() {
+        assertConversion("${x - 0.05}", "x - 0.05");
+    }
+
+    @Test
+    void multiplication() {
+        assertConversion("${x * 0.05}", "x * 0.05");
+    }
+
+    @Test
+    void division() {
+        assertConversion("${x / 0.05}", "x / 0.05");
+    }
+
+    @Test
+    void modulo() {
+        assertConversion("${x % 10}", "x % 10");
+    }
+
+    @Test
+    void calculation() {
+        assertConversion("${x * 10 / 23.0}", "(x * 10) / 23.0");
+    }
+
     private void assertConversion(String el, String java) {
         assertThat(new JspExpressionConverter(el).getJavaCode()).isEqualTo(java);
     }

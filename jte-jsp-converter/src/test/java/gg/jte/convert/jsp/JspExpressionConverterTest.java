@@ -8,22 +8,22 @@ class JspExpressionConverterTest {
 
     @Test
     void empty() {
-        assertConversion("${empty foo}", "foo == null");
+        assertConversion("${empty foo}", "isEmpty(foo)");
     }
 
     @Test
     void notEmpty() {
-        assertConversion("${not empty foo}", "foo != null");
+        assertConversion("${not empty foo}", "!isEmpty(foo)");
     }
 
     @Test
     void notEmptyOr() {
-        assertConversion("${not empty foo or true}", "foo != null || true");
+        assertConversion("${not empty foo or true}", "!isEmpty(foo) || true");
     }
 
     @Test
     void notEmptyAnd() {
-        assertConversion("${not empty foo and false}", "foo != null && false");
+        assertConversion("${not empty foo and false}", "!isEmpty(foo) && false");
     }
 
     @Test

@@ -73,9 +73,13 @@ public class Parser {
         parseXmlAttribute(name, v -> consumer.accept(Boolean.parseBoolean(v)));
     }
 
-    public String convert(String content) {
+    public String convert(String content, String prefix) {
         this.content = content;
         this.result = new StringBuilder(content.length());
+
+        if (prefix != null) {
+            result.append(prefix);
+        }
 
         for (index = 0; index < content.length(); ++index) {
             if (currentConverter == null) {

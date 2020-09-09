@@ -81,21 +81,16 @@ public class JspExpressionConverter {
     private class AstEmptyVisitor implements Visitor {
         @Override
         public void visit(Node node) {
+            result.append("isEmpty(");
             process(node.jjtGetChild(0));
-            if (node.jjtGetParent() instanceof AstNot) {
-                result.append(" != null");
-            } else {
-                result.append(" == null");
-            }
+            result.append(")");
         }
     }
 
     private class AstNotVisitor implements Visitor {
         @Override
         public void visit(Node node) {
-            if (node.jjtGetNumChildren() != 1 || !(node.jjtGetChild(0) instanceof AstEmpty)) {
-                result.append('!');
-            }
+            result.append('!');
             process(node.jjtGetChild(0));
         }
     }

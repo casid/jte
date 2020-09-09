@@ -62,6 +62,11 @@ class JspExpressionConverterTest {
     }
 
     @Test
+    void not() {
+        assertConversion("${!true}", "!true");
+    }
+
+    @Test
     void eqEnum() {
         // TODO maybe we can use type information to make this better
         assertConversion("${data.quality eq 'Good'}", "data.quality == \"Good\"");

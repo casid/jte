@@ -87,6 +87,9 @@ public class JspExpressionConverter {
     private class AstNotVisitor implements Visitor {
         @Override
         public void visit(Node node) {
+            if (node.jjtGetNumChildren() != 1 || !(node.jjtGetChild(0) instanceof AstEmpty)) {
+                result.append('!');
+            }
             process(node.jjtGetChild(0));
         }
     }

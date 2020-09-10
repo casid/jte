@@ -23,22 +23,29 @@ class JspToJteConverterTest {
     @Test
     void simpleTag() {
         givenUsecase("simpleTag");
-        whenJspTagIsConverted("simple.tag", "simple.jte");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
         thenConversionIsAsExpected();
     }
 
     @Test
     void simpleTagWithIfStatement() {
         givenUsecase("simpleTagWithIfStatement");
-        whenJspTagIsConverted("simple.tag", "simple.jte");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
         thenConversionIsAsExpected();
     }
 
     @Test
     void simpleTagWithUsages() {
         givenUsecase("simpleTagWithUsages");
-        whenJspTagIsConverted("my/simple.tag", "my/simple.jte");
-        thenConversionIsAsExpected(); // TODO assert that usages of tag are replaced with jte-tag
+        whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
+    void simpleJspWithAlreadyConvertedTag() {
+        givenUsecase("simpleJspWithAlreadyConvertedTag");
+        whenJspTagIsConverted("usage.jsp", "usage.jte");
+        thenConversionIsAsExpected();
     }
 
     void givenUsecase(String usecase) {
@@ -53,7 +60,7 @@ class JspToJteConverterTest {
     void whenJspTagIsConverted(String jspTag, String jteTag) {
         JspToJteConverter converter = new JspToJteConverter(jspRoot, jteRoot, "<my:jte");
         converter.setDefaultImports("@import static example.JteContext.*\n");
-        converter.convertTag(jspTag, "tag/" + jteTag);
+        converter.convertTag(jspTag, jteTag);
     }
 
     private void thenConversionIsAsExpected() {

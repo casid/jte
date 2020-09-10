@@ -1,9 +1,8 @@
 package gg.jte.convert;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import gg.jte.convert.xml.XmlAttributesParser;
+
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Parser {
@@ -38,6 +37,13 @@ public class Parser {
             return content.startsWith(token, i);
         }
         return false;
+    }
+
+    public XmlAttributesParser parseXmlAttributes(int offset) {
+        XmlAttributesParser parser = new XmlAttributesParser(content, index + offset);
+        index = parser.getEndIndex();
+        lastContentIndex = index;
+        return parser;
     }
 
     public void parseXmlAttribute(String name, Consumer<String> consumer) {
@@ -103,7 +109,7 @@ public class Parser {
     }
 
     private void appendContentToResultIfRequired() {
-        if (currentConverter == null && lastContentIndex < index) {
+        if (currentConverter == null && lastContentIndex < index && lastContentIndex < content.length()) {
             result.append(content, lastContentIndex, index);
         }
     }

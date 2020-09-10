@@ -30,7 +30,7 @@ public class JspToJteConverter {
     }
 
     private void convertTag(Path jspTag, Path jteTag) {
-        JspTagParser parser = new JspTagParser();
+        JspTagParser parser = new JspTagParser(this.jteTag);
         String jte = parser.convert(IoUtils.readFile(jspTag), defaultImports);
 
         String oldJspTagPrefix = extractTagPrefix(jspTag);
@@ -46,9 +46,7 @@ public class JspToJteConverter {
                     .filter(p -> {
                 String fileName = p.toString();
                 return fileName.endsWith(".jsp") || fileName.endsWith(".jsp.inc") || fileName.endsWith(".tag");
-            }).forEach(jspFile -> {
-                replaceUsages(jspFile, oldJspTagPrefix, newJteFile);
-            });
+            }).forEach(jspFile -> replaceUsages(jspFile, oldJspTagPrefix, newJteFile));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

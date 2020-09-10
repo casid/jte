@@ -8,6 +8,14 @@ import java.util.Map;
 
 public class JspExpressionConverter {
 
+    public static String convertAttributeValue(String value) {
+        if (value.trim().startsWith("${")) {
+            return new JspExpressionConverter(value).getJavaCode();
+        } else {
+            return "\"" + value + "\"";
+        }
+    }
+
     private final Node root;
     private final StringBuilder result;
     private final Map<Class<? extends Node>, Visitor> visitorMap = new HashMap<>();

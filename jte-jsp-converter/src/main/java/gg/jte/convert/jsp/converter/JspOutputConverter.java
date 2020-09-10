@@ -6,7 +6,6 @@ import gg.jte.convert.jsp.JspExpressionConverter;
 
 public class JspOutputConverter implements Converter {
     int startIndex = -1;
-    String expression;
 
     @Override
     public boolean canConvert(Parser parser) {
@@ -19,18 +18,16 @@ public class JspOutputConverter implements Converter {
             startIndex = parser.getIndex();
         }
 
-        boolean done = parser.endsWith("}");
-        if (done) {
-            expression = parser.substring(startIndex, parser.getIndex());
+        if (parser.endsWith("}")) {
+            String expression = parser.substring(startIndex, parser.getIndex());
+            String javaCode = new JspExpressionConverter(expression).getJavaCode();
+
+            parser.getResult().append("${").append(javaCode).append('}');
+            parser.markLastContentIndex();
+            return true;
         }
 
-        return done;
-    }
-
-    @Override
-    public void convert(StringBuilder result) {
-        String javaCode = new JspExpressionConverter(expression).getJavaCode();
-        result.append("${").append(javaCode).append('}');
+        return false;
     }
 
     @Override

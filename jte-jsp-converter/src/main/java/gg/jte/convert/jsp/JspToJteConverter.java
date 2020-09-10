@@ -33,6 +33,8 @@ public class JspToJteConverter {
         JspTagParser parser = new JspTagParser(this.jteTag);
         String jte = parser.convert(IoUtils.readFile(jspTag), defaultImports);
 
+        System.out.println(jte);
+
         String oldJspTagPrefix = extractTagPrefix(jspTag);
         String newJteFile = jteRoot.relativize(jteTag).toString().replace('\\', '/');
 
@@ -61,7 +63,7 @@ public class JspToJteConverter {
             lastIndex = jspContent.indexOf(oldJspTagPrefix, lastIndex);
             if (lastIndex != -1 && lastIndex < jspContent.length()) {
                 if (Character.isWhitespace(jspContent.charAt(lastIndex + oldJspTagPrefix.length()))) {
-                    jspContent.replace(lastIndex, lastIndex + oldJspTagPrefix.length(), jteTag + " jte=\"" + newJteFile + "\"");
+                    jspContent.replace(lastIndex, lastIndex + oldJspTagPrefix.length(), "<" + jteTag + " jte=\"" + newJteFile + "\"");
                 }
             }
         } while (lastIndex != -1);

@@ -7,33 +7,25 @@ import gg.jte.convert.xml.XmlAttributesParser;
 
 import java.util.Map;
 
-public class JspJteTagConverter implements Converter {
+public class JspJteTagConverter extends AbstractJspTagConverter {
     private final String jteTag;
 
     private String jteTagPath;
     private Map<String, String> params;
 
     public JspJteTagConverter(String jteTag) {
+        super(jteTag);
         this.jteTag = jteTag;
     }
 
-    public boolean canConvert(Parser parser) {
-        return parser.startsWith(jteTag);
-    }
-
-    public boolean advance(Parser parser) {
-        XmlAttributesParser xmlAttributes = parser.parseXmlAttributes(jteTag.length());
-
-        Map<String, String> attributes = xmlAttributes.getAttributes();
-
-        jteTagPath = attributes.remove("jte");
-        params = attributes;
-
-        return true;
+    @Override
+    protected void parseAttributes(XmlAttributesParser attributes) {
+        params = attributes.getAttributes();
+        jteTagPath = params.remove("jte");
     }
 
     @Override
-    public void convert(StringBuilder result) {
+    public void convertTag(Parser parser, StringBuilder result) {
         String pathWithoutExtension = jteTagPath.substring(0, jteTagPath.length() - 4);
         String tagCall = pathWithoutExtension.replace('/', '.');
 
@@ -50,6 +42,12 @@ public class JspJteTagConverter implements Converter {
         result.append(')');
     }
 
+    @Override
+    public void convertBody(Parser parser, StringBuilder result) {
+        // Not required
+    }
+
+    @Override
     public Converter newInstance() {
         return new JspJteTagConverter(jteTag);
     }

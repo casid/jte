@@ -44,6 +44,7 @@ public class JspExpressionConverter {
         visitorMap.put(AstMult.class, new AstMultVisitor());
         visitorMap.put(AstDiv.class, new AstDivVisitor());
         visitorMap.put(AstMod.class, new AstModVisitor());
+        visitorMap.put(AstLiteralExpression.class, new AstLiteralExpressionVisitor());
 
         process(root);
     }
@@ -253,6 +254,13 @@ public class JspExpressionConverter {
         @Override
         protected String getOperator() {
             return "%";
+        }
+    }
+
+    private class AstLiteralExpressionVisitor implements Visitor {
+        @Override
+        public void visit(Node node) {
+            result.append(node.getImage());
         }
     }
 }

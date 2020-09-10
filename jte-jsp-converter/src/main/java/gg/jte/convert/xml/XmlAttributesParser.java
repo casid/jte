@@ -43,6 +43,10 @@ public class XmlAttributesParser {
                     continue;
                 } else if (character == '>') {
                     return;
+                } else if (character == '/') {
+                    return;
+                } else if (character == '%') {
+                    return;
                 } else {
                     nameStartIndex = i;
                 }
@@ -84,4 +88,15 @@ public class XmlAttributesParser {
         quotes = 0;
     }
 
+    public String get(String name) {
+        return attributes.get(name);
+    }
+
+    public boolean getBoolean(String name) {
+        String value = attributes.get(name);
+        if (value == null) {
+            return false;
+        }
+        return Boolean.parseBoolean(value);
+    }
 }

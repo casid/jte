@@ -2,23 +2,22 @@ package gg.jte.convert.jsp.converter;
 
 import gg.jte.convert.Converter;
 import gg.jte.convert.Parser;
+import gg.jte.convert.xml.XmlAttributesParser;
 
-public class JspTaglibConverter implements Converter {
-    public boolean canConvert(Parser parser) {
-        if (!parser.startsWith("<%@")) {
-            return false;
-        }
+public class JspTaglibConverter extends AbstractJspDirectiveConverter {
 
-        return parser.hasNextToken("taglib", 3);
-    }
-
-    public boolean advance(Parser parser) {
-        return parser.endsWith("%>");
+    public JspTaglibConverter() {
+        super("taglib");
     }
 
     @Override
-    public void convert(StringBuilder result) {
-        // Nothing to convert
+    protected void parseAttributes(XmlAttributesParser attributes) {
+        // we're not interested in those.
+    }
+
+    @Override
+    public void convertDirective(Parser parser, StringBuilder result) {
+        // this directive is ignored in the jte output.
     }
 
     public Converter newInstance() {

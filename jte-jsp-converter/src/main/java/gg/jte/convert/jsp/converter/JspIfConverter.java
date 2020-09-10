@@ -3,31 +3,35 @@ package gg.jte.convert.jsp.converter;
 import gg.jte.convert.Converter;
 import gg.jte.convert.Parser;
 import gg.jte.convert.jsp.JspExpressionConverter;
+import gg.jte.convert.xml.XmlAttributesParser;
 
-public class JspIfConverter implements Converter {
+public class JspIfConverter extends AbstractJspTagConverter {
+
     private String test;
 
-    public boolean canConvert(Parser parser) {
-        if (!parser.startsWith("<c:if")) {
-            return false;
-        }
-
-        return parser.hasNextToken("test", 5);
-    }
-
-    public boolean advance(Parser parser) {
-        parser.parseXmlAttribute("test", v -> test = v);
-
-        return parser.endsWith(">");
+    public JspIfConverter() {
+        super("c:if");
     }
 
     @Override
-    public void convert(StringBuilder result) {
+    protected void parseAttributes(XmlAttributesParser attributes) {
+        test = attributes.get("test");
+    }
+
+    @Override
+    public void convertTag(Parser parser, StringBuilder result) {
         if (test != null) {
             test = new JspExpressionConverter(test).getJavaCode();
+        } else {
+            test = "???";
         }
 
         result.append("@if(").append(test).append(")");
+    }
+
+    @Override
+    public void convertBody(Parser parser, StringBuilder result) {
+        result.append("@endif");
     }
 
     public Converter newInstance() {

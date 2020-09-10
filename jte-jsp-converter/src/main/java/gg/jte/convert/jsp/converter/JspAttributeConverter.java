@@ -2,42 +2,53 @@ package gg.jte.convert.jsp.converter;
 
 import gg.jte.convert.Converter;
 import gg.jte.convert.Parser;
+import gg.jte.convert.xml.XmlAttributesParser;
 
-public class JspAttributeConverter implements Converter {
+public class JspAttributeConverter extends AbstractJspDirectiveConverter {
+
     private String type;
     private String name;
     private boolean required;
 
-    public boolean canConvert(Parser parser) {
-        if (!parser.startsWith("<%@")) {
-            return false;
-        }
-
-        return parser.hasNextToken("attribute", 3);
-    }
-
-    public boolean advance(Parser parser) {
-        parser.parseXmlAttribute("type", v -> type = v);
-        parser.parseXmlAttribute("name", v -> name = v);
-        parser.parseXmlAttributeAsBoolean("required", v -> required = v);
-
-        return parser.endsWith("%>");
+    public JspAttributeConverter() {
+        super("attribute");
     }
 
     @Override
-    public void convert(StringBuilder result) {
+    protected void parseAttributes(XmlAttributesParser attributes) {
+        type = attributes.get("type");
+        name = attributes.get("name");
+        required = attributes.getBoolean("required");
+    }
+
+    @Override
+    public void convertDirective(Parser parser, StringBuilder result) {
         if (type == null) {
             type = "Object";
+        } else if (type.equals("java.lang.Boolean")) {
+            type = "boolean";
         } else if (type.startsWith("java.lang.")) {
             type = type.substring("java.lang.".length());
+        } else {
+            parser.addImportStatement("@import " + type);
+            type = getSimpleType(type);
         }
 
         result.append("@param ").append(type).append(" ").append(name);
 
         if (!required) {
             result.append(" = ");
-            result.append("null"); // TODO depending on type
+            result.append("CHOOSE_DEFAULT_VALUE");
         }
+    }
+
+    private String getSimpleType(String type) {
+        int i = type.lastIndexOf('.');
+        if (i == -1) {
+            return type;
+        }
+
+        return type.substring(i + 1);
     }
 
     public Converter newInstance() {

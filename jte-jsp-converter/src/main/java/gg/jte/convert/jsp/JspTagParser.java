@@ -8,7 +8,9 @@ public class JspTagParser extends Parser {
         register(new JspTaglibConverter());
         register(new JspAttributeConverter());
         register(new JspIfConverter());
-        register(new JspEndIfConverter());
+        register(new JspChooseConverter());
+        register(new JspWhenConverter());
+        register(new JspOtherwiseConverter());
         register(new JspOutputConverter());
         register(new JspJteTagConverter(jteTag));
     }

@@ -3,17 +3,21 @@ package gg.jte.convert;
 import gg.jte.convert.xml.XmlAttributesParser;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class Parser {
+    private final Set<String> importStatements = new TreeSet<>();
     private final List<Converter> converters = new ArrayList<>();
-    private final Deque<Converter> converterStack = new ArrayDeque<>();
+    private final ArrayDeque<Converter> converterStack = new ArrayDeque<>();
 
     private String content;
     private int index;
     private int lastContentIndex;
     private StringBuilder result;
     private Converter currentConverter;
+    private int importIndex;
+    private int skipIndentations;
+    private final int indentationCount = 4;
+    private final char indentationChar = ' ';
 
     public void register(Converter converter) {
         converters.add(converter);
@@ -42,41 +46,8 @@ public class Parser {
     public XmlAttributesParser parseXmlAttributes(int offset) {
         XmlAttributesParser parser = new XmlAttributesParser(content, index + offset);
         index = parser.getEndIndex();
-        lastContentIndex = index;
+        markLastContentIndex();
         return parser;
-    }
-
-    public void parseXmlAttribute(String name, Consumer<String> consumer) {
-        if (!endsWith(name)) {
-            return;
-        }
-
-        if (!Character.isWhitespace(content.charAt(index - name.length() - 1))) {
-            return;
-        }
-
-        int equalsIndex = content.indexOf('=', index);
-        if (equalsIndex == -1) {
-            return;
-        }
-
-        int quotesIndex = content.indexOf('"', equalsIndex + 1);
-        if (quotesIndex == -1) {
-            return;
-        }
-
-        int nextQuotesIndex = content.indexOf('"', quotesIndex + 1);
-        if (nextQuotesIndex == -1) {
-            return;
-        }
-
-        consumer.accept(content.substring(quotesIndex + 1, nextQuotesIndex));
-
-        index = nextQuotesIndex;
-    }
-
-    public void parseXmlAttributeAsBoolean(String name, Consumer<Boolean> consumer) {
-        parseXmlAttribute(name, v -> consumer.accept(Boolean.parseBoolean(v)));
     }
 
     public String convert(String content, String prefix) {
@@ -85,14 +56,14 @@ public class Parser {
 
         if (prefix != null) {
             result.append(prefix);
+            importIndex = result.length();
         }
 
         for (index = 0; index < content.length(); ++index) {
-            if (currentConverter == null) {
-                for (Converter converter : converters) {
-                    if (converter.canConvert(this)) {
-                        pushConverter(converter);
-                    }
+            for (Converter converter : converters) {
+                if (converter.canConvert(this)) {
+                    pushConverter(converter);
+                    break;
                 }
             }
 
@@ -104,13 +75,43 @@ public class Parser {
         }
 
         appendContentToResultIfRequired();
+        insertImportStatementsIfRequired();
 
         return result.toString();
     }
 
-    private void appendContentToResultIfRequired() {
-        if (currentConverter == null && lastContentIndex < index && lastContentIndex < content.length()) {
-            result.append(content, lastContentIndex, index);
+    private void insertImportStatementsIfRequired() {
+        if (!importStatements.isEmpty()) {
+            result.insert(importIndex, String.join("\n", importStatements));
+        }
+    }
+
+    public void appendContentToResultIfRequired() {
+        if (lastContentIndex < index && lastContentIndex < content.length()) {
+            if (skipIndentations > 0) {
+                int amountToSkip = 0;
+
+                if (lastContentIndex > 0 && content.charAt(lastContentIndex - 1) == '\n') {
+                    amountToSkip = skipIndentations * indentationCount;
+                }
+
+                for (int i = lastContentIndex; i < index; i++) {
+                    char c = content.charAt(i);
+                    if (amountToSkip > 0 && c == indentationChar) {
+                        --amountToSkip;
+                    } else {
+                        result.append(c);
+                        amountToSkip = 0;
+                    }
+
+                    if (c == '\n') {
+                        amountToSkip = skipIndentations * indentationCount;
+                    }
+                }
+            } else {
+                result.append(content, lastContentIndex, index);
+            }
+            lastContentIndex = index;
         }
     }
 
@@ -118,24 +119,95 @@ public class Parser {
         appendContentToResultIfRequired();
 
         currentConverter = converter.newInstance();
-        converterStack.add(currentConverter);
+        converterStack.push(currentConverter);
+
+        currentConverter.onPushed(this);
     }
 
     private void popConverter() {
         Converter converter = converterStack.pop();
-        if (converter != null) {
-            converter.convert(result);
-        }
+        converter.onPopped(this);
         currentConverter = converterStack.peek();
+    }
 
+    public void markLastContentIndex() {
         lastContentIndex = index;
+    }
+
+    public void markLastContentIndex(int offset) {
+        lastContentIndex = index + offset;
     }
 
     public int getIndex() {
         return index;
     }
 
+    public void advanceIndex(int offset) {
+        index += offset;
+    }
+
     public String substring(int beginIndex, int endIndex) {
         return content.substring(beginIndex, endIndex);
+    }
+
+    public void addImportStatement(String importStatement) {
+        importStatements.add(importStatement);
+    }
+
+    public Converter getCurrentConverter() {
+        return currentConverter;
+    }
+
+    public Converter getParentConverter() {
+        boolean first = true;
+        for (Converter converter : converterStack) {
+            if (first) {
+                first = false;
+            } else {
+                return converter;
+            }
+        }
+        return null;
+    }
+
+    public StringBuilder getResult() {
+        return result;
+    }
+
+    public void advanceIndexAfter(char character, int atLeast) {
+        advanceIndex(atLeast);
+
+        for (; index < content.length(); ++index) {
+            char c = content.charAt(index);
+            if (!Character.isWhitespace(c)) {
+                return;
+            }
+
+            if (c == character) {
+                return;
+            }
+        }
+    }
+
+    public void incrementSkipIndentations() {
+        ++skipIndentations;
+    }
+
+    public void decrementSkipIndentations() {
+        --skipIndentations;
+    }
+
+    public void removeLeadingSpaces() {
+        int i;
+        for (i = result.length() - 1; i >= 0; --i) {
+            char c = result.charAt(i);
+            if (c != indentationChar) {
+                break;
+            }
+        }
+
+        if (i < result.length() - 1) {
+            result.delete(i + 1, result.length());
+        }
     }
 }

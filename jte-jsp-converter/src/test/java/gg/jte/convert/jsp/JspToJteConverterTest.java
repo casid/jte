@@ -35,6 +35,13 @@ class JspToJteConverterTest {
     }
 
     @Test
+    void simpleTagWithChooseStatement() {
+        givenUsecase("simpleTagWithChooseStatement");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
     void simpleTagWithUsages() {
         givenUsecase("simpleTagWithUsages");
         whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte");
@@ -58,7 +65,7 @@ class JspToJteConverterTest {
     }
 
     void whenJspTagIsConverted(String jspTag, String jteTag) {
-        JspToJteConverter converter = new JspToJteConverter(jspRoot, jteRoot, "<my:jte");
+        JspToJteConverter converter = new JspToJteConverter(jspRoot, jteRoot, "my:jte");
         converter.setDefaultImports("@import static example.JteContext.*\n");
         converter.convertTag(jspTag, jteTag);
     }

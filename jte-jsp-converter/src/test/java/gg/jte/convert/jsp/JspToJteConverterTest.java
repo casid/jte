@@ -69,6 +69,11 @@ class JspToJteConverterTest {
         thenConversionIsAsExpected();
     }
 
+    @Test
+    void simpleJspWithNotYetConvertedTag() {
+        // TODO implement
+    }
+
     void givenUsecase(String usecase) {
         jspRoot = tempDir.resolve("jsp");
         jteRoot = tempDir.resolve("jte");

@@ -24,4 +24,7 @@
         Enjoy your ${foodOption} :-)
     </c:otherwise>
 </c:choose>
+
+<%-- A one liner! --%>
+<c:choose><c:when test="${hangover}">Hangover</c:when><c:otherwise>No hangover</c:otherwise></c:choose>
 </h4>

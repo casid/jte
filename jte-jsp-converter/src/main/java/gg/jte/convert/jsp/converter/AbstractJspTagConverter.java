@@ -28,16 +28,16 @@ public abstract class AbstractJspTagConverter implements Converter {
                 if (dropClosingTagLine()) {
                     parser.removeLeadingSpaces();
                     parser.advanceIndex(closingTag.length());
-                    parser.advanceIndexAfter('\n', 0);
+                    parser.advanceIndexAfter('\n');
                 } else {
                     parser.advanceIndex(closingTag.length());
                 }
-                parser.markLastContentIndex(1);
+                parser.markLastContentIndexAfterTag();
                 return true;
             }
         } else if (advanceTag(parser)) {
             convertTag(parser, parser.getResult());
-            parser.markLastContentIndex(1);
+            parser.markLastContentIndexAfterTag();
             if (!hasBody) {
                 return true;
             }

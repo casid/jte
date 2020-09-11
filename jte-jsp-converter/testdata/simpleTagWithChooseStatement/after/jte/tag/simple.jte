@@ -18,4 +18,7 @@
 @else
     Enjoy your ${foodOption} :-)
 @endif
+
+<%-- A one liner! --%>
+@if(hangover)Hangover@elseNo hangover@endif
 </h4>

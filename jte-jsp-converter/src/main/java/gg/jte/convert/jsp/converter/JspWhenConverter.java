@@ -14,6 +14,11 @@ public class JspWhenConverter extends AbstractJspTagConverter {
     }
 
     @Override
+    public boolean canConvert(Parser parser) {
+        return super.canConvert(parser) && parser.getCurrentConverter() instanceof JspChooseConverter;
+    }
+
+    @Override
     protected void parseAttributes(XmlAttributesParser attributes) {
         test = attributes.get("test");
     }

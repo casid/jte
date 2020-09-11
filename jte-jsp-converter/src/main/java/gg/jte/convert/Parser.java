@@ -116,12 +116,13 @@ public class Parser {
     }
 
     private void pushConverter(Converter converter) {
-        appendContentToResultIfRequired();
 
         currentConverter = converter.newInstance();
         converterStack.push(currentConverter);
 
         currentConverter.onPushed(this);
+
+        appendContentToResultIfRequired();
     }
 
     private void popConverter() {
@@ -134,8 +135,12 @@ public class Parser {
         lastContentIndex = index;
     }
 
-    public void markLastContentIndex(int offset) {
-        lastContentIndex = index + offset;
+    public void markLastContentIndexAfterTag() {
+        if (content.charAt(index) == '\n' || content.charAt(index) == '>') {
+            lastContentIndex = index + 1;
+        } else {
+            lastContentIndex = index;
+        }
     }
 
     public int getIndex() {
@@ -174,12 +179,11 @@ public class Parser {
         return result;
     }
 
-    public void advanceIndexAfter(char character, int atLeast) {
-        advanceIndex(atLeast);
-
+    public void advanceIndexAfter(char character) {
         for (; index < content.length(); ++index) {
             char c = content.charAt(index);
             if (!Character.isWhitespace(c)) {
+                --index;
                 return;
             }
 

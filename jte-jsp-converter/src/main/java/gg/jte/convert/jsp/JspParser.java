@@ -14,5 +14,6 @@ public class JspParser extends Parser {
         register(new JspOutputConverter());
         register(new JspJteTagConverter(jteTag));
         register(new JspCommentConverter());
+        register(new JspVariableConverter());
     }
 }

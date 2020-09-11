@@ -20,6 +20,11 @@ public class JspTaglibConverter extends AbstractJspDirectiveConverter {
         // this directive is ignored in the jte output.
     }
 
+    @Override
+    protected boolean dropClosingTagLine() {
+        return true;
+    }
+
     public Converter newInstance() {
         return new JspTaglibConverter();
     }

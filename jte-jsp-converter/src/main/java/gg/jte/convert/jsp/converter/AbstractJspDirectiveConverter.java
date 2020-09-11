@@ -32,7 +32,12 @@ public abstract class AbstractJspDirectiveConverter implements Converter {
             parseAttributes(attributes);
         } else if (parser.endsWith("%>")) {
             convertDirective(parser, parser.getResult());
-            parser.markLastContentIndex();
+            if (dropClosingTagLine()) {
+                parser.advanceIndexAfter('\n');
+                parser.markLastContentIndexAfterTag();
+            } else {
+                parser.markLastContentIndex();
+            }
             return true;
         }
 
@@ -42,4 +47,8 @@ public abstract class AbstractJspDirectiveConverter implements Converter {
     protected abstract void parseAttributes(XmlAttributesParser attributes);
 
     public abstract void convertDirective(Parser parser, StringBuilder result);
+
+    protected boolean dropClosingTagLine() {
+        return false;
+    }
 }

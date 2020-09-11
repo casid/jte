@@ -1,6 +1,5 @@
 @import static example.JteContext.*
 
-
 @param String greeting
 @param String name
 

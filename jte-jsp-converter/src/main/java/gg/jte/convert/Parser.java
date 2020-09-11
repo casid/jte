@@ -82,7 +82,11 @@ public class Parser {
 
     private void insertImportStatementsIfRequired() {
         if (!importStatements.isEmpty()) {
-            result.insert(importIndex, String.join("\n", importStatements));
+            StringBuilder imports = new StringBuilder();
+            for (String importStatement : importStatements) {
+                imports.append(importStatement).append('\n');
+            }
+            result.insert(importIndex, imports);
         }
     }
 
@@ -136,7 +140,7 @@ public class Parser {
     }
 
     public void markLastContentIndexAfterTag() {
-        if (content.charAt(index) == '\n' || content.charAt(index) == '>') {
+        if (index < content.length() && (content.charAt(index) == '\n' || content.charAt(index) == '>')) {
             lastContentIndex = index + 1;
         } else {
             lastContentIndex = index;

@@ -30,7 +30,7 @@ public class JspToJteConverter {
     }
 
     private void convertTag(Path jspTag, Path jteTag) {
-        JspTagParser parser = new JspTagParser(this.jteTag);
+        JspParser parser = new JspParser(this.jteTag);
         String jte = parser.convert(IoUtils.readFile(jspTag), defaultImports);
 
         System.out.println(jte);

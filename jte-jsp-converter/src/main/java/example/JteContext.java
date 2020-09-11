@@ -1,5 +1,7 @@
 package example;
 
+import gg.jte.Content;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -23,5 +25,19 @@ public class JteContext {
         } else {
             return obj instanceof Map && ((Map<?, ?>) obj).isEmpty();
         }
+    }
+
+    /**
+     * Dummy localization method
+     */
+    public static Content localize(String key) {
+        return null;
+    }
+
+    /**
+     * Dummy localization method
+     */
+    public static Content localize(String key, Object ... params) {
+        return null;
     }
 }

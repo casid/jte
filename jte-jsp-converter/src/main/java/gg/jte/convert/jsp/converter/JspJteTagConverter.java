@@ -25,7 +25,7 @@ public class JspJteTagConverter extends AbstractJspTagConverter {
     }
 
     @Override
-    public void convertTag(Parser parser, StringBuilder result) {
+    public void convertTagBegin(Parser parser, StringBuilder result) {
         String pathWithoutExtension = jteTagPath.substring(0, jteTagPath.length() - 4);
         String tagCall = pathWithoutExtension.replace('/', '.');
 
@@ -43,7 +43,7 @@ public class JspJteTagConverter extends AbstractJspTagConverter {
     }
 
     @Override
-    public void convertBody(Parser parser, StringBuilder result) {
+    public void convertTagEnd(Parser parser, StringBuilder result) {
         // Not required
     }
 

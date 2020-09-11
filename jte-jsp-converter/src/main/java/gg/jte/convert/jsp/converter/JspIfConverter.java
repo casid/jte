@@ -19,7 +19,7 @@ public class JspIfConverter extends AbstractJspTagConverter {
     }
 
     @Override
-    public void convertTag(Parser parser, StringBuilder result) {
+    public void convertTagBegin(Parser parser, StringBuilder result) {
         if (test != null) {
             test = new JspExpressionConverter(test).getJavaCode();
         } else {
@@ -30,7 +30,7 @@ public class JspIfConverter extends AbstractJspTagConverter {
     }
 
     @Override
-    public void convertBody(Parser parser, StringBuilder result) {
+    public void convertTagEnd(Parser parser, StringBuilder result) {
         result.append("@endif");
     }
 

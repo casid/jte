@@ -23,7 +23,7 @@ public abstract class AbstractJspTagConverter implements Converter {
         if (body) {
             if (advanceBody(parser)) {
                 appendContentBeforeClosingTag(parser);
-                convertBody(parser, parser.getResult());
+                convertTagEnd(parser, parser.getResult());
 
                 if (dropClosingTagLine()) {
                     parser.removeLeadingSpaces();
@@ -36,16 +36,23 @@ public abstract class AbstractJspTagConverter implements Converter {
                 return true;
             }
         } else if (advanceTag(parser)) {
-            convertTag(parser, parser.getResult());
+            convertTagBegin(parser, parser.getResult());
             parser.markLastContentIndexAfterTag();
             if (!hasBody) {
+                convertTagEnd(parser, parser.getResult());
                 return true;
+            } else {
+                onBodyDetected(parser);
             }
 
             body = true;
         }
 
         return false;
+    }
+
+    protected void onBodyDetected(Parser parser) {
+        // Do nothing by default
     }
 
     protected void appendContentBeforeClosingTag(Parser parser) {
@@ -82,9 +89,9 @@ public abstract class AbstractJspTagConverter implements Converter {
         return parser.startsWith(closingTag);
     }
 
-    public abstract void convertTag(Parser parser, StringBuilder result);
+    public abstract void convertTagBegin(Parser parser, StringBuilder result);
 
-    public abstract void convertBody(Parser parser, StringBuilder result);
+    public abstract void convertTagEnd(Parser parser, StringBuilder result);
 
     protected abstract void parseAttributes(XmlAttributesParser attributes);
 

@@ -2,27 +2,35 @@ package gg.jte.convert.jsp.converter;
 
 import gg.jte.convert.Converter;
 import gg.jte.convert.Parser;
+import gg.jte.convert.jsp.JspExpressionConverter;
 import gg.jte.convert.xml.XmlAttributesParser;
 
-public class JspOtherwiseConverter extends AbstractJspTagConverter {
+public class JspFormatParamConverter extends AbstractJspTagConverter {
 
-    public JspOtherwiseConverter() {
-        super("c:otherwise");
+    private String value;
+
+    public JspFormatParamConverter() {
+        super("fmt:param");
     }
 
     @Override
     public boolean canConvert(Parser parser) {
-        return super.canConvert(parser) && parser.getCurrentConverter() instanceof JspChooseConverter;
+        return super.canConvert(parser) && parser.getCurrentConverter() instanceof JspFormatMessageConverter;
     }
 
     @Override
     protected void parseAttributes(XmlAttributesParser attributes) {
-        // has none
+        value = attributes.get("value");
     }
 
     @Override
     public void convertTagBegin(Parser parser, StringBuilder result) {
-        result.append("@else");
+        parser.removeLeadingSpaces();
+        parser.advanceIndexAfter('\n');
+
+        value = JspExpressionConverter.convertAttributeValue(value);
+
+        result.append(", ").append(value);
     }
 
     @Override
@@ -36,6 +44,6 @@ public class JspOtherwiseConverter extends AbstractJspTagConverter {
     }
 
     public Converter newInstance() {
-        return new JspOtherwiseConverter();
+        return new JspFormatParamConverter();
     }
 }

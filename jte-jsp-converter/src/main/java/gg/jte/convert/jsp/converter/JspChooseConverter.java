@@ -18,14 +18,14 @@ public class JspChooseConverter extends AbstractJspTagConverter {
     }
 
     @Override
-    public void convertTag(Parser parser, StringBuilder result) {
+    public void convertTagBegin(Parser parser, StringBuilder result) {
         // nothing to write to the jte file
         parser.removeLeadingSpaces();
         parser.advanceIndexAfter('\n');
     }
 
     @Override
-    public void convertBody(Parser parser, StringBuilder result) {
+    public void convertTagEnd(Parser parser, StringBuilder result) {
         result.append("@endif");
     }
 

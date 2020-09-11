@@ -22,18 +22,19 @@ public class JspVariableConverter extends AbstractJspTagConverter {
 
     @Override
     public void convertTag(Parser parser, StringBuilder result) {
+        result.append("!{var ").append(var).append(" = ");
+
         if (value != null) {
             value = JspExpressionConverter.convertAttributeValue(value);
+            result.append(value).append(";}");
         } else {
-            // TODO content block
+            result.append("@`");
         }
-
-        result.append("!{var ").append(var).append(" = ").append(value).append(";}");
     }
 
     @Override
     public void convertBody(Parser parser, StringBuilder result) {
-        result.append("@endif");
+        result.append("`;}");
     }
 
     public Converter newInstance() {

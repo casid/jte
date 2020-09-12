@@ -9,11 +9,15 @@ import java.util.Map;
 public class JspExpressionConverter {
 
     public static String convertAttributeValue(String value) {
-        if (value.trim().startsWith("${")) {
-            return new JspExpressionConverter(value).getJavaCode();
-        } else {
-            return "\"" + value + "\"";
+        if (value != null) {
+            if ( value.trim().startsWith("${") ) {
+                return new JspExpressionConverter(value).getJavaCode();
+            } else {
+                return "\"" + value + "\"";
+            }
         }
+
+        return "?";
     }
 
     private final Node root;
@@ -21,32 +25,41 @@ public class JspExpressionConverter {
     private final Map<Class<? extends Node>, Visitor> visitorMap = new HashMap<>();
 
     public JspExpressionConverter(String el) {
-        root = ExpressionBuilder.createNode(el);
-        result = new StringBuilder(el.length());
+        if (el == null || el.isBlank()) {
+            root = null;
+            result = new StringBuilder();
+        } else {
+            root = ExpressionBuilder.createNode(el);
+            result = new StringBuilder(el.length());
 
-        visitorMap.put(AstMethodParameters.class, new AstMethodParametersVisitor());
-        visitorMap.put(AstIdentifier.class, new AstIdentifierVisitor());
-        visitorMap.put(AstEmpty.class, new AstEmptyVisitor());
-        visitorMap.put(AstNot.class, new AstNotVisitor());
-        visitorMap.put(AstOr.class, new AstOrVisitor());
-        visitorMap.put(AstAnd.class, new AstAndVisitor());
-        visitorMap.put(AstTrue.class, new AstTrueVisitor());
-        visitorMap.put(AstFalse.class, new AstFalseVisitor());
-        visitorMap.put(AstValue.class, new AstValueVisitor());
-        visitorMap.put(AstEqual.class, new AstEqualVisitor());
-        visitorMap.put(AstInteger.class, new AstIntegerVisitor());
-        visitorMap.put(AstDotSuffix.class, new AstDotSuffixVisitor());
-        visitorMap.put(AstChoice.class, new AstChoiceVisitor());
-        visitorMap.put(AstString.class, new AstStringVisitor());
-        visitorMap.put(AstFloatingPoint.class, new AstFloatingPointVisitor());
-        visitorMap.put(AstPlus.class, new AstPlusVisitor());
-        visitorMap.put(AstMinus.class, new AstMinusVisitor());
-        visitorMap.put(AstMult.class, new AstMultVisitor());
-        visitorMap.put(AstDiv.class, new AstDivVisitor());
-        visitorMap.put(AstMod.class, new AstModVisitor());
-        visitorMap.put(AstLiteralExpression.class, new AstLiteralExpressionVisitor());
+            visitorMap.put(AstMethodParameters.class, new AstMethodParametersVisitor());
+            visitorMap.put(AstIdentifier.class, new AstIdentifierVisitor());
+            visitorMap.put(AstEmpty.class, new AstEmptyVisitor());
+            visitorMap.put(AstNot.class, new AstNotVisitor());
+            visitorMap.put(AstOr.class, new AstOrVisitor());
+            visitorMap.put(AstAnd.class, new AstAndVisitor());
+            visitorMap.put(AstTrue.class, new AstTrueVisitor());
+            visitorMap.put(AstFalse.class, new AstFalseVisitor());
+            visitorMap.put(AstValue.class, new AstValueVisitor());
+            visitorMap.put(AstEqual.class, new AstEqualVisitor());
+            visitorMap.put(AstNotEqual.class, new AstNotEqualVisitor());
+            visitorMap.put(AstInteger.class, new AstIntegerVisitor());
+            visitorMap.put(AstDotSuffix.class, new AstDotSuffixVisitor());
+            visitorMap.put(AstChoice.class, new AstChoiceVisitor());
+            visitorMap.put(AstString.class, new AstStringVisitor());
+            visitorMap.put(AstFloatingPoint.class, new AstFloatingPointVisitor());
+            visitorMap.put(AstPlus.class, new AstPlusVisitor());
+            visitorMap.put(AstMinus.class, new AstMinusVisitor());
+            visitorMap.put(AstMult.class, new AstMultVisitor());
+            visitorMap.put(AstDiv.class, new AstDivVisitor());
+            visitorMap.put(AstMod.class, new AstModVisitor());
+            visitorMap.put(AstGreaterThan.class, new AstGreaterThanVisitor());
+            visitorMap.put(AstLessThan.class, new AstLessThanVisitor());
+            visitorMap.put(AstLiteralExpression.class, new AstLiteralExpressionVisitor());
+            visitorMap.put(AstFunction.class, new AstFunctionVisitor());
 
-        process(root);
+            process(root);
+        }
     }
 
     public String getJavaCode() {
@@ -181,6 +194,13 @@ public class JspExpressionConverter {
         }
     }
 
+    private class AstNotEqualVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return "!=";
+        }
+    }
+
     private class AstIntegerVisitor implements Visitor {
         @Override
         public void visit(Node node) {
@@ -257,10 +277,41 @@ public class JspExpressionConverter {
         }
     }
 
+    private class AstGreaterThanVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return ">";
+        }
+    }
+
+    private class AstLessThanVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return "<";
+        }
+    }
+
     private class AstLiteralExpressionVisitor implements Visitor {
         @Override
         public void visit(Node node) {
             result.append(node.getImage());
+        }
+    }
+
+    private class AstFunctionVisitor implements Visitor {
+        @Override
+        public void visit( Node node ) {
+            AstFunction function = (AstFunction)node;
+            result.append(function.getPrefix());
+            result.append(':');
+            result.append(function.getLocalName());
+
+            for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+                if (i > 0) {
+                    result.append(", ");
+                }
+                process(node.jjtGetChild(i));
+            }
         }
     }
 }

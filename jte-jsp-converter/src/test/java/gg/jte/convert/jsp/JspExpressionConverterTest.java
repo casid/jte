@@ -7,6 +7,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JspExpressionConverterTest {
 
     @Test
+    void noContent() {
+        assertConversion("", "");
+    }
+
+    @Test
     void empty() {
         assertConversion("${empty foo}", "isEmpty(foo)");
     }
@@ -57,6 +62,21 @@ class JspExpressionConverterTest {
     }
 
     @Test
+    void ne() {
+        assertConversion("${data.quantity ne 42}", "data.quantity != 42");
+    }
+
+    @Test
+    void gt() {
+        assertConversion("${data.quantity gt 42}", "data.quantity > 42");
+    }
+
+    @Test
+    void lt() {
+        assertConversion("${data.quantity lt 42}", "data.quantity < 42");
+    }
+
+    @Test
     void ternary() {
         assertConversion("${data.quantity == 42 ? 'Yay' : 'Nay'}", "data.quantity == 42 ? \"Yay\" : \"Nay\"");
     }
@@ -100,6 +120,16 @@ class JspExpressionConverterTest {
     @Test
     void calculation() {
         assertConversion("${x * 10 / 23.0}", "(x * 10) / 23.0");
+    }
+
+    @Test
+    void function() {
+        assertConversion("${fn:toLowerCase(viewModel.title)}", "fn:toLowerCase(viewModel.title)");
+    }
+
+    @Test
+    void function2() {
+        assertConversion("${fn:replace(message, newLine, '<br/>')}", "fn:replace(message, newLine, \"<br/>\")");
     }
 
     private void assertConversion(String el, String java) {

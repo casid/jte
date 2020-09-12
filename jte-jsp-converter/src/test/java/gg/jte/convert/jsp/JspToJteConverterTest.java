@@ -28,6 +28,13 @@ class JspToJteConverterTest {
     }
 
     @Test
+    void simpleTagWithTwoOutputsAfterEachOther() {
+        givenUsecase("simpleTagWithTwoOutputsAfterEachOther");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
     void simpleTagWithIfStatement() {
         givenUsecase("simpleTagWithIfStatement");
         whenJspTagIsConverted("simple.tag", "tag/simple.jte");

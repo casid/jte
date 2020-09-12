@@ -9,6 +9,9 @@ public class JspOutputConverter implements Converter {
 
     @Override
     public boolean canConvert(Parser parser) {
+        if (parser.getCurrentConverter() instanceof JspOutputConverter) {
+            return false;
+        }
         return parser.startsWith("${");
     }
 
@@ -16,9 +19,7 @@ public class JspOutputConverter implements Converter {
     public boolean advance(Parser parser) {
         if (startIndex == -1) {
             startIndex = parser.getIndex();
-        }
-
-        if (parser.endsWith("}")) {
+        } else if (parser.endsWith("}")) {
             String expression = parser.substring(startIndex, parser.getIndex());
             String javaCode = new JspExpressionConverter(expression).getJavaCode();
 

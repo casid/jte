@@ -99,8 +99,8 @@ class JspToJteConverterTest {
 
     void whenJspTagIsConverted(String jspTag, String jteTag) {
         JspToJteConverter converter = new JspToJteConverter(jspRoot, jteRoot, "my:jte");
-        converter.setDefaultImports("@import static example.JteContext.*\n");
         converter.convertTag(jspTag, jteTag, parser -> {
+            parser.setPrefix("@import static example.JteContext.*\n");
             parser.setIndentationChar(' ');
             parser.setIndentationCount(4);
             parser.setLineSeparator(System.lineSeparator());

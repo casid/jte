@@ -14,20 +14,10 @@ public class JspToJteConverter {
     private final Path jteRoot;
     private final String jteTag;
 
-    private String defaultImports;
-
     public JspToJteConverter(Path jspRoot, Path jteRoot, String jteTag) {
         this.jspRoot = jspRoot;
         this.jteRoot = jteRoot;
         this.jteTag = jteTag;
-    }
-
-    public void setDefaultImports(String defaultImports) {
-        this.defaultImports = defaultImports;
-    }
-
-    public void convertTag(String jspTag, String jteTag) {
-        convertTag(jspTag, jteTag, null);
     }
 
     public void convertTag(String jspTag, String jteTag, Consumer<JspParser> parserSetup) {
@@ -39,7 +29,7 @@ public class JspToJteConverter {
         if (parserSetup != null) {
             parserSetup.accept(parser);
         }
-        String jte = parser.convert(IoUtils.readFile(jspTag), defaultImports);
+        String jte = parser.convert(IoUtils.readFile(jspTag));
 
         System.out.println(jte);
 

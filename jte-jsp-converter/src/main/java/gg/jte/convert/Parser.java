@@ -19,6 +19,7 @@ public class Parser {
     private int indentationCount = 4;
     private char indentationChar = ' ';
     private String lineSeparator = "\n";
+    private String prefix;
 
     public void register(Converter converter) {
         converters.add(converter);
@@ -34,6 +35,10 @@ public class Parser {
 
     public void setLineSeparator(String lineSeparator) {
         this.lineSeparator = lineSeparator;
+    }
+
+    public void setPrefix( String prefix ) {
+        this.prefix = prefix;
     }
 
     public boolean startsWith(String token) {
@@ -63,7 +68,7 @@ public class Parser {
         return parser;
     }
 
-    public String convert(String content, String prefix) {
+    public String convert(String content) {
         this.content = content.replace("\r\n", "\n");
         this.result = new StringBuilder(content.length());
 

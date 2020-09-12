@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -51,6 +52,8 @@ public class IoUtils {
     public static void deleteFile(Path file) {
         try {
             Files.delete(file);
+        } catch ( NoSuchFileException e ) {
+            // Okay, it is already deleted.
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

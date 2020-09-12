@@ -24,6 +24,29 @@ public class JspToJteConverter {
         convertTag(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag), parserSetup);
     }
 
+    public void replaceUsages(String jspTag, String jteTag) {
+        replaceUsages(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag));
+    }
+
+    public void replaceUsages(Path jspTag, Path jteTag) {
+        String oldJspTagPrefix = extractTagPrefix(jspTag);
+        String newJteFile = jteRoot.relativize(jteTag).toString().replace('\\', '/');
+
+        IoUtils.deleteFile(jspTag);
+
+        try (Stream<Path> stream = Files.walk(jspRoot)) {
+            stream
+                  .filter(Files::isRegularFile)
+                  .filter(p -> !Files.isDirectory(p))
+                  .filter(p -> {
+                      String fileName = p.toString();
+                      return fileName.endsWith(".jsp") || fileName.endsWith(".jsp.inc") || fileName.endsWith(".tag");
+                  }).forEach(jspFile -> replaceUsages(jspFile, oldJspTagPrefix, newJteFile));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     private void convertTag(Path jspTag, Path jteTag, Consumer<JspParser> parserSetup) {
         JspParser parser = new JspParser(this.jteTag);
         if (parserSetup != null) {
@@ -33,23 +56,9 @@ public class JspToJteConverter {
 
         System.out.println(jte);
 
-        String oldJspTagPrefix = extractTagPrefix(jspTag);
-        String newJteFile = jteRoot.relativize(jteTag).toString().replace('\\', '/');
-
         IoUtils.writeFile(jteTag, jte);
-        IoUtils.deleteFile(jspTag);
 
-        try (Stream<Path> stream = Files.walk(jspRoot)) {
-            stream
-                    .filter(Files::isRegularFile)
-                    .filter(p -> !Files.isDirectory(p))
-                    .filter(p -> {
-                String fileName = p.toString();
-                return fileName.endsWith(".jsp") || fileName.endsWith(".jsp.inc") || fileName.endsWith(".tag");
-            }).forEach(jspFile -> replaceUsages(jspFile, oldJspTagPrefix, newJteFile));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        replaceUsages(jspTag, jteTag);
     }
 
     private void replaceUsages(Path jspFile, String oldJspTagPrefix, String newJteFile) {
@@ -59,12 +68,17 @@ public class JspToJteConverter {
 
         do {
             lastIndex = jspContent.indexOf(oldJspTagPrefix, lastIndex);
-            if (lastIndex != -1 && lastIndex < jspContent.length()) {
-                if (Character.isWhitespace(jspContent.charAt(lastIndex + oldJspTagPrefix.length()))) {
+            if (lastIndex >= 0 && lastIndex < jspContent.length()) {
+                char character = jspContent.charAt(lastIndex + oldJspTagPrefix.length());
+                if (Character.isWhitespace(character) || character == '/') {
                     jspContent.replace(lastIndex, lastIndex + oldJspTagPrefix.length(), "<" + jteTag + " jte=\"" + newJteFile + "\"");
+                } else {
+                    ++lastIndex;
                 }
+            } else {
+                break;
             }
-        } while (lastIndex != -1);
+        } while (true);
 
         IoUtils.writeFile(jspFile, jspContent.toString());
     }

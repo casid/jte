@@ -1,6 +1,7 @@
 package gg.jte.convert.jsp;
 
 import gg.jte.convert.IoUtils;
+import gg.jte.convert.cc.CamelCaseConverter;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -10,6 +11,20 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class JspToJteConverter {
+
+    public static void convertFromIntelliJPlugin(String[] commandLineArgs, JspToJteConverter converter, Consumer<JspParser> parserSetup) {
+        if (commandLineArgs.length < 1) {
+            throw new IllegalArgumentException("Missing JSP file, it should be the first argument on the command line.");
+        }
+
+        Path jspFile = Path.of(commandLineArgs[0]);
+        jspFile = converter.jspRoot.toAbsolutePath().relativize(jspFile);
+
+        String jteFile = converter.suggestJteFile(jspFile.toString().replace('\\', '/'));
+
+        converter.convertTag(jspFile.toString(), jteFile, parserSetup);
+    }
+
     private final Path jspRoot;
     private final Path jteRoot;
     private final String jteTag;
@@ -25,6 +40,7 @@ public class JspToJteConverter {
         convertTag(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag), parserSetup);
     }
 
+    @SuppressWarnings("unused")
     public void replaceUsages(String jspTag, String jteTag) {
         checkJteName(jteTag);
         replaceUsages(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag));
@@ -102,7 +118,58 @@ public class JspToJteConverter {
         return "<" + namespace + ":" + tagName;
     }
 
-    private void checkJteName(String name) {
+    protected String suggestJteFile(String jspFile) {
+        int fileSeparatorIndex = jspFile.indexOf('.');
+        if (fileSeparatorIndex == -1) {
+            throw new IllegalArgumentException("JSP file without file extension " + jspFile);
+        }
+
+        String jspFileWithoutExtension = jspFile.substring(0, fileSeparatorIndex);
+        String jspFileExtension = jspFile.substring(fileSeparatorIndex);
+
+        String jteDirectory = suggestJteDirectory(jspFileWithoutExtension, jspFileExtension);
+
+        StringBuilder jteFile = new StringBuilder();
+        if (!jteDirectory.isBlank()) {
+            jteFile.append(jteDirectory);
+            jteFile.append('/');
+        }
+
+        jteFile.append(skipDirectoryIfRequired(jspFileWithoutExtension));
+        CamelCaseConverter.convertTo(jteFile);
+        jteFile.append(".jte");
+
+        return jteFile.toString();
+    }
+
+    protected String skipDirectoryIfRequired(String jspFileWithoutExtension) {
+        if (jspFileWithoutExtension.startsWith("tags/") || jspFileWithoutExtension.startsWith("tag/")) {
+            return skipFirstDirectory(jspFileWithoutExtension);
+        }
+
+        if (jspFileWithoutExtension.startsWith("layouts/") || jspFileWithoutExtension.startsWith("layout/")) {
+            return skipFirstDirectory(jspFileWithoutExtension);
+        }
+
+        return jspFileWithoutExtension;
+    }
+
+    protected String skipFirstDirectory(String jspFileWithoutExtension) {
+        return jspFileWithoutExtension.substring(jspFileWithoutExtension.indexOf('/') + 1);
+    }
+
+    protected String suggestJteDirectory(String jspFileWithoutExtension, String jspFileExtension) {
+        if (jspFileWithoutExtension.startsWith("layouts/") || jspFileWithoutExtension.startsWith("layout/")) {
+            return "layout";
+        }
+
+        if (!".jsp".equals(jspFileExtension)) {
+            return "tag";
+        }
+        return "";
+    }
+
+    protected void checkJteName(String name) {
         if (name.contains("-")) {
             throw new IllegalArgumentException("Illegal jte tag name '" + name + "'. Tag names should be camel case.");
         }

@@ -13,6 +13,11 @@ public class JspChooseConverter extends AbstractJspTagConverter {
     }
 
     @Override
+    protected boolean dropOpeningTagLine() {
+        return true;
+    }
+
+    @Override
     protected void parseAttributes(XmlAttributesParser attributes) {
         // has none
     }
@@ -20,8 +25,6 @@ public class JspChooseConverter extends AbstractJspTagConverter {
     @Override
     public void convertTagBegin(Parser parser, StringBuilder result) {
         // nothing to write to the jte file
-        parser.removeLeadingSpaces();
-        parser.advanceIndexAfter('\n');
     }
 
     @Override

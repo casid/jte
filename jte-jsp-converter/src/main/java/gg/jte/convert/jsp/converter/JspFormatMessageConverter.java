@@ -53,7 +53,7 @@ public class JspFormatMessageConverter extends AbstractJspTagConverter {
     @Override
     protected void onBodyDetected(Parser parser) {
         parser.advanceIndexAfter('\n');
-        parser.markLastContentIndexAfterTag();
+        parser.markLastContentIndexAfterTag(true);
     }
 
     public Converter newInstance() {

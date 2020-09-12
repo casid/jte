@@ -16,11 +16,24 @@ public class Parser {
     private Converter currentConverter;
     private int importIndex;
     private int skipIndentations;
-    private final int indentationCount = 4;
-    private final char indentationChar = ' ';
+    private int indentationCount = 4;
+    private char indentationChar = ' ';
+    private String lineSeparator = "\n";
 
     public void register(Converter converter) {
         converters.add(converter);
+    }
+
+    public void setIndentationCount(int indentationCount) {
+        this.indentationCount = indentationCount;
+    }
+
+    public void setIndentationChar(char indentationChar) {
+        this.indentationChar = indentationChar;
+    }
+
+    public void setLineSeparator(String lineSeparator) {
+        this.lineSeparator = lineSeparator;
     }
 
     public boolean startsWith(String token) {
@@ -51,7 +64,7 @@ public class Parser {
     }
 
     public String convert(String content, String prefix) {
-        this.content = content;
+        this.content = content.replace("\r\n", "\n");
         this.result = new StringBuilder(content.length());
 
         if (prefix != null) {
@@ -77,7 +90,11 @@ public class Parser {
         appendContentToResultIfRequired();
         insertImportStatementsIfRequired();
 
-        return result.toString();
+        String resultString = result.toString();
+        if (!"\n".equals(lineSeparator)) {
+            return resultString.replace("\n", lineSeparator);
+        }
+        return resultString;
     }
 
     private void insertImportStatementsIfRequired() {
@@ -139,8 +156,8 @@ public class Parser {
         lastContentIndex = index;
     }
 
-    public void markLastContentIndexAfterTag() {
-        if (index < content.length() && (content.charAt(index) == '\n' || content.charAt(index) == '>')) {
+    public void markLastContentIndexAfterTag(boolean skipNewLine) {
+        if (index < content.length() && ((skipNewLine && content.charAt(index) == '\n') || content.charAt(index) == '>')) {
             lastContentIndex = index + 1;
         } else {
             lastContentIndex = index;

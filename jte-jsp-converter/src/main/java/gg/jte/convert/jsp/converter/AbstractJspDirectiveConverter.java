@@ -34,7 +34,7 @@ public abstract class AbstractJspDirectiveConverter implements Converter {
             convertDirective(parser, parser.getResult());
             if (dropClosingTagLine()) {
                 parser.advanceIndexAfter('\n');
-                parser.markLastContentIndexAfterTag();
+                parser.markLastContentIndexAfterTag(true);
             } else {
                 parser.markLastContentIndex();
             }

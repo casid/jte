@@ -25,9 +25,6 @@ public class JspFormatParamConverter extends AbstractJspTagConverter {
 
     @Override
     public void convertTagBegin(Parser parser, StringBuilder result) {
-        parser.removeLeadingSpaces();
-        parser.advanceIndexAfter('\n');
-
         value = JspExpressionConverter.convertAttributeValue(value);
 
         result.append(", ").append(value);
@@ -36,6 +33,11 @@ public class JspFormatParamConverter extends AbstractJspTagConverter {
     @Override
     public void convertTagEnd(Parser parser, StringBuilder result) {
         // Nothing to do
+    }
+
+    @Override
+    protected boolean dropOpeningTagLine() {
+        return true;
     }
 
     @Override

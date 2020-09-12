@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class JspToJteConverter {
@@ -26,11 +27,18 @@ public class JspToJteConverter {
     }
 
     public void convertTag(String jspTag, String jteTag) {
-        convertTag(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag));
+        convertTag(jspTag, jteTag, null);
     }
 
-    private void convertTag(Path jspTag, Path jteTag) {
+    public void convertTag(String jspTag, String jteTag, Consumer<JspParser> parserSetup) {
+        convertTag(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag), parserSetup);
+    }
+
+    private void convertTag(Path jspTag, Path jteTag, Consumer<JspParser> parserSetup) {
         JspParser parser = new JspParser(this.jteTag);
+        if (parserSetup != null) {
+            parserSetup.accept(parser);
+        }
         String jte = parser.convert(IoUtils.readFile(jspTag), defaultImports);
 
         System.out.println(jte);

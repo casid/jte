@@ -5,31 +5,34 @@ import gg.jte.convert.Parser;
 import gg.jte.convert.jsp.JspExpressionConverter;
 import gg.jte.convert.xml.XmlAttributesParser;
 
-public class JspIfConverter extends AbstractJspTagConverter {
 
-    private String test;
+public class JspForEachConverter extends AbstractJspTagConverter {
 
-    public JspIfConverter() {
-        super("c:if");
+    private String var;
+    private String items;
+
+    public JspForEachConverter() {
+        super("c:forEach");
     }
 
     @Override
     protected void parseAttributes(XmlAttributesParser attributes) {
-        test = attributes.get("test");
+        var = attributes.get("var");
+        items = attributes.get("items");
     }
 
     @Override
     public void convertTagBegin(Parser parser, StringBuilder result) {
-        test = JspExpressionConverter.convertAttributeValue(test);
-        result.append("@if(").append(test).append(")");
+        items = JspExpressionConverter.convertAttributeValue(items);
+        result.append("@for(var ").append(var).append(" : ").append(items).append(")");
     }
 
     @Override
     public void convertTagEnd(Parser parser, StringBuilder result) {
-        result.append("@endif");
+        result.append("@endfor");
     }
 
     public Converter newInstance() {
-        return new JspIfConverter();
+        return new JspForEachConverter();
     }
 }

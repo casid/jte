@@ -130,7 +130,7 @@ public class Parser {
                     }
                 }
             } else {
-                result.append(content, lastContentIndex, index);
+                result.append(content, lastContentIndex, Math.min(index, content.length()));
             }
             lastContentIndex = index;
         }

@@ -22,12 +22,31 @@ public class JspOutputConverter implements Converter {
             String expression = parser.substring(startIndex, parser.getIndex());
             String javaCode = new JspExpressionConverter(expression).getJavaCode();
 
-            parser.getResult().append("${").append(javaCode).append('}');
+            boolean writeAsOutput = isWriteAsOutput(parser);
+
+            if (writeAsOutput) {
+                parser.getResult().append("${");
+            }
+
+            parser.getResult().append(javaCode);
+
+            if (writeAsOutput) {
+                parser.getResult().append('}');
+            }
+
             parser.markLastContentIndex();
+            parser.advanceIndex(-1);
             return true;
         }
 
         return false;
+    }
+
+    private boolean isWriteAsOutput(Parser parser) {
+        if (parser.getParentConverter() instanceof JspFormatParamConverter) {
+            return false;
+        }
+        return true;
     }
 
     @Override

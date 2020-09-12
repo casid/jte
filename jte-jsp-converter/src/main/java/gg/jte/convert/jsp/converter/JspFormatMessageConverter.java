@@ -7,6 +7,7 @@ import gg.jte.convert.xml.XmlAttributesParser;
 
 public class JspFormatMessageConverter extends AbstractJspTagConverter {
 
+    private boolean nested;
     private String var;
     private String key;
 
@@ -25,26 +26,24 @@ public class JspFormatMessageConverter extends AbstractJspTagConverter {
         key = JspExpressionConverter.convertAttributeValue(key);
 
         if (var == null) {
-            result.append("${localize(").append(key);
+            nested = parser.getParentConverter() instanceof JspFormatParamConverter;
+            if (!nested) {
+                result.append("${");
+            }
+            result.append("localize(").append(key);
         } else {
             result.append("!{var ").append(var).append(" = ").append("localize(").append(key);
         }
-
-        /*
-        result.append("!{var ").append(var).append(" = ");
-
-        if (value != null) {
-            value = JspExpressionConverter.convertAttributeValue(value);
-            result.append(value).append(";}");
-        } else {
-            result.append("@`");
-        }*/
     }
 
     @Override
     public void convertTagEnd(Parser parser, StringBuilder result) {
         if (var == null) {
-            result.append(")}");
+            if (!nested) {
+                result.append(")}");
+            } else {
+                result.append(")");
+            }
         } else {
             result.append(");}");
         }
@@ -54,6 +53,21 @@ public class JspFormatMessageConverter extends AbstractJspTagConverter {
     protected void onBodyDetected(Parser parser) {
         parser.advanceIndexAfter('\n');
         parser.markLastContentIndexAfterTag(true);
+    }
+
+    @Override
+    protected boolean dropOpeningTagLine() {
+        return nested;
+    }
+
+    @Override
+    protected boolean dropClosingTagLine() {
+        return nested;
+    }
+
+    @Override
+    protected boolean dropLineBreakAfterTag() {
+        return nested;
     }
 
     public Converter newInstance() {

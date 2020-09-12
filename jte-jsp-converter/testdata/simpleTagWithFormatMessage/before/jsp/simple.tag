@@ -16,3 +16,15 @@ ${hello}
     <fmt:param value="Param 2"/>
 </fmt:message>
 ${params}
+
+<c:if test="${5 > 0}">
+    <span class="text-md">
+        <fmt:message key="nested">
+            <fmt:param>
+                <fmt:message key="common.x">
+                    <fmt:param>${'Something'}</fmt:param>
+                </fmt:message>
+            </fmt:param>
+        </fmt:message>
+    </span>
+</c:if>

@@ -21,10 +21,12 @@ public class JspToJteConverter {
     }
 
     public void convertTag(String jspTag, String jteTag, Consumer<JspParser> parserSetup) {
+        checkJteName(jteTag);
         convertTag(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag), parserSetup);
     }
 
     public void replaceUsages(String jspTag, String jteTag) {
+        checkJteName(jteTag);
         replaceUsages(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag));
     }
 
@@ -62,6 +64,8 @@ public class JspToJteConverter {
     }
 
     private void replaceUsages(Path jspFile, String oldJspTagPrefix, String newJteFile) {
+        boolean modified = false;
+
         StringBuilder jspContent = new StringBuilder(IoUtils.readFile(jspFile));
 
         int lastIndex = 0;
@@ -72,6 +76,7 @@ public class JspToJteConverter {
                 char character = jspContent.charAt(lastIndex + oldJspTagPrefix.length());
                 if (Character.isWhitespace(character) || character == '/') {
                     jspContent.replace(lastIndex, lastIndex + oldJspTagPrefix.length(), "<" + jteTag + " jte=\"" + newJteFile + "\"");
+                    modified = true;
                 } else {
                     ++lastIndex;
                 }
@@ -80,7 +85,9 @@ public class JspToJteConverter {
             }
         } while (true);
 
-        IoUtils.writeFile(jspFile, jspContent.toString());
+        if (modified) {
+            IoUtils.writeFile(jspFile, jspContent.toString());
+        }
     }
 
     private String extractTagPrefix(Path jspTag) {
@@ -93,5 +100,11 @@ public class JspToJteConverter {
         }
 
         return "<" + namespace + ":" + tagName;
+    }
+
+    private void checkJteName(String name) {
+        if (name.contains("-")) {
+            throw new IllegalArgumentException("Illegal jte tag name '" + name + "'. Tag names should be camel case.");
+        }
     }
 }

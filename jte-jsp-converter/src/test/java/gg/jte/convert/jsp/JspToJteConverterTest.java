@@ -11,6 +11,8 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+
 
 class JspToJteConverterTest {
     @TempDir
@@ -25,6 +27,13 @@ class JspToJteConverterTest {
         givenUsecase("simpleTag");
         whenJspTagIsConverted("simple.tag", "tag/simple.jte");
         thenConversionIsAsExpected();
+    }
+
+    @Test
+    void simpleTag_kebabCase() {
+        givenUsecase("simpleTag");
+        Throwable throwable = catchThrowable(() -> whenJspTagIsConverted("simple.tag", "tag/not-so-simple.jte"));
+        assertThat(throwable).isInstanceOf(IllegalArgumentException.class).hasMessage("Illegal jte tag name 'tag/not-so-simple.jte'. Tag names should be camel case.");
     }
 
     @Test

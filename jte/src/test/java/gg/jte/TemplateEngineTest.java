@@ -471,6 +471,18 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void commentInImports() {
+        givenRawTemplate("<%--@import gg.jte.TemplateEngineTest.Model--%>\n" + "<p>foo</p>");
+        thenOutputIs("\n<p>foo</p>");
+    }
+
+    @Test
+    void commentInParams() {
+        givenRawTemplate("<%--@param gg.jte.TemplateEngineTest.Model model--%>\n" + "<p>foo</p>");
+        thenOutputIs("\n<p>foo</p>");
+    }
+
+    @Test
     void layout() {
         givenLayout("main", "@param gg.jte.TemplateEngineTest.Model model\n" +
                 "@param gg.jte.Content content\n" +

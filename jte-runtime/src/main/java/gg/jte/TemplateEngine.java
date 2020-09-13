@@ -77,6 +77,22 @@ public final class TemplateEngine {
         return new TemplateEngine(null, classDirectory, contentType, TemplateMode.Precompiled);
     }
 
+    /**
+     * Creates a new template engine.
+     * All templates must have been precompiled to Java class files already.
+     * The template engine will load them via the application class loader.
+     * This means all template classes must be bundled in you application JAR file.
+     * No JDK is required.
+     * This is recommended when running templates in production.
+     * How to precompile templates: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates
+     *
+     * @param contentType the content type of all templates this engine manages
+     * @return a fresh TemplateEngine instance
+     */
+    public static TemplateEngine createPrecompiled(ContentType contentType) {
+        return createPrecompiled(null, contentType);
+    }
+
     private TemplateEngine(CodeResolver codeResolver, Path classDirectory, ContentType contentType, TemplateMode templateMode) {
         if (contentType == null) {
             throw new NullPointerException("Content type must be specified.");

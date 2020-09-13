@@ -15,6 +15,14 @@ public class RuntimeTemplateLoader extends TemplateLoader {
     }
 
     @Override
+    protected ClassLoader createClassLoader() {
+        if (classDirectory == null) {
+            return Thread.currentThread().getContextClassLoader();
+        }
+        return super.createClassLoader();
+    }
+
+    @Override
     protected ClassInfo getClassInfo(ClassLoader classLoader, String className) {
         try {
             Class<?> clazz = classLoader.loadClass(className);

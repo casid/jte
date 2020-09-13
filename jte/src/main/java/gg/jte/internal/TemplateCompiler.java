@@ -51,7 +51,7 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     public void cleanAll() {
-        IoUtils.deleteDirectoryContent(classDirectory);
+        IoUtils.deleteDirectoryContent(classDirectory.resolve(Constants.PACKAGE_NAME.replace('.', '/')));
     }
 
     public int precompileAll(List<String> compilePath) {

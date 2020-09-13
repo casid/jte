@@ -132,6 +132,11 @@ class JspExpressionConverterTest {
         assertConversion("${fn:replace(message, newLine, '<br/>')}", "fn:replace(message, newLine, \"<br/>\")");
     }
 
+    @Test
+    void nullExpression() {
+        assertConversion("${x eq null}", "x == null");
+    }
+
     private void assertConversion(String el, String java) {
         assertThat(new JspExpressionConverter(el).getJavaCode()).isEqualTo(java);
     }

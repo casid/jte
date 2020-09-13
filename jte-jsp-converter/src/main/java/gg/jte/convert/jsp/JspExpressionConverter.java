@@ -20,11 +20,14 @@ public class JspExpressionConverter {
         return "???";
     }
 
+    private final String el;
     private final Node root;
     private final StringBuilder result;
     private final Map<Class<? extends Node>, Visitor> visitorMap = new HashMap<>();
 
     public JspExpressionConverter(String el) {
+        this.el = el;
+
         if (el == null || el.isBlank()) {
             root = null;
             result = new StringBuilder();
@@ -57,6 +60,7 @@ public class JspExpressionConverter {
             visitorMap.put(AstLessThan.class, new AstLessThanVisitor());
             visitorMap.put(AstLiteralExpression.class, new AstLiteralExpressionVisitor());
             visitorMap.put(AstFunction.class, new AstFunctionVisitor());
+            visitorMap.put(AstNull.class, new AstNullVisitor());
 
             process(root);
         }
@@ -71,7 +75,7 @@ public class JspExpressionConverter {
         if (visitor != null) {
             visitor.visit(node);
         } else {
-            throw new UnsupportedOperationException("Unknown AST node " + node.getClass());
+            throw new UnsupportedOperationException("Unknown AST node " + node.getClass() + ". Expression was '" + el + "'");
         }
     }
 
@@ -312,6 +316,13 @@ public class JspExpressionConverter {
                 }
                 process(node.jjtGetChild(i));
             }
+        }
+    }
+
+    private class AstNullVisitor implements Visitor {
+        @Override
+        public void visit(Node node) {
+            result.append("null");
         }
     }
 }

@@ -8,7 +8,7 @@ public class JspCommentConverter implements Converter {
 
     @Override
     public boolean canConvert(Parser parser) {
-        return parser.startsWith("<%--");
+        return parser.startsWith("<%--") && parser.getCurrentConverter() == null;
     }
 
     @Override

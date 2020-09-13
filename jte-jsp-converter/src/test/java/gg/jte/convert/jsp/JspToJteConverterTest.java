@@ -32,6 +32,13 @@ class JspToJteConverterTest {
     }
 
     @Test
+    void simpleTagWithCommentBetweenParams() {
+        givenUsecase("simpleTagWithCommentBetweenParams");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
     void simpleTag_kebabCase() {
         givenUsecase("simpleTag");
         Throwable throwable = catchThrowable(() -> whenJspTagIsConverted("simple.tag", "tag/not-so-simple.jte"));

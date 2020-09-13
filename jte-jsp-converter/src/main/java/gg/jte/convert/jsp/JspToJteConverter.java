@@ -7,10 +7,18 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class JspToJteConverter {
+
+    private static final Pattern UNCONVERTED_TAG_REFERENCES = Pattern.compile("<[a-zA-Z\\-]+:[a-zA-Z\\-]+\\b");
 
     public static void convertFromIntelliJPlugin(String[] commandLineArgs, JspToJteConverter converter, Consumer<JspParser> parserSetup) {
         if (commandLineArgs.length < 1) {
@@ -73,6 +81,8 @@ public class JspToJteConverter {
         String jte = parser.convert(IoUtils.readFile(jspTag));
 
         System.out.println(jte);
+
+        checkDependencies(jte);
 
         IoUtils.writeFile(jteTag, jte);
 
@@ -173,5 +183,47 @@ public class JspToJteConverter {
         if (name.contains("-")) {
             throw new IllegalArgumentException("Illegal jte tag name '" + name + "'. Tag names should be camel case.");
         }
+    }
+
+    protected void checkDependencies(String jteCode) {
+        List<String> unresolvedJspTags = findUnresolvedJspTags(jteCode);
+        if (unresolvedJspTags.isEmpty()) {
+            return;
+        }
+
+        Set<String> notConvertedTagsSet = getNotConvertedTagsAsSet();
+
+        for (String unresolvedJspTag : unresolvedJspTags) {
+            if (!notConvertedTagsSet.contains(unresolvedJspTag)) {
+                throw new IllegalStateException("The tag " + unresolvedJspTag + "/> is used by this tag and not converted to jte yet. You should convert my:simple-dependency first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
+            }
+        }
+    }
+
+    private Set<String> getNotConvertedTagsAsSet() {
+        String[] notConvertedTags = getNotConvertedTags();
+        Set<String> notConvertedTagsSet = new HashSet<>();
+        if (notConvertedTags != null) {
+            for (String notConvertedTag : notConvertedTags) {
+                notConvertedTagsSet.add("<" + notConvertedTag);
+            }
+        }
+        return notConvertedTagsSet;
+    }
+
+    protected List<String> findUnresolvedJspTags(String jteCode) {
+        List<String> result = new ArrayList<>();
+
+        Matcher matcher = UNCONVERTED_TAG_REFERENCES.matcher(jteCode);
+
+        while (matcher.find()) {
+            result.add(matcher.group());
+        }
+
+        return result;
+    }
+
+    protected String[] getNotConvertedTags() {
+        return null;
     }
 }

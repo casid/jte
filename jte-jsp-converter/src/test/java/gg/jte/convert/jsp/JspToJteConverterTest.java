@@ -22,6 +22,8 @@ class JspToJteConverterTest {
     Path jspRoot;
     Path jteRoot;
 
+    String[] notConvertedTags;
+
     @Test
     void simpleTag() {
         givenUsecase("simpleTag");
@@ -93,8 +95,19 @@ class JspToJteConverterTest {
     }
 
     @Test
-    void simpleJspWithNotYetConvertedTag() {
-        // TODO implement
+    void simpleTagWithNotYetConvertedTag() {
+        givenUsecase("simpleTagWithNotYetConvertedTag");
+        Throwable throwable = catchThrowable(() -> whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte"));
+        assertThat(throwable).isInstanceOf(IllegalStateException.class).hasMessage("The tag <my:simple-dependency/> is used by this tag and not converted to jte yet. You should convert my:simple-dependency first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
+    }
+
+    @Test
+    void simpleTagWithNotYetConvertedTag_allowed() {
+        notConvertedTags = new String[]{"my:simple-dependency"};
+
+        givenUsecase("simpleTagWithNotYetConvertedTag");
+        whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte");
+        thenConversionIsAsExpected();
     }
 
     void givenUsecase(String usecase) {
@@ -107,7 +120,7 @@ class JspToJteConverterTest {
     }
 
     void whenJspTagIsConverted(String jspTag, String jteTag) {
-        JspToJteConverter converter = new JspToJteConverter(jspRoot, jteRoot, "my:jte");
+        JspToJteConverter converter = new MyConverter();
         converter.convertTag(jspTag, jteTag, parser -> {
             parser.setPrefix("@import static example.JteContext.*\n");
             parser.setIndentationChar(' ');
@@ -128,6 +141,18 @@ class JspToJteConverterTest {
             });
         } catch (IOException e){
             throw new UncheckedIOException(e);
+        }
+    }
+
+    private class MyConverter extends JspToJteConverter {
+
+        public MyConverter() {
+            super(jspRoot, jteRoot, "my:jte");
+        }
+
+        @Override
+        protected String[] getNotConvertedTags() {
+            return notConvertedTags;
         }
     }
 }

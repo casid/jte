@@ -195,7 +195,7 @@ public class JspToJteConverter {
 
         for (String unresolvedJspTag : unresolvedJspTags) {
             if (!notConvertedTagsSet.contains(unresolvedJspTag)) {
-                throw new IllegalStateException("The tag " + unresolvedJspTag + "/> is used by this tag and not converted to jte yet. You should convert my:simple-dependency first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
+                throw new IllegalStateException("The tag " + unresolvedJspTag + "/> is used by this tag and not converted to jte yet. You should convert " + unresolvedJspTag + "/> first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
             }
         }
     }

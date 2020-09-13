@@ -98,7 +98,7 @@ class JspToJteConverterTest {
     void simpleTagWithNotYetConvertedTag() {
         givenUsecase("simpleTagWithNotYetConvertedTag");
         Throwable throwable = catchThrowable(() -> whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte"));
-        assertThat(throwable).isInstanceOf(IllegalStateException.class).hasMessage("The tag <my:simple-dependency/> is used by this tag and not converted to jte yet. You should convert my:simple-dependency first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
+        assertThat(throwable).isInstanceOf(IllegalStateException.class).hasMessage("The tag <my:simple-dependency/> is used by this tag and not converted to jte yet. You should convert <my:simple-dependency/> first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
     }
 
     @Test

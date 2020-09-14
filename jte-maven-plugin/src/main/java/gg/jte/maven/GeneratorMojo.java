@@ -6,6 +6,7 @@ import gg.jte.resolve.DirectoryCodeResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,9 @@ import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_SOURC
 
 @Mojo(name = "generate", defaultPhase = GENERATE_SOURCES)
 public class GeneratorMojo extends AbstractMojo {
+
+    @Parameter(defaultValue = "${project}")
+    public MavenProject project;
 
     /**
      * The directory where template files are located.
@@ -65,5 +69,7 @@ public class GeneratorMojo extends AbstractMojo {
         long end = System.nanoTime();
         long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
         getLog().info("Successfully generated " + amount + " jte file" + (amount == 1 ? "" : "s") + " in " + duration + "s to " + target);
+
+        project.addCompileSourceRoot(targetDirectory);
     }
 }

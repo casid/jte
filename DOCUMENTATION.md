@@ -290,7 +290,7 @@ To speed up the startup of your production server, it is possible to precompile 
 
 To do this, you need to create a `TemplateEngine` with the `createPrecompiled` factory method and specify where compiled template classes are located. Currently there are two options available to do this.
 
-### Using the application class loader (since 1.1.0)
+### Using the application class loader (since 1.2.0)
 
 When using this method the precompiled templates are bundled within your application jar file.
 

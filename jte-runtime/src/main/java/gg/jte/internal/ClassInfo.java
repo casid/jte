@@ -22,7 +22,7 @@ final class ClassInfo {
             startIndex += 1;
         }
 
-        className = Constants.CLASS_PREFIX + name.substring(startIndex, endIndex).replace("-", "") + Constants.CLASS_SUFFIX;
+        className = Constants.CLASS_PREFIX + name.substring(startIndex, endIndex).replace("-", "").replace(".", "") + Constants.CLASS_SUFFIX;
         if (startIndex == 0) {
             packageName = parentPackage;
         } else {

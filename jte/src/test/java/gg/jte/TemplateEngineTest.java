@@ -75,6 +75,13 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void simpleTemplateNameWithMultipleExtensions() {
+        templateName = "Simple.txt.jte";
+        givenTemplate("Hello");
+        thenOutputIs("Hello");
+    }
+
+    @Test
     void addition() {
         givenTemplate("${model.x + 1}");
         thenOutputIs("43");

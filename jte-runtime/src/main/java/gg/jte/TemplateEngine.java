@@ -231,6 +231,15 @@ public final class TemplateEngine {
     }
 
     /**
+     * Generates all template classes in the sources directory, to the compiled template classes directory.
+     * This only generates .java files, not .class files.
+     * @return amount of templates that were generated
+     */
+    public int generateAll() {
+        return templateLoader.generateAll();
+    }
+
+    /**
      * Compiles all templates located in the sources directory, to the compiled template classes directory.
      * @return amount of templates that were compiled
      */

@@ -54,11 +54,31 @@ public class TemplateCompiler extends TemplateLoader {
         IoUtils.deleteDirectoryContent(classDirectory.resolve(Constants.PACKAGE_NAME.replace('.', '/')));
     }
 
+    @Override
+    public int generateAll() {
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames());
+        return classDefinitions.size();
+    }
+
     public int precompileAll(List<String> compilePath) {
         return precompile(codeResolver.resolveAllTemplateNames(), compilePath);
     }
 
     public int precompile(List<String> names, List<String> compilePath) {
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(names);
+
+        String[] files = new String[classDefinitions.size()];
+        int i = 0;
+        for (ClassDefinition classDefinition : classDefinitions) {
+            files[i++] = classDirectory.resolve(classDefinition.getJavaFileName()).toFile().getAbsolutePath();
+        }
+
+        ClassFilesCompiler.compile(files, compilePath, classDirectory, templateByClassName);
+
+        return files.length;
+    }
+
+    private LinkedHashSet<ClassDefinition> generate(List<String> names) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
             switch (getTemplateType(name)) {
@@ -81,16 +101,7 @@ public class TemplateCompiler extends TemplateLoader {
                 throw new UncheckedIOException(e);
             }
         }
-
-        String[] files = new String[classDefinitions.size()];
-        int i = 0;
-        for (ClassDefinition classDefinition : classDefinitions) {
-            files[i++] = classDirectory.resolve(classDefinition.getJavaFileName()).toFile().getAbsolutePath();
-        }
-
-        ClassFilesCompiler.compile(files, compilePath, classDirectory, templateByClassName);
-
-        return files.length;
+        return classDefinitions;
     }
 
     private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {

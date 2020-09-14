@@ -71,6 +71,12 @@ public class RuntimeTemplateLoader extends TemplateLoader {
     }
 
     @Override
+    public int generateAll() {
+        // ignored
+        return 0;
+    }
+
+    @Override
     public int precompileAll(List<String> compilePath) {
         // ignored
         return 0;

@@ -309,14 +309,13 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
     <version>${jte.version}</version>
     <configuration>
         <sourceDirectory>${basedir}/src/main/jte</sourceDirectory> <!-- This is the directory where your .jte files are located. -->
-        <targetDirectory>${basedir}/target/classes</targetDirectory> <!-- Compiled templates are bundled with your application classes. -->
         <contentType>Html</contentType>
     </configuration>
     <executions>
         <execution>
-            <phase>process-classes</phase>
+            <phase>generate-sources</phase>
             <goals>
-                <goal>precompile</goal>
+                <goal>generate</goal>
             </goals>
         </execution>
     </executions>

@@ -43,9 +43,13 @@ jobs:
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw package --file pom.xml --batch-mode jacoco:report coveralls:report
+        run: ./mvnw package --file pom.xml --batch-mode jacoco:report-aggregate
         env:
-          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-          
-
+          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn  
+      
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./target/site/jacoco-aggregate/jacoco.xml
+          fail_ci_if_error: true
 

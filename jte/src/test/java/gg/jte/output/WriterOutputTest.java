@@ -1,19 +1,23 @@
 package gg.jte.output;
 
-import org.junit.jupiter.api.Test;
+import gg.jte.TemplateOutput;
 
 import java.io.StringWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class WriterOutputTest {
-    @Test
-    void test() {
-        StringWriter writer = new StringWriter();
-        WriterOutput output = new WriterOutput(writer);
+public class WriterOutputTest extends AbstractTemplateOutputTest {
 
-        output.writeContent("Hello world");
+    private StringWriter writer;
 
-        assertThat(writer.toString()).isEqualTo("Hello world");
+    @Override
+    TemplateOutput createTemplateOutput() {
+        writer = new StringWriter();
+        return new WriterOutput(writer);
+    }
+
+    @Override
+    void thenOutputIs(String expected) {
+        assertThat(writer.toString()).isEqualTo(expected);
     }
 }

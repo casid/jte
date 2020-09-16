@@ -951,6 +951,25 @@ public class TemplateEngineTest {
                 .hasMessageContaining("model.helloUnknown");
     }
 
+    @Test
+    void calledWithWrongParam1() {
+        givenRawTemplate("@param String hello\n${hello}");
+        thenRenderingFailsWithException().hasMessage("Failed to render test/template.jte, type mismatch for parameter: Expected java.lang.String, got gg.jte.TemplateEngineTest$Model");
+    }
+
+    @Test
+    void calledWithWrongParam2() {
+        givenRawTemplate("@param int x\n${x}");
+        thenRenderingFailsWithException().hasMessage("Failed to render test/template.jte, type mismatch for parameter: Expected int, got gg.jte.TemplateEngineTest$Model");
+    }
+
+    @Test
+    void calledWithWrongParam3() {
+        model = null;
+        givenRawTemplate("@param int x\n${x}");
+        thenRenderingFailsWithException().hasMessage("Failed to render test/template.jte, type mismatch for parameter: Expected int, got null");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + Constants.TAG_EXTENSION, code);
     }

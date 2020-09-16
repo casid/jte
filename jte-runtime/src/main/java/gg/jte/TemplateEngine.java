@@ -199,6 +199,10 @@ public final class TemplateEngine {
     }
 
     private void handleRenderException(String name, Template template, Throwable e) {
+        if (e instanceof TemplateException) {
+            throw (TemplateException)e;
+        }
+
         DebugInfo debugInfo = templateLoader.resolveDebugInfo(template.getClassLoader(), e.getStackTrace());
         String message = "Failed to render " + name;
         if (debugInfo != null) {

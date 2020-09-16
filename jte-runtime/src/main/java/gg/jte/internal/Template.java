@@ -1,5 +1,6 @@
 package gg.jte.internal;
 
+import gg.jte.TemplateException;
 import gg.jte.TemplateOutput;
 import gg.jte.html.HtmlInterceptor;
 
@@ -32,6 +33,10 @@ public final class Template {
             }
         } catch (InvocationTargetException e) {
             throw e.getCause();
+        } catch (IllegalArgumentException e) {
+            String expectedType = render.getParameterTypes()[2].getName();
+            String actualType = param != null ? param.getClass().getName() : null;
+            throw new TemplateException("Failed to render " + name + ", type mismatch for parameter: Expected " + expectedType + ", got " + actualType, e);
         }
     }
 

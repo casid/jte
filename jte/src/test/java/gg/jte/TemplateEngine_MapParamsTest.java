@@ -142,6 +142,69 @@ public class TemplateEngine_MapParamsTest {
         thenOutputIs("One: , two: 3");
     }
 
+    /**
+     * Helpful for incremental migrations to jte.
+     * Other frameworks probably produce plain Strings, which need to be mapped to raw content blocks.
+     */
+    @Test
+    void tag_paramsCanBeMappedToContent() {
+        givenTag("card", "@param gg.jte.Content firstParam\n" +
+                "@param gg.jte.Content secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+
+        params.put("firstParam", "Hello");
+        params.put("secondParam", 42);
+
+        whenTagIsRendered("tag/card.jte");
+
+        thenOutputIs("One: Hello, two: 42");
+    }
+
+    @Test
+    void tag_paramsCanBeMappedToContent_import() {
+        givenTag("card", "@import gg.jte.Content\n" +
+                "@param Content firstParam\n" +
+                "@param Content secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+
+        params.put("firstParam", "Hello");
+        params.put("secondParam", 42);
+
+        whenTagIsRendered("tag/card.jte");
+
+        thenOutputIs("One: Hello, two: 42");
+    }
+
+    @Test
+    void tag_paramsCanBeMappedToContent_null() {
+        givenTag("card", "@import gg.jte.Content\n" +
+                "@param Content firstParam\n" +
+                "@param Content secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+
+        params.put("firstParam", null);
+        params.put("secondParam", null);
+
+        whenTagIsRendered("tag/card.jte");
+
+        thenOutputIs("One: , two: ");
+    }
+
+    @Test
+    void tag_paramsCanBeMappedToContent_alreadyContent() {
+        givenTag("card", "@import gg.jte.Content\n" +
+                "@param Content firstParam\n" +
+                "@param Content secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+
+        params.put("firstParam", (Content) output -> output.writeContent("foo"));
+        params.put("secondParam", (Content) output -> output.writeContent("bar"));
+
+        whenTagIsRendered("tag/card.jte");
+
+        thenOutputIs("One: foo, two: bar");
+    }
+
     @Test
     void layout_noParamsAndDefinitions() {
         givenLayout("page", "Hello !!");

@@ -343,14 +343,28 @@ public class TemplateCompiler extends TemplateLoader {
                     continue;
                 }
 
-                javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = (").append(parameter.type);
-                if (parameter.defaultValue != null) {
-                    javaCode.append(")params.getOrDefault(\"").append(parameter.name).append("\", ");
-                    writeJavaCodeWithContentSupport(0, parameter.defaultValue);
-                    javaCode.append(");\n");
+                boolean isContentType = "Content".equals(parameter.type) || "gg.jte.Content".equals(parameter.type);
+
+                javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = ");
+                if (isContentType) {
+                    javaCode.append("gg.jte.internal.TemplateUtils.toContent(");
                 } else {
-                    javaCode.append(")params.get(\"").append(parameter.name).append("\");\n");
+                    javaCode.append('(').append(parameter.type).append(')');
                 }
+
+                if (parameter.defaultValue != null) {
+                    javaCode.append("params.getOrDefault(\"").append(parameter.name).append("\", ");
+                    writeJavaCodeWithContentSupport(0, parameter.defaultValue);
+                    javaCode.append(')');
+                } else {
+                    javaCode.append("params.get(\"").append(parameter.name).append("\")");
+                }
+
+                if (isContentType) {
+                    javaCode.append(')');
+                }
+
+                javaCode.append(";\n");
             }
             javaCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
 

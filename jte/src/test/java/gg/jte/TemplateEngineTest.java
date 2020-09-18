@@ -472,6 +472,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void commentBeforeImports() {
+        givenRawTemplate("<%--This is a comment--%>@import gg.jte.TemplateEngineTest.Model\n@param Model model\n" + "!{model.setX(12)}${model.x}");
+        thenOutputIs("12");
+    }
+
+    @Test
     void commentBeforeParams() {
         givenRawTemplate("<%--This is a comment--%>@param gg.jte.TemplateEngineTest.Model model\n" + "!{model.setX(12)}${model.x}");
         thenOutputIs("12");
@@ -487,6 +493,12 @@ public class TemplateEngineTest {
     void commentInParams() {
         givenRawTemplate("<%--@param gg.jte.TemplateEngineTest.Model model--%>\n" + "<p>foo</p>");
         thenOutputIs("\n<p>foo</p>");
+    }
+
+    @Test
+    void commentInPlainTemplate() {
+        givenTemplate("Hello<%--This is a comment--%> World");
+        thenOutputIs("Hello World");
     }
 
     @Test

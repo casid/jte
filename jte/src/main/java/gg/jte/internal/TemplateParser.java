@@ -112,7 +112,7 @@ final class TemplateParser {
                 pop();
                 lastIndex = i + 1;
             } else if (currentMode != Mode.Comment && currentMode != Mode.Content && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
-                if (currentMode == Mode.Text && paramsComplete) {
+                if (currentMode == Mode.Text && (paramsComplete || areParamsComplete(i - 3))) {
                     extractTextPart(i - 3, Mode.Comment);
                 }
                 push(Mode.Comment);
@@ -302,6 +302,24 @@ final class TemplateParser {
             completeParamsIfRequired();
             visitor.onComplete();
         }
+    }
+
+    private boolean areParamsComplete(int startIndex) {
+        if (visitor instanceof TemplateParametersCompleteVisitor) {
+            return false;
+        }
+
+        try {
+            TemplateParser templateParser = new TemplateParser(templateCode, type, new TemplateParametersCompleteVisitor(), contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures);
+            templateParser.setStartIndex(startIndex);
+            templateParser.parse();
+        } catch (TemplateParametersCompleteVisitor.Result result) {
+            if (result.complete) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean isContentExpressionAllowed() {

@@ -220,6 +220,12 @@ public class TemplateEngine_TrimControlStructuresTest {
     }
 
     @Test
+    void comment2() {
+        givenTemplate("hello\n<%-- comment --%>\nworld!");
+        thenOutputIs("hello\nworld!");
+    }
+
+    @Test
     void variable() {
         givenTemplate(
                 "!{var x = 1;}\n" +

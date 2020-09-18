@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 
 public class JspToJteConverter {
 
-    private static final Pattern UNCONVERTED_TAG_REFERENCES = Pattern.compile("<[a-zA-Z\\-]+:[a-zA-Z\\-]+\\b");
+    private static final Pattern UNCONVERTED_TAG_REFERENCES = Pattern.compile("<[a-zA-Z0-9\\-]+:[a-zA-Z0-9\\-]+\\b");
 
     public static void convertFromIntelliJPlugin(String[] commandLineArgs, JspToJteConverter converter, Consumer<JspParser> parserSetup) {
         if (commandLineArgs.length < 1) {
@@ -193,10 +194,15 @@ public class JspToJteConverter {
 
         Set<String> notConvertedTagsSet = getNotConvertedTagsAsSet();
 
+        Set<String> errors = new LinkedHashSet<>();
         for (String unresolvedJspTag : unresolvedJspTags) {
             if (!notConvertedTagsSet.contains(unresolvedJspTag)) {
-                throw new IllegalStateException("The tag " + unresolvedJspTag + "/> is used by this tag and not converted to jte yet. You should convert " + unresolvedJspTag + "/> first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
+                errors.add("The tag " + unresolvedJspTag + "/> is used by this tag and not converted to jte yet. You should convert " + unresolvedJspTag + "/> first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
             }
+        }
+
+        if (!errors.isEmpty()) {
+            throw new IllegalStateException(String.join("\n", errors));
         }
     }
 

@@ -79,6 +79,8 @@ public abstract class TemplateLoader {
 
     public abstract void setNullSafeTemplateCode(boolean value);
 
+    public abstract void setTrimControlStructures(boolean value);
+
     public abstract void setHtmlTags(String[] htmlTags);
 
     public abstract void setHtmlAttributes(String[] htmlAttributes);

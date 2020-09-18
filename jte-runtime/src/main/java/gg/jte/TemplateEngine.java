@@ -282,6 +282,14 @@ public final class TemplateEngine {
     }
 
     /**
+     * Experimental mode, that trims control structures, resulting in prettier output.
+     * @param value true, to enable
+     */
+    public void setTrimControlStructures(boolean value) {
+        templateLoader.setTrimControlStructures(value);
+    }
+
+    /**
      * Policy that checks the parsed HTML at compile time.
      * @param htmlPolicy the policy
      * @throws NullPointerException if policy is null

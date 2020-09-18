@@ -46,6 +46,11 @@ public class RuntimeTemplateLoader extends TemplateLoader {
     }
 
     @Override
+    public void setTrimControlStructures(boolean value) {
+        // ignored
+    }
+
+    @Override
     public void setHtmlPolicy(HtmlPolicy htmlPolicy) {
         // ignored
     }

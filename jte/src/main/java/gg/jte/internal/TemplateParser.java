@@ -14,11 +14,14 @@ final class TemplateParser {
     private final HtmlPolicy htmlPolicy;
     private final String[] htmlTags;
     private final String[] htmlAttributes;
+    private final boolean trimControlStructures;
 
     private final Deque<Mode> stack = new ArrayDeque<>();
+    private final Deque<Indent> indentStack = new ArrayDeque<>();
     private final Deque<HtmlTag> htmlStack = new ArrayDeque<>();
 
     private Mode currentMode;
+    private Mode previousIndentMode;
     private HtmlTag currentHtmlTag;
     private int depth;
     private boolean paramsComplete;
@@ -40,7 +43,7 @@ final class TemplateParser {
     private char previousChar0;
     private char currentChar;
 
-    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, ContentType contentType, HtmlPolicy htmlPolicy, String[] htmlTags, String[] htmlAttributes) {
+    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, ContentType contentType, HtmlPolicy htmlPolicy, String[] htmlTags, String[] htmlAttributes, boolean trimControlStructures) {
         this.templateCode = templateCode;
         this.type = type;
         this.visitor = visitor;
@@ -48,6 +51,7 @@ final class TemplateParser {
         this.htmlPolicy = htmlPolicy;
         this.htmlTags = htmlTags;
         this.htmlAttributes = htmlAttributes;
+        this.trimControlStructures = trimControlStructures;
 
         this.startIndex = 0;
         this.endIndex = templateCode.length();
@@ -109,7 +113,7 @@ final class TemplateParser {
                 lastIndex = i + 1;
             } else if (currentMode != Mode.Comment && currentMode != Mode.Content && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
                 if (currentMode == Mode.Text && paramsComplete) {
-                    extract(templateCode, lastIndex, i - 3, visitor::onTextPart);
+                    extractTextPart(i - 3, Mode.Comment);
                 }
                 push(Mode.Comment);
             } else if (currentMode == Mode.Comment) {
@@ -119,16 +123,16 @@ final class TemplateParser {
                 }
             } else if (previousChar0 == '$' && currentChar == '{' && currentMode == Mode.Text) {
                 if (!outputPrevented) {
-                    extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                    extractTextPart(i - 1, Mode.Code);
                     lastIndex = i + 1;
                 }
                 push(Mode.Code);
             } else if (previousChar6 == '$' && previousChar5 == 'u' && previousChar4 == 'n' && previousChar3 == 's' && previousChar2 == 'a' && previousChar1 == 'f' && previousChar0 == 'e' && currentChar == '{' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
+                extractTextPart(i - 7, Mode.UnsafeCode);
                 lastIndex = i + 1;
                 push(Mode.UnsafeCode);
             } else if (previousChar0 == '!' && currentChar == '{' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                extractTextPart(i - 1, Mode.CodeStatement);
                 lastIndex = i + 1;
                 push(Mode.CodeStatement);
             } else if (currentChar == '}' && currentMode == Mode.CodeStatement) {
@@ -153,7 +157,7 @@ final class TemplateParser {
                     lastIndex = i + 1;
                 }
             } else if (previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 2, visitor::onTextPart);
+                extractTextPart(i - 2, Mode.Condition);
                 lastIndex = i + 1;
                 push(Mode.Condition);
             } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
@@ -204,7 +208,7 @@ final class TemplateParser {
                 });
                 lastIndex = i + 1;
             } else if (previousChar3 == '@' && previousChar2 == 'e' && previousChar1 == 'l' && previousChar0 == 's' && currentChar == 'e' && templateCode.charAt(i + 1) != 'i' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 4, visitor::onTextPart);
+                extractTextPart(i - 4, Mode.ConditionElse);
                 lastIndex = i + 1;
 
                 pop();
@@ -212,7 +216,7 @@ final class TemplateParser {
                 visitor.onConditionElse(depth);
                 push(Mode.Text);
             } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
+                extractTextPart(i - 6, Mode.ConditionElse);
                 lastIndex = i + 1;
 
                 pop();
@@ -224,7 +228,7 @@ final class TemplateParser {
                 push(Mode.ConditionElse);
 
             } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 5, visitor::onTextPart);
+                extractTextPart(i - 5, null);
                 lastIndex = i + 1;
 
                 pop();
@@ -234,7 +238,7 @@ final class TemplateParser {
                     pop();
                 }
             } else if (previousChar2 == '@' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 3, visitor::onTextPart);
+                extractTextPart(i - 3, Mode.ForLoop);
                 lastIndex = i + 1;
                 push(Mode.ForLoop);
             } else if (currentChar == '(' && currentMode == Mode.ForLoop) {
@@ -250,7 +254,7 @@ final class TemplateParser {
                     push(Mode.Text);
                 }
             } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 6, visitor::onTextPart);
+                extractTextPart(i - 6, null);
                 lastIndex = i + 1;
 
                 pop();
@@ -260,16 +264,18 @@ final class TemplateParser {
                     pop();
                 }
             } else if (previousChar3 == '@' && previousChar2 == 't' && previousChar1 == 'a' && previousChar0 == 'g' && currentChar == '.' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 4, visitor::onTextPart);
+                TagMode mode = new TagMode(TemplateType.Tag);
+                extractTextPart(i - 4, mode);
                 lastIndex = i + 1;
 
-                push(new TagMode(TemplateType.Tag));
+                push(mode);
                 push(Mode.TagName);
             } else if (previousChar6 == '@' && previousChar5 == 'l' && previousChar4 == 'a' && previousChar3 == 'y' && previousChar2 == 'o' && previousChar1 == 'u' && previousChar0 == 't' && currentChar == '.' && currentMode == Mode.Text) {
-                extract(templateCode, lastIndex, i - 7, visitor::onTextPart);
+                TagMode mode = new TagMode(TemplateType.Layout);
+                extractTextPart(i - 7, mode);
                 lastIndex = i + 1;
 
-                push(new TagMode(TemplateType.Layout));
+                push(mode);
                 push(Mode.TagName);
             } else if (currentMode == Mode.TagName) {
                 if (currentChar == '(') {
@@ -289,7 +295,7 @@ final class TemplateParser {
         }
 
         if (lastIndex < endIndex) {
-            extract(templateCode, lastIndex, endIndex, visitor::onTextPart);
+            extractTextPart(endIndex, null);
         }
 
         if (type != TemplateType.Content) {
@@ -300,6 +306,120 @@ final class TemplateParser {
 
     private boolean isContentExpressionAllowed() {
         return currentMode == Mode.Content || currentMode == Mode.JavaCodeParam || currentMode == Mode.Code || currentMode == Mode.CodeStatement || currentMode == Mode.Param;
+    }
+
+    private void extractTextPart(int endIndex, Mode mode) {
+        if (trimControlStructures && lastIndex >= 0 && endIndex >= lastIndex) {
+            extractTextPartAndTrimControlStructures(endIndex, mode);
+        } else {
+            extract(templateCode, lastIndex, endIndex, visitor::onTextPart);
+        }
+    }
+
+    private void extractTextPartAndTrimControlStructures(int endIndex, Mode mode) {
+        boolean controlStructureBegin = mode == Mode.Condition || mode == Mode.ForLoop;
+        if (controlStructureBegin) {
+            pushIndent(endIndex, mode);
+        }
+
+        StringBuilder resultText = new StringBuilder(endIndex - lastIndex);
+
+        int indentationsToSkip = getIndentationsToSkip();
+        int indentation = 0;
+        int line = 0;
+        boolean writeLine = false;
+        boolean firstNonWhitespaceReached = false;
+        if (previousIndentMode == Mode.Code || previousIndentMode == Mode.UnsafeCode || previousIndentMode instanceof TagMode) {
+            firstNonWhitespaceReached = true;
+        }
+
+        for (int j = lastIndex; j < endIndex; ++j) {
+            char currentChar = templateCode.charAt(j);
+
+            if ((line > 0 || firstNonWhitespaceReached) && (currentChar == '\r' || currentChar == '\n')) {
+                resultText.append(currentChar);
+            }
+
+            if (currentChar == '\r') {
+                continue;
+            }
+
+            if (currentChar == '\n') {
+                ++line;
+                indentation = 0;
+                writeLine = false;
+                continue;
+            }
+
+            if (!firstNonWhitespaceReached && !Character.isWhitespace(currentChar)) {
+                firstNonWhitespaceReached = true;
+            }
+
+            if (!writeLine && isIndentationCharacter(currentChar) && indentation < indentationsToSkip) {
+                ++indentation;
+            } else {
+                writeLine = true;
+            }
+
+            if (writeLine) {
+                resultText.append(currentChar);
+            }
+        }
+
+        extract(resultText.toString(), 0, resultText.length(), visitor::onTextPart);
+
+        if (mode == null) {
+            popIndent();
+        }
+
+        previousIndentMode = mode;
+    }
+
+    private void pushIndent(int endIndex, Mode mode) {
+        int currentLineIndentation = 0;
+        for (int j = endIndex - 1; j >= lastIndex; --j) {
+            char currentChar = templateCode.charAt(j);
+            if (isIndentationCharacter(currentChar)) {
+                ++currentLineIndentation;
+            } else {
+                break;
+            }
+        }
+
+        int nextLineIndentation = 0;
+        int nextIndex = templateCode.indexOf('\n', endIndex);
+        if (nextIndex > 0) {
+            for (int j = nextIndex + 1; j < this.endIndex; ++j) {
+                char currentChar = templateCode.charAt(j);
+                if (isIndentationCharacter(currentChar)) {
+                    ++nextLineIndentation;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        int amount = Math.max(nextLineIndentation - currentLineIndentation, 0);
+
+        indentStack.push(new Indent(mode, amount));
+    }
+
+    private void popIndent() {
+        if (!indentStack.isEmpty()) {
+            indentStack.pop();
+        }
+    }
+
+    private boolean isIndentationCharacter(char c) {
+        return c == ' ' || c == '\t';
+    }
+
+    private int getIndentationsToSkip() {
+        int amount = 0;
+        for (Indent indent : indentStack) {
+            amount += indent.amount;
+        }
+        return amount;
     }
 
     private void extractCodePart() {
@@ -650,6 +770,16 @@ final class TemplateParser {
         @Override
         public boolean isJava() {
             return false;
+        }
+    }
+
+    private static class Indent {
+        public final Mode mode;
+        public final int amount;
+
+        public Indent(Mode mode, int amount) {
+            this.mode = mode;
+            this.amount = amount;
         }
     }
 

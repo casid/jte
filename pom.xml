@@ -41,6 +41,7 @@
         <junit.jupiter.version>5.6.2</junit.jupiter.version>
         <jacoco.version>0.8.5</jacoco.version>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
     </properties>
 
     <modules>
@@ -50,6 +51,7 @@
         <module>jte-runtime-test</module>
         <module>jte-runtime-cp-test</module>
         <module>jte-test-report</module>
+        <module>jte-deploy-nexus</module>
     </modules>
 
     <dependencies>

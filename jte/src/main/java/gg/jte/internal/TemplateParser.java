@@ -97,14 +97,14 @@ final class TemplateParser {
             previousChar0 = currentChar;
             currentChar = templateCode.charAt(i);
 
-            if (currentMode != Mode.Comment && previousChar5 == '@' && previousChar4 == 'i' && previousChar3 == 'm' && previousChar2 == 'p' && previousChar1 == 'o' && previousChar0 == 'r' && currentChar == 't') {
+            if (currentMode != Mode.Comment && previousChar5 == '@' && previousChar4 == 'i' && previousChar3 == 'm' && previousChar2 == 'p' && previousChar1 == 'o' && previousChar0 == 'r' && currentChar == 't' && isParamOrImportAllowed()) {
                 push(Mode.Import);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Import && currentChar == '\n') {
                 extract(templateCode, lastIndex, i, (depth, content) -> visitor.onImport(content.trim()));
                 pop();
                 lastIndex = i + 1;
-            } else if (currentMode != Mode.Comment && previousChar4 == '@' && previousChar3 == 'p' && previousChar2 == 'a' && previousChar1 == 'r' && previousChar0 == 'a' && currentChar == 'm') {
+            } else if (currentMode != Mode.Comment && previousChar4 == '@' && previousChar3 == 'p' && previousChar2 == 'a' && previousChar1 == 'r' && previousChar0 == 'a' && currentChar == 'm' && isParamOrImportAllowed()) {
                 push(Mode.Param);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Param && currentChar == '\n') {
@@ -302,6 +302,17 @@ final class TemplateParser {
             completeParamsIfRequired();
             visitor.onComplete();
         }
+    }
+
+    private boolean isParamOrImportAllowed() {
+        int endIndex = templateCode.lastIndexOf('@', this.i);
+        for (int j = lastIndex; j < endIndex; j++) {
+            char currentChar = templateCode.charAt(j);
+            if (!Character.isWhitespace(currentChar)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean areParamsComplete(int startIndex) {

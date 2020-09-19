@@ -502,6 +502,20 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void importInCss() {
+        givenTemplate("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
+                "    @import url(\"https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap\"); /* <--- Right here */");
+        thenOutputIs("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
+                "    @import url(\"https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap\"); /* <--- Right here */");
+    }
+
+    @Test
+    void paramAfterText() {
+        givenTemplate("Hello @param");
+        thenOutputIs("Hello @param");
+    }
+
+    @Test
     void layout() {
         givenLayout("main", "@param gg.jte.TemplateEngineTest.Model model\n" +
                 "@param gg.jte.Content content\n" +

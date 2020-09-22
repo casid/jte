@@ -2,16 +2,14 @@ package gg.jte.convert.jsp;
 
 import gg.jte.convert.IoUtils;
 import gg.jte.convert.cc.CamelCaseConverter;
+import gg.jte.convert.jsp.converter.*;
+import org.apache.jasper.compiler.JtpConverter;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +19,7 @@ public class JspToJteConverter {
 
     private static final Pattern UNCONVERTED_TAG_REFERENCES = Pattern.compile("<[a-zA-Z0-9\\-]+:[a-zA-Z0-9\\-]+\\b");
 
-    public static void convertFromIntelliJPlugin(String[] commandLineArgs, JspToJteConverter converter, Consumer<JspParser> parserSetup) {
+    public static void convertFromIntelliJPlugin(String[] commandLineArgs, JspToJteConverter converter, Consumer<Converter> parserSetup) {
         if (commandLineArgs.length < 1) {
             throw new IllegalArgumentException("Missing JSP file, it should be the first argument on the command line.");
         }
@@ -44,7 +42,7 @@ public class JspToJteConverter {
         this.jteTag = jteTag;
     }
 
-    public void convertTag(String jspTag, String jteTag, Consumer<JspParser> parserSetup) {
+    public void convertTag(String jspTag, String jteTag, Consumer<Converter> parserSetup) {
         checkJteName(jteTag);
         convertTag(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag), parserSetup);
     }
@@ -74,12 +72,26 @@ public class JspToJteConverter {
         }
     }
 
-    private void convertTag(Path jspTag, Path jteTag, Consumer<JspParser> parserSetup) {
-        JspParser parser = new JspParser(this.jteTag);
+    private void convertTag(Path jspTag, Path jteTag, Consumer<Converter> parserSetup) {
+        Converter converter = JtpConverter.newBuilder(IoUtils.readFile(jspTag).getBytes(), true);
+
+        converter.register("c:if", new JspIfConverter());
+        converter.register("c:forEach", new JspForEachConverter());
+        converter.register("c:choose", new JspChooseConverter());
+        converter.register("c:when", new JspWhenConverter());
+        converter.register("c:otherwise", new JspOtherwiseConverter());
+        converter.register("c:set", new JspSetConverter());
+
+        converter.register("fmt:message", new JstlFmtMessageConverter());
+        converter.register("fmt:param", new JstlFmtParamConverter());
+
+        converter.register("my:jte", new gg.jte.convert.jsp.converter.JspJteConverter());
+
         if (parserSetup != null) {
-            parserSetup.accept(parser);
+            parserSetup.accept(converter);
         }
-        String jte = parser.convert(IoUtils.readFile(jspTag));
+
+        String jte = converter.convert();
 
         System.out.println(jte);
 

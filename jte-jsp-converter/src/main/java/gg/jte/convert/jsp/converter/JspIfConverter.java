@@ -1,35 +1,18 @@
 package gg.jte.convert.jsp.converter;
 
-import gg.jte.convert.Converter;
-import gg.jte.convert.Parser;
-import gg.jte.convert.jsp.JspExpressionConverter;
-import gg.jte.convert.xml.XmlAttributesParser;
+import gg.jte.convert.ConverterOutput;
+import gg.jte.convert.CustomTagConverter;
+import org.apache.jasper.compiler.JtpCustomTag;
 
-public class JspIfConverter extends AbstractJspTagConverter {
+public class JspIfConverter implements CustomTagConverter {
 
-    private String test;
-
-    public JspIfConverter() {
-        super("c:if");
+    @Override
+    public void before(JtpCustomTag tag, ConverterOutput output) {
+        output.append("@if(").append(JspExpressionConverter.convertAttributeValue(tag.getAttribute("test"))).append(")");
     }
 
     @Override
-    protected void parseAttributes(XmlAttributesParser attributes) {
-        test = attributes.get("test");
-    }
-
-    @Override
-    public void convertTagBegin(Parser parser, StringBuilder result) {
-        test = JspExpressionConverter.convertAttributeValue(test);
-        result.append("@if(").append(test).append(")");
-    }
-
-    @Override
-    public void convertTagEnd(Parser parser, StringBuilder result) {
-        result.append("@endif");
-    }
-
-    public Converter newInstance() {
-        return new JspIfConverter();
+    public void after(JtpCustomTag tag, ConverterOutput output) {
+        output.append("@endif");
     }
 }

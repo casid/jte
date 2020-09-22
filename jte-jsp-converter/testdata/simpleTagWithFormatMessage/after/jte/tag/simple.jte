@@ -1,5 +1,7 @@
 @import static example.JteContext.*
 
+
+
 ${localize("hello.world")}
 
 !{var hello = localize("hello.world");}
@@ -12,6 +14,6 @@ ${params}
 
 @if(5 > 0)
     <span class="text-md">
-        ${localize("nested",                 localize("common.x", "Something"                )        )}
+        ${localize("nested", localize("common.x", "Something"))}
     </span>
 @endif

@@ -67,7 +67,7 @@ class JspToJteConverter_FromIntelliJTest {
         }
 
         @Override
-        public void convertTag(String jspTag, String jteTag, Consumer<JspParser> parserSetup) {
+        public void convertTag(String jspTag, String jteTag, Consumer<Converter> parserSetup) {
             checkJteName(jteTag);
             this.jteTag = jteTag;
         }

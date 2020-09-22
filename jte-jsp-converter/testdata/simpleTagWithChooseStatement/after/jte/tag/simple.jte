@@ -1,7 +1,6 @@
 @import static example.JteContext.*
-@import example.FoodOption
 
-@param FoodOption foodOption
+@param example.FoodOption foodOption
 @param boolean hangover = CHOOSE_DEFAULT_VALUE
 
 <h4>

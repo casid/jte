@@ -85,7 +85,7 @@ public class JspToJteConverter {
         converter.register("fmt:message", new JstlFmtMessageConverter());
         converter.register("fmt:param", new JstlFmtParamConverter());
 
-        converter.register("my:jte", new gg.jte.convert.jsp.converter.JspJteConverter());
+        converter.register(this.jteTag, new gg.jte.convert.jsp.converter.JspJteConverter());
 
         if (parserSetup != null) {
             parserSetup.accept(converter);

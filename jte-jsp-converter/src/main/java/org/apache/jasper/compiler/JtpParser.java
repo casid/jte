@@ -20,7 +20,7 @@ public class JtpParser {
         JspC jspc = new JspC();
 
         PrintWriter log = new PrintWriter(System.out);
-        URL resourceBase = Paths.get("WEB-INF").toUri().toURL();
+        URL resourceBase = Paths.get("").toUri().toURL();
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         ServletContext context = new JspCServletContext(log, resourceBase, classLoader, jspc.isValidateXml(), jspc.isBlockExternal());

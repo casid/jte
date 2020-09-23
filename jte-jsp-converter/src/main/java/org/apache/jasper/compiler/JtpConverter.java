@@ -68,7 +68,7 @@ public class JtpConverter extends Node.Visitor {
     }
 
     @Override
-    public void visit(Node.TemplateText n) throws JasperException {
+    public void visit(Node.TemplateText n) {
         if (output.isTrimWhitespace()) {
             output.append(n.getText().trim());
         } else {
@@ -77,7 +77,7 @@ public class JtpConverter extends Node.Visitor {
     }
 
     @Override
-    public void visit(Node.ELExpression n) throws JasperException {
+    public void visit(Node.ELExpression n) {
         if (!output.isInsideScript()) {
             output.append("${");
         }
@@ -90,7 +90,7 @@ public class JtpConverter extends Node.Visitor {
     }
 
     @Override
-    public void visit(Node.PageDirective n) throws JasperException {
+    public void visit(Node.PageDirective n) {
         // noop
     }
 
@@ -100,20 +100,12 @@ public class JtpConverter extends Node.Visitor {
     }
 
     @Override
-    public void visit(Node.TaglibDirective n) throws JasperException {
-        if (n.getAttributeValue("uri").equals("http://java.sun.com/jsp/jstl/core")) {
-            return;
-        }
+    public void visit(Node.TaglibDirective n) {
 
-        if (n.getAttributeValue("uri").equals("http://java.sun.com/jsp/jstl/fmt")) {
-            return;
-        }
-
-        throw new RuntimeException("Unsupported taglib: " + n.getAttributeValue("uri"));
     }
 
     @Override
-    public void visit(Node.AttributeDirective n) throws JasperException {
+    public void visit(Node.AttributeDirective n) {
         new JspAttributeConverter().convert(new JtpAttribute(n), output);
     }
 
@@ -132,12 +124,12 @@ public class JtpConverter extends Node.Visitor {
     }
 
     @Override
-    public void visit(Node.Comment n) throws JasperException {
+    public void visit(Node.Comment n) {
         output.append("<%--").append(n.getText()).append("--%>");
     }
 
     @Override
-    protected void doVisit(Node n) throws JasperException {
+    protected void doVisit(Node n) {
         throw new RuntimeException("Unsupported feature detected: " + n.getClass().getSimpleName());
     }
 }

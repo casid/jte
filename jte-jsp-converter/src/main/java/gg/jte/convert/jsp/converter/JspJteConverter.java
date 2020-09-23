@@ -20,13 +20,18 @@ public class JspJteConverter implements CustomTagConverter {
 
         boolean first = true;
         for (int i = 0; i < attributes.getLength(); i++) {
+            String localName = attributes.getLocalName(i);
+            if ("jte".equals(localName)) {
+                continue;
+            }
+
             if (first) {
                 first = false;
             } else {
                 output.append(", ");
             }
 
-            output.append(attributes.getLocalName(i)).append(" = ").append(convertAttributeValue(attributes.getValue(i)));
+            output.append(localName).append(" = ").append(convertAttributeValue(attributes.getValue(i)));
         }
 
         output.append(")");

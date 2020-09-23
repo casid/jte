@@ -123,6 +123,11 @@ class JspExpressionConverterTest {
     }
 
     @Test
+    void negative() {
+        assertConversion("${-1}", "-1");
+    }
+
+    @Test
     void function() {
         assertConversion("${fn:toLowerCase(viewModel.title)}", "fn:toLowerCase(viewModel.title)");
     }

@@ -56,6 +56,7 @@ public class JspExpressionConverter {
             visitorMap.put(AstMult.class, new AstMultVisitor());
             visitorMap.put(AstDiv.class, new AstDivVisitor());
             visitorMap.put(AstMod.class, new AstModVisitor());
+            visitorMap.put(AstNegative.class, new AstNegativeVisitor());
             visitorMap.put(AstGreaterThan.class, new AstGreaterThanVisitor());
             visitorMap.put(AstLessThan.class, new AstLessThanVisitor());
             visitorMap.put(AstLiteralExpression.class, new AstLiteralExpressionVisitor());
@@ -323,6 +324,14 @@ public class JspExpressionConverter {
         @Override
         public void visit(Node node) {
             result.append("null");
+        }
+    }
+
+    private class AstNegativeVisitor implements Visitor {
+        @Override
+        public void visit(Node node) {
+            result.append('-');
+            process(node.jjtGetChild(0));
         }
     }
 }

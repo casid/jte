@@ -10,6 +10,11 @@
         <version>1.3.0</version>
     </parent>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+    </properties>
+
     <profiles>
         <profile>
             <id>coverage</id>

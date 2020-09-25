@@ -9,8 +9,17 @@ public class StandardConverterOutput implements ConverterOutput {
 
     @Override
     public ConverterOutput append(String s) {
-        buffer.append(s);
+        if (s != null) {
+            buffer.append(s);
+        }
+        return this;
+    }
 
+    @Override
+    public ConverterOutput prepend(String s) {
+        if (s != null) {
+            buffer.insert(0, s);
+        }
         return this;
     }
 

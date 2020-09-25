@@ -62,8 +62,7 @@ public class JtpConverter extends Node.Visitor {
 
                     nodes.visit(converter);
 
-                    String result = prefix + output.toString();
-                    return cleanResult(result);
+                    return cleanResult(output.prepend(prefix).toString());
                 } catch (JasperException | IOException | SAXException e) {
                     throw new RuntimeException(e);
                 }

@@ -2,6 +2,8 @@ package gg.jte.convert.jsp.converter;
 
 import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.CustomTagConverter;
+import gg.jte.convert.jsp.BodyConverter;
+import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.JtpCustomTag;
 
 import java.util.ArrayDeque;
@@ -14,7 +16,7 @@ public class JstlFmtMessageConverter implements CustomTagConverter {
     private final Deque<Boolean> previousInsideScript = new ArrayDeque<>();
 
     @Override
-    public void before(JtpCustomTag tag, ConverterOutput output) {
+    public void convert(JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
         var key = convertAttributeValue(tag.getAttribute("key"));
         var var = tag.getAttribute("var");
 
@@ -28,11 +30,8 @@ public class JstlFmtMessageConverter implements CustomTagConverter {
 
         previousInsideScript.push(output.isInsideScript());
         output.setInsideScript(true);
-    }
 
-    @Override
-    public void after(JtpCustomTag tag, ConverterOutput output) {
-        var var = tag.getAttribute("var");
+        bodyConverter.convert();
 
         output.append(")");
 

@@ -133,19 +133,9 @@ public class JtpConverter extends Node.Visitor {
 
         JtpCustomTag tag = new JtpCustomTag(n);
 
-        before(converter, tag);
-        visitBody(n);
-        after(converter, tag);
-    }
-
-    private void after(CustomTagConverter converter, JtpCustomTag tag) {
-        converter.after(tag, output);
-        popTrimWhitespace();
-    }
-
-    private void before(CustomTagConverter converter, JtpCustomTag tag) {
         pushTrimWhitespace(converter.isTrimWhitespace());
-        converter.before(tag, output);
+        converter.convert(tag, output, () -> visitBody(n));
+        popTrimWhitespace();
     }
 
     private void pushTrimWhitespace(boolean trimWhitespace) {

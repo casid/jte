@@ -2,6 +2,8 @@ package gg.jte.convert.jsp.converter;
 
 import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.CustomTagConverter;
+import gg.jte.convert.jsp.BodyConverter;
+import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.JtpCustomTag;
 
 import static gg.jte.convert.jsp.converter.JspExpressionConverter.convertAttributeValue;
@@ -9,7 +11,7 @@ import static gg.jte.convert.jsp.converter.JspExpressionConverter.convertAttribu
 public class JspJteConverter implements CustomTagConverter {
 
     @Override
-    public void before(JtpCustomTag tag, ConverterOutput output) {
+    public void convert(JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
         var jteTagPath = tag.getAttribute("jte");
         var attributes = tag.getAttributes();
 
@@ -35,10 +37,5 @@ public class JspJteConverter implements CustomTagConverter {
         }
 
         output.append(")");
-    }
-
-    @Override
-    public void after(JtpCustomTag tag, ConverterOutput output) {
-        // nothing to do
     }
 }

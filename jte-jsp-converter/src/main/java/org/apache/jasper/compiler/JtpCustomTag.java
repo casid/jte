@@ -1,7 +1,9 @@
 package org.apache.jasper.compiler;
 
+import org.apache.jasper.JasperException;
 import org.xml.sax.Attributes;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class JtpCustomTag {
@@ -15,18 +17,18 @@ public class JtpCustomTag {
         return this.customTag.getAttributeValue(name);
     }
 
+    public boolean hasBody() {
+        return !this.customTag.hasEmptyBody();
+    }
+
     public JtpCustomTag parent(Predicate<JtpCustomTag> tagFilter) {
         Node parent = this.customTag.getParent();
-        if (parent == null) {
-            return null;
-        }
 
-        if (parent instanceof Node.Root) {
-            return null;
-        }
-
-        if (!(parent instanceof Node.CustomTag)) {
-            throw new RuntimeException("Parent is not a CustomTag: " + parent.getClass().getName());
+        while (!(parent instanceof Node.CustomTag)) {
+            if (parent == null) {
+                return null;
+            }
+            parent = parent.parent;
         }
 
         Node.CustomTag customTagParent = (Node.CustomTag) parent;
@@ -73,5 +75,19 @@ public class JtpCustomTag {
 
     public boolean hasParent(Predicate<JtpCustomTag> tagFilter) {
         return parent(tagFilter) != null;
+    }
+
+    public void forEach(Consumer<JtpCustomTag> tagConsumer) {
+        try {
+            this.customTag.body.visit(new Node.Visitor() {
+                @Override
+                public void visit(Node.CustomTag n) throws JasperException {
+                    tagConsumer.accept(new JtpCustomTag(n));
+                    super.visit(n);
+                }
+            });
+        } catch (JasperException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

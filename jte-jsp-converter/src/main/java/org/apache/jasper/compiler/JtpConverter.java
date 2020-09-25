@@ -9,8 +9,7 @@ import org.apache.jasper.JasperException;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -36,14 +35,10 @@ public class JtpConverter extends Node.Visitor {
         this.converters.put(tagName, converter);
     }
 
-    public static void main(String[] args) throws IOException {
-        System.out.println(newBuilder(Files.readAllBytes(Paths.get("jte-jsp-converter/testdata/simpleTagWithForEach/before/jsp/simple.tag")), true));
-    }
-
-    public static Converter newBuilder(byte[] input, boolean tagFile) {
+    public static Converter newBuilder(String relativeFilePath, byte[] input, URL resourceBase, boolean tagFile) {
         return new Converter() {
             private final Map<String, CustomTagConverter> converters = new HashMap<>();
-            private String prefix = "";
+            private String prefix;
 
             @Override
             public void register(String tagName, CustomTagConverter converter) {
@@ -55,7 +50,7 @@ public class JtpConverter extends Node.Visitor {
                 var output = new StandardConverterOutput();
 
                 try {
-                    Node.Nodes nodes = JtpParser.parse(input, tagFile);
+                    Node.Nodes nodes = JtpParser.parse(relativeFilePath, input, resourceBase, tagFile);
 
                     JtpConverter converter = new JtpConverter(output);
                     this.converters.forEach(converter::register);

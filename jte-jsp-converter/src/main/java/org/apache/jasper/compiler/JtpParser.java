@@ -12,15 +12,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Map;
 
 public class JtpParser {
-    public static Node.Nodes parse(byte[] input, boolean tag) throws JasperException, IOException, SAXException {
+    public static Node.Nodes parse(String relativeFilePath, byte[] input, URL resourceBase, boolean tag) throws JasperException, IOException {
         JspC jspc = new JspC();
 
         PrintWriter log = new PrintWriter(System.out);
-        URL resourceBase = Paths.get("").toUri().toURL();
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         ServletContext context = new JspCServletContext(log, resourceBase, classLoader, jspc.isValidateXml(), jspc.isBlockExternal());
@@ -36,6 +34,8 @@ public class JtpParser {
 
         var tldCache = new TldCache(context, scanner.getUriTldResourcePathMap(), scanner.getTldResourcePathTaglibXmlMap());
         context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME, tldCache);
+
+        var jspConfig = new JspConfig(context);
 
         JspRuntimeContext runtimeContext = new JspRuntimeContext(context, jspc);
         JspCompilationContext compilationContext = new JspCompilationContext("", new Options() {
@@ -146,7 +146,7 @@ public class JtpParser {
 
             @Override
             public JspConfig getJspConfig() {
-                return null;
+                return jspConfig;
             }
 
             @Override
@@ -213,7 +213,7 @@ public class JtpParser {
         InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(input));
         ErrorDispatcher errorDispatcher = new ErrorDispatcher(true);
 
-        JspReader jspReader = new JspReader(compilationContext, "memory.jsp", reader, errorDispatcher);
+        JspReader jspReader = new JspReader(compilationContext, relativeFilePath, reader, errorDispatcher);
 
         return Parser.parse(parserController, jspReader, null, tag, false, null, "UTF-8", "UTF-8", true, false);
     }

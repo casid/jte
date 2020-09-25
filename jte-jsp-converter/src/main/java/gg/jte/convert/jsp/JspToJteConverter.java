@@ -7,8 +7,11 @@ import org.apache.jasper.compiler.JtpConverter;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -73,7 +76,7 @@ public class JspToJteConverter {
     }
 
     private void convertTag(Path jspTag, Path jteTag, Consumer<Converter> parserSetup) {
-        Converter converter = JtpConverter.newBuilder(IoUtils.readFile(jspTag).getBytes(), true);
+        Converter converter = JtpConverter.newBuilder(jspRoot.relativize(jspTag).toString(), IoUtils.readFile(jspTag).getBytes(), getResourceBase(), true);
 
         converter.register("c:if", new JspIfConverter());
         converter.register("c:forEach", new JspForEachConverter());
@@ -163,6 +166,14 @@ public class JspToJteConverter {
         jteFile.append(".jte");
 
         return jteFile.toString();
+    }
+
+    protected URL getResourceBase() {
+        try {
+            return Paths.get("").toUri().toURL();
+        } catch (MalformedURLException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     protected String skipDirectoryIfRequired(String jspFileWithoutExtension) {

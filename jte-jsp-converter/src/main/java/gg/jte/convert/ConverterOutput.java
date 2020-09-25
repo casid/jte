@@ -12,4 +12,6 @@ public interface ConverterOutput {
     void setInsideScript(boolean value);
 
     boolean isInsideScript();
+
+    ConverterOutput trim();
 }

@@ -3,6 +3,7 @@ package org.apache.jasper.compiler;
 import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.CustomTagConverter;
 import gg.jte.convert.jsp.Converter;
+import gg.jte.convert.jsp.JspElementType;
 import gg.jte.convert.jsp.converter.JspAttributeConverter;
 import org.apache.jasper.JasperException;
 
@@ -24,8 +25,10 @@ public class JtpConverter extends Node.Visitor implements Converter {
     private final ConverterOutput output;
     private final Map<String, CustomTagConverter> converters = new HashMap<>();
     private final Set<String> inlinedIncludes = new HashSet<>();
+    private final Map<String, EnumSet<JspElementType>> suppressions = new HashMap<>();
 
     private String prefix;
+    private String lineSeparator = "\n";
 
     private final Deque<Boolean> trimWhitespace = new ArrayDeque<>();
 
@@ -48,13 +51,22 @@ public class JtpConverter extends Node.Visitor implements Converter {
     }
 
     @Override
+    public void addSuppressions(String path, EnumSet<JspElementType> suppressions) {
+        this.suppressions.put(path, suppressions);
+    }
+
+    public void setLineSeparator(String lineSeparator) {
+        this.lineSeparator = lineSeparator;
+    }
+
+    @Override
     public String convert() {
         try {
             Node.Nodes nodes = JtpParser.parse(relativeFilePath, input, resourceBase, tagFile);
 
             nodes.visit(this);
 
-            return cleanResult(output.prepend(prefix).toString());
+            return cleanResult(output.trim().prepend(prefix).toString());
         } catch (JasperException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -65,9 +77,10 @@ public class JtpConverter extends Node.Visitor implements Converter {
         this.prefix = prefix;
     }
 
-    private static String cleanResult(String result) {
+    private String cleanResult(String result) {
         result = NEW_LINE_WHITESPACE_CLEANUP.matcher(result).replaceAll("\n");
         result = NEW_LINE_CLEANUP.matcher(result).replaceAll("\n\n");
+        result = result.replace("\n", lineSeparator);
         return result;
     }
 
@@ -78,6 +91,14 @@ public class JtpConverter extends Node.Visitor implements Converter {
         } else {
             output.append(n.getText());
         }
+    }
+
+    @Override
+    public void visit(Node.UseBean n) throws JasperException {
+        if (isSuppressed(n)) {
+            return;
+        }
+        super.visit(n);
     }
 
     @Override
@@ -114,7 +135,19 @@ public class JtpConverter extends Node.Visitor implements Converter {
     }
 
     @Override
+    public void visit(Node.Declaration n) throws JasperException {
+        if (isSuppressed(n)) {
+            return;
+        }
+        super.visit(n);
+    }
+
+    @Override
     public void visit(Node.CustomTag n) throws JasperException {
+        if (isSuppressed(n)) {
+            return;
+        }
+
         CustomTagConverter converter = converters.get(n.getQName());
         if (converter == null) {
             throw new RuntimeException("Missing converter for custom tag: <" + n.getQName() + " />");
@@ -143,7 +176,24 @@ public class JtpConverter extends Node.Visitor implements Converter {
 
     @Override
     public void visit(Node.Comment n) {
+        if (isSuppressed(n)) {
+            return;
+        }
+
         output.append("<%--").append(n.getText()).append("--%>");
+    }
+
+    @Override
+    public void visit(Node.Scriptlet n) throws JasperException {
+        if (isSuppressed(n)) {
+            return;
+        }
+
+        super.visit(n);
+    }
+
+    public static JspElementType getType(Node n) {
+        return JspElementType.valueOf(n.getClass().getSimpleName());
     }
 
     @Override
@@ -159,5 +209,15 @@ public class JtpConverter extends Node.Visitor implements Converter {
     @Override
     protected void doVisit(Node n) {
         throw new RuntimeException("Unsupported feature detected: " + n.getClass().getSimpleName());
+    }
+
+    private boolean isSuppressed(Node n) {
+        EnumSet<JspElementType> suppressedTypes = suppressions.get(n.getStart().getFile());
+        if (suppressedTypes == null) {
+            return false;
+        }
+
+        JspElementType type = getType(n);
+        return suppressedTypes.contains(type);
     }
 }

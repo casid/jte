@@ -44,6 +44,14 @@ public class StandardConverterOutput implements ConverterOutput {
     }
 
     @Override
+    public ConverterOutput trim() {
+        String trimmed = buffer.toString().trim();
+        buffer.setLength(0);
+        buffer.append(trimmed);
+        return this;
+    }
+
+    @Override
     public String toString() {
         return buffer.toString();
     }

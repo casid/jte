@@ -6,4 +6,8 @@ public interface CustomTagConverter {
     void before(JtpCustomTag tag, ConverterOutput output);
 
     void after(JtpCustomTag tag, ConverterOutput output);
+
+    default boolean isTrimWhitespace() {
+        return false;
+    }
 }

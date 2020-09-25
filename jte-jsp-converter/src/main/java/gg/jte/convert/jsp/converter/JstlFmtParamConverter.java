@@ -22,4 +22,9 @@ public class JstlFmtParamConverter implements CustomTagConverter {
     public void after(JtpCustomTag tag, ConverterOutput output) {
         // nothing to do
     }
+
+    @Override
+    public boolean isTrimWhitespace() {
+        return true;
+    }
 }

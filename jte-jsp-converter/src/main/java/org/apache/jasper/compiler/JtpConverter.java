@@ -11,14 +11,22 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static gg.jte.convert.jsp.converter.JspExpressionConverter.convertAttributeValue;
 
 public class JtpConverter extends Node.Visitor {
+    private static final Pattern NEW_LINE_CLEANUP = Pattern.compile("\n{3,}");
+    private static final Pattern NEW_LINE_WHITESPACE_CLEANUP = Pattern.compile("\n([\\t ]+)\n");
+
     private final ConverterOutput output;
     private final Map<String, CustomTagConverter> converters = new HashMap<>();
+
+    private final Deque<Boolean> trimWhitespace = new ArrayDeque<>();
 
     public JtpConverter(ConverterOutput output) {
         this.output = output;
@@ -54,7 +62,8 @@ public class JtpConverter extends Node.Visitor {
 
                     nodes.visit(converter);
 
-                    return prefix + output.toString();
+                    String result = prefix + output.toString();
+                    return cleanResult(result);
                 } catch (JasperException | IOException | SAXException e) {
                     throw new RuntimeException(e);
                 }
@@ -65,6 +74,12 @@ public class JtpConverter extends Node.Visitor {
                 this.prefix = prefix;
             }
         };
+    }
+
+    private static String cleanResult(String result) {
+        result = NEW_LINE_WHITESPACE_CLEANUP.matcher(result).replaceAll("\n");
+        result = NEW_LINE_CLEANUP.matcher(result).replaceAll("\n\n");
+        return result;
     }
 
     @Override
@@ -118,9 +133,33 @@ public class JtpConverter extends Node.Visitor {
 
         JtpCustomTag tag = new JtpCustomTag(n);
 
-        converter.before(tag, output);
+        before(converter, tag);
         visitBody(n);
+        after(converter, tag);
+    }
+
+    private void after(CustomTagConverter converter, JtpCustomTag tag) {
         converter.after(tag, output);
+        popTrimWhitespace();
+    }
+
+    private void before(CustomTagConverter converter, JtpCustomTag tag) {
+        pushTrimWhitespace(converter.isTrimWhitespace());
+        converter.before(tag, output);
+    }
+
+    private void pushTrimWhitespace(boolean trimWhitespace) {
+        this.trimWhitespace.push(trimWhitespace);
+        output.setTrimWhitespace(trimWhitespace);
+    }
+
+    private void popTrimWhitespace() {
+        this.trimWhitespace.pop();
+        if (this.trimWhitespace.isEmpty()) {
+            output.setTrimWhitespace(false);
+        } else {
+            output.setTrimWhitespace(this.trimWhitespace.peek());
+        }
     }
 
     @Override

@@ -1,6 +1,5 @@
 @import static example.JteContext.*
 
-
 @param java.util.List rows
 
 <div class="well content m-b-3">

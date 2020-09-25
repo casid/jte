@@ -4,14 +4,14 @@ import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.CustomTagConverter;
 import org.apache.jasper.compiler.JtpCustomTag;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import static gg.jte.convert.jsp.converter.JspExpressionConverter.convertAttributeValue;
 
 public class JstlFmtMessageConverter implements CustomTagConverter {
 
-    private final Stack<Boolean> previousWhitespace = new Stack<>();
-    private final Stack<Boolean> previousInsideScript = new Stack<>();
+    private final Deque<Boolean> previousInsideScript = new ArrayDeque<>();
 
     @Override
     public void before(JtpCustomTag tag, ConverterOutput output) {
@@ -25,9 +25,6 @@ public class JstlFmtMessageConverter implements CustomTagConverter {
         }
 
         output.append("localize(").append(key);
-
-        previousWhitespace.push(output.isTrimWhitespace());
-        output.setTrimWhitespace(true);
 
         previousInsideScript.push(output.isInsideScript());
         output.setInsideScript(true);
@@ -45,7 +42,11 @@ public class JstlFmtMessageConverter implements CustomTagConverter {
             output.append("}");
         }
 
-        output.setTrimWhitespace(previousWhitespace.pop());
         output.setInsideScript(previousInsideScript.pop());
+    }
+
+    @Override
+    public boolean isTrimWhitespace() {
+        return true;
     }
 }

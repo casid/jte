@@ -1,7 +1,5 @@
 @import static example.JteContext.*
 
-
-
 ${localize("hello.world")}
 
 !{var hello = localize("hello.world");}

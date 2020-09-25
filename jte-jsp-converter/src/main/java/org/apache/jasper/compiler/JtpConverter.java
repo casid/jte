@@ -2,72 +2,67 @@ package org.apache.jasper.compiler;
 
 import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.CustomTagConverter;
-import gg.jte.convert.StandardConverterOutput;
 import gg.jte.convert.jsp.Converter;
 import gg.jte.convert.jsp.converter.JspAttributeConverter;
 import org.apache.jasper.JasperException;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static gg.jte.convert.jsp.converter.JspExpressionConverter.convertAttributeValue;
 
-public class JtpConverter extends Node.Visitor {
+public class JtpConverter extends Node.Visitor implements Converter {
     private static final Pattern NEW_LINE_CLEANUP = Pattern.compile("\n{3,}");
     private static final Pattern NEW_LINE_WHITESPACE_CLEANUP = Pattern.compile("\n([\\t ]+)\n");
 
+    private final String relativeFilePath;
+    private final byte[] input;
+    private final URL resourceBase;
+    private final boolean tagFile;
     private final ConverterOutput output;
     private final Map<String, CustomTagConverter> converters = new HashMap<>();
+    private final Set<String> inlinedIncludes = new HashSet<>();
+
+    private String prefix;
 
     private final Deque<Boolean> trimWhitespace = new ArrayDeque<>();
 
-    public JtpConverter(ConverterOutput output) {
+    public JtpConverter(String relativeFilePath, byte[] input, URL resourceBase, boolean tagFile, ConverterOutput output) {
+        this.relativeFilePath = relativeFilePath;
+        this.input = input;
+        this.resourceBase = resourceBase;
+        this.tagFile = tagFile;
         this.output = output;
     }
 
-    private void register(String tagName, CustomTagConverter converter) {
+    @Override
+    public void register(String tagName, CustomTagConverter converter) {
         this.converters.put(tagName, converter);
     }
 
-    public static Converter newBuilder(String relativeFilePath, byte[] input, URL resourceBase, boolean tagFile) {
-        return new Converter() {
-            private final Map<String, CustomTagConverter> converters = new HashMap<>();
-            private String prefix;
+    @Override
+    public void addInlinedInclude(String path) {
+        inlinedIncludes.add(path);
+    }
 
-            @Override
-            public void register(String tagName, CustomTagConverter converter) {
-                converters.put(tagName, converter);
-            }
+    @Override
+    public String convert() {
+        try {
+            Node.Nodes nodes = JtpParser.parse(relativeFilePath, input, resourceBase, tagFile);
 
-            @Override
-            public String convert() {
-                var output = new StandardConverterOutput();
+            nodes.visit(this);
 
-                try {
-                    Node.Nodes nodes = JtpParser.parse(relativeFilePath, input, resourceBase, tagFile);
+            return cleanResult(output.prepend(prefix).toString());
+        } catch (JasperException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-                    JtpConverter converter = new JtpConverter(output);
-                    this.converters.forEach(converter::register);
-
-                    nodes.visit(converter);
-
-                    return cleanResult(output.prepend(prefix).toString());
-                } catch (JasperException | IOException | SAXException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            @Override
-            public void setPrefix(String prefix) {
-                this.prefix = prefix;
-            }
-        };
+    @Override
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
     private static String cleanResult(String result) {
@@ -149,6 +144,16 @@ public class JtpConverter extends Node.Visitor {
     @Override
     public void visit(Node.Comment n) {
         output.append("<%--").append(n.getText()).append("--%>");
+    }
+
+    @Override
+    public void visit(Node.IncludeDirective n) throws JasperException {
+        String file = n.getAttributeValue("file");
+        if (!inlinedIncludes.contains(file)) {
+            throw new UnsupportedOperationException("Includes are not supported. You should convert it to a tag first, or suppress with addInlinedInclude(\"" + file + "\")");
+        }
+
+        visitBody(n);
     }
 
     @Override

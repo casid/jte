@@ -11,6 +11,8 @@ public interface Converter {
 
     void addSuppressions(String path, EnumSet<JspElementType> suppressions);
 
+    void setLineSeparator(String lineSeparator);
+
     String convert();
 
     void setPrefix(String prefix);

@@ -5,6 +5,7 @@ import gg.jte.convert.CustomTagConverter;
 import gg.jte.convert.jsp.Converter;
 import gg.jte.convert.jsp.JspElementType;
 import gg.jte.convert.jsp.converter.JspAttributeConverter;
+import gg.jte.convert.jsp.converter.JspExpressionConverter;
 import org.apache.jasper.JasperException;
 
 import java.io.IOException;
@@ -55,6 +56,7 @@ public class JtpConverter extends Node.Visitor implements Converter {
         this.suppressions.put(path, suppressions);
     }
 
+    @Override
     public void setLineSeparator(String lineSeparator) {
         this.lineSeparator = lineSeparator;
     }
@@ -126,7 +128,26 @@ public class JtpConverter extends Node.Visitor implements Converter {
 
     @Override
     public void visit(Node.TaglibDirective n) {
+        // noop
+    }
 
+    @Override
+    public void visit(Node.TagDirective n) {
+        // noop
+    }
+
+    @Override
+    public void visit(Node.SetProperty n) {
+        String name = n.getAttributeValue("name");
+        String value = n.getAttributeValue("value");
+        String property = n.getAttributeValue("property");
+
+        output.append("!{");
+        output.append(name).append(".set");
+        output.append(Character.toUpperCase(property.charAt(0)) + property.substring(1));
+        output.append("(");
+        output.append(JspExpressionConverter.convertAttributeValue(value));
+        output.append(");}");
     }
 
     @Override

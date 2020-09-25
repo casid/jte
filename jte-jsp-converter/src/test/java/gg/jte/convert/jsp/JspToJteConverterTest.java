@@ -107,6 +107,13 @@ class JspToJteConverterTest {
     }
 
     @Test
+    void simpleTagWithSetProperty() {
+        givenUsecase("simpleTagWithSetProperty");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
     void simpleTagWithNotYetConvertedTag() {
         givenUsecase("simpleTagWithNotYetConvertedTag");
         Throwable throwable = catchThrowable(() -> whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte"));

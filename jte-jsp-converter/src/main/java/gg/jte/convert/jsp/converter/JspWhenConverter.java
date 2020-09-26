@@ -1,67 +1,31 @@
 package gg.jte.convert.jsp.converter;
 
-import gg.jte.convert.Converter;
-import gg.jte.convert.Parser;
-import gg.jte.convert.jsp.JspExpressionConverter;
-import gg.jte.convert.xml.XmlAttributesParser;
+import gg.jte.convert.ConverterOutput;
+import gg.jte.convert.CustomTagConverter;
+import gg.jte.convert.jsp.BodyConverter;
+import org.apache.jasper.JasperException;
+import org.apache.jasper.compiler.JtpCustomTag;
 
-public class JspWhenConverter extends AbstractJspTagConverter {
+public class JspWhenConverter implements CustomTagConverter {
 
-    private String test;
+    private boolean isFirst(JtpCustomTag tag) {
+        JtpCustomTag parent = tag.parent(JtpCustomTag.byTagName("c:choose"));
 
-    public JspWhenConverter() {
-        super("c:when");
+        return parent.indexOf(tag) == 0;
     }
 
     @Override
-    public boolean canConvert(Parser parser) {
-        return super.canConvert(parser) && parser.getCurrentConverter() instanceof JspChooseConverter;
-    }
-
-    @Override
-    protected void parseAttributes(XmlAttributesParser attributes) {
-        test = attributes.get("test");
-    }
-
-    @Override
-    public void convertTagBegin(Parser parser, StringBuilder result) {
-        if (test != null) {
-            test = new JspExpressionConverter(test).getJavaCode();
+    public void convert(JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
+        if (isFirst(tag)) {
+            output.append("@if(");
         } else {
-            test = "???";
+            output.append("@elseif(");
         }
 
-        if (isFirst(parser)) {
-            result.append("@if(").append(test).append(")");
-        } else {
-            result.append("@elseif(").append(test).append(")");
-        }
-    }
+        output.append(JspExpressionConverter.convertAttributeValue(tag.getAttribute("test"))).append(")");
 
-    private boolean isFirst(Parser parser) {
-        boolean first = false;
+        bodyConverter.convert();
 
-        Converter parentConverter = parser.getParentConverter();
-        if (parentConverter instanceof JspChooseConverter) {
-            JspChooseConverter chooseConverter = (JspChooseConverter)parentConverter;
-            first = chooseConverter.getWhenCount() == 0;
-            chooseConverter.incrementWhenCount();
-        }
-
-        return first;
-    }
-
-    @Override
-    public void convertTagEnd(Parser parser, StringBuilder result) {
-        // Nothing to do
-    }
-
-    @Override
-    protected boolean dropClosingTagLine() {
-        return true;
-    }
-
-    public Converter newInstance() {
-        return new JspWhenConverter();
+        // written in before or JspChooseConverter.after
     }
 }

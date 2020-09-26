@@ -1,35 +1,17 @@
 package gg.jte.convert.jsp.converter;
 
-import gg.jte.convert.Converter;
-import gg.jte.convert.Parser;
-import gg.jte.convert.jsp.JspExpressionConverter;
-import gg.jte.convert.xml.XmlAttributesParser;
+import gg.jte.convert.ConverterOutput;
+import gg.jte.convert.CustomTagConverter;
+import gg.jte.convert.jsp.BodyConverter;
+import org.apache.jasper.JasperException;
+import org.apache.jasper.compiler.JtpCustomTag;
 
-public class JspIfConverter extends AbstractJspTagConverter {
-
-    private String test;
-
-    public JspIfConverter() {
-        super("c:if");
-    }
+public class JspIfConverter implements CustomTagConverter {
 
     @Override
-    protected void parseAttributes(XmlAttributesParser attributes) {
-        test = attributes.get("test");
-    }
-
-    @Override
-    public void convertTagBegin(Parser parser, StringBuilder result) {
-        test = JspExpressionConverter.convertAttributeValue(test);
-        result.append("@if(").append(test).append(")");
-    }
-
-    @Override
-    public void convertTagEnd(Parser parser, StringBuilder result) {
-        result.append("@endif");
-    }
-
-    public Converter newInstance() {
-        return new JspIfConverter();
+    public void convert(JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
+        output.append("@if(").append(JspExpressionConverter.convertAttributeValue(tag.getAttribute("test"))).append(")");
+        bodyConverter.convert();
+        output.append("@endif");
     }
 }

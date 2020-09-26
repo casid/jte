@@ -6,12 +6,20 @@ import gg.jte.convert.jsp.BodyConverter;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.JtpCustomTag;
 
-public class JspChooseConverter implements CustomTagConverter {
+import static gg.jte.convert.jsp.converter.JspExpressionConverter.convertAttributeValue;
+
+public class JstlFmtParamConverter implements CustomTagConverter {
 
     @Override
     public void convert(JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
+        output.append(", ");
+
+        var value = tag.getAttribute("value");
+        if (value != null) {
+            output.append(convertAttributeValue(value));
+        }
+
         bodyConverter.convert();
-        output.append("@endif");
     }
 
     @Override

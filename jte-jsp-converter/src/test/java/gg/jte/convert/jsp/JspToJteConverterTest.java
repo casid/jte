@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,11 +27,21 @@ class JspToJteConverterTest {
 
     String[] notConvertedTags;
 
+    List<Consumer<Converter>> setups = new ArrayList<>();
+
     @Test
     void simpleTag() {
         givenUsecase("simpleTag");
         whenJspTagIsConverted("simple.tag", "tag/simple.jte");
         thenConversionIsAsExpected();
+    }
+
+    @Test
+    void simpleTag_nullPrefix() {
+        givenSetup(c -> c.setPrefix(null));
+        givenUsecase("simpleTag");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        // No npe!
     }
 
     @Test
@@ -102,17 +115,24 @@ class JspToJteConverterTest {
     }
 
     @Test
+    void simpleTagWithSetProperty() {
+        givenUsecase("simpleTagWithSetProperty");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
     void simpleTagWithNotYetConvertedTag() {
         givenUsecase("simpleTagWithNotYetConvertedTag");
         Throwable throwable = catchThrowable(() -> whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte"));
-        assertThat(throwable).isInstanceOf(IllegalStateException.class).hasMessage("The tag <my:simple-dependency/> is used by this tag and not converted to jte yet. You should convert <my:simple-dependency/> first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
+        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class).hasMessage("The tag <my:simple-dependency/> is used by this tag and not converted to jte yet. You should convert <my:simple-dependency/> first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.");
     }
 
     @Test
     void simpleTagWithNotYetConvertedTags() {
         givenUsecase("simpleTagWithNotYetConvertedTags");
         Throwable throwable = catchThrowable(() -> whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte"));
-        assertThat(throwable).isInstanceOf(IllegalStateException.class).hasMessage(
+        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class).hasMessage(
               "The tag <my:simple-dependency1/> is used by this tag and not converted to jte yet. You should convert <my:simple-dependency1/> first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there.\n" +
               "The tag <my:simple-dependency2/> is used by this tag and not converted to jte yet. You should convert <my:simple-dependency2/> first. If this is a tag that should be always converted by hand, implement getNotConvertedTags() and add it there."
         );
@@ -127,6 +147,25 @@ class JspToJteConverterTest {
         thenConversionIsAsExpected();
     }
 
+    @Test
+    void simpleTagWithInclude_fails() {
+        givenUsecase("simpleTagWithInclude");
+
+        Throwable throwable = catchThrowable(() -> whenJspTagIsConverted("simple.tag", "tag/simple.jte"));
+
+        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class).hasMessage("Includes are not supported. You should convert it to a tag first, or suppress with addInlinedInclude(\"/WEB-INF/import.jsp.inc\")");
+    }
+
+    @Test
+    void simpleTagWithInclude_inlined() {
+        givenSetup(c -> c.addInlinedInclude("/WEB-INF/import.jsp.inc"));
+        givenUsecase("simpleTagWithInclude");
+
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+
+        thenConversionIsAsExpected();
+    }
+
     void givenUsecase(String usecase) {
         jspRoot = tempDir.resolve("jsp");
         jteRoot = tempDir.resolve("jte");
@@ -136,13 +175,15 @@ class JspToJteConverterTest {
         this.usecase = usecase;
     }
 
+    void givenSetup(Consumer<Converter> setup) {
+        setups.add(setup);
+    }
+
     void whenJspTagIsConverted(String jspTag, String jteTag) {
         JspToJteConverter converter = new MyConverter();
-        converter.convertTag(jspTag, jteTag, parser -> {
-            parser.setPrefix("@import static example.JteContext.*\n");
-            parser.setIndentationChar(' ');
-            parser.setIndentationCount(4);
-            parser.setLineSeparator(System.lineSeparator());
+        converter.convertTag(jspTag, jteTag, c -> {
+            c.setPrefix("@import static example.JteContext.*\n");
+            setups.forEach(s -> s.accept(c));
         });
     }
 
@@ -151,7 +192,7 @@ class JspToJteConverterTest {
         Path actual = tempDir;
 
         try (Stream<Path> stream = Files.walk(expected)) {
-            stream.filter(p -> !Files.isDirectory(p)).forEach(expectedFile -> {
+            stream.filter(p -> !Files.isDirectory(p) && !p.getFileName().toString().startsWith(".")).forEach(expectedFile -> {
                 Path actualFile = actual.resolve(expected.relativize(expectedFile));
                 assertThat(actualFile).exists();
                 assertThat(actualFile).hasSameTextualContentAs(expectedFile);

@@ -1,38 +1,21 @@
 package gg.jte.convert.jsp.converter;
 
-import gg.jte.convert.Converter;
-import gg.jte.convert.Parser;
-import gg.jte.convert.jsp.JspExpressionConverter;
-import gg.jte.convert.xml.XmlAttributesParser;
+import gg.jte.convert.ConverterOutput;
+import gg.jte.convert.CustomTagConverter;
+import gg.jte.convert.jsp.BodyConverter;
+import org.apache.jasper.JasperException;
+import org.apache.jasper.compiler.JtpCustomTag;
 
-
-public class JspForEachConverter extends AbstractJspTagConverter {
-
-    private String var;
-    private String items;
-
-    public JspForEachConverter() {
-        super("c:forEach");
-    }
+public class JspForEachConverter implements CustomTagConverter {
 
     @Override
-    protected void parseAttributes(XmlAttributesParser attributes) {
-        var = attributes.get("var");
-        items = attributes.get("items");
-    }
+    public void convert(JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
+        var items = JspExpressionConverter.convertAttributeValue(tag.getAttribute("items"));
 
-    @Override
-    public void convertTagBegin(Parser parser, StringBuilder result) {
-        items = JspExpressionConverter.convertAttributeValue(items);
-        result.append("@for(var ").append(var).append(" : ").append(items).append(")");
-    }
+        output.append("@for(var ").append(tag.getAttribute("var")).append(" : ").append(items).append(")");
 
-    @Override
-    public void convertTagEnd(Parser parser, StringBuilder result) {
-        result.append("@endfor");
-    }
+        bodyConverter.convert();
 
-    public Converter newInstance() {
-        return new JspForEachConverter();
+        output.append("@endfor");
     }
 }

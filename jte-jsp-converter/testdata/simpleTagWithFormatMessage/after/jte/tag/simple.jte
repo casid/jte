@@ -12,6 +12,6 @@ ${params}
 
 @if(5 > 0)
     <span class="text-md">
-        ${localize("nested",                 localize("common.x", "Something"                )        )}
+        ${localize("nested", localize("common.x", "Something"))}
     </span>
 @endif

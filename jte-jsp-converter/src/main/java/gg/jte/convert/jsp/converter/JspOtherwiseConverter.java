@@ -1,41 +1,16 @@
 package gg.jte.convert.jsp.converter;
 
-import gg.jte.convert.Converter;
-import gg.jte.convert.Parser;
-import gg.jte.convert.xml.XmlAttributesParser;
+import gg.jte.convert.ConverterOutput;
+import gg.jte.convert.CustomTagConverter;
+import gg.jte.convert.jsp.BodyConverter;
+import org.apache.jasper.JasperException;
+import org.apache.jasper.compiler.JtpCustomTag;
 
-public class JspOtherwiseConverter extends AbstractJspTagConverter {
-
-    public JspOtherwiseConverter() {
-        super("c:otherwise");
-    }
+public class JspOtherwiseConverter implements CustomTagConverter {
 
     @Override
-    public boolean canConvert(Parser parser) {
-        return super.canConvert(parser) && parser.getCurrentConverter() instanceof JspChooseConverter;
-    }
-
-    @Override
-    protected void parseAttributes(XmlAttributesParser attributes) {
-        // has none
-    }
-
-    @Override
-    public void convertTagBegin(Parser parser, StringBuilder result) {
-        result.append("@else");
-    }
-
-    @Override
-    public void convertTagEnd(Parser parser, StringBuilder result) {
-        // Nothing to do
-    }
-
-    @Override
-    protected boolean dropClosingTagLine() {
-        return true;
-    }
-
-    public Converter newInstance() {
-        return new JspOtherwiseConverter();
+    public void convert(JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
+        output.append("@else");
+        bodyConverter.convert();
     }
 }

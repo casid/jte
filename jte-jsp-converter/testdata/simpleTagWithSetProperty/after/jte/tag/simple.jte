@@ -1,5 +1,6 @@
 @import static example.JteContext.*
+@import example.SimpleBean
 
-@param example.SimpleBean bean
+@param SimpleBean bean
 !{bean.setStringProperty("hello");}
 ${bean.stringProperty}

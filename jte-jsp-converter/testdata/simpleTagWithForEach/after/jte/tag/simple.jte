@@ -1,6 +1,7 @@
 @import static example.JteContext.*
+@import java.util.List
 
-@param java.util.List rows
+@param List rows
 
 <div class="well content m-b-3">
     @for(var row : rows)

@@ -174,7 +174,7 @@ class JspToJteConverterTest {
     void whenJspTagIsConverted(String jspTag, String jteTag) {
         JspToJteConverter converter = new MyConverter();
         converter.convertTag(jspTag, jteTag, c -> {
-            c.setPrefix("@import static example.JteContext.*\n\n");
+            c.setPrefix("@import static example.JteContext.*\n");
             setups.forEach(s -> s.accept(c));
         });
     }

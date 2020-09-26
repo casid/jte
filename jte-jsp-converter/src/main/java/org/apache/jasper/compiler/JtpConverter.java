@@ -27,6 +27,7 @@ public class JtpConverter extends Node.Visitor implements Converter {
     private final Map<String, CustomTagConverter> converters = new HashMap<>();
     private final Set<String> inlinedIncludes = new HashSet<>();
     private final Map<String, EnumSet<JspElementType>> suppressions = new HashMap<>();
+    private final Set<String> imports = new TreeSet<>();
 
     private String prefix;
     private String lineSeparator = "\n";
@@ -68,15 +69,31 @@ public class JtpConverter extends Node.Visitor implements Converter {
 
             nodes.visit(this);
 
-            return cleanResult(output.trim().prepend(prefix).toString());
+            return cleanResult(output.trim().prepend(createPrefix()).toString());
         } catch (JasperException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private String createPrefix() {
+        StringBuilder result = new StringBuilder(prefix);
+
+        for (String type : imports) {
+            result.append("@import ").append(type).append('\n');
+        }
+
+        result.append('\n');
+
+        return result.toString();
+    }
+
     @Override
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+    }
+
+    public void addImport(String className) {
+        imports.add(className);
     }
 
     private String cleanResult(String result) {
@@ -152,7 +169,7 @@ public class JtpConverter extends Node.Visitor implements Converter {
 
     @Override
     public void visit(Node.AttributeDirective n) {
-        new JspAttributeConverter().convert(new JtpAttribute(n), output);
+        new JspAttributeConverter().convert(this, new JtpAttribute(n), output);
     }
 
     @Override

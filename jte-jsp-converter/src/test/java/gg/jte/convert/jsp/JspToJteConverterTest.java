@@ -37,6 +37,14 @@ class JspToJteConverterTest {
     }
 
     @Test
+    void simpleTag_nullPrefix() {
+        givenSetup(c -> c.setPrefix(null));
+        givenUsecase("simpleTag");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        // No npe!
+    }
+
+    @Test
     void simpleTagWithCommentBetweenParams() {
         givenUsecase("simpleTagWithCommentBetweenParams");
         whenJspTagIsConverted("simple.tag", "tag/simple.jte");

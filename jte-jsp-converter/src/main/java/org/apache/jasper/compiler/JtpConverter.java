@@ -76,13 +76,15 @@ public class JtpConverter extends Node.Visitor implements Converter {
     }
 
     private String createPrefix() {
-        StringBuilder result = new StringBuilder(prefix);
+        StringBuilder result = new StringBuilder(prefix == null ? "" : prefix);
 
         for (String type : imports) {
             result.append("@import ").append(type).append('\n');
         }
 
-        result.append('\n');
+        if (result.length() > 0) {
+            result.append('\n');
+        }
 
         return result.toString();
     }

@@ -192,7 +192,7 @@ class JspToJteConverterTest {
         Path actual = tempDir;
 
         try (Stream<Path> stream = Files.walk(expected)) {
-            stream.filter(p -> !Files.isDirectory(p)).forEach(expectedFile -> {
+            stream.filter(p -> !Files.isDirectory(p) && !p.getFileName().toString().startsWith(".")).forEach(expectedFile -> {
                 Path actualFile = actual.resolve(expected.relativize(expectedFile));
                 assertThat(actualFile).exists();
                 assertThat(actualFile).hasSameTextualContentAs(expectedFile);

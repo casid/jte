@@ -7,12 +7,13 @@ public class ConverterOutput {
     private int indentationCount = 4;
     private char indentationChar = ' ';
 
+    private int skipIndent;
     private boolean trim = false;
     private boolean insideScript = false;
 
     public ConverterOutput append(String s) {
         if (s != null) {
-            buffer.append(s);
+            buffer.append(trimIndent(s));
         }
         return this;
     }
@@ -77,6 +78,42 @@ public class ConverterOutput {
             buffer.append(indentationChar);
         }
         return this;
+    }
+
+    public void incrementSkipIndent() {
+        skipIndent++;
+    }
+
+    public void decrementSkipIndent() {
+        skipIndent--;
+    }
+
+    private String trimIndent(String content) {
+        if (skipIndent == 0) {
+            return content;
+        }
+
+        StringBuilder result = new StringBuilder(content.length());
+
+        int trim = 0;
+
+        for (int i = 0; i < content.length(); ++i) {
+            char c = content.charAt(i);
+            if (c == '\n') {
+                trim = skipIndent * indentationCount;
+            } else if (trim > 0) {
+                if (c == indentationChar) {
+                    --trim;
+                    continue;
+                } else {
+                    trim = 0;
+                }
+            }
+
+            result.append(c);
+        }
+
+        return result.toString();
     }
 
     public void setIndentationChar(char indentationChar) {

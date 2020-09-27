@@ -11,8 +11,10 @@ public class JspChooseConverter implements CustomTagConverter {
 
     @Override
     public void convert(JtpConverter converter, JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
+        output.incrementSkipIndent();
         bodyConverter.convert();
         output.append("@endif");
+        output.decrementSkipIndent();
     }
 
     @Override

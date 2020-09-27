@@ -13,6 +13,10 @@ public interface Converter {
 
     void setLineSeparator(String lineSeparator);
 
+    void setIndentationCount(int indentationCount);
+
+    void setIndentationChar(char indentationChar);
+
     String convert();
 
     void setPrefix(String prefix);

@@ -1,7 +1,7 @@
 package gg.jte.convert.jsp;
 
 import gg.jte.convert.IoUtils;
-import gg.jte.convert.StandardConverterOutput;
+import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.cc.CamelCaseConverter;
 import gg.jte.convert.jsp.converter.*;
 import org.apache.jasper.compiler.JtpConverter;
@@ -78,7 +78,7 @@ public class JspToJteConverter {
 
     private void convertTag(Path jspTag, Path jteTag, Consumer<Converter> parserSetup) {
         String relativeFilePath = jspRoot.relativize(jspTag).toString();
-        Converter converter = new JtpConverter(relativeFilePath, IoUtils.readFile(jspTag).replace("\r", "").getBytes(), getResourceBase(), relativeFilePath.endsWith(".tag"), new StandardConverterOutput());
+        Converter converter = new JtpConverter(relativeFilePath, IoUtils.readFile(jspTag).replace("\r", "").getBytes(), getResourceBase(), relativeFilePath.endsWith(".tag"), new ConverterOutput());
 
         converter.register("c:if", new JspIfConverter());
         converter.register("c:forEach", new JspForEachConverter());

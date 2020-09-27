@@ -94,6 +94,13 @@ class JspToJteConverterTest {
     }
 
     @Test
+    void simpleTagWithForEachAndVarStatus() {
+        givenUsecase("simpleTagWithForEachAndVarStatus");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
     void simpleTagWithFormatMessage() {
         givenUsecase("simpleTagWithFormatMessage");
         whenJspTagIsConverted("simple.tag", "tag/simple.jte");

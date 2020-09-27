@@ -1,7 +1,7 @@
 package org.apache.jasper.compiler;
 
-import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.CustomTagConverter;
+import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.jsp.Converter;
 import gg.jte.convert.jsp.JspElementType;
 import gg.jte.convert.jsp.converter.JspAttributeConverter;
@@ -60,6 +60,16 @@ public class JtpConverter extends Node.Visitor implements Converter {
     @Override
     public void setLineSeparator(String lineSeparator) {
         this.lineSeparator = lineSeparator;
+    }
+
+    @Override
+    public void setIndentationCount(int indentationCount) {
+        output.setIndentationCount(indentationCount);
+    }
+
+    @Override
+    public void setIndentationChar(char indentationChar) {
+        output.setIndentationChar(indentationChar);
     }
 
     @Override
@@ -196,7 +206,7 @@ public class JtpConverter extends Node.Visitor implements Converter {
         JtpCustomTag tag = new JtpCustomTag(n);
 
         pushTrimWhitespace(converter.isTrimWhitespace());
-        converter.convert(tag, output, () -> visitBody(n));
+        converter.convert(this, tag, output, () -> visitBody(n));
         popTrimWhitespace();
     }
 

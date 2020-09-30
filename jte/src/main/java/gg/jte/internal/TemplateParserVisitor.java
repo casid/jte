@@ -9,7 +9,7 @@ interface TemplateParserVisitor {
 
     void onParamsComplete();
 
-    void onTextPart(int depth, String textPart);
+    void onTextPart(int depth, String textPart, TemplateType type);
 
     void onCodePart(int depth, String codePart);
 

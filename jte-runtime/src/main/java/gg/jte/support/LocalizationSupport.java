@@ -18,7 +18,7 @@ public interface LocalizationSupport {
             return null;
         }
 
-        return output -> output.writeContent(value);
+        return output -> output.writeContentPart(value);
     }
 
     @SuppressWarnings("unused") // Called by template code
@@ -36,7 +36,7 @@ public interface LocalizationSupport {
                 if (matcher.find()) {
                     int startIndex = 0;
                     do {
-                        output.writeContent(value.substring(startIndex, matcher.start()));
+                        output.writeContentPart(value.substring(startIndex, matcher.start()));
                         startIndex = matcher.end();
 
                         int argumentIndex = Integer.parseInt(matcher.group(1));
@@ -49,9 +49,9 @@ public interface LocalizationSupport {
                         }
                     } while (matcher.find());
 
-                    output.writeContent(value.substring(startIndex));
+                    output.writeContentPart(value.substring(startIndex));
                 } else {
-                    output.writeContent(value);
+                    output.writeContentPart(value);
                 }
             }
 

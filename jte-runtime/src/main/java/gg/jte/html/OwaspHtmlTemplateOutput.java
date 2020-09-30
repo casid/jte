@@ -40,6 +40,17 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         }
     }
 
+    @Override
+    public void writeContentPart(String value) {
+        if (value != null) {
+            if (tagName != null && attributeName != null) {
+                writeTagAttributeUserContent(value);
+            } else {
+                writeContent(value);
+            }
+        }
+    }
+
     private void writeTagBodyUserContent(String value) {
         try {
             if ("script".equals(tagName)) {

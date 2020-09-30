@@ -43,7 +43,7 @@ public final class TemplateUtils {
 
         @Override
         public void writeTo(TemplateOutput output) {
-            output.writeContent(param.toString());
+            output.writeContentPart(param.toString());
         }
     }
 }

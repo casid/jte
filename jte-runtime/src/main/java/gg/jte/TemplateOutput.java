@@ -8,6 +8,12 @@ public interface TemplateOutput {
 
     void writeContent(String value);
 
+    default void writeContentPart(String value) {
+        if (value != null) {
+            writeContent(value);
+        }
+    }
+
     default void writeUserContent(String value) {
         if (value != null) {
             writeContent(value);

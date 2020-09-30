@@ -341,7 +341,7 @@ final class TemplateParser {
         if (trimControlStructures && lastIndex >= 0 && endIndex >= lastIndex) {
             extractTextPartAndTrimControlStructures(endIndex, mode);
         } else {
-            extract(templateCode, lastIndex, endIndex, visitor::onTextPart);
+            extract(templateCode, lastIndex, endIndex, (depth, content) -> visitor.onTextPart(depth, content, type));
         }
     }
 
@@ -395,7 +395,7 @@ final class TemplateParser {
             }
         }
 
-        extract(resultText.toString(), 0, resultText.length(), visitor::onTextPart);
+        extract(resultText.toString(), 0, resultText.length(), (depth, content) -> visitor.onTextPart(depth, content, type));
 
         if (mode == null) {
             popIndent();
@@ -507,7 +507,7 @@ final class TemplateParser {
                     currentAttribute.valueStartIndex = i + 1;
 
                     if (!currentAttribute.bool && isHtmlAttributeIntercepted(currentAttribute.name)) {
-                        extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
+                        extract(templateCode, lastIndex, i + 1, (depth, content) -> visitor.onTextPart(depth, content, type));
                         lastIndex = i + 1;
 
                         visitor.onHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
@@ -516,7 +516,7 @@ final class TemplateParser {
                     currentAttribute.value = templateCode.substring(currentAttribute.valueStartIndex, i);
 
                     if (currentAttribute.bool) {
-                        extract(templateCode, lastIndex, currentAttribute.startIndex, visitor::onTextPart);
+                        extract(templateCode, lastIndex, currentAttribute.startIndex, (depth, content) -> visitor.onTextPart(depth, content, type));
                         lastIndex = i + 1;
 
                         visitor.onHtmlBooleanAttributeStarted(depth, currentHtmlTag, currentAttribute);
@@ -526,7 +526,7 @@ final class TemplateParser {
                 }
             } else if (!currentHtmlTag.attributesProcessed && previousChar0 == '/' && currentChar == '>') {
                 if (currentHtmlTag.intercepted) {
-                    extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                    extract(templateCode, lastIndex, i - 1, (depth, content) -> visitor.onTextPart(depth, content, type));
                     lastIndex = i - 1;
                     visitor.onHtmlTagOpened(depth, currentHtmlTag);
                 }
@@ -538,7 +538,7 @@ final class TemplateParser {
                     tagClosed = false;
                 } else {
                     if (currentHtmlTag.intercepted) {
-                        extract(templateCode, lastIndex, i, visitor::onTextPart);
+                        extract(templateCode, lastIndex, i, (depth, content) -> visitor.onTextPart(depth, content, type));
                         lastIndex = i;
                         visitor.onHtmlTagOpened(depth, currentHtmlTag);
                     }
@@ -552,7 +552,7 @@ final class TemplateParser {
                 if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
                     if (!currentHtmlTag.bodyIgnored) {
                         if (currentHtmlTag.intercepted) {
-                            extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                            extract(templateCode, lastIndex, i - 1, (depth, content) -> visitor.onTextPart(depth, content, type));
                             lastIndex = i - 1;
                             visitor.onHtmlTagClosed(depth, currentHtmlTag);
                         }

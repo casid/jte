@@ -402,6 +402,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void contentBlockInAttribute() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.Content content = @`This is \"the way\"!`\n<span data-title=\"${content}\">Info</span>");
+
+        templateEngine.render("template.jte", Map.of(), output);
+
+        assertThat(output.toString()).isEqualTo("<span data-title=\"This is &#34;the way&#34;!\">Info</span>");
+    }
+
+    @Test
     void javascriptUrl() {
         codeResolver.givenCode("template.jte", "@param String url\n<a href=\"${url}\">Click me!</a>");
 
@@ -526,6 +535,29 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>This is a key with user content: <b>&lt;script&gt;evil()&lt;/script&gt;</b>. Including HTML in key!</b>. Including HTML in key!</span>");
+    }
+
+    @Test
+    void localization_quotesInAttribute() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "<span data-title=\"${localizer.localize(\"quotes\")}\"></span>");
+
+        templateEngine.render("template.jte", Map.of("localizer", localizer), output);
+
+        assertThat(output.toString()).isEqualTo("<span data-title=\"This is a key with &#34;quotes&#34;\"></span>");
+    }
+
+    @Test
+    void localization_quotesInAttributeWithParams() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "@param String p1\n" +
+                "@param String p2\n" +
+                "@param String p3\n" +
+                "<span data-title=\"${localizer.localize(\"quotes-params\", p1, p2, p3)}\"></span>");
+
+        templateEngine.render("template.jte", Map.of("localizer", localizer, "p1", "<script>evil()</script>", "p2", "p2", "p3", "p3"), output);
+
+        assertThat(output.toString()).isEqualTo("<span data-title=\"This is a key with &#34;quotes&#34; and params &lt;i>&#34;&lt;script>evil()&lt;/script>&#34;&lt;/i>, &lt;b>&#34;p2&#34;&lt;/b>, &#34;p3&#34;...\"></span>");
     }
 
     @Test
@@ -743,7 +775,9 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "many-params-html", "Hello <i>{0}</i>, <b>{1}</b>, {2}",
                 "bad-pattern", "Hello {foo}",
                 "all-primitives", "boolean: {0}, byte: {1}, short: {2}, int: {3}, long: {4}, float: {5}, double: {6}, char: {7}",
-                "enum", "Content type is: {0}"
+                "enum", "Content type is: {0}",
+                "quotes", "This is a key with \"quotes\"",
+                "quotes-params", "This is a key with \"quotes\" and params <i>\"{0}\"</i>, <b>\"{1}\"</b>, \"{2}\"..."
         );
 
         @Override

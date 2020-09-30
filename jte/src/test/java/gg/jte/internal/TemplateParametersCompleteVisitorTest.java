@@ -8,7 +8,7 @@ class TemplateParametersCompleteVisitorTest {
 
     @Test
     void ignoreCoverageOfEmptyMethods() {
-        visitor.onTextPart(0, null);
+        visitor.onTextPart(0, null, null);
         visitor.onCodePart(0, null);
         visitor.onHtmlTagBodyCodePart(0, null, null);
         visitor.onHtmlTagAttributeCodePart(0, null, null, null);

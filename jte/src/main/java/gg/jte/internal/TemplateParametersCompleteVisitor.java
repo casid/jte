@@ -20,7 +20,7 @@ class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onTextPart(int depth, String textPart) {
+    public void onTextPart(int depth, String textPart, TemplateType type) {
 
     }
 

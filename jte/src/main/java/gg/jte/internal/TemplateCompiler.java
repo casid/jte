@@ -396,13 +396,17 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
-        public void onTextPart(int depth, String textPart) {
+        public void onTextPart(int depth, String textPart, TemplateType type) {
             if (textPart.isEmpty()) {
                 return;
             }
 
             writeIndentation(depth);
-            javaCode.append("jteOutput.writeContent(\"");
+            if (type == TemplateType.Content) {
+                javaCode.append("jteOutput.writeContentPart(\"");
+            } else {
+                javaCode.append("jteOutput.writeContent(\"");
+            }
             appendEscaped(javaCode.getStringBuilder(), textPart);
             javaCode.append("\");\n");
         }
@@ -564,7 +568,7 @@ public class TemplateCompiler extends TemplateLoader {
         public void onHtmlBooleanAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
             String javaExpression = extractJavaExpression(htmlAttribute.value);
             if (javaExpression == null) {
-                onTextPart(depth, htmlAttribute.name);
+                onTextPart(depth, htmlAttribute.name, null);
             } else {
                 onConditionStart(depth, javaExpression);
                 onCodePart(depth + 1, "\"" + htmlAttribute.name + "\"");

@@ -104,6 +104,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void booleanAttribute_noJavaExpression() {
+        codeResolver.givenCode("template.jte", "@param boolean disabled\n<button disabled=\"disabled\">Click</button>");
+
+        templateEngine.render("template.jte", false, output);
+
+        assertThat(output.toString()).isEqualTo("<button disabled>Click</button>");
+    }
+
+    @Test
     void booleanAttributes_noParams() {
         codeResolver.givenCode("template.jte", "@param String cssClass\n<button disabled class=\"${cssClass}\">Click</button>");
 

@@ -153,6 +153,11 @@ class JspExpressionConverterTest {
         assertConversion("${user.list[42 + user.index]}", "user.list.get((42 + user.index))");
     }
 
+    @Test
+    void compositeExpression() {
+        assertConversion("${lazy ? 'js-lazy js-rflag-lazy' : ''}${' '}${cssClass}", "@`${lazy ? \"js-lazy js-rflag-lazy\" : \"\"}${\" \"}${cssClass}`");
+    }
+
     private void assertConversion(String el, String java) {
         assertThat(new JspExpressionConverter(el).getJavaCode()).isEqualTo(java);
     }

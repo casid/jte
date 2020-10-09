@@ -63,6 +63,8 @@ public class JspExpressionConverter {
             visitorMap.put(AstFunction.class, new AstFunctionVisitor());
             visitorMap.put(AstNull.class, new AstNullVisitor());
             visitorMap.put(AstBracketSuffix.class, new AstBracketSuffixVisitor());
+            visitorMap.put(AstCompositeExpression.class, new AstCompositeExpressionVisitor());
+            visitorMap.put(AstDynamicExpression.class, new AstDynamicExpressionVisitor());
 
             process(root);
         }
@@ -342,6 +344,26 @@ public class JspExpressionConverter {
             result.append(".get(");
             process(node.jjtGetChild(0));
             result.append(")");
+        }
+    }
+
+    private class AstCompositeExpressionVisitor implements Visitor {
+        @Override
+        public void visit(Node node) {
+            result.append("@`");
+            for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+                process(node.jjtGetChild(i));
+            }
+            result.append("`");
+        }
+    }
+
+    private class AstDynamicExpressionVisitor implements Visitor {
+        @Override
+        public void visit(Node node) {
+            result.append("${");
+            process(node.jjtGetChild(0));
+            result.append("}");
         }
     }
 }

@@ -143,6 +143,16 @@ class JspExpressionConverterTest {
         assertConversion("${x eq null}", "x == null");
     }
 
+    @Test
+    void bracketExpression() {
+        assertConversion("${user.list[0]}", "user.list.get(0)");
+    }
+
+    @Test
+    void bracketExpression2() {
+        assertConversion("${user.list[42 + user.index]}", "user.list.get((42 + user.index))");
+    }
+
     private void assertConversion(String el, String java) {
         assertThat(new JspExpressionConverter(el).getJavaCode()).isEqualTo(java);
     }

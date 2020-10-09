@@ -92,6 +92,10 @@ public class JspToJteConverter {
 
         converter.register(this.jteTag, new gg.jte.convert.jsp.converter.JspJteConverter());
 
+        for (String notConvertedTag : getNotConvertedTagsAsSet()) {
+            converter.register(notConvertedTag, new JspNoopConverter());
+        }
+
         if (parserSetup != null) {
             parserSetup.accept(converter);
         }

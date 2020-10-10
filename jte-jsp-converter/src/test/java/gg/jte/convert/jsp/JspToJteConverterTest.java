@@ -181,6 +181,27 @@ class JspToJteConverterTest {
         thenConversionIsAsExpected();
     }
 
+    @Test
+    void simpleTagWithBody1() {
+        givenUsecase("simpleTagWithBody1");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
+    void simpleTagWithBody2() {
+        givenUsecase("simpleTagWithBody2");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
+    void simpleTagWithBody3() {
+        givenUsecase("simpleTagWithBody3");
+        whenJspTagIsConverted("simple.tag", "tag/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
     void givenUsecase(String usecase) {
         jspRoot = tempDir.resolve("jsp");
         jteRoot = tempDir.resolve("jte");

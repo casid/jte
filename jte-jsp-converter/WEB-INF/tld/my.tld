@@ -10,7 +10,7 @@
    <tag>
       <name>jte</name>
       <tag-class>example.JteTag</tag-class>
-      <body-content>empty</body-content>
+      <body-content>scriptless</body-content>
       <attribute><name>jte</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
       <dynamic-attributes>true</dynamic-attributes>
    </tag>

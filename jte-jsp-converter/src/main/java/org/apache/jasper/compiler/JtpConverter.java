@@ -28,6 +28,7 @@ public class JtpConverter extends Node.Visitor implements Converter {
     private final Set<String> inlinedIncludes = new HashSet<>();
     private final Map<String, EnumSet<JspElementType>> suppressions = new HashMap<>();
     private final Set<String> imports = new TreeSet<>();
+    private final Set<String> params = new TreeSet<>();
 
     private String prefix;
     private String lineSeparator = "\n";
@@ -96,6 +97,10 @@ public class JtpConverter extends Node.Visitor implements Converter {
             result.append('\n');
         }
 
+        for (String param : params) {
+            result.append("@param ").append(param).append('\n');
+        }
+
         return result.toString();
     }
 
@@ -106,6 +111,10 @@ public class JtpConverter extends Node.Visitor implements Converter {
 
     public void addImport(String className) {
         imports.add(className);
+    }
+
+    public void addParam(String param) {
+        params.add(param);
     }
 
     private String cleanResult(String result) {
@@ -254,6 +263,13 @@ public class JtpConverter extends Node.Visitor implements Converter {
         }
 
         visitBody(n);
+    }
+
+    @Override
+    public void visit(Node.DoBodyAction n) {
+        addImport("gg.jte.Content");
+        addParam("Content bodyContent");
+        output.append("${bodyContent}").newLine();
     }
 
     @Override

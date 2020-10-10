@@ -37,6 +37,15 @@ public class JspJteConverter implements CustomTagConverter {
             output.append(localName).append(" = ").append(convertAttributeValue(attributes.getValue(i)));
         }
 
+        if (tag.hasBody()) {
+            if (!first) {
+                output.append(", ");
+            }
+            output.append("bodyContent = @`");
+            bodyConverter.convert();
+            output.append("`");
+        }
+
         output.append(")");
     }
 }

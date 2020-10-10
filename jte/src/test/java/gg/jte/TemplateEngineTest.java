@@ -996,6 +996,30 @@ public class TemplateEngineTest {
         thenRenderingFailsWithException().hasMessage("Failed to render test/template.jte, type mismatch for parameter: Expected int, got null");
     }
 
+    @Test
+    void params_none() {
+        givenRawTemplate("Hello World!");
+        Map<String, Class<?>> params = templateEngine.getParamInfo(templateName);
+        assertThat(params).isEmpty();
+    }
+
+    @Test
+    void params_one() {
+        givenRawTemplate("@param int foo\nHello World!");
+        Map<String, Class<?>> params = templateEngine.getParamInfo(templateName);
+        assertThat(params).hasSize(1);
+        assertThat(params).containsEntry("foo", int.class);
+    }
+
+    @Test
+    void params_some() {
+        givenRawTemplate("@import gg.jte.Content\n@param int foo\n@param Content content\nHello World!");
+        Map<String, Class<?>> params = templateEngine.getParamInfo(templateName);
+        assertThat(params).hasSize(2);
+        assertThat(params).containsEntry("foo", int.class);
+        assertThat(params).containsEntry("content", Content.class);
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + Constants.TAG_EXTENSION, code);
     }

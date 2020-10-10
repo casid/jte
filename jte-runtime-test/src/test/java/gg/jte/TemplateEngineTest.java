@@ -57,6 +57,14 @@ public class TemplateEngineTest {
         thenOutputIs("One is One, two is Two.");
     }
 
+    @Test
+    void params() {
+        Map<String, Class<?>> params = templateEngine.getParamInfo("tag/unused.jte");
+        assertThat(params).hasSize(2);
+        assertThat(params).containsEntry("param1", String.class);
+        assertThat(params).containsEntry("param2", String.class);
+    }
+
     private void whenTemplateIsRendered(String templateName) {
         templateEngine.render(templateName, model, output);
     }

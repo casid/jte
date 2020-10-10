@@ -56,6 +56,12 @@ public class TemplateEngineTest {
         thenOutputIs("One is One, two is Two.");
     }
 
+    @Test
+    void params() {
+        Throwable throwable = catchThrowable(() -> templateEngine.getParamInfo("tag/unused.jte"));
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("No parameter information is available for tag/unused.jte, compile templates with -parameters flag, to use this method.");
+    }
+
     private void whenTemplateIsRendered(String templateName) {
         templateEngine.render(templateName, model, output);
     }

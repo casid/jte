@@ -13,14 +13,19 @@ import java.util.Map;
 public class ClassFilesCompiler {
     public static void compile(String[] files, List<String> compilePath, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         if (compilePath != null && !compilePath.isEmpty()) {
-            String[] args = new String[files.length + 2];
-            args[0] = "-classpath";
-            args[1] = String.join(File.pathSeparator, compilePath);
-            System.arraycopy(files, 0, args, 2, files.length);
+            String[] args = new String[files.length + 3];
+            args[0] = "-parameters";
+            args[1] = "-classpath";
+            args[2] = String.join(File.pathSeparator, compilePath);
+            System.arraycopy(files, 0, args, 3, files.length);
 
             runCompiler(args, classDirectory, templateByClassName);
         } else {
-            runCompiler(files, classDirectory, templateByClassName);
+            String[] args = new String[files.length + 1];
+            args[0] = "-parameters";
+            System.arraycopy(files, 0, args, 1, files.length);
+
+            runCompiler(args, classDirectory, templateByClassName);
         }
     }
 

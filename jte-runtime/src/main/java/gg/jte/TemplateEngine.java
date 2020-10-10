@@ -220,6 +220,15 @@ public final class TemplateEngine {
     }
 
     /**
+     * Obtain parameter information about a specific template.
+     * @param name the template name relative to the specified root directory, for instance "tag/example.jte".
+     * @return a map containing all template parameters names and their classes
+     */
+    public Map<String, Class<?>> getParamInfo(String name) {
+        return resolveTemplate(name).getParamInfo();
+    }
+
+    /**
      * Prepares the template with the given name for rendering
      * @param name the template name relative to the specified root directory, for instance "pages/welcome.jte".
      */

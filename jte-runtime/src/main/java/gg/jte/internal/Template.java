@@ -6,6 +6,8 @@ import gg.jte.html.HtmlInterceptor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class Template {
@@ -76,5 +78,18 @@ public final class Template {
         } else {
             return render.getParameterCount() - 2;
         }
+    }
+
+    public Map<String, Class<?>> getParamInfo() {
+        HashMap<String, Class<?>> result = new HashMap<>();
+
+        Parameter[] parameters = render.getParameters();
+        for (int i = 2; i < parameters.length; ++i) {
+            if (!parameters[i].isNamePresent()) {
+                throw new TemplateException("No parameter information is available for " + name + ", compile templates with -parameters flag, to use this method.");
+            }
+            result.put(parameters[i].getName(), parameters[i].getType());
+        }
+        return result;
     }
 }

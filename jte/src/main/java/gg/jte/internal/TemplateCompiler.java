@@ -349,28 +349,14 @@ public class TemplateCompiler extends TemplateLoader {
                     continue;
                 }
 
-                boolean isContentType = "Content".equals(parameter.type) || "gg.jte.Content".equals(parameter.type);
-
-                javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = ");
-                if (isContentType) {
-                    javaCode.append("gg.jte.internal.TemplateUtils.toContent(");
-                } else {
-                    javaCode.append('(').append(parameter.type).append(')');
-                }
-
+                javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = (").append(parameter.type);
                 if (parameter.defaultValue != null) {
-                    javaCode.append("params.getOrDefault(\"").append(parameter.name).append("\", ");
+                    javaCode.append(")params.getOrDefault(\"").append(parameter.name).append("\", ");
                     writeJavaCodeWithContentSupport(0, parameter.defaultValue);
-                    javaCode.append(')');
+                    javaCode.append(");\n");
                 } else {
-                    javaCode.append("params.get(\"").append(parameter.name).append("\")");
+                    javaCode.append(")params.get(\"").append(parameter.name).append("\");\n");
                 }
-
-                if (isContentType) {
-                    javaCode.append(')');
-                }
-
-                javaCode.append(";\n");
             }
             javaCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
 

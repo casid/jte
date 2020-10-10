@@ -153,7 +153,7 @@ final class TemplateParser {
             } else if (currentChar == '}' && currentMode == Mode.UnsafeCode) {
                 pop();
                 if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i, visitor::onUnsafeCodePart);
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onUnsafeCodePart(d, c, type));
                     lastIndex = i + 1;
                 }
             } else if (previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
@@ -471,18 +471,18 @@ final class TemplateParser {
             }
 
             if (currentHtmlTag.attributesProcessed) {
-                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, currentHtmlTag.name));
+                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, currentHtmlTag.name, type));
                 return;
             }
 
             HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
             if (currentAttribute != null && currentAttribute.quoteCount < 2) {
-                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagAttributeCodePart(depth, codePart, currentHtmlTag.name, currentAttribute.name));
+                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagAttributeCodePart(depth, codePart, currentHtmlTag.name, currentAttribute.name, type));
                 return;
             }
         }
 
-        extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, "html"));
+        extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, "html", type));
     }
 
     private void interceptHtmlTags() {

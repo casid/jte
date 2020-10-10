@@ -13,11 +13,11 @@ interface TemplateParserVisitor {
 
     void onCodePart(int depth, String codePart);
 
-    void onHtmlTagBodyCodePart(int depth, String codePart, String tagName);
+    void onHtmlTagBodyCodePart(int depth, String codePart, String tagName, TemplateType type);
 
-    void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName);
+    void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName, TemplateType type);
 
-    void onUnsafeCodePart(int depth, String codePart);
+    void onUnsafeCodePart(int depth, String codePart, TemplateType type);
 
     void onCodeStatement(int depth, String codePart);
 

@@ -7,4 +7,6 @@ public interface HtmlTemplateOutput extends TemplateOutput {
 
     void setContext(String tagName, String attributeName);
 
+    void resetContext();
+
 }

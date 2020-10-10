@@ -403,29 +403,44 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
-        public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
+        public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName, TemplateType type) {
             writeIndentation(depth);
             javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", null);\n");
 
             writeCodePart(depth, codePart);
+
+            if (type == TemplateType.Content) {
+                writeIndentation(depth);
+                javaCode.append("jteOutput.resetContext();\n");
+            }
         }
 
         @Override
-        public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
+        public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName, TemplateType type) {
             writeIndentation(depth);
             javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\");\n");
 
             writeCodePart(depth, codePart);
+
+            if (type == TemplateType.Content) {
+                writeIndentation(depth);
+                javaCode.append("jteOutput.resetContext();\n");
+            }
         }
 
         @Override
-        public void onUnsafeCodePart(int depth, String codePart) {
+        public void onUnsafeCodePart(int depth, String codePart, TemplateType type) {
             if (contentType == ContentType.Html) {
                 writeIndentation(depth);
                 javaCode.append("jteOutput.setContext(null, null);\n");
             }
 
             writeCodePart(depth, codePart);
+
+            if (contentType == ContentType.Html && type == TemplateType.Content) {
+                writeIndentation(depth);
+                javaCode.append("jteOutput.resetContext();\n");
+            }
         }
 
         private void writeCodePart(int depth, String codePart) {

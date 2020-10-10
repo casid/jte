@@ -30,17 +30,17 @@ class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
+    public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName, TemplateType type) {
 
     }
 
     @Override
-    public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
+    public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName, TemplateType type) {
 
     }
 
     @Override
-    public void onUnsafeCodePart(int depth, String codePart) {
+    public void onUnsafeCodePart(int depth, String codePart, TemplateType type) {
 
     }
 

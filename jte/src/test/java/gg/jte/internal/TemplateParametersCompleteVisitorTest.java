@@ -10,9 +10,9 @@ class TemplateParametersCompleteVisitorTest {
     void ignoreCoverageOfEmptyMethods() {
         visitor.onTextPart(0, null, null);
         visitor.onCodePart(0, null);
-        visitor.onHtmlTagBodyCodePart(0, null, null);
-        visitor.onHtmlTagAttributeCodePart(0, null, null, null);
-        visitor.onUnsafeCodePart(0, null);
+        visitor.onHtmlTagBodyCodePart(0, null, null, null);
+        visitor.onHtmlTagAttributeCodePart(0, null, null, null, null);
+        visitor.onUnsafeCodePart(0, null, null);
         visitor.onCodeStatement(0, null);
         visitor.onConditionStart(0, null);
         visitor.onConditionElse(0);

@@ -17,14 +17,25 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     private String tagName;
     private String attributeName;
 
+    private String previousTagName;
+    private String previousAttributeName;
+
     public OwaspHtmlTemplateOutput(TemplateOutput templateOutput) {
         this.templateOutput = templateOutput;
     }
 
     @Override
     public void setContext(String tagName, String attributeName) {
+        this.previousTagName = this.tagName;
+        this.previousAttributeName = this.attributeName;
         this.tagName = tagName;
         this.attributeName = attributeName;
+    }
+
+    @Override
+    public void resetContext() {
+        this.tagName = this.previousTagName;
+        this.attributeName = this.previousAttributeName;
     }
 
     @Override

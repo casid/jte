@@ -420,6 +420,40 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void contentBlockInAttribute2() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.Content content = @`This is <b>the way</b>!`\n<span data-title=\"${content}\" foo=\"bar\">${content}</span>");
+
+        templateEngine.render("template.jte", Map.of(), output);
+
+        assertThat(output.toString()).isEqualTo("<span data-title=\"This is &lt;b>the way&lt;/b>!\" foo=\"bar\">This is <b>the way</b>!</span>");
+    }
+
+    @Test
+    void contentBlockInAttribute3() {
+        codeResolver.givenCode("template.jte",
+                "@param String url\n" +
+                "!{var content = @`<a href=\"${url}\" class=\"foo\">Hello</a>`;}\n" +
+                "${content}");
+
+        templateEngine.render("template.jte", Map.of("url", "https://jte.gg"), output);
+
+        assertThat(output.toString()).isEqualTo("\n<a href=\"https://jte.gg\" class=\"foo\">Hello</a>");
+    }
+
+    @Test
+    void contentBlockInAttribute4() {
+        codeResolver.givenCode("template.jte",
+                "@param String url\n" +
+                        "!{var content = @`<a href=\"${url}\" class=\"foo\">Hello</a>`;}\n" +
+                        "<span data-content=\"${content}\">${content}</span>");
+
+        templateEngine.render("template.jte", Map.of("url", "https://jte.gg"), output);
+
+        assertThat(output.toString()).isEqualTo("\n" +
+                "<span data-content=\"&lt;a href=&#34;https://jte.gg&#34; class=&#34;foo&#34;>Hello&lt;/a>\"><a href=\"https://jte.gg\" class=\"foo\">Hello</a></span>");
+    }
+
+    @Test
     void javascriptUrl() {
         codeResolver.givenCode("template.jte", "@param String url\n<a href=\"${url}\">Click me!</a>");
 

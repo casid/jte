@@ -223,8 +223,9 @@ public final class TemplateEngine {
      * Obtain parameter information about a specific template.
      * @param name the template name relative to the specified root directory, for instance "tag/example.jte".
      * @return a map containing all template parameters names and their classes
+     * @throws TemplateException in case parameter information is not available (jte classes must be compiled with -parameters compiler flag.)
      */
-    public Map<String, Class<?>> getParamInfo(String name) {
+    public Map<String, Class<?>> getParamInfo(String name) throws TemplateException {
         return resolveTemplate(name).getParamInfo();
     }
 

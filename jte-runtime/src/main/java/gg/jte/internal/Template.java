@@ -7,6 +7,7 @@ import gg.jte.html.HtmlInterceptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ public final class Template {
     private final int parameterCount;
     private Method render;
     private Method renderMap;
+    private Map<String, Class<?>> parameterInfo;
 
     public Template(String name, TemplateType type, Class<?> clazz) {
         this.name = name;
@@ -81,7 +83,14 @@ public final class Template {
     }
 
     public Map<String, Class<?>> getParamInfo() {
-        HashMap<String, Class<?>> result = new HashMap<>();
+        if (parameterInfo == null) {
+            parameterInfo = calculateParameterInfo();
+        }
+        return parameterInfo;
+    }
+
+    private Map<String, Class<?>> calculateParameterInfo() {
+        Map<String, Class<?>> result = new HashMap<>();
 
         Parameter[] parameters = render.getParameters();
         for (int i = 2; i < parameters.length; ++i) {
@@ -90,6 +99,7 @@ public final class Template {
             }
             result.put(parameters[i].getName(), parameters[i].getType());
         }
-        return result;
+
+        return Collections.unmodifiableMap(result);
     }
 }

@@ -997,14 +997,14 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void params_none() {
+    void getParamInfo_none() {
         givenRawTemplate("Hello World!");
         Map<String, Class<?>> params = templateEngine.getParamInfo(templateName);
         assertThat(params).isEmpty();
     }
 
     @Test
-    void params_one() {
+    void getParamInfo_one() {
         givenRawTemplate("@param int foo\nHello World!");
         Map<String, Class<?>> params = templateEngine.getParamInfo(templateName);
         assertThat(params).hasSize(1);
@@ -1012,12 +1012,22 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void params_some() {
+    void getParamInfo_some() {
         givenRawTemplate("@import gg.jte.Content\n@param int foo\n@param Content content\nHello World!");
         Map<String, Class<?>> params = templateEngine.getParamInfo(templateName);
         assertThat(params).hasSize(2);
         assertThat(params).containsEntry("foo", int.class);
         assertThat(params).containsEntry("content", Content.class);
+    }
+
+    @Test
+    void getParamInfo_lazy() {
+        givenRawTemplate("@param int foo\nHello World!");
+        Map<String, Class<?>> params1 = templateEngine.getParamInfo(templateName);
+        Map<String, Class<?>> params2 = templateEngine.getParamInfo(templateName);
+
+        assertThat(params1).isSameAs(params2);
+        assertThat(catchThrowable(() -> params1.put("bar", String.class))).isInstanceOf(UnsupportedOperationException.class);
     }
 
     private void givenTag(String name, String code) {

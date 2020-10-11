@@ -185,20 +185,38 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void htmlComment() {
-        codeResolver.givenCode("template.jte", "@param String name\n\n<!--Comment here with ${name}-->\n<span>Test</span>");
+        codeResolver.givenCode("template.jte", "@param String url\n<!-- html comment --><a href=\"${url}\">Click me!</a>");
 
-        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "Hello", output));
+        templateEngine.render("template.jte", "https://jte.gg", output);
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Expressions in HTML comments are not allowed.");
+        assertThat(output.toString()).isEqualTo("<a href=\"https://jte.gg\">Click me!</a>");
     }
 
     @Test
-    void htmlComment_unsafe() {
-        codeResolver.givenCode("template.jte", "@param String name\n\n<!--Comment here with $unsafe{name}-->\n<span>Test</span>");
+    void htmlComment_withCode() {
+        codeResolver.givenCode("template.jte", "@param String name\n\n<!--Comment here with ${name}-->\n<span>Test</span>");
 
         templateEngine.render("template.jte", "Hello", output);
 
-        assertThat(output.toString()).isEqualTo("\n<!--Comment here with Hello-->\n<span>Test</span>");
+        assertThat(output.toString()).isEqualTo("\n\n<span>Test</span>");
+    }
+
+    @Test
+    void htmlComment_andNothingElse() {
+        codeResolver.givenCode("template.jte", "<!--Comment here-->");
+
+        templateEngine.render("template.jte", null, output);
+
+        assertThat(output.toString()).isEqualTo("");
+    }
+
+    @Test
+    void htmlComment_beforeParams() {
+        codeResolver.givenCode("template.jte", "<!--Comment here-->\n@param String name\n<span>${name}</span>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<span>Hello</span>");
     }
 
     @Test
@@ -208,6 +226,42 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "Hello", output);
 
         assertThat(output.toString()).isEqualTo("\n<span name=\"<!--this is not a comment Hello-->\">Test</span>");
+    }
+
+    @Test
+    void htmlComment_ignoredIfInJavaScript() {
+        codeResolver.givenCode("template.jte", "@param String name\n<script>var name=\"<!--this is not a comment ${name}-->\"</script>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>var name=\"<!--this is not a comment Hello-->\"</script>");
+    }
+
+    @Test
+    void htmlComment_ignoredIfInCss() {
+        codeResolver.givenCode("template.jte", "@param String name\n<style type=\"text/css\"><!--this is not a comment ${name}--></style>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<style type=\"text/css\"><!--this is not a comment Hello--></style>");
+    }
+
+    @Test
+    void htmlComment_ignoredIfInJavaPart() {
+        codeResolver.givenCode("template.jte", "@param String name\n<span>${\"<!--this is not a comment \" + name + \"-->\"}</span>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<span>&lt;!--this is not a comment Hello--&gt;</span>");
+    }
+
+    @Test
+    void htmlComment_ignoredIfInJavaPart2() {
+        codeResolver.givenCode("template.jte", "@param String name\n<span>!{var x = \"<!--this is not a comment \" + name + \"-->\";}${x}</span>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<span>&lt;!--this is not a comment Hello--&gt;</span>");
     }
 
     @Test

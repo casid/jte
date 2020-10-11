@@ -97,27 +97,31 @@ final class TemplateParser {
             previousChar0 = currentChar;
             currentChar = templateCode.charAt(i);
 
-            if (currentMode != Mode.Comment && previousChar5 == '@' && previousChar4 == 'i' && previousChar3 == 'm' && previousChar2 == 'p' && previousChar1 == 'o' && previousChar0 == 'r' && currentChar == 't' && isParamOrImportAllowed()) {
+            if (!currentMode.isComment() && previousChar5 == '@' && previousChar4 == 'i' && previousChar3 == 'm' && previousChar2 == 'p' && previousChar1 == 'o' && previousChar0 == 'r' && currentChar == 't' && isParamOrImportAllowed()) {
                 push(Mode.Import);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Import && currentChar == '\n') {
                 extract(templateCode, lastIndex, i, (depth, content) -> visitor.onImport(content.trim()));
                 pop();
                 lastIndex = i + 1;
-            } else if (currentMode != Mode.Comment && previousChar4 == '@' && previousChar3 == 'p' && previousChar2 == 'a' && previousChar1 == 'r' && previousChar0 == 'a' && currentChar == 'm' && isParamOrImportAllowed()) {
+            } else if (!currentMode.isComment() && previousChar4 == '@' && previousChar3 == 'p' && previousChar2 == 'a' && previousChar1 == 'r' && previousChar0 == 'a' && currentChar == 'm' && isParamOrImportAllowed()) {
                 push(Mode.Param);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Param && currentChar == '\n') {
                 extract(templateCode, lastIndex, i, (depth, content) -> visitor.onParam(new ParamInfo(content.trim())));
                 pop();
                 lastIndex = i + 1;
-            } else if (currentMode != Mode.Comment && currentMode != Mode.Content && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
-                if (currentMode == Mode.Text && (paramsComplete || areParamsComplete(i - 3))) {
-                    extractTextPart(i - 3, Mode.Comment);
-                }
-                push(Mode.Comment);
+            } else if (isCommentAllowed() && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
+                extractComment(Mode.Comment);
+            } else if (isCommentAllowed() && previousChar2 == '<' && previousChar1 == '!' && previousChar0 == '-' && currentChar == '-' && isHtmlCommentAllowed()) {
+                extractComment(Mode.HtmlComment);
             } else if (currentMode == Mode.Comment) {
                 if (previousChar2 == '-' && previousChar1 == '-' && previousChar0 == '%' && currentChar == '>') {
+                    pop();
+                    lastIndex = i + 1;
+                }
+            } else if (currentMode == Mode.HtmlComment) {
+                if (previousChar1 == '-' && previousChar0 == '-' && currentChar == '>') {
                     pop();
                     lastIndex = i + 1;
                 }
@@ -304,6 +308,10 @@ final class TemplateParser {
         }
     }
 
+    private boolean isCommentAllowed() {
+        return currentMode == Mode.Text;
+    }
+
     private boolean isParamOrImportAllowed() {
         int endIndex = templateCode.lastIndexOf('@', this.i);
         for (int j = lastIndex; j < endIndex; j++) {
@@ -466,10 +474,6 @@ final class TemplateParser {
 
     private void extractHtmlCodePart() {
         if (currentHtmlTag != null) {
-            if (currentHtmlTag.comment) {
-                visitor.onError("Expressions in HTML comments are not allowed.");
-            }
-
             if (currentHtmlTag.attributesProcessed) {
                 extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, currentHtmlTag.name));
                 return;
@@ -485,6 +489,26 @@ final class TemplateParser {
         extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, "html"));
     }
 
+    private void extractComment(Mode mode) {
+        if (paramsComplete || areParamsComplete(i - 3)) {
+            extractTextPart(i - 3, mode);
+        }
+        push(mode);
+    }
+
+    private boolean isHtmlCommentAllowed() {
+        if (contentType != ContentType.Html) {
+            return false;
+        }
+
+        if (currentHtmlTag == null) {
+            return true;
+        }
+
+        return !currentHtmlTag.isScript && !currentHtmlTag.isStyle && !currentHtmlTag.isInAttribute();
+    }
+
+
     private void interceptHtmlTags() {
         if ( isOpeningHtmlTag() ) {
             String name = parseHtmlTagName(i + 1);
@@ -495,12 +519,7 @@ final class TemplateParser {
                 tagClosed = false;
             }
         } else if (currentHtmlTag != null && i > currentHtmlTag.attributeStartIndex) {
-            if (currentHtmlTag.comment) {
-                if (previousChar1 == '-' && previousChar0 == '-' && currentChar == '>') {
-                    popHtmlTag();
-                    tagClosed = true;
-                }
-            } else if (!currentHtmlTag.attributesProcessed && currentHtmlTag.isCurrentAttributeQuote(currentChar)) {
+            if (!currentHtmlTag.attributesProcessed && currentHtmlTag.isCurrentAttributeQuote(currentChar)) {
                 HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
                 currentAttribute.quoteCount++;
                 if (currentAttribute.quoteCount == 1) {
@@ -595,7 +614,7 @@ final class TemplateParser {
             return false;
         }
 
-        if (templateCode.startsWith("<!", i) && !templateCode.startsWith("<!--", i)) {
+        if (templateCode.startsWith("<!", i)) {
             return false;
         }
 
@@ -750,35 +769,44 @@ final class TemplateParser {
         Mode UnsafeCode = new StatelessMode("UnsafeCode");
         Mode CodeStatement = new StatelessMode("CodeStatement");
         Mode Condition = new StatelessMode("Condition");
-        Mode JavaCode = new StatelessMode("JavaCode", true);
-        Mode JavaCodeParam = new StatelessMode("JavaCodeParam", true);
+        Mode JavaCode = new StatelessMode("JavaCode", true, false);
+        Mode JavaCodeParam = new StatelessMode("JavaCodeParam", true, false);
         Mode JavaCodeString = new StatelessMode("JavaCodeString");
         Mode ConditionElse = new StatelessMode("ConditionElse");
         Mode ForLoop = new StatelessMode("ForLoop");
         Mode ForLoopCode = new StatelessMode("ForLoopCode");
         Mode TagName = new StatelessMode("TagName");
         Mode Comment = new StatelessMode("Comment");
-        Mode Content = new StatelessMode("Content");
+        Mode HtmlComment = new StatelessMode("HtmlComment", false, true);
+        Mode Content = new StatelessMode("Content", false, true);
 
         boolean isJava();
+        boolean isComment();
     }
 
     private static class StatelessMode implements Mode {
         private final String debugName;
         private final boolean java;
+        private final boolean comment;
 
         private StatelessMode(String debugName) {
-            this(debugName, false);
+            this(debugName, false, false);
         }
 
-        private StatelessMode(String debugName, boolean java) {
+        private StatelessMode(String debugName, boolean java, boolean comment) {
             this.debugName = debugName;
             this.java = java;
+            this.comment = comment;
         }
 
         @Override
         public boolean isJava() {
             return java;
+        }
+
+        @Override
+        public boolean isComment() {
+            return comment;
         }
 
         @Override
@@ -798,6 +826,11 @@ final class TemplateParser {
 
         @Override
         public boolean isJava() {
+            return false;
+        }
+
+        @Override
+        public boolean isComment() {
             return false;
         }
     }
@@ -822,7 +855,8 @@ final class TemplateParser {
         public final int attributeStartIndex;
         public final boolean bodyIgnored;
         public final boolean innerTagsIgnored;
-        public final boolean comment;
+        public final boolean isScript;
+        public final boolean isStyle;
         public final List<HtmlAttribute> attributes = new ArrayList<>();
         public boolean attributesProcessed;
 
@@ -831,8 +865,9 @@ final class TemplateParser {
             this.intercepted = intercepted;
             this.attributeStartIndex = attributeStartIndex;
             this.bodyIgnored = VOID_HTML_TAGS.contains(name);
-            this.comment = "!--".equals(name);
-            this.innerTagsIgnored = "script".equals(name) || "style".equals(name);
+            this.isScript = "script".equals(name);
+            this.isStyle = "style".equals(name);
+            this.innerTagsIgnored = isScript || isStyle;
         }
 
         public HtmlAttribute getCurrentAttribute() {
@@ -862,6 +897,15 @@ final class TemplateParser {
             }
 
             return currentChar == currentAttribute.quotes;
+        }
+
+        public boolean isInAttribute() {
+            if (attributesProcessed) {
+                return false;
+            }
+
+            HtmlAttribute currentAttribute = getCurrentAttribute();
+            return currentAttribute != null && currentAttribute.quoteCount < 2;
         }
 
         @Override

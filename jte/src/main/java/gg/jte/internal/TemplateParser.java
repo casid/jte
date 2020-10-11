@@ -34,6 +34,7 @@ final class TemplateParser {
     private int lastIndex = 0;
 
     @SuppressWarnings("FieldCanBeLocal")
+    private char previousChar7;
     private char previousChar6;
     private char previousChar5;
     private char previousChar4;
@@ -88,6 +89,7 @@ final class TemplateParser {
         depth = startingDepth;
 
         for (i = startIndex; i < endIndex; ++i) {
+            previousChar7 = previousChar6;
             previousChar6 = previousChar5;
             previousChar5 = previousChar4;
             previousChar4 = previousChar3;
@@ -117,6 +119,10 @@ final class TemplateParser {
                 extractComment(Mode.HtmlComment, i - 3);
             } else if (isCommentAllowed() && previousChar0 == '/' && currentChar == '*' && isCssCommentAllowed()) {
                 extractComment(Mode.CssComment, i - 1);
+            } else if (isCommentAllowed() && previousChar0 == '/' && currentChar == '/' && isJsCommentAllowed()) {
+                extractComment(Mode.JsComment, i - 1);
+            } else if (isCommentAllowed() && previousChar0 == '/' && currentChar == '*' && isJsCommentAllowed()) {
+                extractComment(Mode.JsBlockComment, i - 1);
             } else if (currentMode == Mode.Comment) {
                 if (previousChar2 == '-' && previousChar1 == '-' && previousChar0 == '%' && currentChar == '>') {
                     pop();
@@ -127,10 +133,18 @@ final class TemplateParser {
                     pop();
                     lastIndex = i + 1;
                 }
-            } else if (currentMode == Mode.CssComment) {
+            } else if (currentMode == Mode.CssComment || currentMode == Mode.JsBlockComment) {
                 if (previousChar0 == '*' && currentChar == '/') {
                     pop();
                     lastIndex = i + 1;
+                }
+            } else if (currentMode == Mode.JsComment) {
+                if (currentChar == '\n') {
+                    pop();
+                    lastIndex = i + 1;
+                } else if (previousChar7 == '<' && previousChar6 == '/' && previousChar5 == 's' && previousChar4 == 'c' && previousChar3 == 'r' && previousChar2 == 'i' && previousChar1 == 'p' && previousChar0 == 't' && currentChar == '>') {
+                    pop();
+                    lastIndex = i - 8;
                 }
             } else if (previousChar0 == '$' && currentChar == '{' && currentMode == Mode.Text) {
                 if (!outputPrevented) {
@@ -527,6 +541,18 @@ final class TemplateParser {
         return currentHtmlTag.isStyle && !currentHtmlTag.isInStringLiteral() && !currentHtmlTag.isInAttribute();
     }
 
+    private boolean isJsCommentAllowed() {
+        if (contentType != ContentType.Html) {
+            return false;
+        }
+
+        if (currentHtmlTag == null) {
+            return false;
+        }
+
+        return currentHtmlTag.isScript && !currentHtmlTag.isInStringLiteral() && !currentHtmlTag.isInAttribute();
+    }
+
     private void interceptHtmlTags() {
         if ( isOpeningHtmlTag() ) {
             String name = parseHtmlTagName(i + 1);
@@ -619,7 +645,7 @@ final class TemplateParser {
                 } else {
                     outputPrevented = false;
                 }
-            } else if (currentHtmlTag.isStyle) {
+            } else if (currentHtmlTag.isStyle || currentHtmlTag.isScript) {
                 handleStringLiterals('\'');
                 handleStringLiterals('"');
             }
@@ -810,6 +836,8 @@ final class TemplateParser {
         Mode Comment = new StatelessMode("Comment");
         Mode HtmlComment = new StatelessMode("HtmlComment", false, true);
         Mode CssComment = new StatelessMode("CssComment", false, true);
+        Mode JsComment = new StatelessMode("JsComment", false, true);
+        Mode JsBlockComment = new StatelessMode("JsBlockComment", false, true); // TODO
         Mode Content = new StatelessMode("Content", false, true);
 
         boolean isJava();

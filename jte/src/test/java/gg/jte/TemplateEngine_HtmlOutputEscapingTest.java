@@ -265,6 +265,78 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void jsComment() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>// hello\nvar x = 'hello';</script>${hello}");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>var x = 'hello';</script>Hello");
+    }
+
+    @Test
+    void jsComment_onlyComment() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>// hello</script>${hello}");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script></script>Hello");
+    }
+
+    @Test
+    void jsComment_string_singleQuote() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>var x = '// hello, hello';</script>${hello}");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>var x = '// hello, hello';</script>Hello");
+    }
+
+    @Test
+    void jsComment_string_doubleQuote() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>var x = \"// hello, hello\";</script>${hello}");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>var x = \"// hello, hello\";</script>Hello");
+    }
+
+    @Test
+    void jsBlockComment() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>/* hello*/var x = 'hello';</script>${hello}");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>var x = 'hello';</script>Hello");
+    }
+
+    @Test
+    void jsBlockComment_onlyComment() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>/* hello*/</script>${hello}");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script></script>Hello");
+    }
+
+    @Test
+    void jsBlockComment_string_singleQuote() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>var x = '/* hello, hello';</script>${hello}");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>var x = '/* hello, hello';</script>Hello");
+    }
+
+    @Test
+    void jsBlockComment_string_doubleQuote() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>var x = \"/* hello, hello\";</script>${hello}");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>var x = \"/* hello, hello\";</script>Hello");
+    }
+
+    @Test
     void cssComment() {
         codeResolver.givenCode("template.jte", "<style type=\"text/css\">/*This is it!*/html { height: 100%;}</style>");
 

@@ -176,6 +176,33 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void attributes_Boolean() {
+        codeResolver.givenCode("template.jte", "@param Boolean value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", Boolean.FALSE, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
+    void attributes_Boolean2() {
+        codeResolver.givenCode("template.jte", "@param Boolean value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", false, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
+    void attributes_Boolean_null() {
+        codeResolver.givenCode("template.jte", "@param Boolean value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", (Boolean)null, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
     void attributes_content() {
         codeResolver.givenCode("template.jte", "@param gg.jte.Content content\n<button data-title = \"${content}\">Click</button>");
 

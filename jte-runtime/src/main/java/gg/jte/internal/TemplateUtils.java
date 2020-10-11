@@ -47,6 +47,6 @@ public final class TemplateUtils {
     }
 
     public static boolean isAttributeRendered(Object value) {
-        return value != null;
+        return value != null && value != Boolean.FALSE;
     }
 }

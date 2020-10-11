@@ -569,20 +569,20 @@ final class TemplateParser {
                 if (currentAttribute.quoteCount == 1) {
                     currentAttribute.valueStartIndex = i + 1;
 
-                    if (!currentAttribute.bool && isHtmlAttributeIntercepted(currentAttribute.name)) {
+                    if (isHtmlAttributeIntercepted(currentAttribute.name)) {
                         extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
                         lastIndex = i + 1;
 
-                        visitor.onHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
+                        visitor.onInterceptHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
                     }
                 } else if (currentAttribute.quoteCount == 2) {
                     currentAttribute.value = templateCode.substring(currentAttribute.valueStartIndex, i);
 
-                    if (currentAttribute.bool) {
-                        extract(templateCode, lastIndex, currentAttribute.startIndex, visitor::onTextPart);
+                    if (currentAttribute.containsSingleOutput) {
+                        extract(templateCode, lastIndex, getLastWhitespaceIndex(currentAttribute.startIndex - 1), visitor::onTextPart);
                         lastIndex = i + 1;
 
-                        visitor.onHtmlBooleanAttributeStarted(depth, currentHtmlTag, currentAttribute);
+                        visitor.onHtmlAttributeOutput(depth, currentHtmlTag, currentAttribute);
 
                         outputPrevented = false;
                     }
@@ -591,7 +591,7 @@ final class TemplateParser {
                 if (currentHtmlTag.intercepted) {
                     extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
                     lastIndex = i - 1;
-                    visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                    visitor.onInterceptHtmlTagOpened(depth, currentHtmlTag);
                 }
                 currentHtmlTag.attributesProcessed = true;
 
@@ -603,7 +603,7 @@ final class TemplateParser {
                     if (currentHtmlTag.intercepted) {
                         extract(templateCode, lastIndex, i, visitor::onTextPart);
                         lastIndex = i;
-                        visitor.onHtmlTagOpened(depth, currentHtmlTag);
+                        visitor.onInterceptHtmlTagOpened(depth, currentHtmlTag);
                     }
                     currentHtmlTag.attributesProcessed = true;
 
@@ -617,7 +617,7 @@ final class TemplateParser {
                         if (currentHtmlTag.intercepted) {
                             extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
                             lastIndex = i - 1;
-                            visitor.onHtmlTagClosed(depth, currentHtmlTag);
+                            visitor.onInterceptHtmlTagClosed(depth, currentHtmlTag);
                         }
 
                         popHtmlTag();
@@ -634,13 +634,13 @@ final class TemplateParser {
 
                     currentHtmlTag.attributes.add(attribute);
 
-                    if (attribute.bool) {
-                        if (attribute.quotes == 0) {
-                            i += attribute.name.length() - 1;
-                            outputPrevented = false;
-                        } else {
-                            outputPrevented = true;
-                        }
+                    if (attribute.containsSingleOutput) {
+                        outputPrevented = true;
+                    }
+
+                    if (attribute.quotes == 0) {
+                        i += attribute.name.length() - 1;
+                        outputPrevented = false;
                     }
                 } else {
                     outputPrevented = false;
@@ -735,7 +735,7 @@ final class TemplateParser {
             return null;
         }
 
-        return new HtmlAttribute(templateCode.substring(i, nameEndIndex), quotes, i);
+        return new HtmlAttribute(templateCode.substring(i, nameEndIndex), quotes, i, isHtmlAttributeSingleOutput(nameEndIndex, quotes));
     }
 
     private char parseHtmlAttributeQuotes(int index) {
@@ -744,6 +744,45 @@ final class TemplateParser {
         }
 
         return templateCode.charAt(index);
+    }
+
+    private boolean isHtmlAttributeSingleOutput(int nameEndIndex, char quotes) {
+        int openingQuoteIndex = -1;
+        int openingOutputIndex = -1;
+        int closingOutputIndex = -1;
+        for (int j = nameEndIndex + 1; j < endIndex; ++j) {
+            char c = templateCode.charAt(j);
+
+            if (openingQuoteIndex == -1) {
+                if (c == quotes) {
+                    openingQuoteIndex = j;
+                }
+            } else if (openingOutputIndex == -1) {
+                if (templateCode.startsWith("${", j)) {
+                    openingOutputIndex = j;
+                } else {
+                    return false;
+                }
+            } else if (closingOutputIndex == -1) {
+                if (c == '}') {
+                    closingOutputIndex = j;
+                }
+            } else {
+                return c == quotes;
+            }
+        }
+
+        return false;
+    }
+
+    private int getLastWhitespaceIndex(int index) {
+        for (; index >= 0; --index) {
+            if (!Character.isWhitespace(templateCode.charAt(index))) {
+                ++index;
+                break;
+            }
+        }
+        return index;
     }
 
     private boolean isHtmlTagIntercepted(String name) {
@@ -987,16 +1026,18 @@ final class TemplateParser {
         public final String name;
         public final char quotes;
         public final int startIndex;
+        public final boolean containsSingleOutput;
         public final boolean bool;
         public String value;
 
         public int quoteCount;
         public int valueStartIndex;
 
-        private HtmlAttribute(String name, char quotes, int startIndex) {
+        private HtmlAttribute(String name, char quotes, int startIndex, boolean containsSingleOutput) {
             this.name = name;
             this.quotes = quotes;
             this.startIndex = startIndex;
+            this.containsSingleOutput = containsSingleOutput;
             this.bool = BOOLEAN_HTML_ATTRIBUTES.contains(name);
         }
 

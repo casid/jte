@@ -41,11 +41,11 @@ interface TemplateParserVisitor {
 
     void onError(String message);
 
-    void onHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag);
+    void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag);
 
-    void onHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute);
+    void onInterceptHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute);
 
-    void onHtmlBooleanAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute);
+    void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag);
 
-    void onHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag);
+    void onHtmlAttributeOutput(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute);
 }

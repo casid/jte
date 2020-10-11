@@ -86,6 +86,96 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void attributes_null() {
+        codeResolver.givenCode("template.jte", "@param String title\n<button data-title=\"${title}\">Click</button>");
+
+        templateEngine.render("template.jte", (String)null, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
+    void attributes_string() {
+        codeResolver.givenCode("template.jte", "@param String title\n<button data-title=\"${title}\">Click</button>");
+
+        templateEngine.render("template.jte", "The title", output);
+
+        assertThat(output.toString()).isEqualTo("<button data-title=\"The title\">Click</button>");
+    }
+
+    @Test
+    void attributes_content() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.Content content\n<button data-title = \"${content}\">Click</button>");
+
+        templateEngine.render("template.jte", (Content) output -> output.writeContent("Hello \"My friend\"!"), output);
+
+        assertThat(output.toString()).isEqualTo("<button data-title=\"Hello &#34;My friend&#34;!\">Click</button>");
+    }
+
+    @Test
+    void attributes_content_null() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.Content content\n<button data-title = \"${content}\">Click</button>");
+
+        templateEngine.render("template.jte", (Content)null, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
+    void attributes_multipleOutputs() {
+        codeResolver.givenCode("template.jte", "@param String title\n<button data-title-x2=\"${title} + ${title}\">Click</button>");
+
+        templateEngine.render("template.jte", "The title", output);
+
+        assertThat(output.toString()).isEqualTo("<button data-title-x2=\"The title + The title\">Click</button>");
+    }
+
+    @Test
+    void attributes_multipleOutputs_null() {
+        codeResolver.givenCode("template.jte", "@param String title\n<button data-title-x2=\"${title} + ${title}\">Click</button>");
+
+        templateEngine.render("template.jte", (String)null, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-title-x2=\" + \">Click</button>");
+    }
+
+    @Test
+    void attributes_boolean_true() {
+        codeResolver.givenCode("template.jte", "@param boolean visible\n<button data-visible=\"${visible}\">Click</button>");
+
+        templateEngine.render("template.jte", true, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-visible=\"true\">Click</button>");
+    }
+
+    @Test
+    void attributes_boolean_false() {
+        codeResolver.givenCode("template.jte", "@param boolean visible\n<button data-visible=\"${visible}\">Click</button>");
+
+        templateEngine.render("template.jte", false, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
+    void attributes_booleanExpression1() {
+        codeResolver.givenCode("template.jte", "@param boolean visible\n<button data-visible=\"${visible == true}\" data-invisible=\"${!visible}\">Click</button>");
+
+        templateEngine.render("template.jte", true, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-visible=\"true\">Click</button>");
+    }
+
+    @Test
+    void attributes_booleanExpression2() {
+        codeResolver.givenCode("template.jte", "@param boolean visible\n<button data-visible=\"${visible == true}\" data-invisible=\"${!visible}\">Click</button>");
+
+        templateEngine.render("template.jte", false, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-invisible=\"true\">Click</button>");
+    }
+
+    @Test
     void booleanAttributes_true() {
         codeResolver.givenCode("template.jte", "@param boolean disabled\n<button disabled=\"${disabled}\">Click</button>");
 
@@ -100,7 +190,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", false, output);
 
-        assertThat(output.toString()).isEqualTo("<button >Click</button>");
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
     }
 
     @Test
@@ -109,7 +199,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", false, output);
 
-        assertThat(output.toString()).isEqualTo("<button disabled>Click</button>");
+        assertThat(output.toString()).isEqualTo("<button disabled=\"disabled\">Click</button>");
     }
 
     @Test
@@ -164,7 +254,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", (Object)null, output);
 
-        assertThat(output.toString()).isEqualTo("<button >Click</button>");
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
     }
 
     @Test
@@ -506,7 +596,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "test", output));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Unquoted HTML attribute values are not allowed.");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: Unquoted HTML attribute values are not allowed: id");
     }
 
     @Test
@@ -560,7 +650,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", Collections.singletonMap("type", null), output);
 
-        assertThat(output.toString()).isEqualTo("<div data-type=\"\"></div>");
+        assertThat(output.toString()).isEqualTo("<div></div>");
     }
 
     @Test

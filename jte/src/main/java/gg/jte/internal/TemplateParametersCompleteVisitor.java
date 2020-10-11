@@ -100,22 +100,22 @@ class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
+    public void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
 
     }
 
     @Override
-    public void onHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
+    public void onInterceptHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
 
     }
 
     @Override
-    public void onHtmlBooleanAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
+    public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
 
     }
 
     @Override
-    public void onHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
+    public void onHtmlAttributeOutput(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
 
     }
 

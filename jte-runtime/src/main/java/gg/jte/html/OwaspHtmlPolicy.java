@@ -22,7 +22,7 @@ public class OwaspHtmlPolicy implements HtmlPolicy {
             throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! Expressions in HTML attribute names are not allowed.");
         }
         if (!htmlAttribute.isBoolean() && htmlAttribute.getQuotes() != '\"' && htmlAttribute.getQuotes() != '\'') {
-            throw new HtmlPolicyException("Unquoted HTML attribute values are not allowed.");
+            throw new HtmlPolicyException("Unquoted HTML attribute values are not allowed: " + htmlAttribute.getName());
         }
         if (StringUtils.isAllUpperCase(htmlAttribute.getName())) {
             throw new HtmlPolicyException("HTML attributes are expected to be lowercase: " + htmlAttribute.getName());

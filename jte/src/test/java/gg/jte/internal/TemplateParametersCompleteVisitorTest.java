@@ -24,9 +24,9 @@ class TemplateParametersCompleteVisitorTest {
         visitor.onLineFinished();
         visitor.onComplete();
         visitor.onError(null);
-        visitor.onHtmlTagOpened(0, null);
-        visitor.onHtmlAttributeStarted(0, null, null);
-        visitor.onHtmlBooleanAttributeStarted(0, null, null);
-        visitor.onHtmlTagClosed(0, null);
+        visitor.onInterceptHtmlTagOpened(0, null);
+        visitor.onInterceptHtmlAttributeStarted(0, null, null);
+        visitor.onInterceptHtmlTagClosed(0, null);
+        visitor.onHtmlAttributeOutput(0, null, null);
     }
 }

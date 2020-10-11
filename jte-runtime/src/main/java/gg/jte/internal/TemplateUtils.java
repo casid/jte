@@ -17,4 +17,12 @@ public final class TemplateUtils {
         }
         return map;
     }
+
+    public static boolean isAttributeRendered(boolean value) {
+        return value;
+    }
+
+    public static boolean isAttributeRendered(Object value) {
+        return value != null;
+    }
 }

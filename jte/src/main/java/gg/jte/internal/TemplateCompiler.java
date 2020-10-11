@@ -531,7 +531,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
-        public void onHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
+        public void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
             writeIndentation(depth);
             javaCode.append("jteHtmlInterceptor.onHtmlTagOpened(\"").append(htmlTag.name).append("\", ");
             writeAttributeMap(htmlTag);
@@ -539,7 +539,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
-        public void onHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
+        public void onInterceptHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
             writeIndentation(depth);
             javaCode.append("jteHtmlInterceptor.onHtmlAttributeStarted(\"").append(htmlAttribute.name).append("\", ");
             writeAttributeMap(currentHtmlTag);
@@ -547,21 +547,24 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
-        public void onHtmlBooleanAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
-            String javaExpression = extractJavaExpression(htmlAttribute.value);
-            if (javaExpression == null) {
-                onTextPart(depth, htmlAttribute.name);
-            } else {
-                onConditionStart(depth, javaExpression);
-                onCodePart(depth + 1, "\"" + htmlAttribute.name + "\"");
-                onConditionEnd(depth);
-            }
+        public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
+            writeIndentation(depth);
+            javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput);\n");
         }
 
         @Override
-        public void onHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
-            writeIndentation(depth);
-            javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput);\n");
+        public void onHtmlAttributeOutput(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
+            String javaExpression = extractJavaExpression(htmlAttribute.value);
+            if (htmlAttribute.bool) {
+                onConditionStart(depth, javaExpression);
+                onTextPart(depth, " " + htmlAttribute.name);
+            } else {
+                onConditionStart(depth, "gg.jte.internal.TemplateUtils.isAttributeRendered(" + javaExpression + ")");
+                onTextPart(depth + 1, " " + htmlAttribute.name + "=" + htmlAttribute.quotes);
+                onHtmlTagAttributeCodePart(depth + 1, javaExpression, currentHtmlTag.name, htmlAttribute.name);
+                onTextPart(depth + 1, "" + htmlAttribute.quotes);
+            }
+            onConditionEnd(depth);
         }
 
         private void writeAttributeMap(TemplateParser.HtmlTag htmlTag) {

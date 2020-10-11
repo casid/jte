@@ -382,17 +382,13 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
-        public void onTextPart(int depth, String textPart, TemplateType type) {
+        public void onTextPart(int depth, String textPart) {
             if (textPart.isEmpty()) {
                 return;
             }
 
             writeIndentation(depth);
-            if (type == TemplateType.Content) {
-                javaCode.append("jteOutput.writeContentPart(\"");
-            } else {
-                javaCode.append("jteOutput.writeContent(\"");
-            }
+            javaCode.append("jteOutput.writeContent(\"");
             appendEscaped(javaCode.getStringBuilder(), textPart);
             javaCode.append("\");\n");
         }
@@ -403,44 +399,29 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         @Override
-        public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName, TemplateType type) {
+        public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
             writeIndentation(depth);
             javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", null);\n");
 
             writeCodePart(depth, codePart);
-
-            if (type == TemplateType.Content) {
-                writeIndentation(depth);
-                javaCode.append("jteOutput.resetContext();\n");
-            }
         }
 
         @Override
-        public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName, TemplateType type) {
+        public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
             writeIndentation(depth);
             javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\");\n");
 
             writeCodePart(depth, codePart);
-
-            if (type == TemplateType.Content) {
-                writeIndentation(depth);
-                javaCode.append("jteOutput.resetContext();\n");
-            }
         }
 
         @Override
-        public void onUnsafeCodePart(int depth, String codePart, TemplateType type) {
+        public void onUnsafeCodePart(int depth, String codePart) {
             if (contentType == ContentType.Html) {
                 writeIndentation(depth);
                 javaCode.append("jteOutput.setContext(null, null);\n");
             }
 
             writeCodePart(depth, codePart);
-
-            if (contentType == ContentType.Html && type == TemplateType.Content) {
-                writeIndentation(depth);
-                javaCode.append("jteOutput.resetContext();\n");
-            }
         }
 
         private void writeCodePart(int depth, String codePart) {
@@ -569,7 +550,7 @@ public class TemplateCompiler extends TemplateLoader {
         public void onHtmlBooleanAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
             String javaExpression = extractJavaExpression(htmlAttribute.value);
             if (javaExpression == null) {
-                onTextPart(depth, htmlAttribute.name, null);
+                onTextPart(depth, htmlAttribute.name);
             } else {
                 onConditionStart(depth, javaExpression);
                 onCodePart(depth + 1, "\"" + htmlAttribute.name + "\"");

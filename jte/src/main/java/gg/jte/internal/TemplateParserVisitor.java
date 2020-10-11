@@ -9,15 +9,15 @@ interface TemplateParserVisitor {
 
     void onParamsComplete();
 
-    void onTextPart(int depth, String textPart, TemplateType type);
+    void onTextPart(int depth, String textPart);
 
     void onCodePart(int depth, String codePart);
 
-    void onHtmlTagBodyCodePart(int depth, String codePart, String tagName, TemplateType type);
+    void onHtmlTagBodyCodePart(int depth, String codePart, String tagName);
 
-    void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName, TemplateType type);
+    void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName);
 
-    void onUnsafeCodePart(int depth, String codePart, TemplateType type);
+    void onUnsafeCodePart(int depth, String codePart);
 
     void onCodeStatement(int depth, String codePart);
 

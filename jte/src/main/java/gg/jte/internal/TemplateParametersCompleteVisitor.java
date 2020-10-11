@@ -20,7 +20,7 @@ class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onTextPart(int depth, String textPart, TemplateType type) {
+    public void onTextPart(int depth, String textPart) {
 
     }
 
@@ -30,17 +30,17 @@ class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName, TemplateType type) {
+    public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
 
     }
 
     @Override
-    public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName, TemplateType type) {
+    public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
 
     }
 
     @Override
-    public void onUnsafeCodePart(int depth, String codePart, TemplateType type) {
+    public void onUnsafeCodePart(int depth, String codePart) {
 
     }
 

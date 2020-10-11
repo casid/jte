@@ -1,7 +1,9 @@
 package gg.jte.html;
 
+import gg.jte.Content;
 import gg.jte.TemplateOutput;
 import gg.jte.internal.StringUtils;
+import gg.jte.output.StringOutput;
 import org.owasp.encoder.Encode;
 
 import java.io.IOException;
@@ -17,25 +19,14 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     private String tagName;
     private String attributeName;
 
-    private String previousTagName;
-    private String previousAttributeName;
-
     public OwaspHtmlTemplateOutput(TemplateOutput templateOutput) {
         this.templateOutput = templateOutput;
     }
 
     @Override
     public void setContext(String tagName, String attributeName) {
-        this.previousTagName = this.tagName;
-        this.previousAttributeName = this.attributeName;
         this.tagName = tagName;
         this.attributeName = attributeName;
-    }
-
-    @Override
-    public void resetContext() {
-        this.tagName = this.previousTagName;
-        this.attributeName = this.previousAttributeName;
     }
 
     @Override
@@ -52,12 +43,15 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     }
 
     @Override
-    public void writeContentPart(String value) {
-        if (value != null) {
+    public void writeUserContent(Content content) {
+        if (content != null) {
             if (tagName != null && attributeName != null) {
-                writeTagAttributeUserContent(value);
+                StringOutput output = new StringOutput(1024);
+                content.writeTo(new OwaspHtmlTemplateOutput(output));
+
+                writeTagAttributeUserContent(output.toString());
             } else {
-                writeContent(value);
+                content.writeTo(this);
             }
         }
     }

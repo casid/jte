@@ -153,7 +153,7 @@ final class TemplateParser {
             } else if (currentChar == '}' && currentMode == Mode.UnsafeCode) {
                 pop();
                 if (currentMode == Mode.Text) {
-                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onUnsafeCodePart(d, c, type));
+                    extract(templateCode, lastIndex, i, visitor::onUnsafeCodePart);
                     lastIndex = i + 1;
                 }
             } else if (previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
@@ -341,7 +341,7 @@ final class TemplateParser {
         if (trimControlStructures && lastIndex >= 0 && endIndex >= lastIndex) {
             extractTextPartAndTrimControlStructures(endIndex, mode);
         } else {
-            extract(templateCode, lastIndex, endIndex, (depth, content) -> visitor.onTextPart(depth, content, type));
+            extract(templateCode, lastIndex, endIndex, visitor::onTextPart);
         }
     }
 
@@ -395,7 +395,7 @@ final class TemplateParser {
             }
         }
 
-        extract(resultText.toString(), 0, resultText.length(), (depth, content) -> visitor.onTextPart(depth, content, type));
+        extract(resultText.toString(), 0, resultText.length(), visitor::onTextPart);
 
         if (mode == null) {
             popIndent();
@@ -471,18 +471,18 @@ final class TemplateParser {
             }
 
             if (currentHtmlTag.attributesProcessed) {
-                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, currentHtmlTag.name, type));
+                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, currentHtmlTag.name));
                 return;
             }
 
             HtmlAttribute currentAttribute = currentHtmlTag.getCurrentAttribute();
             if (currentAttribute != null && currentAttribute.quoteCount < 2) {
-                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagAttributeCodePart(depth, codePart, currentHtmlTag.name, currentAttribute.name, type));
+                extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagAttributeCodePart(depth, codePart, currentHtmlTag.name, currentAttribute.name));
                 return;
             }
         }
 
-        extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, "html", type));
+        extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, "html"));
     }
 
     private void interceptHtmlTags() {
@@ -507,7 +507,7 @@ final class TemplateParser {
                     currentAttribute.valueStartIndex = i + 1;
 
                     if (!currentAttribute.bool && isHtmlAttributeIntercepted(currentAttribute.name)) {
-                        extract(templateCode, lastIndex, i + 1, (depth, content) -> visitor.onTextPart(depth, content, type));
+                        extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
                         lastIndex = i + 1;
 
                         visitor.onHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
@@ -516,7 +516,7 @@ final class TemplateParser {
                     currentAttribute.value = templateCode.substring(currentAttribute.valueStartIndex, i);
 
                     if (currentAttribute.bool) {
-                        extract(templateCode, lastIndex, currentAttribute.startIndex, (depth, content) -> visitor.onTextPart(depth, content, type));
+                        extract(templateCode, lastIndex, currentAttribute.startIndex, visitor::onTextPart);
                         lastIndex = i + 1;
 
                         visitor.onHtmlBooleanAttributeStarted(depth, currentHtmlTag, currentAttribute);
@@ -526,7 +526,7 @@ final class TemplateParser {
                 }
             } else if (!currentHtmlTag.attributesProcessed && previousChar0 == '/' && currentChar == '>') {
                 if (currentHtmlTag.intercepted) {
-                    extract(templateCode, lastIndex, i - 1, (depth, content) -> visitor.onTextPart(depth, content, type));
+                    extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
                     lastIndex = i - 1;
                     visitor.onHtmlTagOpened(depth, currentHtmlTag);
                 }
@@ -538,7 +538,7 @@ final class TemplateParser {
                     tagClosed = false;
                 } else {
                     if (currentHtmlTag.intercepted) {
-                        extract(templateCode, lastIndex, i, (depth, content) -> visitor.onTextPart(depth, content, type));
+                        extract(templateCode, lastIndex, i, visitor::onTextPart);
                         lastIndex = i;
                         visitor.onHtmlTagOpened(depth, currentHtmlTag);
                     }
@@ -552,7 +552,7 @@ final class TemplateParser {
                 if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
                     if (!currentHtmlTag.bodyIgnored) {
                         if (currentHtmlTag.intercepted) {
-                            extract(templateCode, lastIndex, i - 1, (depth, content) -> visitor.onTextPart(depth, content, type));
+                            extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
                             lastIndex = i - 1;
                             visitor.onHtmlTagClosed(depth, currentHtmlTag);
                         }
@@ -872,6 +872,7 @@ final class TemplateParser {
 
     public static class HtmlAttribute implements gg.jte.html.HtmlAttribute {
         // See https://meiert.com/en/blog/boolean-attributes-of-html/
+        @SuppressWarnings("SpellCheckingInspection")
         private static final Set<String> BOOLEAN_HTML_ATTRIBUTES = Set.of("allowfullscreen", "allowpaymentrequest", "async", "autofocus", "autoplay", "checked", "controls", "default", "disabled", "formnovalidate", "hidden", "ismap", "itemscope", "loop", "multiple", "muted", "nomodule", "novalidate", "open", "playsinline", "readonly", "required", "reversed", "selected", "truespeed");
 
         public final String name;

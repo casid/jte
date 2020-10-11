@@ -104,6 +104,78 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void attributes_byte() {
+        codeResolver.givenCode("template.jte", "@param byte value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", (byte)42, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-value=\"42\">Click</button>");
+    }
+
+    @Test
+    void attributes_short() {
+        codeResolver.givenCode("template.jte", "@param short value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", (short)42, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-value=\"42\">Click</button>");
+    }
+
+    @Test
+    void attributes_int() {
+        codeResolver.givenCode("template.jte", "@param int value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", 42, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-value=\"42\">Click</button>");
+    }
+
+    @Test
+    void attributes_long() {
+        codeResolver.givenCode("template.jte", "@param long value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", 42L, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-value=\"42\">Click</button>");
+    }
+
+    @Test
+    void attributes_float() {
+        codeResolver.givenCode("template.jte", "@param float value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", 42.5f, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-value=\"42.5\">Click</button>");
+    }
+
+    @Test
+    void attributes_double() {
+        codeResolver.givenCode("template.jte", "@param double value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", 42.5, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-value=\"42.5\">Click</button>");
+    }
+
+    @Test
+    void attributes_Integer() {
+        codeResolver.givenCode("template.jte", "@param Integer value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", 42, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-value=\"42\">Click</button>");
+    }
+
+    @Test
+    void attributes_Integer_null() {
+        codeResolver.givenCode("template.jte", "@param Integer value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", (Integer)null, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
     void attributes_content() {
         codeResolver.givenCode("template.jte", "@param gg.jte.Content content\n<button data-title = \"${content}\">Click</button>");
 

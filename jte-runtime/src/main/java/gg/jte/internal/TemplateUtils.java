@@ -22,6 +22,30 @@ public final class TemplateUtils {
         return value;
     }
 
+    public static boolean isAttributeRendered(byte value) {
+        return true;
+    }
+
+    public static boolean isAttributeRendered(short value) {
+        return true;
+    }
+
+    public static boolean isAttributeRendered(int value) {
+        return true;
+    }
+
+    public static boolean isAttributeRendered(long value) {
+        return true;
+    }
+
+    public static boolean isAttributeRendered(float value) {
+        return true;
+    }
+
+    public static boolean isAttributeRendered(double value) {
+        return true;
+    }
+
     public static boolean isAttributeRendered(Object value) {
         return value != null;
     }

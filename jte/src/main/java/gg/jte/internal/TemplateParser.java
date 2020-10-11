@@ -112,9 +112,11 @@ final class TemplateParser {
                 pop();
                 lastIndex = i + 1;
             } else if (isCommentAllowed() && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
-                extractComment(Mode.Comment);
+                extractComment(Mode.Comment, i - 3);
             } else if (isCommentAllowed() && previousChar2 == '<' && previousChar1 == '!' && previousChar0 == '-' && currentChar == '-' && isHtmlCommentAllowed()) {
-                extractComment(Mode.HtmlComment);
+                extractComment(Mode.HtmlComment, i - 3);
+            } else if (isCommentAllowed() && previousChar0 == '/' && currentChar == '*' && isCssCommentAllowed()) {
+                extractComment(Mode.CssComment, i - 1);
             } else if (currentMode == Mode.Comment) {
                 if (previousChar2 == '-' && previousChar1 == '-' && previousChar0 == '%' && currentChar == '>') {
                     pop();
@@ -122,6 +124,11 @@ final class TemplateParser {
                 }
             } else if (currentMode == Mode.HtmlComment) {
                 if (previousChar1 == '-' && previousChar0 == '-' && currentChar == '>') {
+                    pop();
+                    lastIndex = i + 1;
+                }
+            } else if (currentMode == Mode.CssComment) {
+                if (previousChar0 == '*' && currentChar == '/') {
                     pop();
                     lastIndex = i + 1;
                 }
@@ -489,9 +496,9 @@ final class TemplateParser {
         extract(templateCode, lastIndex, i, (depth, codePart) -> visitor.onHtmlTagBodyCodePart(depth, codePart, "html"));
     }
 
-    private void extractComment(Mode mode) {
-        if (paramsComplete || areParamsComplete(i - 3)) {
-            extractTextPart(i - 3, mode);
+    private void extractComment(Mode mode, int startIndex) {
+        if (paramsComplete || areParamsComplete(startIndex)) {
+            extractTextPart(startIndex, mode);
         }
         push(mode);
     }
@@ -508,6 +515,17 @@ final class TemplateParser {
         return !currentHtmlTag.isScript && !currentHtmlTag.isStyle && !currentHtmlTag.isInAttribute();
     }
 
+    private boolean isCssCommentAllowed() {
+        if (contentType != ContentType.Html) {
+            return false;
+        }
+
+        if (currentHtmlTag == null) {
+            return false;
+        }
+
+        return currentHtmlTag.isStyle && !currentHtmlTag.isInStringLiteral() && !currentHtmlTag.isInAttribute();
+    }
 
     private void interceptHtmlTags() {
         if ( isOpeningHtmlTag() ) {
@@ -601,6 +619,19 @@ final class TemplateParser {
                 } else {
                     outputPrevented = false;
                 }
+            } else if (currentHtmlTag.isStyle) {
+                handleStringLiterals('\'');
+                handleStringLiterals('"');
+            }
+        }
+    }
+
+    private void handleStringLiterals(char quote) {
+        if (currentChar == quote && (currentHtmlTag.stringLiteralQuote == 0 || currentHtmlTag.stringLiteralQuote == quote)) {
+            if (currentHtmlTag.stringLiteralQuote == 0) {
+                currentHtmlTag.stringLiteralQuote = currentChar;
+            } else if (previousChar0 != '\\') {
+                currentHtmlTag.stringLiteralQuote = 0;
             }
         }
     }
@@ -778,6 +809,7 @@ final class TemplateParser {
         Mode TagName = new StatelessMode("TagName");
         Mode Comment = new StatelessMode("Comment");
         Mode HtmlComment = new StatelessMode("HtmlComment", false, true);
+        Mode CssComment = new StatelessMode("CssComment", false, true);
         Mode Content = new StatelessMode("Content", false, true);
 
         boolean isJava();
@@ -859,6 +891,7 @@ final class TemplateParser {
         public final boolean isStyle;
         public final List<HtmlAttribute> attributes = new ArrayList<>();
         public boolean attributesProcessed;
+        public char stringLiteralQuote;
 
         public HtmlTag(String name, boolean intercepted, int attributeStartIndex) {
             this.name = name;
@@ -906,6 +939,10 @@ final class TemplateParser {
 
             HtmlAttribute currentAttribute = getCurrentAttribute();
             return currentAttribute != null && currentAttribute.quoteCount < 2;
+        }
+
+        public boolean isInStringLiteral() {
+            return stringLiteralQuote != 0;
         }
 
         @Override

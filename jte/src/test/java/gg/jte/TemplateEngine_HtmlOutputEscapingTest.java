@@ -265,6 +265,51 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void cssComment() {
+        codeResolver.givenCode("template.jte", "<style type=\"text/css\">/*This is it!*/html { height: 100%;}</style>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<style type=\"text/css\">html { height: 100%;}</style>");
+    }
+
+    @Test
+    void cssComment_string_singleQuote() {
+        codeResolver.givenCode("template.jte", "<style type=\"text/css\">/*This is it!*/.smog::after { content: '/*cough*/';/*funny*/}</style>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<style type=\"text/css\">.smog::after { content: '/*cough*/';}</style>");
+    }
+
+    @Test
+    void cssComment_string_singleQuote_escape() {
+        codeResolver.givenCode("template.jte", "<style type=\"text/css\">/*This is it!*/.smog::after { content: 'Let\\'s /*cough*/';/*funny*/}</style>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<style type=\"text/css\">.smog::after { content: 'Let\\'s /*cough*/';}</style>");
+    }
+
+    @Test
+    void cssComment_string_doubleQuote() {
+        codeResolver.givenCode("template.jte", "<style type=\"text/css\">/*This is it!*/.smog::after { content: \"/*cough*/\";/*funny*/}</style>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<style type=\"text/css\">.smog::after { content: \"/*cough*/\";}</style>");
+    }
+
+    @Test
+    void cssComment_string_doubleQuote_escape() {
+        codeResolver.givenCode("template.jte", "<style type=\"text/css\">/*This is it!*/.smog::after { content: \"Let\\'s /*cough*/\";/*funny*/}</style>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<style type=\"text/css\">.smog::after { content: \"Let\\'s /*cough*/\";}</style>");
+    }
+
+    @Test
     void script1() {
         codeResolver.givenCode("template.jte", "@param String userName\n<script>var x = 'Hello, ${userName}';</script>");
 
@@ -364,7 +409,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", null, output);
 
         assertThat(output.toString()).isEqualTo("<style type=\"text/css\">\n" +
-                "/*<![CDATA[*/\n" +
+                "\n" +
                 "body {\n" +
                 "\tcolor: #333333;\n" +
                 "\tline-height: 150%;\n" +
@@ -374,7 +419,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "\tfont-weight: bold;\n" +
                 "\tbackground-color: #CCCCCC;\n" +
                 "}\n" +
-                "/*]]>*/\n" +
+                "\n" +
                 "</style>");
     }
 

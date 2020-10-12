@@ -76,9 +76,13 @@ public class JspToJteConverter {
         }
     }
 
+    protected String readFile(Path jspTag) {
+        return IoUtils.readFile(jspTag);
+    }
+
     private void convertTag(Path jspTag, Path jteTag, Consumer<Converter> parserSetup) {
         String relativeFilePath = jspRoot.relativize(jspTag).toString();
-        Converter converter = new JtpConverter(relativeFilePath, IoUtils.readFile(jspTag).replace("\r", "").getBytes(), getResourceBase(), relativeFilePath.endsWith(".tag"), new ConverterOutput());
+        Converter converter = new JtpConverter(relativeFilePath, readFile(jspTag).replace("\r", "").getBytes(), getResourceBase(), relativeFilePath.endsWith(".tag"), new ConverterOutput());
 
         converter.register("c:if", new JspIfConverter());
         converter.register("c:forEach", new JspForEachConverter());

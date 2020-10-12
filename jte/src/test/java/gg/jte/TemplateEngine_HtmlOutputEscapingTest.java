@@ -266,6 +266,33 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void attributes_String() {
+        codeResolver.givenCode("template.jte", "@param String value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<button data-value=\"Hello\">Click</button>");
+    }
+
+    @Test
+    void attributes_String_null() {
+        codeResolver.givenCode("template.jte", "@param String value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", (String)null, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
+    void attributes_String_empty() {
+        codeResolver.givenCode("template.jte", "@param String value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", "", output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
     void attributes_booleanExpression2() {
         codeResolver.givenCode("template.jte", "@param boolean visible\n<button data-visible=\"${visible == true}\" data-invisible=\"${!visible}\">Click</button>");
 
@@ -363,6 +390,24 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "Label", output);
 
         assertThat(output.toString()).isEqualTo("<input required><label>Label</label>");
+    }
+
+    @Test
+    void cssClasses() {
+        codeResolver.givenCode("template.jte", "@import gg.jte.html.Css\n@param boolean visible\n<button class=\"${Css.classes().add(\"mb-3\").addIf(!visible, \"hide\")}\">Click</button>");
+
+        templateEngine.render("template.jte", false, output);
+
+        assertThat(output.toString()).isEqualTo("<button class=\"mb-3 hide\">Click</button>");
+    }
+
+    @Test
+    void cssClasses_empty() {
+        codeResolver.givenCode("template.jte", "@import gg.jte.html.Css\n@param boolean visible\n<button class=\"${Css.classes().addIf(!visible, \"hide\")}\">Click</button>");
+
+        templateEngine.render("template.jte", true, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
     }
 
     @Test

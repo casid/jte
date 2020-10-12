@@ -1,7 +1,5 @@
 package gg.jte.internal;
 
-import gg.jte.Content;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,14 +44,6 @@ public final class TemplateUtils {
 
     public static boolean isAttributeRendered(double value) {
         return true;
-    }
-
-    public static boolean isAttributeRendered(String value) {
-        return value != null && !value.isEmpty();
-    }
-
-    public static boolean isAttributeRendered(Content value) {
-        return value != null && !value.isEmpty();
     }
 
     public static boolean isAttributeRendered(Object value) {

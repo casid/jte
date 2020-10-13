@@ -12,7 +12,17 @@ public final class CssClasses implements Content {
 
     public CssClasses addClassIf(boolean condition, String cssClass) {
         if (condition) {
-            add(cssClass);
+            addClass(cssClass);
+        }
+        return this;
+    }
+
+    public CssClasses addClass(String cssClass) {
+        if (cssClass != null && !cssClass.isBlank()) {
+            if (cssClasses == null) {
+                cssClasses = new ArrayList<>();
+            }
+            cssClasses.add(cssClass);
         }
         return this;
     }
@@ -37,14 +47,5 @@ public final class CssClasses implements Content {
     @Override
     public boolean isEmpty() {
         return cssClasses == null;
-    }
-
-    private void add(String cssClass) {
-        if (cssClass != null && !cssClass.isBlank()) {
-            if (cssClasses == null) {
-                cssClasses = new ArrayList<>();
-            }
-            cssClasses.add(cssClass);
-        }
     }
 }

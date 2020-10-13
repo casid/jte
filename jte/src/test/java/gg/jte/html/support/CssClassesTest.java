@@ -45,9 +45,26 @@ class CssClassesTest {
     }
 
     @Test
+    void addClass() {
+        addClass("two");
+        thenOutputIs("two");
+    }
+
+    @Test
+    void addClass_null() {
+        addClass(null);
+        thenOutputIs("");
+    }
+
+    @Test
     void condition() {
-        addClassIf(false, "bold").addClassIf(true, "mb-3");
-        thenOutputIs("mb-3");
+        addClass("first").addClassIf(false, "bold").addClassIf(true, "mb-3");
+        thenOutputIs("first mb-3");
+    }
+
+    private CssClasses addClass(String cssClass) {
+        classes = HtmlSupport.addClass(cssClass);
+        return classes;
     }
 
     private CssClasses addClassIf(boolean condition, String cssClass) {

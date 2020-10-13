@@ -10,7 +10,7 @@ public final class CssClasses implements Content {
 
     private List<String> cssClasses;
 
-    public CssClasses addClassIf(boolean condition, String cssClass) {
+    public CssClasses addClass(boolean condition, String cssClass) {
         if (condition) {
             addClass(cssClass);
         }

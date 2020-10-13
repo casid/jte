@@ -10,37 +10,37 @@ class CssClassesTest {
 
     @Test
     void empty() {
-        addClassIf(false, "foo");
+        addClass(false, "foo");
         thenOutputIs("");
     }
 
     @Test
     void one() {
-        addClassIf(true, "bold");
+        addClass(true, "bold");
         thenOutputIs("bold");
     }
 
     @Test
     void two() {
-        addClassIf(true, "bold").addClassIf(true, "ml-3");
+        addClass(true, "bold").addClass(true, "ml-3");
         thenOutputIs("bold ml-3");
     }
 
     @Test
     void three_oneNull() {
-        addClassIf(true, "bold").addClassIf(true, null).addClassIf(true, "ml-3");
+        addClass(true, "bold").addClass(true, null).addClass(true, "ml-3");
         thenOutputIs("bold ml-3");
     }
 
     @Test
     void three_oneEmpty() {
-        addClassIf(true, "bold").addClassIf(true, "").addClassIf(true, "ml-3");
+        addClass(true, "bold").addClass(true, "").addClass(true, "ml-3");
         thenOutputIs("bold ml-3");
     }
 
     @Test
     void three_oneBlank() {
-        addClassIf(true, "bold").addClassIf(true, " ").addClassIf(true, "ml-3");
+        addClass(true, "bold").addClass(true, " ").addClass(true, "ml-3");
         thenOutputIs("bold ml-3");
     }
 
@@ -58,7 +58,7 @@ class CssClassesTest {
 
     @Test
     void condition() {
-        addClass("first").addClassIf(false, "bold").addClassIf(true, "mb-3");
+        addClass("first").addClass(false, "bold").addClass(true, "mb-3");
         thenOutputIs("first mb-3");
     }
 
@@ -67,8 +67,8 @@ class CssClassesTest {
         return classes;
     }
 
-    private CssClasses addClassIf(boolean condition, String cssClass) {
-        classes = HtmlSupport.addClassIf(condition, cssClass);
+    private CssClasses addClass(boolean condition, String cssClass) {
+        classes = HtmlSupport.addClass(condition, cssClass);
         return classes;
     }
 

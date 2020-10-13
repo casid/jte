@@ -5,7 +5,7 @@ public final class HtmlSupport {
         return new CssClasses().addClass(cssClass);
     }
 
-    public static CssClasses addClassIf(boolean condition, String cssClass) {
-        return new CssClasses().addClassIf(condition, cssClass);
+    public static CssClasses addClass(boolean condition, String cssClass) {
+        return new CssClasses().addClass(condition, cssClass);
     }
 }

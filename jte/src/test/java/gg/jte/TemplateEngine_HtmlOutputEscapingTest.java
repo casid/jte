@@ -394,7 +394,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void cssClasses() {
-        codeResolver.givenCode("template.jte", "@import static gg.jte.html.support.HtmlSupport.*\n@param boolean visible\n<button class=\"mb-3 ${addClassIf(!visible, \"hide\").addClassIf(visible, \"show\")}\">Click</button>");
+        codeResolver.givenCode("template.jte", "@import static gg.jte.html.support.HtmlSupport.*\n@param boolean visible\n<button class=\"mb-3 ${addClass(!visible, \"hide\").addClass(visible, \"show\")}\">Click</button>");
 
         templateEngine.render("template.jte", false, output);
 
@@ -403,7 +403,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void cssClasses_empty() {
-        codeResolver.givenCode("template.jte", "@import static gg.jte.html.support.HtmlSupport.*\n@param boolean visible\n<button class=\"${addClassIf(!visible, \"hide\")}\">Click</button>");
+        codeResolver.givenCode("template.jte", "@import static gg.jte.html.support.HtmlSupport.*\n@param boolean visible\n<button class=\"${addClass(!visible, \"hide\")}\">Click</button>");
 
         templateEngine.render("template.jte", true, output);
 

@@ -45,7 +45,7 @@ public final class CssClasses implements Content {
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isEmptyContent() {
         return cssClasses == null;
     }
 }

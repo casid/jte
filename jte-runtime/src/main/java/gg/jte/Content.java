@@ -3,7 +3,7 @@ package gg.jte;
 public interface Content {
     void writeTo(TemplateOutput output);
 
-    default boolean isEmpty() {
+    default boolean isEmptyContent() {
         return false;
     }
 }

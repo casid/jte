@@ -53,7 +53,7 @@ public final class TemplateUtils {
     }
 
     public static boolean isAttributeRendered(Content value) {
-        return value != null && !value.isEmpty();
+        return value != null && !value.isEmptyContent();
     }
 
     public static boolean isAttributeRendered(Object value) {

@@ -366,6 +366,52 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void attributes_String() {
+        codeResolver.givenCode("template.jte", "@param String value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<button data-value=\"Hello\">Click</button>");
+    }
+
+    @Test
+    void attributes_String_null() {
+        codeResolver.givenCode("template.jte", "@param String value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", (String)null, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
+    void attributes_String_empty() {
+        codeResolver.givenCode("template.jte", "@param String value\n<button data-value=\"${value}\">Click</button>");
+
+        templateEngine.render("template.jte", "", output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+    @Test
+    void cssClasses() {
+        codeResolver.givenCode("template.jte", "@import static gg.jte.html.support.HtmlSupport.*\n@param boolean visible\n<button class=\"mb-3 ${addClassIf(!visible, \"hide\").addClassIf(visible, \"show\")}\">Click</button>");
+
+        templateEngine.render("template.jte", false, output);
+
+        assertThat(output.toString()).isEqualTo("<button class=\"mb-3 hide\">Click</button>");
+    }
+
+    @Test
+    void cssClasses_empty() {
+        codeResolver.givenCode("template.jte", "@import static gg.jte.html.support.HtmlSupport.*\n@param boolean visible\n<button class=\"${addClassIf(!visible, \"hide\")}\">Click</button>");
+
+        templateEngine.render("template.jte", true, output);
+
+        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+    }
+
+
+    @Test
     void doctype() {
         codeResolver.givenCode("template.jte", "@param String x\n<!DOCTYPE html>");
         templateEngine.render("template.jte", (Object)null, output);

@@ -765,7 +765,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
-    void forbidSingleUnquotedAttributeValues() {
+    void forbidSingleQuotedAttributeValues() {
         OwaspHtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
         htmlPolicy.addPolicy(new PreventSingleQuotedAttributes());
         templateEngine.setHtmlPolicy(htmlPolicy);
@@ -774,6 +774,18 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "test", output));
 
         assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: HTML attribute values must be double quoted: id");
+    }
+
+    @Test
+    void forbidSingleQuotedAttributeValues_boolean() {
+        OwaspHtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
+        htmlPolicy.addPolicy(new PreventSingleQuotedAttributes());
+        templateEngine.setHtmlPolicy(htmlPolicy);
+        codeResolver.givenCode("template.jte", "@param String id\n<input id=\"${id}\" required>");
+
+        templateEngine.render("template.jte", "test", output);
+
+        assertThat(output.toString()).isEqualTo("<input id=\"test\" required>");
     }
 
     @Test

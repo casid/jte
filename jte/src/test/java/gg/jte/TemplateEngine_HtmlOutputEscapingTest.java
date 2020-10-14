@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import java.util.Collections;
 import java.util.Map;
 
+import gg.jte.html.OwaspHtmlPolicy;
+import gg.jte.html.policy.PreventSingleQuotedAttributes;
 import gg.jte.support.LocalizationSupport;
 import org.junit.jupiter.api.Test;
 import gg.jte.output.StringOutput;
@@ -760,6 +762,18 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "<script>console.log(\"Hello\")</script>", output);
 
         assertThat(output.toString()).isEqualTo("\n<span id='&lt;script>console.log(&#34;Hello&#34;)&lt;/script>'></span>");
+    }
+
+    @Test
+    void forbidSingleUnquotedAttributeValues() {
+        OwaspHtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
+        htmlPolicy.addPolicy(new PreventSingleQuotedAttributes());
+        templateEngine.setHtmlPolicy(htmlPolicy);
+        codeResolver.givenCode("template.jte", "@param String id\n\n<span id='${id}'></span>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "test", output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 3: HTML attribute values must be double quoted: id");
     }
 
     @Test

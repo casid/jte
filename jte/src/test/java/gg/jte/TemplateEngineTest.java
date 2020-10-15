@@ -358,6 +358,13 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithoutParams_paramPassed() {
+        givenTag("basic", "I do nothing!");
+        givenTemplate("@tag.basic(42)");
+        thenRenderingFailsWithException().hasMessageStartingWith("Failed to compile template, error at test/template.jte:2");
+    }
+
+    @Test
     void tagWithPackage() {
         givenTag("my/basic", "I have a custom package");
         givenTemplate("@tag.my.basic()");

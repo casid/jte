@@ -623,10 +623,6 @@ public class TemplateCompiler extends TemplateLoader {
                 throw new IllegalStateException("No parameter information for " + name);
             }
 
-            if (paramInfos.isEmpty()) {
-                return;
-            }
-
             int index = 0;
             ParamCallInfo[] paramCallInfos = new ParamCallInfo[Math.max(params.size(), paramInfos.size())];
             for (String param : params) {

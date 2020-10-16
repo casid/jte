@@ -14,8 +14,6 @@ import static gg.jte.convert.jsp.converter.JspExpressionConverter.convertAttribu
 
 public class JstlFmtMessageConverter implements CustomTagConverter {
 
-    private final Deque<Boolean> previousInsideScript = new ArrayDeque<>();
-
     @Override
     public void convert(JtpConverter converter, JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
         var key = convertAttributeValue(tag.getAttribute("key"));
@@ -29,8 +27,7 @@ public class JstlFmtMessageConverter implements CustomTagConverter {
 
         output.append("localize(").append(key);
 
-        previousInsideScript.push(output.isInsideScript());
-        output.setInsideScript(true);
+        output.pushInsideScript(true);
 
         bodyConverter.convert();
 
@@ -42,7 +39,7 @@ public class JstlFmtMessageConverter implements CustomTagConverter {
             output.append("}");
         }
 
-        output.setInsideScript(previousInsideScript.pop());
+        output.popInsideScript();
     }
 
     @Override

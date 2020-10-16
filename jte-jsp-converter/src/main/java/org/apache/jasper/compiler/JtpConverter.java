@@ -33,8 +33,6 @@ public class JtpConverter extends Node.Visitor implements Converter {
     private String prefix;
     private String lineSeparator = "\n";
 
-    private final Deque<Boolean> trimWhitespace = new ArrayDeque<>();
-
     public JtpConverter(String relativeFilePath, byte[] input, URL resourceBase, boolean tagFile, ConverterOutput output) {
         this.relativeFilePath = relativeFilePath;
         this.input = input;
@@ -214,23 +212,9 @@ public class JtpConverter extends Node.Visitor implements Converter {
 
         JtpCustomTag tag = new JtpCustomTag(n);
 
-        pushTrimWhitespace(converter.isTrimWhitespace());
+        output.pushTrimWhitespace(converter.isTrimWhitespace());
         converter.convert(this, tag, output, () -> visitBody(n));
-        popTrimWhitespace();
-    }
-
-    private void pushTrimWhitespace(boolean trimWhitespace) {
-        this.trimWhitespace.push(trimWhitespace);
-        output.setTrimWhitespace(trimWhitespace);
-    }
-
-    private void popTrimWhitespace() {
-        this.trimWhitespace.pop();
-        if (this.trimWhitespace.isEmpty()) {
-            output.setTrimWhitespace(false);
-        } else {
-            output.setTrimWhitespace(this.trimWhitespace.peek());
-        }
+        output.popTrimWhitespace();
     }
 
     @Override

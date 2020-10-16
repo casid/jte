@@ -1,14 +1,20 @@
 package gg.jte.convert;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 public class ConverterOutput {
 
     private final StringBuilder buffer = new StringBuilder();
+    private final Deque<Boolean> trimWhitespaceStack = new ArrayDeque<>();
+    private final Deque<Boolean> insideScriptStack = new ArrayDeque<>();
+
 
     private int indentationCount = 4;
     private char indentationChar = ' ';
 
     private int skipIndent;
-    private boolean trim = false;
+    private boolean trimWhitespace = false;
     private boolean insideScript = false;
 
     public ConverterOutput append(String s) {
@@ -26,19 +32,11 @@ public class ConverterOutput {
     }
 
     public boolean isTrimWhitespace() {
-        return trim;
-    }
-
-    public void setTrimWhitespace(boolean value) {
-        trim = value;
+        return trimWhitespace;
     }
 
     public boolean isInsideScript() {
         return insideScript;
-    }
-
-    public void setInsideScript(boolean value) {
-        insideScript = value;
     }
 
     public ConverterOutput trim() {
@@ -122,6 +120,34 @@ public class ConverterOutput {
 
     public void setIndentationCount(int indentationCount) {
         this.indentationCount = indentationCount;
+    }
+
+    public void pushTrimWhitespace(boolean trimWhitespace) {
+        trimWhitespaceStack.push(trimWhitespace);
+        this.trimWhitespace = trimWhitespace;
+    }
+
+    public void popTrimWhitespace() {
+        trimWhitespaceStack.pop();
+        if (trimWhitespaceStack.isEmpty()) {
+            trimWhitespace = false;
+        } else {
+            trimWhitespace = this.trimWhitespaceStack.peek();
+        }
+    }
+
+    public void pushInsideScript(boolean insideScript) {
+        insideScriptStack.push(ConverterOutput.this.insideScript);
+        this.insideScript = insideScript;
+    }
+
+    public void popInsideScript() {
+        insideScriptStack.pop();
+        if (insideScriptStack.isEmpty()) {
+            insideScript = false;
+        } else {
+            insideScript = this.insideScriptStack.peek();
+        }
     }
 
     @Override

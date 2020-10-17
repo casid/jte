@@ -78,6 +78,16 @@ class JspExpressionConverterTest {
     }
 
     @Test
+    void gteq() {
+        assertConversion("${data.quantity >= 42}", "data.quantity >= 42");
+    }
+
+    @Test
+    void lteq() {
+        assertConversion("${data.quantity <= 42}", "data.quantity <= 42");
+    }
+
+    @Test
     void ternary() {
         assertConversion("${data.quantity == 42 ? 'Yay' : 'Nay'}", "data.quantity == 42 ? \"Yay\" : \"Nay\"");
     }

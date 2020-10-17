@@ -59,6 +59,8 @@ public class JspExpressionConverter {
             visitorMap.put(AstNegative.class, new AstNegativeVisitor());
             visitorMap.put(AstGreaterThan.class, new AstGreaterThanVisitor());
             visitorMap.put(AstLessThan.class, new AstLessThanVisitor());
+            visitorMap.put(AstGreaterThanEqual.class, new AstGreaterThanEqualVisitor());
+            visitorMap.put(AstLessThanEqual.class, new AstLessThanEqualVisitor());
             visitorMap.put(AstLiteralExpression.class, new AstLiteralExpressionVisitor());
             visitorMap.put(AstFunction.class, new AstFunctionVisitor());
             visitorMap.put(AstNull.class, new AstNullVisitor());
@@ -296,6 +298,20 @@ public class JspExpressionConverter {
         @Override
         protected String getOperator() {
             return "<";
+        }
+    }
+
+    private class AstGreaterThanEqualVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return ">=";
+        }
+    }
+
+    private class AstLessThanEqualVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return "<=";
         }
     }
 

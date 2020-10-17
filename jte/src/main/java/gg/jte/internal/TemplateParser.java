@@ -334,6 +334,10 @@ final class TemplateParser {
     }
 
     private boolean isParamOrImportAllowed() {
+        if (paramsComplete) {
+            return false;
+        }
+
         int endIndex = templateCode.lastIndexOf('@', this.i);
         for (int j = lastIndex; j < endIndex; j++) {
             char currentChar = templateCode.charAt(j);

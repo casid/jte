@@ -523,6 +523,15 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void importInCss2() {
+        givenTemplate("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
+                "xxx@if(model.hello != null)    @import url(\"${model.hello}\");\n@endif</style>");
+        thenOutputIs("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
+                "xxx    @import url(\"Hello\");\n" +
+                "</style>");
+    }
+
+    @Test
     void paramAfterText() {
         givenTemplate("Hello @param");
         thenOutputIs("Hello @param");

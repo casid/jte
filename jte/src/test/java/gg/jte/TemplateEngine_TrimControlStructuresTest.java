@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for experimental mode {@link TemplateEngine#setTrimControlStructures(boolean)}
  * Still missing before actually useful:
- * TODO write tests to ensure {@link gg.jte.html.HtmlInterceptor} works in this mode
  * TODO add parameter for maven plugin
  */
 @SuppressWarnings("SameParameterValue")
@@ -19,7 +18,7 @@ public class TemplateEngine_TrimControlStructuresTest {
     String templateName = "test/template.jte";
 
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, ContentType.Plain);
+    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, ContentType.Html);
     Map<String, Object> params = new HashMap<>();
 
     @BeforeEach
@@ -35,6 +34,14 @@ public class TemplateEngine_TrimControlStructuresTest {
     }
 
     @Test
+    void attributes() {
+        givenTemplate("@if(true)\n" +
+                "    <a href=\"${\"url\"}\" class=\"nav-item@if(true) is-active@endif\">foo</a>\n" +
+                "@endif");
+        thenOutputIs("<a href=\"url\" class=\"nav-item is-active\">foo</a>\n");
+    }
+
+    @Test
     void ifStatement() {
         givenTemplate(
                 "@if(true)\n" +
@@ -42,6 +49,12 @@ public class TemplateEngine_TrimControlStructuresTest {
                 "    it's true!\n" +
                 "@endif\n");
         thenOutputIs("Yay,\nit's true!\n");
+    }
+
+    @Test
+    void ifStatement_oneLineWithSpace() {
+        givenTemplate("@if(true) @endifYay");
+        thenOutputIs(" Yay");
     }
 
     @Test
@@ -214,6 +227,50 @@ public class TemplateEngine_TrimControlStructuresTest {
     }
 
     @Test
+    void formWithLoop() {
+        givenTemplate("@param gg.jte.TemplateEngine_HtmlInterceptorTest.Controller controller\n" +
+                "<body>\n" +
+                "   <h1>Hello</h1>\n" +
+                "\n" +
+                "   <form action=\"${controller.getUrl()}\" method=\"POST\">\n" +
+                "\n" +
+                "      <label>\n" +
+                "         Food option:\n" +
+                "         <select name=\"foodOption\">\n" +
+                "            <option value=\"\">-</option>\n" +
+                "            @for(var foodOption : controller.getFoodOptions())\n" +
+                "               <option value=\"${foodOption}\">${foodOption}</option>\n" +
+                "            @endfor\n" +
+                "         </select>\n" +
+                "      </label>\n" +
+                "\n" +
+                "      <button type=\"submit\">Submit</button>\n" +
+                "   </form>\n" +
+                "</body>");
+
+        params.put("controller", new TemplateEngine_HtmlInterceptorTest.Controller());
+
+        thenOutputIs("<body>\n" +
+                "   <h1>Hello</h1>\n" +
+                "\n" +
+                "   <form action=\"hello.htm\" method=\"POST\">\n" +
+                "\n" +
+                "      <label>\n" +
+                "         Food option:\n" +
+                "         <select name=\"foodOption\">\n" +
+                "            <option value=\"\">-</option>\n" +
+                "            <option value=\"Cheese\">Cheese</option>\n" +
+                "            <option value=\"Onion\">Onion</option>\n" +
+                "            <option value=\"Chili\">Chili</option>\n" +
+                "         </select>\n" +
+                "      </label>\n" +
+                "\n" +
+                "      <button type=\"submit\">Submit</button>\n" +
+                "   </form>\n" +
+                "</body>");
+    }
+
+    @Test
     void comment() {
         givenTemplate("@param String hello = \"hello\"\n${hello}\n<%-- comment --%>\nworld!");
         thenOutputIs("hello\nworld!");
@@ -270,16 +327,33 @@ public class TemplateEngine_TrimControlStructuresTest {
         );
         givenTemplate(
                 "@if(true)\n" +
-                "    @layout.my(@`Here is some data: ${42}`)\n" +
+                "    @layout.my(@`Here is some data: ${42} that's nice.`)\n" +
                 "@endif\n" +
                 "Next line");
 
         thenOutputIs(
                 "<div>\n" +
-                "    Here is some data: 42\n" +
+                "    Here is some data: 42 that's nice.\n" +
                 "</div>\n" +
                 "\n" +
                 "Next line");
+    }
+
+    @Test
+    void indentationsArePopped() {
+        givenTemplate(
+                "<head>\n" +
+                "    @if(true)\n" +
+                "        <span>foo</span>\n" +
+                "        foo@endif\n" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+                "</head>");
+        thenOutputIs(
+                "<head>\n" +
+                "    <span>foo</span>\n" +
+                "    foo\n" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+                "</head>");
     }
 
     private void givenTag(String name, String code) {

@@ -19,6 +19,7 @@ class Benchmark {
 
     Benchmark() {
         templateEngine = TemplateEngine.create(new ResourceCodeResolver("benchmark"), ContentType.Html);
+        templateEngine.setTrimControlStructures(true);
     }
 
     public void run() {

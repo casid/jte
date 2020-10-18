@@ -25,6 +25,7 @@ public class TemplateEngine_HtmlInterceptorTest {
         templateEngine.setHtmlTags("form", "input", "select", "option");
         templateEngine.setHtmlAttributes("class");
         templateEngine.setHtmlInterceptor(htmlInterceptor);
+        templateEngine.setTrimControlStructures(true);
     }
 
     @Test
@@ -35,7 +36,24 @@ public class TemplateEngine_HtmlInterceptorTest {
 
         templateEngine.render("page.jte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n<input name=\"__fp\" value=\"a:hello.htm, p:\"></form>");
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n<input name=\"__fp\" value=\"a:hello.htm, p:\">\n</form>");
+    }
+
+    @Test
+    void formInIf() {
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "@if(true)\n" +
+                "    <form action=\"${url}\">\n" +
+                "        <input name=\"x\"/>\n" +
+                "    </form>" +
+                "@endif");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
+                "    <input name=\"x\" value=\"?\"/>\n" +
+                "<input name=\"__fp\" value=\"a:hello.htm, p:x\">\n" +
+                "</form>");
     }
 
     @Test
@@ -51,7 +69,8 @@ public class TemplateEngine_HtmlInterceptorTest {
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"param1\" value=\"?\">\n" +
                 "<input name=\"param2\" value=\"?\">\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
+                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\">\n" +
+                "</form>");
     }
 
     @Test
@@ -65,7 +84,8 @@ public class TemplateEngine_HtmlInterceptorTest {
 
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"age\" value=\"23\">\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:age\"></form>");
+                "<input name=\"__fp\" value=\"a:hello.htm, p:age\">\n" +
+                "</form>");
     }
 
     @Test
@@ -81,7 +101,8 @@ public class TemplateEngine_HtmlInterceptorTest {
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"param1\" value=\"?\"/>\n" +
                 "<input name=\"param2\" value=\"?\"/>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
+                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\">\n" +
+                "</form>");
     }
 
     @Test
@@ -117,7 +138,8 @@ public class TemplateEngine_HtmlInterceptorTest {
                 "<option value=\"Onion\" selected>Mmmh, Onion</option>\n" +
                 "<option value=\"Chili\">Mmmh, Chili</option>\n" +
                 "</select>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:foodOption\"></form>");
+                "<input name=\"__fp\" value=\"a:hello.htm, p:foodOption\">\n" +
+                "</form>");
     }
 
     @Test
@@ -136,7 +158,8 @@ public class TemplateEngine_HtmlInterceptorTest {
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"param1\" value=\"?\"></input>\n" +
                 "<input name=\"param2\" value=\"?\"></input>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
+                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\">\n" +
+                "</form>");
     }
 
     @Test
@@ -159,26 +182,52 @@ public class TemplateEngine_HtmlInterceptorTest {
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"param1\" value=\"?\"></input>\n" +
                 "<input name=\"param2\" value=\"?\"></input>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\"></form>");
+                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\">\n" +
+                "</form>");
     }
 
     @Test
     void form() {
         dummyCodeResolver.givenCode("page.jte", "@param gg.jte.TemplateEngine_HtmlInterceptorTest.Controller controller\n"
-              + "<body>\n" + "   <h1>Hello</h1>\n" + "\n" + "   <form action=\"${controller.getUrl()}\" method=\"POST\">\n" + "\n"
-              + "      <label>\n" + "         Food option:\n" + "         <select name=\"foodOption\">\n" + "            <option value=\"\">-</option>\n"
-              + "            @for(var foodOption : controller.getFoodOptions())\n" + "               <option value=\"${foodOption}\">${foodOption}</option>\n"
-              + "            @endfor\n" + "         </select>\n" + "      </label>\n" + "\n" + "      <button type=\"submit\">Submit</button>\n"
-              + "   </form>\n" + "</body>");
+              + "<body>\n"
+              + "   <h1>Hello</h1>\n"
+              + "\n"
+              + "   <form action=\"${controller.getUrl()}\" method=\"POST\">\n"
+              + "\n"
+              + "      <label>\n"
+              + "         Food option:\n"
+              + "         <select name=\"foodOption\">\n"
+              + "            <option value=\"\">-</option>\n"
+              + "            @for(var foodOption : controller.getFoodOptions())\n"
+              + "               <option value=\"${foodOption}\">${foodOption}</option>\n"
+              + "            @endfor\n"
+              + "         </select>\n"
+              + "      </label>\n"
+              + "\n"
+              + "      <button type=\"submit\">Submit</button>\n"
+              + "   </form>\n"
+              + "</body>");
 
         templateEngine.render("page.jte", controller, output);
 
-        assertThat(output.toString()).isEqualTo("<body>\n" + "   <h1>Hello</h1>\n" + "\n" + "   <form action=\"hello.htm\" method=\"POST\" data-form=\"x\">\n"
-              + "\n" + "      <label>\n" + "         Food option:\n" + "         <select name=\"foodOption\">\n"
-              + "            <option value=\"\">-</option>\n" + "            \n" + "               <option value=\"Cheese\">Cheese</option>\n"
-              + "            \n" + "               <option value=\"Onion\">Onion</option>\n" + "            \n"
-              + "               <option value=\"Chili\">Chili</option>\n" + "            \n" + "         </select>\n" + "      </label>\n" + "\n"
-              + "      <button type=\"submit\">Submit</button>\n" + "   <input name=\"__fp\" value=\"a:hello.htm, p:foodOption\"></form>\n"
+        assertThat(output.toString()).isEqualTo("<body>\n"
+              + "   <h1>Hello</h1>\n"
+              + "\n"
+              + "   <form action=\"hello.htm\" method=\"POST\" data-form=\"x\">\n"
+              + "\n"
+              + "      <label>\n"
+              + "         Food option:\n"
+              + "         <select name=\"foodOption\">\n"
+              + "            <option value=\"\">-</option>\n"
+              + "            <option value=\"Cheese\">Cheese</option>\n"
+              + "            <option value=\"Onion\">Onion</option>\n"
+              + "            <option value=\"Chili\">Chili</option>\n"
+              + "         </select>\n"
+              + "      </label>\n"
+              + "\n"
+              + "      <button type=\"submit\">Submit</button>\n"
+              + "   <input name=\"__fp\" value=\"a:hello.htm, p:foodOption\">\n"
+              + "</form>\n"
               + "</body>");
     }
 
@@ -193,7 +242,25 @@ public class TemplateEngine_HtmlInterceptorTest {
 
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
                 "<input name=\"error\" class=\"error foo\" value=\"?\">\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:error\"></form>");
+                "<input name=\"__fp\" value=\"a:hello.htm, p:error\">\n" +
+                "</form>");
+    }
+
+    @Test
+    void errorClass_indentation() {
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "<form action=\"${url}\">\n" +
+                "@if(true)\n" +
+                "    <input name=\"error\" class=\"foo\">\n" +
+                "@endif\n" +
+                "</form>");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
+                "<input name=\"error\" class=\"error foo\" value=\"?\">\n" +
+                "<input name=\"__fp\" value=\"a:hello.htm, p:error\">\n" +
+                "</form>");
     }
 
     @SuppressWarnings("unused")
@@ -252,7 +319,7 @@ public class TemplateEngine_HtmlInterceptorTest {
         @Override
         public void onHtmlTagClosed(String name, TemplateOutput output) {
             if ("form".equals(name)) {
-                output.writeContent("<input name=\"__fp\" value=\"a:" + action + ", p:" + String.join(",", fieldNames) + "\">");
+                output.writeContent("<input name=\"__fp\" value=\"a:" + action + ", p:" + String.join(",", fieldNames) + "\">\n");
             }
         }
     }

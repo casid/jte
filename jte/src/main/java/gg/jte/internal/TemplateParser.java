@@ -21,7 +21,8 @@ final class TemplateParser {
     private final Deque<HtmlTag> htmlStack = new ArrayDeque<>();
 
     private Mode currentMode;
-    private Mode previousIndentMode;
+    private Mode previousControlStructureTrimmed;
+    private List<Mode> initialModes;
     private HtmlTag currentHtmlTag;
     private int depth;
     private boolean paramsComplete;
@@ -32,6 +33,8 @@ final class TemplateParser {
     private int endIndex;
 
     private int lastIndex = 0;
+    private int lastLineIndex = 0;
+    private int lastTrimmedIndex = -1;
 
     @SuppressWarnings("FieldCanBeLocal")
     private char previousChar7;
@@ -61,10 +64,15 @@ final class TemplateParser {
     public void setStartIndex(int startIndex) {
         this.startIndex = startIndex;
         this.lastIndex = startIndex;
+        this.lastLineIndex = startIndex;
     }
 
     public void setEndIndex(int endIndex) {
         this.endIndex = endIndex;
+    }
+
+    public void setInitialModes(List<Mode> initialModes) {
+        this.initialModes = initialModes;
     }
 
     public void setParamsComplete(boolean paramsComplete) {
@@ -86,6 +94,13 @@ final class TemplateParser {
     private void doParse(int startingDepth) {
         currentMode = Mode.Text;
         stack.push(currentMode);
+
+        if (initialModes != null) {
+            for (Mode initialMode : initialModes) {
+                push(initialMode);
+            }
+        }
+
         depth = startingDepth;
 
         for (i = startIndex; i < endIndex; ++i) {
@@ -253,7 +268,7 @@ final class TemplateParser {
                 push(Mode.ConditionElse);
 
             } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
-                extractTextPart(i - 5, null);
+                extractTextPart(i - 5, Mode.ConditionEnd);
                 lastIndex = i + 1;
 
                 pop();
@@ -279,7 +294,7 @@ final class TemplateParser {
                     push(Mode.Text);
                 }
             } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
-                extractTextPart(i - 6, null);
+                extractTextPart(i - 6, Mode.ForLoopEnd);
                 lastIndex = i + 1;
 
                 pop();
@@ -316,6 +331,7 @@ final class TemplateParser {
 
             if (currentChar == '\n' && currentMode != Mode.Content) {
                 visitor.onLineFinished();
+                lastLineIndex = i + 1;
             }
         }
 
@@ -371,7 +387,7 @@ final class TemplateParser {
     }
 
     private void extractTextPart(int endIndex, Mode mode) {
-        if (trimControlStructures && lastIndex >= 0 && endIndex >= lastIndex) {
+        if (trimControlStructures) {
             extractTextPartAndTrimControlStructures(endIndex, mode);
         } else {
             extract(templateCode, lastIndex, endIndex, visitor::onTextPart);
@@ -379,23 +395,61 @@ final class TemplateParser {
     }
 
     private void extractTextPartAndTrimControlStructures(int endIndex, Mode mode) {
-        boolean controlStructureBegin = mode == Mode.Condition || mode == Mode.ForLoop;
-        if (controlStructureBegin) {
-            pushIndent(endIndex, mode);
+        completeParamsIfRequired();
+
+        int startIndex = lastIndex;
+        if (lastTrimmedIndex != -1) {
+            if (lastTrimmedIndex > lastIndex) {
+                startIndex = lastTrimmedIndex;
+            }
+            lastTrimmedIndex = -1;
         }
 
-        StringBuilder resultText = new StringBuilder(endIndex - lastIndex);
+        if (startIndex < 0) {
+            return;
+        }
+        if (endIndex < startIndex) {
+            return;
+        }
 
+        if (LineInfo.isSingleControlStructure(templateCode, endIndex, this.endIndex, lastLineIndex, mode)) {
+            lastTrimmedIndex = templateCode.indexOf('\n', endIndex) + 1;
+            extractTrimmed(startIndex, lastLineIndex);
+            previousControlStructureTrimmed = mode;
+        } else {
+            extractTrimmed(startIndex, endIndex);
+            previousControlStructureTrimmed = null;
+        }
+
+        if (mode == Mode.Condition || mode == Mode.ForLoop) {
+            pushIndent(endIndex, mode);
+        } else if (mode == Mode.ConditionEnd || mode == Mode.ForLoopEnd) {
+            popIndent();
+        }
+    }
+
+    private void extractTrimmed(int startIndex, int endIndex) {
         int indentationsToSkip = getIndentationsToSkip();
+        if (indentationsToSkip > 0) {
+            visitor.onTextPart(depth, trimIndentations(startIndex, endIndex, indentationsToSkip));
+        } else {
+            extract(templateCode, startIndex, endIndex, visitor::onTextPart);
+        }
+    }
+
+    private String trimIndentations(int startIndex, int endIndex, int indentationsToSkip) {
+        StringBuilder resultText = new StringBuilder(endIndex - startIndex);
+
         int indentation = 0;
         int line = 0;
         boolean writeLine = false;
         boolean firstNonWhitespaceReached = false;
-        if (previousIndentMode == Mode.Code || previousIndentMode == Mode.UnsafeCode || previousIndentMode instanceof TagMode) {
+        if (previousControlStructureTrimmed == null) {
             firstNonWhitespaceReached = true;
+            writeLine = true;
         }
 
-        for (int j = lastIndex; j < endIndex; ++j) {
+        for (int j = startIndex; j < endIndex; ++j) {
             char currentChar = templateCode.charAt(j);
 
             if ((line > 0 || firstNonWhitespaceReached) && (currentChar == '\r' || currentChar == '\n')) {
@@ -428,13 +482,7 @@ final class TemplateParser {
             }
         }
 
-        extract(resultText.toString(), 0, resultText.length(), visitor::onTextPart);
-
-        if (mode == null) {
-            popIndent();
-        }
-
-        previousIndentMode = mode;
+        return resultText.toString();
     }
 
     private void pushIndent(int endIndex, Mode mode) {
@@ -574,7 +622,7 @@ final class TemplateParser {
                     currentAttribute.valueStartIndex = i + 1;
 
                     if (isHtmlAttributeIntercepted(currentAttribute.name)) {
-                        extract(templateCode, lastIndex, i + 1, visitor::onTextPart);
+                        extractTextPart(i + 1, null);
                         lastIndex = i + 1;
 
                         visitor.onInterceptHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
@@ -583,7 +631,7 @@ final class TemplateParser {
                     currentAttribute.value = templateCode.substring(currentAttribute.valueStartIndex, i);
 
                     if (currentAttribute.containsSingleOutput) {
-                        extract(templateCode, lastIndex, getLastWhitespaceIndex(currentAttribute.startIndex - 1), visitor::onTextPart);
+                        extractTextPart(getLastWhitespaceIndex(currentAttribute.startIndex - 1), Mode.Code);
                         lastIndex = i + 1;
 
                         visitor.onHtmlAttributeOutput(depth, currentHtmlTag, currentAttribute);
@@ -593,7 +641,7 @@ final class TemplateParser {
                 }
             } else if (!currentHtmlTag.attributesProcessed && previousChar0 == '/' && currentChar == '>') {
                 if (currentHtmlTag.intercepted) {
-                    extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                    extractTextPart(i - 1, null);
                     lastIndex = i - 1;
                     visitor.onInterceptHtmlTagOpened(depth, currentHtmlTag);
                 }
@@ -605,7 +653,7 @@ final class TemplateParser {
                     tagClosed = false;
                 } else {
                     if (currentHtmlTag.intercepted) {
-                        extract(templateCode, lastIndex, i, visitor::onTextPart);
+                        extractTextPart(i, null);
                         lastIndex = i;
                         visitor.onInterceptHtmlTagOpened(depth, currentHtmlTag);
                     }
@@ -619,7 +667,7 @@ final class TemplateParser {
                 if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
                     if (!currentHtmlTag.bodyIgnored) {
                         if (currentHtmlTag.intercepted) {
-                            extract(templateCode, lastIndex, i - 1, visitor::onTextPart);
+                            extractTextPart(i - 1, null);
                             lastIndex = i - 1;
                             visitor.onInterceptHtmlTagClosed(depth, currentHtmlTag);
                         }
@@ -861,7 +909,7 @@ final class TemplateParser {
         void accept(int depth, String content);
     }
 
-    private interface Mode {
+    interface Mode {
         Mode Import = new StatelessMode("Import");
         Mode Param = new StatelessMode("Param");
         Mode Text = new StatelessMode("Text");
@@ -873,14 +921,16 @@ final class TemplateParser {
         Mode JavaCodeParam = new StatelessMode("JavaCodeParam", true, false);
         Mode JavaCodeString = new StatelessMode("JavaCodeString");
         Mode ConditionElse = new StatelessMode("ConditionElse");
+        Mode ConditionEnd = new StatelessMode("ConditionEnd");
         Mode ForLoop = new StatelessMode("ForLoop");
         Mode ForLoopCode = new StatelessMode("ForLoopCode");
+        Mode ForLoopEnd = new StatelessMode("ForLoopEnd");
         Mode TagName = new StatelessMode("TagName");
         Mode Comment = new StatelessMode("Comment");
         Mode HtmlComment = new StatelessMode("HtmlComment", false, true);
         Mode CssComment = new StatelessMode("CssComment", false, true);
         Mode JsComment = new StatelessMode("JsComment", false, true);
-        Mode JsBlockComment = new StatelessMode("JsBlockComment", false, true); // TODO
+        Mode JsBlockComment = new StatelessMode("JsBlockComment", false, true);
         Mode Content = new StatelessMode("Content", false, true);
 
         boolean isJava();

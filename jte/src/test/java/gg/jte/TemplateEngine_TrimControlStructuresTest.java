@@ -10,8 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for experimental mode {@link TemplateEngine#setTrimControlStructures(boolean)}
- * Still missing before actually useful:
- * TODO add parameter for maven plugin
  */
 @SuppressWarnings("SameParameterValue")
 public class TemplateEngine_TrimControlStructuresTest {

@@ -35,6 +35,9 @@ public class GeneratorMojo extends AbstractMojo {
     public String contentType;
 
     @Parameter(readonly = true)
+    public boolean trimControlStructures;
+
+    @Parameter(readonly = true)
     public String[] htmlTags;
 
     @Parameter(readonly = true)
@@ -52,6 +55,7 @@ public class GeneratorMojo extends AbstractMojo {
         getLog().info("Generating jte templates found in " + source);
 
         TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target, ContentType.valueOf(contentType));
+        templateEngine.setTrimControlStructures(trimControlStructures);
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);
 

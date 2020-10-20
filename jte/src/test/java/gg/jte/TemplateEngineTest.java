@@ -538,6 +538,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void paramWithoutName() {
+        givenRawTemplate("@param int\n");
+        thenRenderingFailsWithException().hasMessage("Failed to compile test/template.jte, error at line 1: Missing parameter name: '@param int'");
+    }
+
+    @Test
     void layout() {
         givenLayout("main", "@param gg.jte.TemplateEngineTest.Model model\n" +
                 "@param gg.jte.Content content\n" +

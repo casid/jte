@@ -125,7 +125,7 @@ final class TemplateParser {
                 push(Mode.Param);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Param && currentChar == '\n') {
-                extract(templateCode, lastIndex, i, (depth, content) -> visitor.onParam(new ParamInfo(content.trim())));
+                extract(templateCode, lastIndex, i, (depth, content) -> visitor.onParam(new ParamInfo(content.trim(), visitor)));
                 pop();
                 lastIndex = i + 1;
             } else if (isCommentAllowed() && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {

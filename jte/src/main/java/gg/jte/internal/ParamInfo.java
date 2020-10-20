@@ -6,7 +6,7 @@ final class ParamInfo {
     final String defaultValue;
     final boolean varargs;
 
-    ParamInfo(String parameterString) {
+    ParamInfo(String parameterString, TemplateParserVisitor visitor) {
         int typeStartIndex = -1;
         int typeEndIndex = -1;
         int nameStartIndex = -1;
@@ -59,6 +59,10 @@ final class ParamInfo {
 
         if (nameEndIndex == -1) {
             nameEndIndex = parameterString.length();
+        }
+
+        if (nameStartIndex == -1) {
+            visitor.onError("Missing parameter name: '@param " + parameterString + "'");
         }
 
         this.name = parameterString.substring(nameStartIndex, nameEndIndex);

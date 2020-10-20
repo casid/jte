@@ -78,7 +78,7 @@ public class DirectoryCodeResolver implements CodeResolver {
     public void startTemplateFilesListenerBlocking(TemplateEngine templateEngine, Consumer<List<String>> onTemplatesChanged) {
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
 
-            Files.walk(root).filter(p -> Files.isDirectory(p)).forEach(p -> {
+            Files.walk(root).filter(Files::isDirectory).forEach(p -> {
                 try {
                     p.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, SensitivityWatchEventModifier.HIGH);
                 } catch (IOException e) {

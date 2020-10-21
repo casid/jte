@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import gg.jte.html.OwaspHtmlPolicy;
+import gg.jte.html.policy.PreventInlineEventHandlers;
 import gg.jte.html.policy.PreventSingleQuotedAttributes;
 import gg.jte.support.LocalizationSupport;
 import org.junit.jupiter.api.Test;
@@ -697,6 +698,18 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "'); alert('xss", output);
 
         assertThat(output.toString()).isEqualTo("\n<span onclick=\"showName('\\x27); alert(\\x27xss')\">Click me</span>");
+    }
+
+    @Test
+    void onMethods_policy() {
+        OwaspHtmlPolicy policy = new OwaspHtmlPolicy();
+        policy.addPolicy(new PreventInlineEventHandlers());
+        templateEngine.setHtmlPolicy(policy);
+        codeResolver.givenCode("template.jte", "@param String name\n\n<span onclick=\"showName('${name}')\">Click me</span>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "'); alert('xss", output));
+
+        assertThat(throwable).hasMessage("Failed to compile template.jte, error at line 3: Inline event handlers are not allowed: onclick");
     }
 
     @Test

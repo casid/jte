@@ -1,5 +1,6 @@
 package gg.jte;
 
+import gg.jte.internal.Template;
 import gg.jte.output.StringOutput;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeAll;
@@ -63,6 +64,25 @@ public class TemplateEngineTest {
         assertThat(params).hasSize(2);
         assertThat(params).containsEntry("param1", String.class);
         assertThat(params).containsEntry("param2", String.class);
+    }
+
+    @Test
+    void onDemandIsNotWorking() {
+        Throwable throwable = catchThrowable(() ->
+            TemplateEngine.create(new CodeResolver() {
+                @Override
+                public String resolve(String name) {
+                    return "hello";
+                }
+
+                @Override
+                public boolean hasChanged(String name) {
+                    return false;
+                }
+            }, ContentType.Plain)
+        );
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("TemplateCompiler could not be located. Maybe jte isn't on your classpath?");
     }
 
     private void whenTemplateIsRendered(String templateName) {

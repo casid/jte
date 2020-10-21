@@ -1058,6 +1058,12 @@ public class TemplateEngineTest {
         assertThat(catchThrowable(() -> params1.put("bar", String.class))).isInstanceOf(UnsupportedOperationException.class);
     }
 
+    @Test
+    void missingContentType() {
+        Throwable throwable = catchThrowable(() -> TemplateEngine.create(dummyCodeResolver, null));
+        assertThat(throwable).isInstanceOf(NullPointerException.class).hasMessage("Content type must be specified.");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + Constants.TAG_EXTENSION, code);
     }

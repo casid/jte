@@ -3,10 +3,13 @@ package gg.jte;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
+import java.io.Writer;
 import java.util.Collections;
 import java.util.Map;
 
+import gg.jte.html.HtmlTemplateOutput;
 import gg.jte.html.OwaspHtmlPolicy;
+import gg.jte.html.OwaspHtmlTemplateOutput;
 import gg.jte.html.policy.PreventInlineEventHandlers;
 import gg.jte.html.policy.PreventSingleQuotedAttributes;
 import gg.jte.support.LocalizationSupport;
@@ -940,6 +943,37 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     void customPolicy_null() {
         Throwable throwable = catchThrowable(() -> templateEngine.setHtmlPolicy(null));
         assertThat(throwable).isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    void customOutput() {
+        var customHtmlOutput = new HtmlTemplateOutput() {
+            String lastTagName;
+            String lastAttributeName;
+
+            @Override
+            public Writer getWriter() {
+                return output.getWriter();
+            }
+
+            @Override
+            public void writeContent(String value) {
+                output.writeContent(value);
+            }
+
+            @Override
+            public void setContext(String tagName, String attributeName) {
+                lastTagName = tagName;
+                lastAttributeName = attributeName;
+            }
+        };
+        codeResolver.givenCode("template.jte", "@param String p\n<span data-title=\"${p}\">foo</span>");
+
+        templateEngine.render("template.jte", "hello", customHtmlOutput);
+
+        assertThat(output.toString()).isEqualTo("<span data-title=\"hello\">foo</span>");
+        assertThat(customHtmlOutput.lastTagName).isEqualTo("span");
+        assertThat(customHtmlOutput.lastAttributeName).isEqualTo("data-title");
     }
 
     @Test

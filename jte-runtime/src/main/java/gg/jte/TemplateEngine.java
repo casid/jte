@@ -134,7 +134,7 @@ public final class TemplateEngine {
         try {
             template.render(checkOutput(output), htmlInterceptor, param);
         } catch (Throwable e) {
-            handleRenderException(name, template, e);
+            throw handleRenderException(name, template, e);
         }
     }
 
@@ -152,7 +152,7 @@ public final class TemplateEngine {
         try {
             template.renderMap(checkOutput(output), htmlInterceptor, params);
         } catch (Throwable e) {
-            handleRenderException(name, template, e);
+            throw handleRenderException(name, template, e);
         }
     }
 
@@ -172,7 +172,7 @@ public final class TemplateEngine {
         try {
             template.renderMap(checkOutput(output), htmlInterceptor, params);
         } catch (Throwable e) {
-            handleRenderException(name, template, e);
+            throw handleRenderException(name, template, e);
         }
     }
 
@@ -198,9 +198,9 @@ public final class TemplateEngine {
         return templateOutput;
     }
 
-    private void handleRenderException(String name, Template template, Throwable e) {
+    private TemplateException handleRenderException(String name, Template template, Throwable e) {
         if (e instanceof TemplateException) {
-            throw (TemplateException)e;
+            return (TemplateException)e;
         }
 
         DebugInfo debugInfo = templateLoader.resolveDebugInfo(template.getClassLoader(), e.getStackTrace());
@@ -208,7 +208,7 @@ public final class TemplateEngine {
         if (debugInfo != null) {
             message += ", error at " + debugInfo.name + ":" + debugInfo.line;
         }
-        throw new TemplateException(message, e);
+        return new TemplateException(message, e);
     }
 
     public List<String> getTemplatesUsing(String name) {

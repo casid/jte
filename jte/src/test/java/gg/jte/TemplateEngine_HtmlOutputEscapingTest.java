@@ -705,7 +705,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         OwaspHtmlPolicy policy = new OwaspHtmlPolicy();
         policy.addPolicy(new PreventInlineEventHandlers());
         templateEngine.setHtmlPolicy(policy);
-        codeResolver.givenCode("template.jte", "@param String name\n\n<span onclick=\"showName('${name}')\">Click me</span>");
+        codeResolver.givenCode("template.jte", "@param String name\n\n<span data-title=\"${name}\" onclick=\"showName('${name}')\">Click me</span>");
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "'); alert('xss", output));
 

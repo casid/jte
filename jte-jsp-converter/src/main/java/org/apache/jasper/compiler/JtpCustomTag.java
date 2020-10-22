@@ -1,5 +1,6 @@
 package org.apache.jasper.compiler;
 
+import gg.jte.convert.jsp.converter.JspExpressionConverter;
 import org.apache.jasper.JasperException;
 import org.xml.sax.Attributes;
 
@@ -19,6 +20,25 @@ public class JtpCustomTag {
 
     public boolean hasBody() {
         return !this.customTag.hasEmptyBody();
+    }
+
+    public void visitBody(JtpConverter converter) throws JasperException {
+        if (customTag.getBody() != null) {
+            customTag.getBody().visit(converter);
+        }
+    }
+
+    public String getBodyAsSimpleConvertedJavaCode() {
+        if (customTag.getBody().size() != 1) {
+            return null;
+        }
+
+        Node node = customTag.getBody().getNode(0);
+        if (node instanceof Node.ELExpression) {
+            return JspExpressionConverter.convertAttributeValue("${" + node.getText() + "}");
+        }
+
+        return null;
     }
 
     public JtpCustomTag parent(Predicate<JtpCustomTag> tagFilter) {

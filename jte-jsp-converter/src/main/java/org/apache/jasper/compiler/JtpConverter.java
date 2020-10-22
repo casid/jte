@@ -213,7 +213,7 @@ public class JtpConverter extends Node.Visitor implements Converter {
         JtpCustomTag tag = new JtpCustomTag(n);
 
         output.pushTrimWhitespace(converter.isTrimWhitespace());
-        converter.convert(this, tag, output, () -> visitBody(n));
+        converter.convert(this, tag, output, () -> tag.visitBody(this));
         output.popTrimWhitespace();
     }
 

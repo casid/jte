@@ -45,7 +45,7 @@ class CssClassesTest {
     }
 
     @Test
-    void addClass() {
+    void addClass_string() {
         addClass("two");
         thenOutputIs("two");
     }
@@ -62,6 +62,18 @@ class CssClassesTest {
         thenOutputIs("first mb-3");
     }
 
+    @Test
+    void condition_else() {
+        addClass(true, "yes", "no").addClass(true, "mb-3");
+        thenOutputIs("yes mb-3");
+    }
+
+    @Test
+    void condition_else2() {
+        addClass(false, "yes", "no").addClass(true, "mb-3");
+        thenOutputIs("no mb-3");
+    }
+
     private CssClasses addClass(String cssClass) {
         classes = HtmlSupport.addClass(cssClass);
         return classes;
@@ -69,6 +81,12 @@ class CssClassesTest {
 
     private CssClasses addClass(boolean condition, String cssClass) {
         classes = HtmlSupport.addClass(condition, cssClass);
+        return classes;
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private CssClasses addClass(boolean condition, String cssClass, String otherCssClass) {
+        classes = HtmlSupport.addClass(condition, cssClass, otherCssClass);
         return classes;
     }
 

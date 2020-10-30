@@ -10,6 +10,16 @@ public final class CssClasses implements Content {
 
     private List<String> cssClasses;
 
+    public CssClasses addClass(String cssClass) {
+        if (cssClass != null && !cssClass.isBlank()) {
+            if (cssClasses == null) {
+                cssClasses = new ArrayList<>();
+            }
+            cssClasses.add(cssClass);
+        }
+        return this;
+    }
+
     public CssClasses addClass(boolean condition, String cssClass) {
         if (condition) {
             addClass(cssClass);
@@ -17,12 +27,11 @@ public final class CssClasses implements Content {
         return this;
     }
 
-    public CssClasses addClass(String cssClass) {
-        if (cssClass != null && !cssClass.isBlank()) {
-            if (cssClasses == null) {
-                cssClasses = new ArrayList<>();
-            }
-            cssClasses.add(cssClass);
+    public CssClasses addClass(boolean condition, String cssClass, String otherCssClass) {
+        if (condition) {
+            addClass(cssClass);
+        } else {
+            addClass(otherCssClass);
         }
         return this;
     }

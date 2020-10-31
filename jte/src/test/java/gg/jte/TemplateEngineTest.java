@@ -37,6 +37,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void templateWithoutParameters_mrPoo() {
+        givenRawTemplate("\uD83D\uDCA9");
+        thenOutputIs("\uD83D\uDCA9");
+    }
+
+    @Test
     void templateWithoutParametersLong() {
         givenRawTemplate(".".repeat(65536));
         thenOutputIs(".".repeat(65536));

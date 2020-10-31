@@ -387,9 +387,43 @@ public class TemplateCompiler extends TemplateLoader {
                 return;
             }
 
+            final int length = textPart.length();
+            if (length < 65535 / 6) {
+                // Optimization for strings that definitely fit into a single string literal
+                writeText(depth, textPart);
+            } else {
+                int modifiedUtf8Length = 0;
+                int chunkOffset = 0;
+
+                for (int i = 0; i < length; i++) {
+                    int c = textPart.charAt(i);
+                    if (c >= 0x80 || c == 0) {
+                        modifiedUtf8Length += c >= 0x800 ? 2 : 1;
+                    }
+
+                    // low surrogate: c >= 0xdc00 && c <= 0xdfff
+                    // high surrogate: c >= 0xd800 && c <= 0xdbff
+                    if (c >= 0xd800 && c <= 0xdbff) {
+                        continue; // don't split low and high surrogates
+                    }
+
+                    if (modifiedUtf8Length + (i - chunkOffset + 1) > 65529) {
+                        writeText(depth, textPart.substring(chunkOffset, i + 1));
+                        modifiedUtf8Length = 0;
+                        chunkOffset = i + 1;
+                    }
+                }
+
+                if (chunkOffset < length) {
+                    writeText(depth, textPart.substring(chunkOffset));
+                }
+            }
+        }
+
+        private void writeText(int depth, String text) {
             writeIndentation(depth);
             javaCode.append("jteOutput.writeContent(\"");
-            appendEscaped(javaCode.getStringBuilder(), textPart);
+            appendEscaped(javaCode.getStringBuilder(), text);
             javaCode.append("\");\n");
         }
 

@@ -37,6 +37,60 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void templateWithoutParameters_mrPoo() {
+        givenRawTemplate("\uD83D\uDCA9");
+        thenOutputIs("\uD83D\uDCA9");
+    }
+
+    @Test
+    void templateWithoutParametersLong() {
+        givenRawTemplate(".".repeat(65536));
+        thenOutputIs(".".repeat(65536));
+    }
+
+    @Test
+    void templateWithoutParametersLongNull() {
+        givenRawTemplate("\u0000".repeat(65536) + "foo");
+        thenOutputIs("\u0000".repeat(65536) + "foo");
+    }
+
+    @Test
+    void templateWithoutParametersLongMultibyteOffset0() {
+        givenRawTemplate("\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("\uD83D\uDCA9".repeat(65536));
+    }
+
+    @Test
+    void templateWithoutParametersLongMultibyteOffset1() {
+        givenRawTemplate("." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("." + "\uD83D\uDCA9".repeat(65536));
+    }
+
+    @Test
+    void templateWithoutParametersLongMultibyteOffset2() {
+        givenRawTemplate(".." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs(".." + "\uD83D\uDCA9".repeat(65536));
+    }
+
+    @Test
+    void templateWithoutParametersLongMultibyteOffset3() {
+        givenRawTemplate("..." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("..." + "\uD83D\uDCA9".repeat(65536));
+    }
+
+    @Test
+    void templateWithoutParametersLongMultibyteOffset4() {
+        givenRawTemplate("...." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("...." + "\uD83D\uDCA9".repeat(65536));
+    }
+
+    @Test
+    void templateWithoutParametersLongMultibyteOffset5() {
+        givenRawTemplate("....." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("....." + "\uD83D\uDCA9".repeat(65536));
+    }
+
+    @Test
     void helloWorld_lineBreak() {
         givenTemplate("${model.hello}\nWorld");
         thenOutputIs("Hello\nWorld");

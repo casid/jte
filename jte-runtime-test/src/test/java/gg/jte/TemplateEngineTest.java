@@ -1,6 +1,5 @@
 package gg.jte;
 
-import gg.jte.internal.Template;
 import gg.jte.output.StringOutput;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeAll;

@@ -49,6 +49,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void templateWithoutParametersLongNull() {
+        givenRawTemplate("\u0000".repeat(65536) + "foo");
+        thenOutputIs("\u0000".repeat(65536) + "foo");
+    }
+
+    @Test
     void templateWithoutParametersLongMultibyteOffset0() {
         givenRawTemplate("\uD83D\uDCA9".repeat(65536));
         thenOutputIs("\uD83D\uDCA9".repeat(65536));

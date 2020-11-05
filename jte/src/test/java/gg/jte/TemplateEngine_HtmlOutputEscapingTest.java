@@ -9,7 +9,6 @@ import java.util.Map;
 
 import gg.jte.html.HtmlTemplateOutput;
 import gg.jte.html.OwaspHtmlPolicy;
-import gg.jte.html.OwaspHtmlTemplateOutput;
 import gg.jte.html.policy.PreventInlineEventHandlers;
 import gg.jte.html.policy.PreventSingleQuotedAttributes;
 import gg.jte.support.LocalizationSupport;
@@ -89,6 +88,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "John", output);
 
         assertThat(output.toString()).isEqualTo("\n<p>Hello John</p>");
+    }
+
+    @Test
+    void attributes() {
+        codeResolver.givenCode("template.jte", "@param String userName\n<div data-title=\"Hello ${userName}\"></div>");
+
+        templateEngine.render("template.jte", "\"><script>alert('xss')</script>", output);
+
+        assertThat(output.toString()).isEqualTo("<div data-title=\"Hello &#34;>&lt;script>alert(&#39;xss&#39;)&lt;/script>\"></div>");
     }
 
     @Test
@@ -696,7 +704,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void onMethods() {
-        codeResolver.givenCode("template.jte", "@param String name\n\n<span onclick=\"showName('${name}')\">Click me</span>");
+        codeResolver.givenCode("template.jte", "@param String userName\n\n<span onclick=\"showName('${userName}')\">Click me</span>");
 
         templateEngine.render("template.jte", "'); alert('xss", output);
 

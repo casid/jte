@@ -1,16 +1,16 @@
 package gg.jte.internal;
 
 public class StringUtils {
-    public static boolean startsWithIgnoringCaseAndWhitespaces(String url, String protocol) {
+    public static boolean startsWithIgnoringCaseAndWhitespaces(String string, String prefix) {
         int j = 0;
-        for (int i = 0; i < url.length() && j < protocol.length(); ++i) {
-            char c = url.charAt(i);
+        for (int i = 0; i < string.length() && j < prefix.length(); ++i) {
+            char c = string.charAt(i);
 
             if (j == 0 && Character.isWhitespace(c)) {
                 continue;
             }
 
-            char p =  protocol.charAt(j++);
+            char p =  prefix.charAt(j++);
 
             if (p != Character.toLowerCase(c)) {
                 return false;

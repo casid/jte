@@ -61,7 +61,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
             if ("script".equals(tagName)) {
                 Encode.forJavaScriptBlock(getWriter(), value);
             } else {
-                Encode.forHtml(getWriter(), value);
+                Encode.forHtmlContent(getWriter(), value);
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);

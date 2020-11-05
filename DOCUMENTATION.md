@@ -13,7 +13,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
 - [Content](#content)
 - [Hot Reloading](#hot-reloading)
 - [Precompiling Templates](#precompiling-templates)
-- [Output Escaping](#output-escaping)
+- [HTML rendering](#html-rendering)
 
 ## Rendering a template
 
@@ -357,27 +357,64 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
 </plugin>
 ```
 
-## Output Escaping
+## HTML rendering
 
 Output escaping depends on the `ContentType` the engine is created with:
-- With `ContentType.Plain` not output escaping takes place.
+- With `ContentType.Plain` there is no output escaping.
 - With `ContentType.Html`, the [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java) is used for context sensitive output escaping.
 
 In `Html` mode, user content `${}` is automatically escaped, depending what part of the template it is placed into:
+- HTML tag bodies
+- HMTL attributes
 - JavaScript attributes, e.g. `onclick`
 - `<script>` blocks
-- HMTL attributes
-- HTML tag bodies
 
-For example, if you have this template:
+### HTML tag bodies
+User output in HTML tag bodies is escaped with `org.owasp.encoder.Encode#forHtmlContent` (`org.owasp.encoder.Encode#forHtml` before jte 1.5.0).
 
-```xml
+```htm
 <div>${userName}</div>
 ```
 
-With `userName` being `<script>alert('hello');</script>`,
+With `userName` being `<script>alert('xss');</script>`,
 
-the output would be `<div>&lt;script&gt;alert(&#39;hello&#39;);&lt;/script&gt;</div>`.
+the output would be `<div>&lt;script&gt;alert('xss');&lt;/script&gt;</div>`.
+
+### HTML attributes
+User output in HTML attributes is escaped with `org.owasp.encoder.Encode#forHtmlAttribute`. It ensures that all quotes are escaped, so that an attacker cannot escape the attribute.
+
+```htm
+<div data-title="Hello ${userName}"></div>
+```
+
+With `userName` being `"><script>alert('xss')</script>`,
+
+the output would be `<div data-title="Hello &#34;>&lt;script>alert(&#39;xss&#39;)&lt;/script>"></div>`. The quote is `"` is escaped with `&#34;` and the attacker cannot escape the attribute.
+
+### JavaScript attributes
+User output in HTML attributes is escaped with `org.owasp.encoder.Encode#forJavaScriptAttribute`. Those are all HTML attributes starting with `on`.
+
+```htm
+<span onclick="showName('${userName}')">Click me</span>
+```
+
+With `userName` being `'); alert('xss`,
+
+the output would be `<span onclick="showName('\x27); alert(\x27xss')">Click me</span>`.
+
+In case you run a [strict content security policy](https://csp.withgoogle.com/docs/strict-csp.html) without `unsafe-inline`, you could configure jte to run with `gg.jte.html.policy.PreventInlineEventHandlers`. This would cause errors at compile time, if inline event handlers are used. See #20 for additional context.
+
+```java
+public class MyHtmlPolicy extends OwaspHtmlPolicy {
+    public MyHtmlPolicy() {
+        addPolicy(new PreventInlineEventHandlers());
+    }
+}
+```
+
+Then, you set it with `templateEngine.setHtmlPolicy(new MyHtmlPolicy());`.
+
+### 
 
 For more examples, you may want to check out the [TemplateEngine_HtmlOutputEscapingTest](jte/src/test/java/gg/jte/TemplateEngine_HtmlOutputEscapingTest.java).
 
@@ -385,7 +422,7 @@ For more examples, you may want to check out the [TemplateEngine_HtmlOutputEscap
 
 In rare cases you may want to skip output escaping for a certain element. You can do this by using `$unsafe{}` instead of `${}`. For instance, to trust the user name, you would write:
 
-```xml
+```htm
 <div>$unsafe{userName}</div>
 ```
 

@@ -14,6 +14,9 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
 - [Hot Reloading](#hot-reloading)
 - [Precompiling Templates](#precompiling-templates)
 - [HTML rendering](#html-rendering)
+  - [HTML tag bodies](#html-tag-bodies)
+  - [HTML attributes](#html-attributes)
+  - [JavaScript attributes](#javascript-attributes)  
 
 ## Rendering a template
 
@@ -402,7 +405,7 @@ With `userName` being `'); alert('xss`,
 
 the output would be `<span onclick="showName('\x27); alert(\x27xss')">Click me</span>`.
 
-In case you run a [strict content security policy](https://csp.withgoogle.com/docs/strict-csp.html) without `unsafe-inline`, you could configure jte to run with `gg.jte.html.policy.PreventInlineEventHandlers`. This would cause errors at compile time, if inline event handlers are used. See #20 for additional context.
+In case you run a [strict content security policy](https://csp.withgoogle.com/docs/strict-csp.html) without `unsafe-inline`, you could configure jte to run with `gg.jte.html.policy.PreventInlineEventHandlers`. This would cause errors at compile time, if inline event handlers are used. See [this issue](https://github.com/casid/jte/issues/20) for additional context.
 
 ```java
 public class MyHtmlPolicy extends OwaspHtmlPolicy {

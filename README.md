@@ -11,7 +11,7 @@
 - <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offering completion and refactoring support
 - Hot reloading of templates during development
 - Intuitive, easy to learn [syntax](DOCUMENTATION.md)
-- Blazing fast execution ([~100k renders/s](#performance) on a MacBook Pro 2015)
+- Blazing fast execution ([~100k renders/s](#performance) on a MacBook Pro 2015, [~2M renders/s](#high-concurrency) on AMD Ryzen 5950x)
 - Very small footprint (just <a href="https://github.com/OWASP/owasp-java-encoder/">one external dependency for HTML escaping</a>)
 
 ## TLDR

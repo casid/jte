@@ -120,9 +120,7 @@ This is a <a href="https://github.com/casid/template-benchmark/tree/ryzen-5950x"
 
 For this benchmark, the amount of threads was manually set `@Threads(32)`. A few interesting things to note with this level of concurrency:
 - `ConcurrentHashMap` is amazing, jte uses it for template lookups and with so much concurrency going on it really shows how fast and reliable it is.
-- Trimou had to be removed from the benchmark, it ran in deadlocks and the benchmark could not finish
 - Velocity also had concurrency problems, `java.lang.NullPointerException at org.apache.velocity.runtime.directive.Directive.postRender(Directive.java:202)`
-- Thymeleaf eventually also produced an error, so that I had to remove the result of one Fork: `Error during execution of processor 'org.thymeleaf.standard.processor.attr.StandardEachAttrProcessor' Caused by: java.lang.NullPointerException at org.thymeleaf.context.VariablesMap.get(VariablesMap.java:105)`
 - Finally, this CPU is insane! I'm genuinly impressed what AMD did there.
 
 ## Getting started

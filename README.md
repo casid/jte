@@ -105,7 +105,7 @@ The shorthand to create content blocks within jte templates is an `@`followed by
 Check out the [syntax documentation](DOCUMENTATION.md), for a more comprehensive introduction.
 
 ## Performance
-By design, jte provides very fast output. This is a <a href="https://github.com/casid/template-benchmark/">fork of mbosecke/template-benchmark</a> with jte included, running on a MacBook Pro 2015:
+By design, jte provides very fast output. This is a <a href="https://github.com/casid/template-benchmark/">fork of mbosecke/template-benchmark</a> with jte included, running on a MacBook Pro 2015 (single thread):
 
 ![alt Template Benchmark](https://raw.githubusercontent.com/casid/template-benchmark/master/results.png)
 

@@ -118,10 +118,7 @@ This is a <a href="https://github.com/casid/template-benchmark/tree/ryzen-5950x"
 
 ![alt Template Benchmark](https://raw.githubusercontent.com/casid/template-benchmark/ryzen-5950x/results.png)
 
-For this benchmark, the amount of threads was manually set `@Threads(32)`. A few interesting things to note with this level of concurrency:
-- `ConcurrentHashMap` is amazing, jte uses it for template lookups and with so much concurrency going on it really shows how fast and reliable it is.
-- Velocity also had concurrency problems, `java.lang.NullPointerException at org.apache.velocity.runtime.directive.Directive.postRender(Directive.java:202)`
-- Finally, this CPU is insane! I'm genuinly impressed what AMD did there.
+For this benchmark, the amount of threads was manually set `@Threads(32)`, to fully utilize all cores. jte has pretty much zero serialization bottlenecks and runs  very concurrent on servers with a lot of CPU cores.
 
 ## Getting started
 

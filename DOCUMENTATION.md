@@ -392,7 +392,7 @@ User output in HTML attributes is escaped with `org.owasp.encoder.Encode#forHtml
 
 With `userName` being `"><script>alert('xss')</script>`,
 
-the output would be `<div data-title="Hello &#34;>&lt;script>alert(&#39;xss&#39;)&lt;/script>"></div>`. The quote is `"` is escaped with `&#34;` and the attacker cannot escape the attribute.
+the output would be `<div data-title="Hello &#34;>&lt;script>alert(&#39;xss&#39;)&lt;/script>"></div>`. The quote `"` is escaped with `&#34;` and the attacker cannot escape the attribute.
 
 ### JavaScript attributes
 User output in HTML attributes is escaped with `org.owasp.encoder.Encode#forJavaScriptAttribute`. Those are all HTML attributes starting with `on`.

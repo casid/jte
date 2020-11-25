@@ -28,6 +28,7 @@ public class TemplateCompiler extends TemplateLoader {
     private HtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
     private String[] htmlTags;
     private String[] htmlAttributes;
+    private String [] compileArgs;
 
     public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, ContentType contentType) {
         super(classDirectory);
@@ -74,7 +75,7 @@ public class TemplateCompiler extends TemplateLoader {
             files[i++] = classDirectory.resolve(classDefinition.getJavaFileName()).toFile().getAbsolutePath();
         }
 
-        ClassFilesCompiler.compile(files, compilePath, classDirectory, templateByClassName);
+        ClassFilesCompiler.compile(files, compilePath, compileArgs, classDirectory, templateByClassName);
 
         return files.length;
     }
@@ -241,6 +242,11 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public void setHtmlAttributes(String[] htmlAttributes) {
         this.htmlAttributes = htmlAttributes;
+    }
+
+    @Override
+    public void setCompileArgs(String[] compileArgs) {
+        this.compileArgs = compileArgs;
     }
 
     private class CodeGenerator implements TemplateParserVisitor {

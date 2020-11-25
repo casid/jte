@@ -7,26 +7,28 @@ import javax.tools.ToolProvider;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class ClassFilesCompiler {
-    public static void compile(String[] files, List<String> compilePath, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
-        if (compilePath != null && !compilePath.isEmpty()) {
-            String[] args = new String[files.length + 3];
-            args[0] = "-parameters";
-            args[1] = "-classpath";
-            args[2] = String.join(File.pathSeparator, compilePath);
-            System.arraycopy(files, 0, args, 3, files.length);
+    public static void compile(String[] files, List<String> compilePath, String[] compileArgs, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
+        List<String> args = new ArrayList<>(files.length);
 
-            runCompiler(args, classDirectory, templateByClassName);
-        } else {
-            String[] args = new String[files.length + 1];
-            args[0] = "-parameters";
-            System.arraycopy(files, 0, args, 1, files.length);
-
-            runCompiler(args, classDirectory, templateByClassName);
+        if (compileArgs != null) {
+            args.addAll(Arrays.asList(compileArgs));
         }
+        args.add("-parameters");
+
+        if (compilePath != null && !compilePath.isEmpty()) {
+            args.add("-classpath");
+            args.add(String.join(File.pathSeparator, compilePath));
+        }
+
+        args.addAll(Arrays.asList(files));
+
+        runCompiler(args.toArray(new String[0]), classDirectory, templateByClassName);
     }
 
     private static void runCompiler(String[] args, Path classDirectory, Map<String, ClassInfo> templateByClassName) {

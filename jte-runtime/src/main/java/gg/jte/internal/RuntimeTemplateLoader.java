@@ -66,6 +66,11 @@ public class RuntimeTemplateLoader extends TemplateLoader {
     }
 
     @Override
+    public void setCompileArgs(String[] compileArgs) {
+        // Ignored
+    }
+
+    @Override
     public List<String> getTemplatesUsing(String name) {
         return Collections.emptyList();
     }

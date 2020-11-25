@@ -1118,6 +1118,13 @@ public class TemplateEngineTest {
         assertThat(throwable).isInstanceOf(NullPointerException.class).hasMessage("Content type must be specified.");
     }
 
+    @Test
+    void compileArgs_enablePreview() {
+        templateEngine.setCompileArgs("--enable-preview");
+        givenRawTemplate("Hello World!");
+        thenRenderingFailsWithException().hasMessageContaining("--enable-preview must be used with either -source or --release");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + Constants.TAG_EXTENSION, code);
     }

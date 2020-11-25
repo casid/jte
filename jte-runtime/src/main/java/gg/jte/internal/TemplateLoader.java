@@ -85,6 +85,8 @@ public abstract class TemplateLoader {
 
     public abstract void setHtmlAttributes(String[] htmlAttributes);
 
+    public abstract void setCompileArgs(String[] compileArgs);
+
     public abstract List<String> getTemplatesUsing(String name);
 
     public abstract void cleanAll();

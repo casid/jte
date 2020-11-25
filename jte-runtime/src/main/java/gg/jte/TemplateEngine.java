@@ -284,6 +284,14 @@ public final class TemplateEngine {
     }
 
     /**
+     * Sets additional compiler arguments for jte templates.
+     * @param compileArgs for instance templateEngine.setCompileArgs("--enable-preview", "--release", "" + Runtime.version().feature());
+     */
+    public void setCompileArgs(String ... compileArgs) {
+        templateLoader.setCompileArgs(compileArgs);
+    }
+
+    /**
      * Experimental mode, that ignores any {@link NullPointerException} that occurs in template files.
      * @param value true, to enable
      */

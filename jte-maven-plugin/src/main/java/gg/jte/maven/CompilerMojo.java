@@ -52,6 +52,9 @@ public class CompilerMojo extends AbstractMojo {
     @Parameter(readonly = true)
     public String htmlPolicyClass;
 
+    @Parameter(readonly = true)
+    public String[] compileArgs;
+
 
     @Override
     public void execute() {
@@ -70,6 +73,7 @@ public class CompilerMojo extends AbstractMojo {
         if (htmlPolicyClass != null) {
             templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass));
         }
+        templateEngine.setCompileArgs(compileArgs);
 
         int amount;
         try {

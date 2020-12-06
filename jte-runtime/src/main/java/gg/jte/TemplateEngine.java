@@ -298,7 +298,7 @@ public final class TemplateEngine {
     public TemplateEngine reloadPrecompiled(TemplateEngine precompiler) throws TemplateException {
         precompiler.precompileAll();
 
-        TemplateEngine engine = createPrecompiled(classDirectory, contentType);
+        TemplateEngine engine = createPrecompiled(precompiler.classDirectory, precompiler.contentType);
         engine.setHtmlInterceptor(htmlInterceptor);
 
         Set<String> templates = new HashSet<>(templateCache.keySet());

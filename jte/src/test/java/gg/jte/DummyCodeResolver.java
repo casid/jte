@@ -1,6 +1,8 @@
 package gg.jte;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DummyCodeResolver implements CodeResolver {
@@ -18,5 +20,10 @@ public class DummyCodeResolver implements CodeResolver {
 
     public void givenCode(String name, String code) {
         codeLookup.put(name, code);
+    }
+
+    @Override
+    public List<String> resolveAllTemplateNames() {
+        return new ArrayList<>(codeLookup.keySet());
     }
 }

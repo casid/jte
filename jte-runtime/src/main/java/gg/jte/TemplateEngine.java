@@ -7,9 +7,7 @@ import gg.jte.html.OwaspHtmlTemplateOutput;
 import gg.jte.html.HtmlInterceptor;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -26,6 +24,7 @@ public final class TemplateEngine {
     private final TemplateMode templateMode;
     private final ConcurrentMap<String, Template> templateCache;
     private final ContentType contentType;
+    private final Path classDirectory;
 
     private HtmlInterceptor htmlInterceptor;
 
@@ -97,11 +96,12 @@ public final class TemplateEngine {
         if (contentType == null) {
             throw new NullPointerException("Content type must be specified.");
         }
-        
+
         this.templateLoader = createTemplateLoader(codeResolver, classDirectory, contentType, templateMode);
         this.templateMode = templateMode;
         this.templateCache = new ConcurrentHashMap<>();
         this.contentType = contentType;
+        this.classDirectory = classDirectory;
 
         if (templateMode == TemplateMode.OnDemand) {
             cleanAll();
@@ -281,6 +281,32 @@ public final class TemplateEngine {
             }
         }
         return templateCache.computeIfAbsent(name, templateLoader::load);
+    }
+
+    /**
+     * Useful, if this engine is in precompiled mode (probably production) but you still want to be able to apply a hotfix without deployment.
+     * This template engine will be entirely unaffected by this call. Instead, a fresh template engine will be created.
+     * When this call succeeds, you can safely switch the template engine reference to the new instance. The old instance including all
+     * old templates should then be subject to garbage collection.
+     *
+     * This only works if you're running on the JDK and if templates have their own classloader.
+     *
+     * @param precompiler a template engine that is configured exactly as you usually would precompile your templates.
+     * @return a fresh template engine with a warmed up cache.
+     * @throws TemplateException in case there was a compilation error, in this case you should keep the current engine running!
+     */
+    public TemplateEngine reloadPrecompiled(TemplateEngine precompiler) throws TemplateException {
+        precompiler.precompileAll();
+
+        TemplateEngine engine = createPrecompiled(classDirectory, contentType);
+        engine.setHtmlInterceptor(htmlInterceptor);
+
+        Set<String> templates = new HashSet<>(templateCache.keySet());
+        for (String templateName : templates) {
+            engine.prepareForRendering(templateName);
+        }
+
+        return engine;
     }
 
     /**

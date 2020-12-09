@@ -25,6 +25,7 @@ public final class TemplateEngine {
     private final ConcurrentMap<String, Template> templateCache;
     private final ContentType contentType;
     private final Path classDirectory;
+    private final ClassLoader parentClassLoader;
 
     private HtmlInterceptor htmlInterceptor;
 
@@ -137,6 +138,7 @@ public final class TemplateEngine {
         this.templateCache = new ConcurrentHashMap<>();
         this.contentType = contentType;
         this.classDirectory = classDirectory;
+        this.parentClassLoader = parentClassLoader;
 
         if (templateMode == TemplateMode.OnDemand) {
             cleanAll();
@@ -333,7 +335,7 @@ public final class TemplateEngine {
     public TemplateEngine reloadPrecompiled(TemplateEngine precompiler) throws TemplateException {
         precompiler.precompileAll();
 
-        TemplateEngine engine = createPrecompiled(precompiler.classDirectory, precompiler.contentType);
+        TemplateEngine engine = createPrecompiled(precompiler.classDirectory, precompiler.contentType, parentClassLoader);
         engine.setHtmlInterceptor(htmlInterceptor);
 
         Set<String> templates = new HashSet<>(templateCache.keySet());

@@ -19,6 +19,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     private final CodeResolver codeResolver;
     private final ContentType contentType;
+    private final ClassLoader parentClassLoader;
 
     private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
@@ -30,10 +31,11 @@ public class TemplateCompiler extends TemplateLoader {
     private String[] htmlAttributes;
     private String [] compileArgs;
 
-    public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, ContentType contentType) {
+    public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, ContentType contentType, ClassLoader parentClassLoader) {
         super(classDirectory);
         this.codeResolver = codeResolver;
         this.contentType = contentType;
+        this.parentClassLoader = parentClassLoader;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     protected ClassLoader getClassLoader() {
-        return createClassLoader();
+        return createClassLoader(parentClassLoader);
     }
 
     public void cleanAll() {

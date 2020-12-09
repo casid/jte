@@ -67,9 +67,14 @@ public abstract class TemplateLoader {
 
     protected abstract ClassLoader getClassLoader();
 
-    protected ClassLoader createClassLoader() {
+    protected ClassLoader createClassLoader(ClassLoader parentClassLoader) {
         try {
-            return new URLClassLoader(new URL[]{classDirectory.toUri().toURL()});
+            URL[] urls = {classDirectory.toUri().toURL()};
+            if (parentClassLoader == null) {
+                return new URLClassLoader(urls);
+            } else {
+                return new URLClassLoader(urls, parentClassLoader);
+            }
         } catch (MalformedURLException e) {
             throw new TemplateException("Failed to create class loader for " + classDirectory, e);
         }

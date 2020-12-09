@@ -9,17 +9,17 @@ import java.util.List;
 public class RuntimeTemplateLoader extends TemplateLoader {
     private final ClassLoader singleClassLoader;
 
-    public RuntimeTemplateLoader(Path classDirectory) {
+    public RuntimeTemplateLoader(Path classDirectory, ClassLoader parentClassLoader) {
         super(classDirectory);
-        this.singleClassLoader = createClassLoader();
+        this.singleClassLoader = createClassLoader(parentClassLoader);
     }
 
     @Override
-    protected ClassLoader createClassLoader() {
+    protected ClassLoader createClassLoader(ClassLoader parentClassLoader) {
         if (classDirectory == null) {
             return Thread.currentThread().getContextClassLoader();
         }
-        return super.createClassLoader();
+        return super.createClassLoader(parentClassLoader);
     }
 
     @Override

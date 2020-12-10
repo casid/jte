@@ -355,14 +355,6 @@ public final class TemplateEngine {
     }
 
     /**
-     * Experimental mode, that ignores any {@link NullPointerException} that occurs in template files.
-     * @param value true, to enable
-     */
-    public void setNullSafeTemplateCode(boolean value) {
-        templateLoader.setNullSafeTemplateCode(value);
-    }
-
-    /**
      * Experimental mode, that trims control structures, resulting in prettier output.
      * @param value true, to enable
      */

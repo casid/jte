@@ -24,7 +24,6 @@ public class TemplateCompiler extends TemplateLoader {
     private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
-    private boolean nullSafeTemplateCode;
     private boolean trimControlStructures;
     private HtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
     private String[] htmlTags;
@@ -219,11 +218,6 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         return result;
-    }
-
-    @Override
-    public void setNullSafeTemplateCode(boolean nullSafeTemplateCode) {
-        this.nullSafeTemplateCode = nullSafeTemplateCode;
     }
 
     @Override
@@ -468,55 +462,25 @@ public class TemplateCompiler extends TemplateLoader {
 
         private void writeCodePart(int depth, String codePart) {
             writeIndentation(depth);
-            if (nullSafeTemplateCode) {
-                javaCode.append("try {\n");
-                writeIndentation(depth + 1);
-            }
+
             javaCode.append("jteOutput.writeUserContent(");
             writeJavaCodeWithContentSupport(depth, codePart);
             javaCode.append(");\n");
-            if (nullSafeTemplateCode) {
-                writeIndentation(depth);
-                javaCode.append("} catch (NullPointerException jteOutputNpe) {\n");
-                writeIndentation(depth + 1);
-                javaCode.append("gg.jte.internal.NullCheck.handleNullOutput(jteOutputNpe);\n");
-                writeIndentation(depth);
-                javaCode.append("}\n");
-            }
         }
 
         @Override
         public void onCodeStatement(int depth, String codePart) {
             writeIndentation(depth);
-            if (nullSafeTemplateCode) {
-                int index = codePart.indexOf('=');
-                if (index == -1) {
-                    javaCode.append("gg.jte.internal.NullCheck.evaluate(() -> ");
-                    javaCode.append(codePart);
-                    javaCode.append(")");
-                } else {
-                    javaCode.append(codePart, 0, index + 1);
-                    javaCode.append(" gg.jte.internal.NullCheck.evaluate(() -> ");
-                    javaCode.append(codePart, index + 2, codePart.length());
-                    javaCode.append(")");
-                }
-            } else {
-                writeJavaCodeWithContentSupport(depth, codePart);
-            }
+            writeJavaCodeWithContentSupport(depth, codePart);
             javaCode.append(";\n");
         }
 
         @Override
         public void onConditionStart(int depth, String condition) {
             writeIndentation(depth);
+
             javaCode.append("if (");
-
-            if (nullSafeTemplateCode) {
-                javaCode.append("gg.jte.internal.NullCheck.evaluate(() -> ").append(condition).append(")");
-            } else {
-                javaCode.append(condition);
-            }
-
+            javaCode.append(condition);
             javaCode.append(") {\n");
         }
 
@@ -524,13 +488,7 @@ public class TemplateCompiler extends TemplateLoader {
         public void onConditionElse(int depth, String condition) {
             writeIndentation(depth);
             javaCode.append("} else if (");
-
-            if (nullSafeTemplateCode) {
-                javaCode.append("gg.jte.internal.NullCheck.evaluate(() -> ").append(condition).append(")");
-            } else {
-                javaCode.append(condition);
-            }
-
+            javaCode.append(condition);
             javaCode.append(") {\n");
         }
 

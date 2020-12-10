@@ -82,8 +82,6 @@ public abstract class TemplateLoader {
 
     public abstract void setHtmlPolicy(HtmlPolicy htmlPolicy);
 
-    public abstract void setNullSafeTemplateCode(boolean value);
-
     public abstract void setTrimControlStructures(boolean value);
 
     public abstract void setHtmlTags(String[] htmlTags);

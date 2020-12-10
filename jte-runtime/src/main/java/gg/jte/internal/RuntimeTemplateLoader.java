@@ -41,11 +41,6 @@ public class RuntimeTemplateLoader extends TemplateLoader {
     }
 
     @Override
-    public void setNullSafeTemplateCode(boolean value) {
-        // ignored
-    }
-
-    @Override
     public void setTrimControlStructures(boolean value) {
         // ignored
     }

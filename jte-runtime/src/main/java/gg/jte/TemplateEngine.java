@@ -334,8 +334,26 @@ public final class TemplateEngine {
      */
     public TemplateEngine reloadPrecompiled(TemplateEngine precompiler) throws TemplateException {
         precompiler.precompileAll();
+        return reloadPrecompiled(precompiler.classDirectory);
+    }
 
-        TemplateEngine engine = createPrecompiled(precompiler.classDirectory, precompiler.contentType, parentClassLoader);
+    /**
+     * Useful, if this engine is in precompiled mode (probably production) but you still want to be able to apply a hotfix without deployment.
+     * This template engine will be entirely unaffected by this call. Instead, a fresh template engine will be created.
+     * When this call succeeds, you can safely switch the template engine reference to the new instance. The old instance including all
+     * old templates should then be subject to garbage collection.
+     *
+     * Basically you could recompile all templates on your build server, upload them to your production server
+     * and call this method afterwards.
+     *
+     * This only works if templates have their own classloader.
+     *
+     * @param classDirectory the class directory to load the new templates from.
+     * @return a fresh template engine with a warmed up cache.
+     * @throws TemplateException in case there was an error during class loading, in this case you should keep the current engine running!
+     */
+    public TemplateEngine reloadPrecompiled(Path classDirectory) throws TemplateException {
+        TemplateEngine engine = createPrecompiled(classDirectory, contentType, parentClassLoader);
         engine.setHtmlInterceptor(htmlInterceptor);
 
         Set<String> templates = new HashSet<>(templateCache.keySet());

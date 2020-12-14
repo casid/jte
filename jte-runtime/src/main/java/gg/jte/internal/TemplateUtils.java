@@ -8,11 +8,11 @@ import java.util.Map;
 
 @SuppressWarnings("unused") // by template code
 public final class TemplateUtils {
-    public static Map<String, Object> toMap(Object ... pairs) {
-        if (pairs.length == 0) {
-            return Collections.emptyMap();
-        }
+    public static Map<String, Object> toMap() {
+        return Collections.emptyMap();
+    }
 
+    public static Map<String, Object> toMap(Object ... pairs) {
         Map<String, Object> map = new HashMap<>(pairs.length / 2);
         for (int i = 0; i < pairs.length; i += 2) {
             map.put((String)pairs[i], pairs[i + 1]);

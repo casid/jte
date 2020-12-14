@@ -119,6 +119,16 @@ public class TemplateEngine_HtmlInterceptorTest {
     }
 
     @Test
+    void input_noAttributes() {
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "<input>");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo("<input>");
+    }
+
+    @Test
     void select() {
         dummyCodeResolver.givenCode("page.jte", "@param gg.jte.TemplateEngine_HtmlInterceptorTest.Controller controller\n" +
                 "<form action=\"${controller.getUrl()}\">\n" +
@@ -296,7 +306,7 @@ public class TemplateEngine_HtmlInterceptorTest {
                 output.writeContent(" data-form=\"x\"");
             } else if ("input".equals(name)) {
                 fieldNames.add((String)attributes.get("name"));
-                if (!attributes.containsKey("value")) {
+                if (attributes.containsKey("name") && !attributes.containsKey("value")) {
                     output.writeContent(" value=\"?\"");
                 }
             } else if ("select".equals(name)) {

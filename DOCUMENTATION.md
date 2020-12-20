@@ -111,7 +111,7 @@ In addition to if statements, jte provides the `@for` and `@endfor` keywords to 
 When looping, you may use the `ForSupport`class to gain information about the loop, such as whether you are in the first or last iteration through the loop.
 
 ```xml
-@import gg.jte.ForSupport
+@import gg.jte.support.ForSupport
 <%-- ... --%>
 @for(var entryLoop : ForSupport.of(model.entries))
     <tr class="${(entryLoop.getIndex() + 1) % 2 == 0 ? "even" : "odd"}">

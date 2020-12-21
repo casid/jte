@@ -122,7 +122,7 @@ When looping, you may use the `ForSupport`class to gain information about the lo
 
 ## Comments
 
-jte allows you to define comments in your templates. Unlike HTML comments, jte comments are not included in the output of your template:
+jte allows you to define comments in your templates. jte comments are not included in the output of your template:
 
 ```xml
 <%-- This comment will not be present in the rendered output --%>

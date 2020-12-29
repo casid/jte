@@ -50,7 +50,13 @@ public abstract class TemplateLoader {
 
     private int resolveLineNumber(ClassInfo classInfo, int lineNumber) {
         int[] javaLineToTemplateLine = classInfo.lineInfo;
-        return javaLineToTemplateLine[lineNumber - 1] + 1;
+        int lineIndex = lineNumber - 1;
+
+        if (lineIndex >= javaLineToTemplateLine.length) {
+            return 0;
+        }
+
+        return javaLineToTemplateLine[lineIndex] + 1;
     }
 
     protected TemplateType getTemplateType(String name) {

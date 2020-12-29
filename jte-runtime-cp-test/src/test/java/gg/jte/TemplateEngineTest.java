@@ -62,6 +62,12 @@ public class TemplateEngineTest {
         assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("No parameter information is available for tag/unused.jte, compile templates with -parameters flag, to use this method.");
     }
 
+    @Test
+    void paramWithWrongType() {
+        Throwable throwable = catchThrowable(() -> templateEngine.render("helloWorld.jte", Map.of("model", "string"), output));
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessageContaining("Failed to render helloWorld.jte, error at helloWorld.jte:0");
+    }
+
     private void whenTemplateIsRendered(String templateName) {
         templateEngine.render(templateName, model, output);
     }

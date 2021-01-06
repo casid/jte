@@ -289,7 +289,15 @@ if (isDeveloperEnvironment()) {
 
 ## Precompiling Templates
 
-To speed up the startup of your production server, it is possible to precompile all templates during the build. This way, the template engine can load the .class file for each template directly, without first compiling it. For security reasons you may not want to run a JDK on production - with precompiled templates this is not needed. This implies that features like hot reloading won't work either.
+To speed up startup and rendering your production server, it is possible to precompile all templates during the build. This way, the template engine can load the .class file for each template directly, without first compiling it. For security reasons you may not want to run a JDK on production - with precompiled templates this is not needed. The recommended way to setup jte, is to instantiate the engine differently, depending on when you are developing or running on a server.
+
+```java
+if (isDeveloperMachine()) {
+   // create template engine with hot reloading (a bit slower)
+} else {
+   // create template engine with precompiled templates (fastest)
+}
+```
 
 To do this, you need to create a `TemplateEngine` with the `createPrecompiled` factory method and specify where compiled template classes are located. Currently there are two options available to do this.
 

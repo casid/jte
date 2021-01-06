@@ -301,39 +301,7 @@ if (isDeveloperMachine()) {
 
 To do this, you need to create a `TemplateEngine` with the `createPrecompiled` factory method and specify where compiled template classes are located. Currently there are two options available to do this.
 
-### Using the application class loader (since 1.2.0)
-
-When using this method the precompiled templates are bundled within your application jar file.
-
-```java
-TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Html);
-```
-
-There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
-
-> It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte compiler plugin always matches your jte dependency.
-
-```xml
-<plugin>
-    <groupId>gg.jte</groupId>
-    <artifactId>jte-maven-plugin</artifactId>
-    <version>${jte.version}</version>
-    <configuration>
-        <sourceDirectory>${basedir}/src/main/jte</sourceDirectory> <!-- This is the directory where your .jte files are located. -->
-        <contentType>Html</contentType>
-    </configuration>
-    <executions>
-        <execution>
-            <phase>generate-sources</phase>
-            <goals>
-                <goal>generate</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
-```
-
-### Using a directory on your server
+### Using a directory on your server (recommended)
 
 When using this method you need to deploy the precompiled templates to your server.
 
@@ -362,6 +330,38 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
             <phase>process-classes</phase>
             <goals>
                 <goal>precompile</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+### Using the application class loader (since 1.2.0)
+
+When using this method the precompiled templates are bundled within your application jar file.
+
+```java
+TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Html);
+```
+
+There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
+
+> It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte compiler plugin always matches your jte dependency.
+
+```xml
+<plugin>
+    <groupId>gg.jte</groupId>
+    <artifactId>jte-maven-plugin</artifactId>
+    <version>${jte.version}</version>
+    <configuration>
+        <sourceDirectory>${basedir}/src/main/jte</sourceDirectory> <!-- This is the directory where your .jte files are located. -->
+        <contentType>Html</contentType>
+    </configuration>
+    <executions>
+        <execution>
+            <phase>generate-sources</phase>
+            <goals>
+                <goal>generate</goal>
             </goals>
         </execution>
     </executions>

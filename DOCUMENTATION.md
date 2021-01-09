@@ -11,6 +11,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
 - [Comments](#comments)
 - [Tags](#tags)
 - [Content](#content)
+- [Variables](#variables)
 - [Hot Reloading](#hot-reloading)
 - [Precompiling Templates](#precompiling-templates)
 - [HTML rendering](#html-rendering)
@@ -260,6 +261,19 @@ The shorthand to create content blocks within jte templates is an `@`followed by
     `
 )
 ```
+
+## Variables
+
+Local variables can be declared like this:
+
+```
+!{var innerObject = someObject.get().very().deeply().located().internal().object();}
+
+${innerObject.a()}
+${innerObject.b()}
+```
+
+Local variables translate 1:1 to Java code.
 
 ## Hot Reloading
 

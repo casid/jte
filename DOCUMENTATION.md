@@ -280,7 +280,7 @@ Local variables translate 1:1 to Java code.
 
 ## HTML Rendering
 
-For rendering HTML documents, `ContentType.Html` is highly recommended for [security](#html-escaping) but also for convinience.
+For rendering HTML documents, `ContentType.Html` is highly recommended for [security](#html-escaping) but also for convenience.
 
 ### Smart Attributes
 Expressions in HTML attributes are evaluated, so that optimal output is generated. This means attributes with a single output that evaluates to an empty string, null, or false, are not rendered. For instance:

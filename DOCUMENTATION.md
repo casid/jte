@@ -285,7 +285,15 @@ For rendering HTML documents, `ContentType.Html` is highly recommended for [secu
 ### Smart Attributes
 Expressions in HTML attributes are evaluated, so that optimal output is generated. This means attributes with a single output that evaluates to an empty string, null, or false, are not rendered. For instance:
 
-`<span data-title="${null}">Info</span>` will be rendered as `<span>Info</span>`.
+```html
+<span data-title="${null}">Info</span>
+```
+
+Will be rendered as:
+
+```html
+<span>Info</span>
+```
 
 If an HTML attribute is boolean, jte requires you to provide a boolean expression and it will omit the attribute if that expression evaluates to `false`. For example:
 

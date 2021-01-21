@@ -14,7 +14,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
 - [Variables](#variables)
 - [Hot Reloading](#hot-reloading)
 - [Precompiling Templates](#precompiling-templates)
-- [HTML rendering](#html-rendering)
+- [HTML escaping](#html-escaping)
   - [HTML tag bodies](#html-tag-bodies)
   - [HTML attributes](#html-attributes)
   - [JavaScript attributes](#javascript-attributes)  
@@ -382,7 +382,7 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
 </plugin>
 ```
 
-## HTML rendering
+## HTML escaping
 
 Output escaping depends on the `ContentType` the engine is created with:
 - With `ContentType.Plain` there is no output escaping.

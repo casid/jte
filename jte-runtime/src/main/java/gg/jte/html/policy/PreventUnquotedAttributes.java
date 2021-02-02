@@ -14,7 +14,7 @@ public class PreventUnquotedAttributes implements HtmlPolicy {
 
     @Override
     public void validateHtmlAttribute(HtmlTag htmlTag, HtmlAttribute htmlAttribute) throws HtmlPolicyException {
-        if (!htmlAttribute.isBoolean() && htmlAttribute.getQuotes() != '\"' && htmlAttribute.getQuotes() != '\'') {
+        if (!htmlAttribute.isEmpty() && htmlAttribute.getQuotes() != '\"' && htmlAttribute.getQuotes() != '\'') {
             throw new HtmlPolicyException("Unquoted HTML attribute values are not allowed: " + htmlAttribute.getName());
         }
     }

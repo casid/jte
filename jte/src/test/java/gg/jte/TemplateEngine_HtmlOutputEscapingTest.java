@@ -780,6 +780,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void forbidUnqotedAttributeValues_emptyAttribute() {
+        codeResolver.givenCode("template.jte", "<div data-test-important-content>");
+
+        templateEngine.render("template.jte", null, output);
+
+        assertThat(output.toString()).isEqualTo("<div data-test-important-content>");
+    }
+
+    @Test
     void singleQuotedAttributeValues() {
         codeResolver.givenCode("template.jte", "@param String id\n\n<span id='${id}'></span>");
 
@@ -810,6 +819,18 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "test", output);
 
         assertThat(output.toString()).isEqualTo("<input id=\"test\" required>");
+    }
+
+    @Test
+    void forbidSingleQuotedAttributeValues_empty() {
+        OwaspHtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
+        htmlPolicy.addPolicy(new PreventSingleQuotedAttributes());
+        templateEngine.setHtmlPolicy(htmlPolicy);
+        codeResolver.givenCode("template.jte", "@param String id\n<input data-webtest>");
+
+        templateEngine.render("template.jte", "test", output);
+
+        assertThat(output.toString()).isEqualTo("<input data-webtest>");
     }
 
     @Test

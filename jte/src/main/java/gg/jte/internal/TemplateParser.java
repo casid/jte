@@ -1101,6 +1101,11 @@ final class TemplateParser {
         }
 
         @Override
+        public boolean isEmpty() {
+            return quotes == 0;
+        }
+
+        @Override
         public char getQuotes() {
             return quotes;
         }

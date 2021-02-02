@@ -14,7 +14,7 @@ public class PreventSingleQuotedAttributes implements HtmlPolicy {
 
     @Override
     public void validateHtmlAttribute(HtmlTag htmlTag, HtmlAttribute htmlAttribute) throws HtmlPolicyException {
-        if (!htmlAttribute.isBoolean() && htmlAttribute.getQuotes() != '\"') {
+        if (!htmlAttribute.isEmpty() && htmlAttribute.getQuotes() != '\"') {
             throw new HtmlPolicyException("HTML attribute values must be double quoted: " + htmlAttribute.getName());
         }
     }

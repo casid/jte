@@ -479,7 +479,11 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
 
 ### Using the application class loader (since 1.2.0)
 
-When using this method the precompiled templates are bundled within your application jar file.
+When using this method the precompiled templates are bundled within your application jar file. The plugin generates `*.java` files for all jte templates during Maven's `GENERATE_SOURCES` phase. Compilation of the templates is left to the Maven Compiler plugin.
+
+While this provides you with a nice self-containing jar, it has some limitations:
+- Once the sources are generated, IntelliJ will put them on the classpath and hot reloading will not work unless the generated sources are deleted.
+- Some plugin settings are not supported, like configuring a custom HtmlPolicy class (this is because project classes are not yet compiled at the `GENERATE_SOURCES` phase).
 
 ```java
 TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Html);

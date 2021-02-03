@@ -13,7 +13,7 @@ final class LineInfo {
         }
 
         try {
-            TemplateParser templateParser = new TemplateParser(templateCode, TemplateType.Template, new TemplateSingleControlStructureVisitor(), ContentType.Plain, null, null, null, false);
+            TemplateParser templateParser = new TemplateParser(templateCode, TemplateType.Template, new TemplateSingleControlStructureVisitor(), ContentType.Plain, null, null, null, false, false);
             templateParser.setStartIndex(startLineIndex);
             templateParser.setEndIndex(endLineIndex);
             if (mode == Mode.ConditionEnd) {

@@ -61,6 +61,11 @@ public class RuntimeTemplateLoader extends TemplateLoader {
     }
 
     @Override
+    public void setHtmlCommentsPreserved(boolean htmlCommentsPreserved) {
+        // ignored
+    }
+
+    @Override
     public void setCompileArgs(String[] compileArgs) {
         // Ignored
     }

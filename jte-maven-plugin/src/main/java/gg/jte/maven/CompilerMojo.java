@@ -53,6 +53,9 @@ public class CompilerMojo extends AbstractMojo {
     public String htmlPolicyClass;
 
     @Parameter(readonly = true)
+    public boolean htmlCommentsPreserved;
+
+    @Parameter(readonly = true)
     public String[] compileArgs;
 
 
@@ -73,6 +76,7 @@ public class CompilerMojo extends AbstractMojo {
         if (htmlPolicyClass != null) {
             templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass));
         }
+        templateEngine.setHtmlCommentsPreserved(htmlCommentsPreserved);
         templateEngine.setCompileArgs(compileArgs);
 
         int amount;

@@ -94,6 +94,8 @@ public abstract class TemplateLoader {
 
     public abstract void setHtmlAttributes(String[] htmlAttributes);
 
+    public abstract void setHtmlCommentsPreserved(boolean htmlCommentsPreserved);
+
     public abstract void setCompileArgs(String[] compileArgs);
 
     public abstract List<String> getTemplatesUsing(String name);

@@ -29,6 +29,7 @@ public class TemplateCompiler extends TemplateLoader {
     private String[] htmlTags;
     private String[] htmlAttributes;
     private String [] compileArgs;
+    private boolean htmlCommentsPreserved;
 
     public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, ContentType contentType, ClassLoader parentClassLoader) {
         super(classDirectory);
@@ -115,7 +116,7 @@ public class TemplateCompiler extends TemplateLoader {
         ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
         CodeGenerator codeGenerator = new CodeGenerator(templateInfo, classDefinitions, templateDependencies);
-        new TemplateParser(code, TemplateType.Template, codeGenerator, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures).parse();
+        new TemplateParser(code, TemplateType.Template, codeGenerator, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures, htmlCommentsPreserved).parse();
 
         this.templateDependencies.put(name, templateDependencies);
 
@@ -164,7 +165,7 @@ public class TemplateCompiler extends TemplateLoader {
         classDefinitions.add(classDefinition);
 
         CodeGenerator codeGenerator = new CodeGenerator(classInfo, classDefinitions, templateDependencies);
-        new TemplateParser(code, type, codeGenerator, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures).parse();
+        new TemplateParser(code, type, codeGenerator, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures, htmlCommentsPreserved).parse();
 
         classDefinition.setCode(codeGenerator.getCode());
         templateByClassName.put(classDefinition.getName(), classInfo);
@@ -238,6 +239,11 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public void setHtmlAttributes(String[] htmlAttributes) {
         this.htmlAttributes = htmlAttributes;
+    }
+
+    @Override
+    public void setHtmlCommentsPreserved(boolean htmlCommentsPreserved) {
+        this.htmlCommentsPreserved = htmlCommentsPreserved;
     }
 
     @Override
@@ -754,7 +760,7 @@ public class TemplateCompiler extends TemplateLoader {
                 writeTemplateOutputParam();
                 javaCode.append(") {\n");
 
-                TemplateParser parser = new TemplateParser(param, TemplateType.Content, CodeGenerator.this, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures);
+                TemplateParser parser = new TemplateParser(param, TemplateType.Content, CodeGenerator.this, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures, htmlCommentsPreserved);
                 parser.setStartIndex(startIndex);
                 parser.setEndIndex(endIndex);
                 parser.setParamsComplete(true);

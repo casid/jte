@@ -442,12 +442,32 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void htmlComment_withHtmlCommentsPreserved() {
+        codeResolver.givenCode("template.jte", "@param String url\n<!-- html comment --><a href=\"${url}\">Click me!</a>");
+        templateEngine.setHtmlCommentsPreserved(true);
+
+        templateEngine.render("template.jte", "https://jte.gg", output);
+
+        assertThat(output.toString()).isEqualTo("<!-- html comment --><a href=\"https://jte.gg\">Click me!</a>");
+    }
+
+    @Test
     void htmlComment_withCode() {
         codeResolver.givenCode("template.jte", "@param String name\n\n<!--Comment here with ${name}-->\n<span>Test</span>");
 
         templateEngine.render("template.jte", "Hello", output);
 
         assertThat(output.toString()).isEqualTo("\n\n<span>Test</span>");
+    }
+
+    @Test
+    void htmlComment_withCode_withHtmlCommentsPreserved() {
+        codeResolver.givenCode("template.jte", "@param String name\n\n<!--Comment here with ${name}-->\n<span>Test</span>");
+        templateEngine.setHtmlCommentsPreserved(true);
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("\n<!--Comment here with Hello-->\n<span>Test</span>");
     }
 
     @Test
@@ -523,6 +543,16 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void jsComment_withHtmlCommentsPreserved() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>// hello\nvar x = 'hello';</script>${hello}");
+        templateEngine.setHtmlCommentsPreserved(true);
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>// hello\nvar x = 'hello';</script>Hello");
+    }
+
+    @Test
     void jsComment_onlyComment() {
         codeResolver.givenCode("template.jte", "@param String hello\n<script>// hello</script>${hello}");
 
@@ -559,6 +589,16 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void jsBlockComment_withHtmlCommentsPreserved() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>/* hello*/var x = 'hello';</script>${hello}");
+        templateEngine.setHtmlCommentsPreserved(true);
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>/* hello*/var x = 'hello';</script>Hello");
+    }
+
+    @Test
     void jsBlockComment_onlyComment() {
         codeResolver.givenCode("template.jte", "@param String hello\n<script>/* hello*/</script>${hello}");
 
@@ -592,6 +632,16 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "Hello", output);
 
         assertThat(output.toString()).isEqualTo("<style type=\"text/css\">html { height: 100%;}</style>");
+    }
+
+    @Test
+    void cssComment_withHtmlCommentsPreserved() {
+        codeResolver.givenCode("template.jte", "<style type=\"text/css\">/*This is it!*/html { height: 100%;}</style>");
+        templateEngine.setHtmlCommentsPreserved(true);
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<style type=\"text/css\">/*This is it!*/html { height: 100%;}</style>");
     }
 
     @Test

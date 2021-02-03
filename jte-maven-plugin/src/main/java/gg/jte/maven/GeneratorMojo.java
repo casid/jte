@@ -43,6 +43,9 @@ public class GeneratorMojo extends AbstractMojo {
     @Parameter(readonly = true)
     public String[] htmlAttributes;
 
+    @Parameter(readonly = true)
+    public boolean htmlCommentsPreserved;
+
 
     @Override
     public void execute() {
@@ -58,6 +61,7 @@ public class GeneratorMojo extends AbstractMojo {
         templateEngine.setTrimControlStructures(trimControlStructures);
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);
+        templateEngine.setHtmlCommentsPreserved(htmlCommentsPreserved);
 
         int amount;
         try {

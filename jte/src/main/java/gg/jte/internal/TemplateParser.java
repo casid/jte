@@ -15,6 +15,7 @@ final class TemplateParser {
     private final String[] htmlTags;
     private final String[] htmlAttributes;
     private final boolean trimControlStructures;
+    private final boolean htmlCommentsPreserved;
 
     private final Deque<Mode> stack = new ArrayDeque<>();
     private final Deque<Indent> indentStack = new ArrayDeque<>();
@@ -47,7 +48,7 @@ final class TemplateParser {
     private char previousChar0;
     private char currentChar;
 
-    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, ContentType contentType, HtmlPolicy htmlPolicy, String[] htmlTags, String[] htmlAttributes, boolean trimControlStructures) {
+    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, ContentType contentType, HtmlPolicy htmlPolicy, String[] htmlTags, String[] htmlAttributes, boolean trimControlStructures, boolean htmlCommentsPreserved) {
         this.templateCode = templateCode;
         this.type = type;
         this.visitor = visitor;
@@ -56,6 +57,7 @@ final class TemplateParser {
         this.htmlTags = htmlTags;
         this.htmlAttributes = htmlAttributes;
         this.trimControlStructures = trimControlStructures;
+        this.htmlCommentsPreserved = htmlCommentsPreserved;
 
         this.startIndex = 0;
         this.endIndex = templateCode.length();
@@ -370,7 +372,7 @@ final class TemplateParser {
         }
 
         try {
-            TemplateParser templateParser = new TemplateParser(templateCode, type, new TemplateParametersCompleteVisitor(), contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures);
+            TemplateParser templateParser = new TemplateParser(templateCode, type, new TemplateParametersCompleteVisitor(), contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures, htmlCommentsPreserved);
             templateParser.setStartIndex(startIndex);
             templateParser.parse();
         } catch (TemplateParametersCompleteVisitor.Result result) {
@@ -574,6 +576,10 @@ final class TemplateParser {
             return false;
         }
 
+        if (htmlCommentsPreserved) {
+            return false;
+        }
+
         if (currentHtmlTag == null) {
             return true;
         }
@@ -586,6 +592,10 @@ final class TemplateParser {
             return false;
         }
 
+        if (htmlCommentsPreserved) {
+            return false;
+        }
+
         if (currentHtmlTag == null) {
             return false;
         }
@@ -595,6 +605,10 @@ final class TemplateParser {
 
     private boolean isJsCommentAllowed() {
         if (contentType != ContentType.Html) {
+            return false;
+        }
+
+        if (htmlCommentsPreserved) {
             return false;
         }
 

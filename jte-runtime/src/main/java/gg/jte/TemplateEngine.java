@@ -420,4 +420,13 @@ public final class TemplateEngine {
     public void setHtmlInterceptor(HtmlInterceptor htmlInterceptor) {
         this.htmlInterceptor = htmlInterceptor;
     }
+
+    /**
+     * By default, jte omits all HMTL/CSS/JS comments, when compiling with {@link ContentType#Html}.
+     * If you don't want this behavior, you can disable it here.
+     * @param htmlCommentsPreserved true, to preserve HTML comments in templates
+     */
+    public void setHtmlCommentsPreserved(boolean htmlCommentsPreserved) {
+        templateLoader.setHtmlCommentsPreserved(htmlCommentsPreserved);
+    }
 }

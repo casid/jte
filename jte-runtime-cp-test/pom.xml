@@ -4,7 +4,7 @@
 
     <groupId>gg.jte</groupId>
     <artifactId>jte-runtime-cp-test</artifactId>
-    <version>1.5.1</version>
+    <version>1.6.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>gg.jte</groupId>
             <artifactId>jte-runtime</artifactId>
-            <version>1.5.1</version>
+            <version>1.6.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -75,7 +75,7 @@
             <plugin>
                 <groupId>gg.jte</groupId>
                 <artifactId>jte-maven-plugin</artifactId>
-                <version>1.5.1</version>
+                <version>1.6.0-SNAPSHOT</version>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/jte</sourceDirectory>
                     <contentType>Html</contentType>

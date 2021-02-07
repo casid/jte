@@ -1,8 +1,9 @@
-package gg.jte.internal;
+package gg.jte.compiler;
 
 import gg.jte.ContentType;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.html.HtmlPolicyException;
+import gg.jte.runtime.TemplateType;
 
 import java.util.*;
 

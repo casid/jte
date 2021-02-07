@@ -1,4 +1,4 @@
-package gg.jte.internal;
+package gg.jte.runtime;
 
 public class DebugInfo {
     public final String name;

@@ -1,4 +1,4 @@
-package gg.jte.internal;
+package gg.jte.runtime;
 
 import gg.jte.TemplateException;
 import gg.jte.TemplateOutput;

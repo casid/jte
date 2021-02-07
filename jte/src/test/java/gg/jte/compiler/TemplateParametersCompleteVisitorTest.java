@@ -1,4 +1,4 @@
-package gg.jte.internal;
+package gg.jte.compiler;
 
 import org.junit.jupiter.api.Test;
 

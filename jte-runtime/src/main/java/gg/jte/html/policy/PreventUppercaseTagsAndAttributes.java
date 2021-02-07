@@ -4,7 +4,7 @@ import gg.jte.html.HtmlAttribute;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.html.HtmlPolicyException;
 import gg.jte.html.HtmlTag;
-import gg.jte.internal.StringUtils;
+import gg.jte.runtime.StringUtils;
 
 public class PreventUppercaseTagsAndAttributes implements HtmlPolicy {
 

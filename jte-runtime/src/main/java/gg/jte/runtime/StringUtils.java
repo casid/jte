@@ -1,6 +1,6 @@
-package gg.jte.internal;
+package gg.jte.runtime;
 
-public class StringUtils {
+public final class StringUtils {
     public static boolean startsWithIgnoringCaseAndWhitespaces(String string, String prefix) {
         int j = 0;
         for (int i = 0; i < string.length() && j < prefix.length(); ++i) {

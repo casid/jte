@@ -2,7 +2,7 @@ package gg.jte.html;
 
 import gg.jte.Content;
 import gg.jte.TemplateOutput;
-import gg.jte.internal.StringUtils;
+import gg.jte.runtime.StringUtils;
 import gg.jte.output.StringOutput;
 import org.owasp.encoder.Encode;
 

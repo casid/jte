@@ -1,4 +1,4 @@
-package gg.jte.internal;
+package gg.jte.compiler;
 
 public final class ClassDefinition {
     private final String name;

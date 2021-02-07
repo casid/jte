@@ -1,10 +1,10 @@
 package gg.jte;
 
 import gg.jte.html.HtmlPolicy;
-import gg.jte.internal.*;
 import gg.jte.html.HtmlTemplateOutput;
 import gg.jte.html.OwaspHtmlTemplateOutput;
 import gg.jte.html.HtmlInterceptor;
+import gg.jte.runtime.*;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -150,7 +150,7 @@ public final class TemplateEngine {
             return new RuntimeTemplateLoader(classDirectory, parentClassLoader);
         } else {
             try {
-                Class<?> compilerClass = Class.forName("gg.jte.internal.TemplateCompiler");
+                Class<?> compilerClass = Class.forName("gg.jte.compiler.TemplateCompiler");
                 return (TemplateLoader)compilerClass.getConstructor(CodeResolver.class, Path.class, ContentType.class, ClassLoader.class).newInstance(codeResolver, classDirectory, contentType, parentClassLoader);
             } catch (Exception e) {
                 throw new TemplateException("TemplateCompiler could not be located. Maybe jte isn't on your classpath?", e);

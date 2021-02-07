@@ -1,13 +1,13 @@
-package gg.jte.internal;
+package gg.jte.runtime;
 
-final class ClassInfo {
-    final String name;
-    final String className;
-    final String packageName;
-    final String fullName;
-    int[] lineInfo;
+public final class ClassInfo {
+    public final String name;
+    public final String className;
+    public final String packageName;
+    public final String fullName;
+    public int[] lineInfo;
 
-    ClassInfo(String name, String parentPackage) {
+    public ClassInfo(String name, String parentPackage) {
         this.name = name;
 
         int endIndex = name.lastIndexOf('.');

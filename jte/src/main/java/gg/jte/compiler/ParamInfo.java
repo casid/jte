@@ -1,4 +1,4 @@
-package gg.jte.internal;
+package gg.jte.compiler;
 
 final class ParamInfo {
     final String type;

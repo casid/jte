@@ -3,7 +3,7 @@ package gg.jte;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import gg.jte.internal.Constants;
+import gg.jte.runtime.Constants;
 import gg.jte.output.StringOutput;
 
 import java.util.*;

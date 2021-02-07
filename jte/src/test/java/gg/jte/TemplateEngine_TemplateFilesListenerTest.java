@@ -4,7 +4,7 @@ import gg.jte.resolve.DirectoryCodeResolver;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import gg.jte.internal.IoUtils;
+import gg.jte.compiler.IoUtils;
 import gg.jte.output.FileOutput;
 import gg.jte.output.StringOutput;
 

@@ -1,5 +1,6 @@
-package gg.jte.internal;
+package gg.jte.compiler;
 
+import gg.jte.compiler.TemplateCompiler;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

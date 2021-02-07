@@ -1,10 +1,11 @@
-package gg.jte.internal;
+package gg.jte.compiler;
 
 import gg.jte.CodeResolver;
 import gg.jte.ContentType;
 import gg.jte.TemplateException;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.html.OwaspHtmlPolicy;
+import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
 
 import java.io.IOException;
@@ -565,7 +566,7 @@ public class TemplateCompiler extends TemplateLoader {
                 onConditionStart(depth, javaExpression);
                 onTextPart(depth, " " + htmlAttribute.name);
             } else {
-                onConditionStart(depth, "gg.jte.internal.TemplateUtils.isAttributeRendered(" + javaExpression + ")");
+                onConditionStart(depth, "gg.jte.runtime.TemplateUtils.isAttributeRendered(" + javaExpression + ")");
                 onTextPart(depth + 1, " " + htmlAttribute.name + "=" + htmlAttribute.quotes);
                 onHtmlTagAttributeCodePart(depth + 1, javaExpression, currentHtmlTag.name, htmlAttribute.name);
                 onTextPart(depth + 1, "" + htmlAttribute.quotes);
@@ -574,7 +575,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         private void writeAttributeMap(TemplateParser.HtmlTag htmlTag) {
-            javaCode.append("gg.jte.internal.TemplateUtils.toMap(");
+            javaCode.append("gg.jte.runtime.TemplateUtils.toMap(");
             boolean firstWritten = false;
             for (TemplateParser.HtmlAttribute attribute : htmlTag.attributes) {
                 if (attribute.value == null) {

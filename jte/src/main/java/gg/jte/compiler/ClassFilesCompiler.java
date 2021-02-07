@@ -1,6 +1,7 @@
-package gg.jte.internal;
+package gg.jte.compiler;
 
 import gg.jte.TemplateException;
+import gg.jte.runtime.ClassInfo;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;

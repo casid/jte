@@ -1,7 +1,7 @@
 package gg.jte.resolve;
 
 import gg.jte.CodeResolver;
-import gg.jte.internal.IoUtils;
+import gg.jte.compiler.IoUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

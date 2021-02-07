@@ -1,4 +1,6 @@
-package gg.jte.internal;
+package gg.jte.compiler;
+
+import gg.jte.runtime.Constants;
 
 import java.util.Arrays;
 

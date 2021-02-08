@@ -1052,7 +1052,7 @@ final class TemplateParser {
                 return true;
             }
 
-            if (currentAttribute.bool && currentAttribute.quotes == 0) {
+            if (currentAttribute.quotes == 0) {
                 return true;
             }
 

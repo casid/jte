@@ -280,6 +280,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void attributes_boolean_true_attributeBefore() {
+        codeResolver.givenCode("template.jte", "@param boolean visible\n<button data-test data-visible=\"${visible}\">Click</button>");
+
+        templateEngine.render("template.jte", true, output);
+
+        assertThat(output.toString()).isEqualTo("<button data-test data-visible=\"true\">Click</button>");
+    }
+
+    @Test
     void attributes_booleanExpression1() {
         codeResolver.givenCode("template.jte", "@param boolean visible\n<button data-visible=\"${visible == true}\" data-invisible=\"${!visible}\">Click</button>");
 

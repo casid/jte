@@ -1,6 +1,7 @@
 package gg.jte;
 
 import gg.jte.output.StringOutput;
+import gg.jte.runtime.TemplateUtils;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +53,7 @@ public class TemplateEngineTest {
 
     @Test
     void unusedTag() {
-        templateEngine.renderTag("tag/unused.jte", Map.of("param1", "One", "param2", "Two"), output);
+        templateEngine.renderTag("tag/unused.jte", TemplateUtils.toMap("param1", "One", "param2", "Two"), output);
         thenOutputIs("One is One, two is Two.");
     }
 

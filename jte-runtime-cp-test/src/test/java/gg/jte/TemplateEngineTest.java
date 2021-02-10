@@ -8,8 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import test.Model;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
@@ -65,7 +63,7 @@ public class TemplateEngineTest {
 
     @Test
     void paramWithWrongType() {
-        Throwable throwable = catchThrowable(() -> templateEngine.render("helloWorld.jte", Map.of("model", "string"), output));
+        Throwable throwable = catchThrowable(() -> templateEngine.render("helloWorld.jte", TemplateUtils.toMap("model", "string"), output));
         assertThat(throwable).isInstanceOf(TemplateException.class).hasMessageContaining("Failed to render helloWorld.jte, error at helloWorld.jte:0");
     }
 

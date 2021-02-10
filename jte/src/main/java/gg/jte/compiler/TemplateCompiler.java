@@ -41,7 +41,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public Template load(String name) {
-        precompile(List.of(name), null);
+        precompile(Collections.singletonList(name), null);
         return super.load(name);
     }
 

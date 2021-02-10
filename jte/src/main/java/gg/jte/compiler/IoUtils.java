@@ -1,7 +1,6 @@
 package gg.jte.compiler;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -15,7 +14,7 @@ public final class IoUtils {
         while ((length = inputStream.read(buffer)) != -1) {
             result.write(buffer, 0, length);
         }
-        return result.toString(StandardCharsets.UTF_8);
+        return result.toString("UTF-8");
     }
 
     public static void deleteDirectoryContent(Path directory) {

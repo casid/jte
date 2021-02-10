@@ -236,7 +236,7 @@ public class TemplateEngine_TrimControlStructuresTest {
                 "         Food option:\n" +
                 "         <select name=\"foodOption\">\n" +
                 "            <option value=\"\">-</option>\n" +
-                "            @for(var foodOption : controller.getFoodOptions())\n" +
+                "            @for(String foodOption : controller.getFoodOptions())\n" +
                 "               <option value=\"${foodOption}\">${foodOption}</option>\n" +
                 "            @endfor\n" +
                 "         </select>\n" +
@@ -283,8 +283,8 @@ public class TemplateEngine_TrimControlStructuresTest {
     @Test
     void variable() {
         givenTemplate(
-                "!{var x = 1;}\n" +
-                "!{var y = 2;}\n" +
+                "!{int x = 1;}\n" +
+                "!{int y = 2;}\n" +
                 "${x + y}\n" +
                 "done..\n"
         );
@@ -294,8 +294,8 @@ public class TemplateEngine_TrimControlStructuresTest {
     @Test
     void variable_unsafe() {
         givenTemplate(
-                "!{var x = 1;}\n" +
-                "!{var y = 2;}\n" +
+                "!{int x = 1;}\n" +
+                "!{int y = 2;}\n" +
                 "$unsafe{x + y}\n" +
                 "done..\n"
         );

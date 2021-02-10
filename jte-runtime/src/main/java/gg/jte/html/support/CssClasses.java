@@ -2,6 +2,7 @@ package gg.jte.html.support;
 
 import gg.jte.Content;
 import gg.jte.TemplateOutput;
+import gg.jte.runtime.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public final class CssClasses implements Content {
     private List<String> cssClasses;
 
     public CssClasses addClass(String cssClass) {
-        if (cssClass != null && !cssClass.isBlank()) {
+        if (!StringUtils.isBlank(cssClass)) {
             if (cssClasses == null) {
                 cssClasses = new ArrayList<>();
             }

@@ -1,5 +1,6 @@
 @import gg.jte.Content
 @import gg.jte.benchmark.Page
+@import gg.jte.benchmark.MenuItem
 
 @param Page page
 @param Content content
@@ -17,7 +18,7 @@
 
 <body>
     <div class="menu">
-        @for (var menuItem : page.getMenu())
+        @for (MenuItem menuItem : page.getMenu())
             <a href="${menuItem.url}">${menuItem.name}</a>
         @endfor
     </div>

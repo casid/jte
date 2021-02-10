@@ -1,5 +1,6 @@
 package gg.jte.compiler;
 
+import gg.jte.runtime.StringUtils;
 import gg.jte.runtime.TemplateType;
 
 import java.util.List;
@@ -24,7 +25,7 @@ class TemplateSingleControlStructureVisitor implements TemplateParserVisitor {
 
     @Override
     public void onTextPart(int depth, String textPart) {
-        if (!textPart.isBlank()) {
+        if (!StringUtils.isBlank(textPart)) {
             throw new NotSingleControlStructure();
         }
     }

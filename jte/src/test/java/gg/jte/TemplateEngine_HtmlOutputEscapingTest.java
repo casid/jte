@@ -5,12 +5,14 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.io.Writer;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import gg.jte.html.HtmlTemplateOutput;
 import gg.jte.html.OwaspHtmlPolicy;
 import gg.jte.html.policy.PreventInlineEventHandlers;
 import gg.jte.html.policy.PreventSingleQuotedAttributes;
+import gg.jte.runtime.TemplateUtils;
 import gg.jte.support.LocalizationSupport;
 import org.junit.jupiter.api.Test;
 import gg.jte.output.StringOutput;
@@ -31,7 +33,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String title\n" +
                 "Look at <a href=\"${url}\">${title}</a>");
 
-        templateEngine.render("template.jte", Map.of("url", "https://www.test.com?param1=1&param2=2", "title", "<script>alert('hello');</script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("url", "https://www.test.com?param1=1&param2=2", "title", "<script>alert('hello');</script>"), output);
 
         assertThat(output.toString()).isEqualTo("Look at <a href=\"https://www.test.com?param1=1&amp;param2=2\">&lt;script&gt;alert('hello');&lt;/script&gt;</a>");
     }
@@ -544,7 +546,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void htmlComment_ignoredIfInJavaPart2() {
-        codeResolver.givenCode("template.jte", "@param String name\n<span>!{var x = \"<!--this is not a comment \" + name + \"-->\";}${x}</span>");
+        codeResolver.givenCode("template.jte", "@param String name\n<span>!{String x = \"<!--this is not a comment \" + name + \"-->\";}${x}</span>");
 
         templateEngine.render("template.jte", "Hello", output);
 
@@ -959,7 +961,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     void contentBlockInAttribute() {
         codeResolver.givenCode("template.jte", "@param gg.jte.Content content = @`This is \"the way\"!`\n<span data-title=\"${content}\">Info</span>");
 
-        templateEngine.render("template.jte", Map.of(), output);
+        templateEngine.render("template.jte", new HashMap<>(), output);
 
         assertThat(output.toString()).isEqualTo("<span data-title=\"This is &#34;the way&#34;!\">Info</span>");
     }
@@ -968,7 +970,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     void contentBlockInAttribute2() {
         codeResolver.givenCode("template.jte", "@param gg.jte.Content content = @`This is <b>the way</b>!`\n<span data-title=\"${content}\" foo=\"bar\">${content}</span>");
 
-        templateEngine.render("template.jte", Map.of(), output);
+        templateEngine.render("template.jte", new HashMap<>(), output);
 
         assertThat(output.toString()).isEqualTo("<span data-title=\"This is &lt;b>the way&lt;/b>!\" foo=\"bar\">This is <b>the way</b>!</span>");
     }
@@ -977,10 +979,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     void contentBlockInAttribute3() {
         codeResolver.givenCode("template.jte",
                 "@param String url\n" +
-                "!{var content = @`<a href=\"${url}\" class=\"foo\">Hello</a>`;}\n" +
+                "!{gg.jte.Content content = @`<a href=\"${url}\" class=\"foo\">Hello</a>`;}\n" +
                 "${content}");
 
-        templateEngine.render("template.jte", Map.of("url", "https://jte.gg"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("url", "https://jte.gg"), output);
 
         assertThat(output.toString()).isEqualTo("\n<a href=\"https://jte.gg\" class=\"foo\">Hello</a>");
     }
@@ -989,10 +991,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     void contentBlockInAttribute4() {
         codeResolver.givenCode("template.jte",
                 "@param String url\n" +
-                        "!{var content = @`<a href=\"${url}\" class=\"foo\">Hello</a>`;}\n" +
+                        "!{gg.jte.Content content = @`<a href=\"${url}\" class=\"foo\">Hello</a>`;}\n" +
                         "<span data-content=\"${content}\">${content}</span>");
 
-        templateEngine.render("template.jte", Map.of("url", "https://jte.gg"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("url", "https://jte.gg"), output);
 
         assertThat(output.toString()).isEqualTo("\n" +
                 "<span data-content=\"&lt;a href=&#34;https://jte.gg&#34; class=&#34;foo&#34;>Hello&lt;/a>\"><a href=\"https://jte.gg\" class=\"foo\">Hello</a></span>");
@@ -1044,7 +1046,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void customOutput() {
-        var customHtmlOutput = new HtmlTemplateOutput() {
+        class CustomHtmlTemplateOutput implements HtmlTemplateOutput {
             String lastTagName;
             String lastAttributeName;
 
@@ -1063,7 +1065,9 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 lastTagName = tagName;
                 lastAttributeName = attributeName;
             }
-        };
+        }
+
+        CustomHtmlTemplateOutput customHtmlOutput = new CustomHtmlTemplateOutput();
         codeResolver.givenCode("template.jte", "@param String p\n<span data-title=\"${p}\">foo</span>");
 
         templateEngine.render("template.jte", "hello", customHtmlOutput);
@@ -1129,7 +1133,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String param\n" +
                 "<span>${localizer.localize(\"one-param\", param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: &lt;script&gt;evil()&lt;/script&gt;.</span>");
     }
@@ -1140,7 +1144,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String param\n" +
                 "<span>${localizer.localize(\"one-param-html\", param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>&lt;script&gt;evil()&lt;/script&gt;</b>. Including HTML in key!</span>");
     }
@@ -1151,7 +1155,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String param\n" +
                 "<span>${localizer.localize(\"one-param-html\", localizer.localize(\"one-param-html\", param))}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>This is a key with user content: <b>&lt;script&gt;evil()&lt;/script&gt;</b>. Including HTML in key!</b>. Including HTML in key!</span>");
     }
@@ -1161,7 +1165,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span data-title=\"${localizer.localize(\"quotes\")}\"></span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer), output);
 
         assertThat(output.toString()).isEqualTo("<span data-title=\"This is a key with &#34;quotes&#34;\"></span>");
     }
@@ -1174,7 +1178,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String p3\n" +
                 "<span data-title=\"${localizer.localize(\"quotes-params\", p1, p2, p3)}\"></span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "p1", "<script>evil()</script>", "p2", "p2", "p3", "p3"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "p1", "<script>evil()</script>", "p2", "p2", "p3", "p3"), output);
 
         assertThat(output.toString()).isEqualTo("<span data-title=\"This is a key with &#34;quotes&#34; and params &lt;i>&#34;&lt;script>evil()&lt;/script>&#34;&lt;/i>, &lt;b>&#34;p2&#34;&lt;/b>, &#34;p3&#34;...\"></span>");
     }
@@ -1185,7 +1189,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\")}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello <i>{0}</i>, <b>{1}</b>, {2}</span>");
     }
@@ -1196,7 +1200,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\")}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "p1", true, "p2", 1, "p3", 2), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "p1", true, "p2", 1, "p3", 2), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello <i>{0}</i>, <b>{1}</b>, {2}</span>");
     }
@@ -1207,7 +1211,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\", param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello <i>&lt;script&gt;evil()&lt;/script&gt;</i>, <b></b>, </span>");
     }
@@ -1218,7 +1222,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String param\n" +
                 "<span>${localizer.localize(\"many-params-html\", param, param, param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello <i>&lt;script&gt;evil()&lt;/script&gt;</i>, <b>&lt;script&gt;evil()&lt;/script&gt;</b>, &lt;script&gt;evil()&lt;/script&gt;</span>");
     }
@@ -1229,7 +1233,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String param\n" +
                 "<span>${localizer.localize(\"bad-pattern\", param)}</span>");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "param", "<script>evil()</script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello {foo}</span>");
     }
@@ -1270,7 +1274,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param gg.jte.ContentType contentType\n" +
                 "<span alt=\"${localizer.localize(\"enum\", contentType)}\">${localizer.localize(\"enum\", contentType)}</span> Unsafe: $unsafe{localizer.localize(\"enum\", contentType)}");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "contentType", ContentType.Html), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "contentType", ContentType.Html), output);
 
         assertThat(output.toString()).isEqualTo("<span alt=\"Content type is: Html\">Content type is: Html</span> Unsafe: Content type is: Html");
     }
@@ -1283,7 +1287,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String name\n" +
                 "@tag.card(content = @`<b>${localizer.localize(\"one-param\", name)}</b>`)");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span><b>This is a key with user content: &lt;script&gt;.</b></span>");
     }
@@ -1296,7 +1300,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String name\n" +
                 "@tag.card(content = localizer.localize(\"one-param\", name))");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: &lt;script&gt;.</span>");
     }
@@ -1309,7 +1313,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String name\n" +
                 "@tag.card(content = localizer.localize(\"one-param\", @`<b>${name}</b>`))");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>&lt;script&gt;</b>.</span>");
     }
@@ -1322,7 +1326,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "@param String name\n" +
                 "@tag.card(content = localizer.localize(\"many-params-html\", @`<span>${name}</span>`, @`<span>${name}</span>`, @`<span>${name}</span>`))");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello <i><span>&lt;script&gt;</span></i>, <b><span>&lt;script&gt;</span></b>, <span>&lt;script&gt;</span></span>");
     }
@@ -1337,7 +1341,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                     "${localizer.localize(\"one-param-html\", @`<i>${name}</i>`)}" +
                 "</b>`))");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>This is a key with user content: <b><i>&lt;script&gt;</i></b>. Including HTML in key!</b>.</span>");
     }
@@ -1352,7 +1356,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                     "@tag.card(content = localizer.localize(\"one-param-html\", @`<i>${name}</i>`))" +
                 "</b>`))");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b><span>This is a key with user content: <b><i>&lt;script&gt;</i></b>. Including HTML in key!</span></b>.</span>");
     }
@@ -1363,12 +1367,12 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String name\n" +
-                "!{var content = localizer.localize(\"one-param\", @`<b>" +
+                "!{gg.jte.Content content = localizer.localize(\"one-param\", @`<b>" +
                 "${localizer.localize(\"one-param-html\", @`<i>${name}</i>`)}" +
                 "</b>`);}" +
                 "@tag.card(content = content)");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>This is a key with user content: <b>This is a key with user content: <b><i>&lt;script&gt;</i></b>. Including HTML in key!</b>.</span>");
     }
@@ -1379,14 +1383,14 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.jte", "@tag.card()");
 
-        templateEngine.render("template.jte", Map.of("localizer", localizer, "name", "<script>"), output);
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
         assertThat(output.toString()).isEqualTo("<span>My default is 42</span>");
     }
 
     @SuppressWarnings("unused")
     public static class MyLocalizer implements LocalizationSupport {
-        Map<String, String> resources = Map.of(
+        Map<String, Object> resources = TemplateUtils.toMap(
                 "no-params", "This is a key without params",
                 "no-params-html", "This is a key without params but with <b>html content</b>",
                 "one-param", "This is a key with user content: {0}.",
@@ -1401,7 +1405,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         @Override
         public String lookup(String key) {
-            return resources.get(key);
+            return (String)resources.get(key);
         }
     }
 }

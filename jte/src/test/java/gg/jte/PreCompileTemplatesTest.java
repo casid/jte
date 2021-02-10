@@ -9,7 +9,7 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PreCompileTemplatesTest {
     @Test
     void precompileAll() {
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Path.of("src/test/resources/benchmark")), Path.of("jte-classes"), ContentType.Plain);
+        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Paths.get("src/test/resources/benchmark")), Paths.get("jte-classes"), ContentType.Plain);
         templateEngine.cleanAll();
         int amount = templateEngine.precompileAll();
 
@@ -31,17 +31,21 @@ public class PreCompileTemplatesTest {
 
     @Test
     void precompileAll_externalClassLoader() {
+        if (TestUtils.isLegacyJavaVersion()) {
+            return;
+        }
+
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             ClassLoader externalClassLoader = new URLClassLoader(new URL[] {contextClassLoader.getResource("external/external.jar")});
             Thread.currentThread().setContextClassLoader(externalClassLoader);
 
-            TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Path.of("src/test/resources/external")), Path.of("jte-classes"), ContentType.Plain);
+            TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Paths.get("src/test/resources/external")), Paths.get("jte-classes"), ContentType.Plain);
             templateEngine.cleanAll();
             templateEngine.precompileAll(getCompilePath("src/test/resources/external/external.jar"));
 
-            assertThat(Files.exists(Path.of("jte-classes", "gg", "jte", "generated", "JteexternalGenerated.java"))).isTrue();
-            assertThat(Files.exists(Path.of("jte-classes", "gg", "jte", "generated", "JteexternalGenerated.class"))).isTrue();
+            assertThat(Files.exists(Paths.get("jte-classes", "gg", "jte", "generated", "JteexternalGenerated.java"))).isTrue();
+            assertThat(Files.exists(Paths.get("jte-classes", "gg", "jte", "generated", "JteexternalGenerated.class"))).isTrue();
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }

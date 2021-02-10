@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +14,7 @@ public class TemplateEngine_ParentClassLoaderTest {
     String templateName = "test/template.jte";
 
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, Path.of("jte-classes"), ContentType.Plain, new URLClassLoader(new URL[0]));
+    TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, Paths.get("jte-classes"), ContentType.Plain, new URLClassLoader(new URL[0]));
 
 
     @Test

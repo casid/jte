@@ -6,6 +6,7 @@ import gg.jte.CodeResolver;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,7 +29,7 @@ public class DirectoryCodeResolver implements CodeResolver {
         try {
             Path file = root.resolve(name);
             modificationTimes.put(name, getLastModified(file));
-            return Files.readString(file);
+            return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

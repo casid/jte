@@ -5,13 +5,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TemplateEngine_PrecompiledReloadableTest {
 
     DummyCodeResolver codeResolver = new DummyCodeResolver();
-    Path classDirectory = Path.of("jte-classes");
+    Path classDirectory = Paths.get("jte-classes");
     ContentType contentType = ContentType.Html;
 
     TemplateEngine precompiler;

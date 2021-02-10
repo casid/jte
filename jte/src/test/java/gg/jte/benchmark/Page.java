@@ -1,11 +1,12 @@
 package gg.jte.benchmark;
 
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class Page {
     private final int visits;
 
-    private static final List<MenuItem> MENU = List.of(
+    private static final List<MenuItem> MENU = Arrays.asList(
             new MenuItem("Home", "home.html"),
             new MenuItem("News", "news.html"),
             new MenuItem("About", "about.html")

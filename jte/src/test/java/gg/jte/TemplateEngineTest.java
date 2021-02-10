@@ -44,50 +44,50 @@ public class TemplateEngineTest {
 
     @Test
     void templateWithoutParametersLong() {
-        givenRawTemplate(".".repeat(65536));
-        thenOutputIs(".".repeat(65536));
+        givenRawTemplate(TestUtils.repeat(".", 65536));
+        thenOutputIs(TestUtils.repeat(".", 65536));
     }
 
     @Test
     void templateWithoutParametersLongNull() {
-        givenRawTemplate("\u0000".repeat(65536) + "foo");
-        thenOutputIs("\u0000".repeat(65536) + "foo");
+        givenRawTemplate(TestUtils.repeat("\u0000", 65536) + "foo");
+        thenOutputIs(TestUtils.repeat("\u0000", 65536) + "foo");
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset0() {
-        givenRawTemplate("\uD83D\uDCA9".repeat(65536));
-        thenOutputIs("\uD83D\uDCA9".repeat(65536));
+        givenRawTemplate(TestUtils.repeat("\uD83D\uDCA9", 65536));
+        thenOutputIs(TestUtils.repeat("\uD83D\uDCA9", 65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset1() {
-        givenRawTemplate("." + "\uD83D\uDCA9".repeat(65536));
-        thenOutputIs("." + "\uD83D\uDCA9".repeat(65536));
+        givenRawTemplate("." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        thenOutputIs("." + TestUtils.repeat("\uD83D\uDCA9", 65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset2() {
-        givenRawTemplate(".." + "\uD83D\uDCA9".repeat(65536));
-        thenOutputIs(".." + "\uD83D\uDCA9".repeat(65536));
+        givenRawTemplate(".." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        thenOutputIs(".." + TestUtils.repeat("\uD83D\uDCA9", 65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset3() {
-        givenRawTemplate("..." + "\uD83D\uDCA9".repeat(65536));
-        thenOutputIs("..." + "\uD83D\uDCA9".repeat(65536));
+        givenRawTemplate("..." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        thenOutputIs("..." + TestUtils.repeat("\uD83D\uDCA9", 65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset4() {
-        givenRawTemplate("...." + "\uD83D\uDCA9".repeat(65536));
-        thenOutputIs("...." + "\uD83D\uDCA9".repeat(65536));
+        givenRawTemplate("...." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        thenOutputIs("...." + TestUtils.repeat("\uD83D\uDCA9", 65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset5() {
-        givenRawTemplate("....." + "\uD83D\uDCA9".repeat(65536));
-        thenOutputIs("....." + "\uD83D\uDCA9".repeat(65536));
+        givenRawTemplate("....." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        thenOutputIs("....." + TestUtils.repeat("\uD83D\uDCA9", 65536));
     }
 
     @Test
@@ -250,7 +250,7 @@ public class TemplateEngineTest {
     void loopWithVariable() {
         model.array = new int[]{1, 2, 3};
         givenTemplate("@for (int i : model.array)" +
-                "!{var y = i + 1}" +
+                "!{int y = i + 1}" +
                 "${y}" +
                 "@endfor");
         thenOutputIs("234");
@@ -286,7 +286,7 @@ public class TemplateEngineTest {
 
     @Test
     void variableInContentBlock() {
-        givenTemplate("${@`!{var x = 5;}${x}`}");
+        givenTemplate("${@`!{int x = 5;}${x}`}");
         thenOutputIs("5");
     }
 
@@ -305,6 +305,16 @@ public class TemplateEngineTest {
     @Test
     void variable() {
         givenTemplate("!{int y = 50}${y}");
+        thenOutputIs("50");
+    }
+
+    @Test
+    void variable_modern() {
+        if (TestUtils.isLegacyJavaVersion()) {
+            return;
+        }
+
+        givenTemplate("!{var y = 50}${y}");
         thenOutputIs("50");
     }
 
@@ -352,7 +362,7 @@ public class TemplateEngineTest {
         givenTag("entry", "@param java.util.Map.Entry<String, java.util.List<String>> entry\n" +
                 "${entry.getKey()}: ${entry.getValue().toString()}");
         givenRawTemplate("@param java.util.Map<String, java.util.List<String>> map\n" +
-                "@for(var entry : map.entrySet())@tag.entry(entry)\n@endfor");
+                "@for(java.util.Map.Entry entry : map.entrySet())@tag.entry(entry)\n@endfor");
 
         Map<String, List<String>> model = new TreeMap<>();
         model.put("one", Arrays.asList("1", "2"));
@@ -1002,6 +1012,10 @@ public class TemplateEngineTest {
 
     @Test
     void compileArgs_enablePreview() {
+        if (TestUtils.isLegacyJavaVersion()) {
+            return;
+        }
+
         templateEngine.setCompileArgs("--enable-preview");
         givenRawTemplate("Hello World!");
         thenRenderingFailsWithException().hasMessageContaining("--enable-preview must be used with either -source or --release");

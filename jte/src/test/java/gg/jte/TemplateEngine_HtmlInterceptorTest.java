@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import gg.jte.output.StringOutput;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -133,7 +134,7 @@ public class TemplateEngine_HtmlInterceptorTest {
         dummyCodeResolver.givenCode("page.jte", "@param gg.jte.TemplateEngine_HtmlInterceptorTest.Controller controller\n" +
                 "<form action=\"${controller.getUrl()}\">\n" +
                 "<select name=\"foodOption\">\n" +
-                "@for(var foodOption : controller.getFoodOptions())" +
+                "@for(String foodOption : controller.getFoodOptions())" +
                 "<option value=\"${foodOption}\">Mmmh, ${foodOption}</option>\n" +
                 "@endfor" +
                 "</select>\n" +
@@ -208,7 +209,7 @@ public class TemplateEngine_HtmlInterceptorTest {
               + "         Food option:\n"
               + "         <select name=\"foodOption\">\n"
               + "            <option value=\"\">-</option>\n"
-              + "            @for(var foodOption : controller.getFoodOptions())\n"
+              + "            @for(String foodOption : controller.getFoodOptions())\n"
               + "               <option value=\"${foodOption}\">${foodOption}</option>\n"
               + "            @endfor\n"
               + "         </select>\n"
@@ -290,7 +291,7 @@ public class TemplateEngine_HtmlInterceptorTest {
         }
 
         public List<String> getFoodOptions() {
-            return List.of("Cheese", "Onion", "Chili");
+            return Arrays.asList("Cheese", "Onion", "Chili");
         }
     }
 

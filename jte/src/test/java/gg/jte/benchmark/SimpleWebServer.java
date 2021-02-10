@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimpleWebServer implements HttpHandler {
@@ -22,7 +22,7 @@ public class SimpleWebServer implements HttpHandler {
         new SimpleWebServer().start();
     }
 
-    private final DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte", "src", "test", "resources", "benchmark"));
+    private final DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Paths.get("jte", "src", "test", "resources", "benchmark"));
     private final TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
     private final StringOutputPool stringOutputPool = new StringOutputPool();
     private final AtomicInteger visits = new AtomicInteger();

@@ -7,6 +7,7 @@ import gg.jte.html.HtmlInterceptor;
 import gg.jte.runtime.*;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -41,7 +42,7 @@ public final class TemplateEngine {
      * @return a fresh TemplateEngine instance
      */
     public static TemplateEngine create(CodeResolver codeResolver, ContentType contentType) {
-        return create(codeResolver, Path.of("jte-classes"), contentType);
+        return create(codeResolver, Paths.get("jte-classes"), contentType);
     }
 
     /**

@@ -38,6 +38,8 @@ class TemplateEngine_HotReloadTest {
         whenFileIsWritten(TEMPLATE, "@param String name\nHello ${name}!");
         thenTemplateOutputIs("Hello hot reload!");
 
+        TestUtils.sleepIfLegacyJavaVersion(1000); // File.getLastModified() only has seconds precision on most Java 8 versions
+
         whenFileIsWritten(TEMPLATE, "@param String name\nHello ${name}!!!");
         thenTemplateOutputIs("Hello hot reload!!!");
     }
@@ -47,6 +49,8 @@ class TemplateEngine_HotReloadTest {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
         whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
         thenTemplateOutputIs("Hello hot reload!");
+
+        TestUtils.sleepIfLegacyJavaVersion(1000); // File.getLastModified() only has seconds precision on most Java 8 versions
 
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!!!");
         thenTemplateOutputIs("Hello hot reload!!!");

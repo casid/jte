@@ -15,4 +15,14 @@ public class TestUtils {
     public static boolean isLegacyJavaVersion() {
         return JAVA_VERSION < 11;
     }
+
+    public static void sleepIfLegacyJavaVersion(long millis) {
+        if (isLegacyJavaVersion()) {
+            try {
+                Thread.sleep(millis);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
 }

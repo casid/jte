@@ -1,13 +1,14 @@
 package gg.jte;
 
 import gg.jte.output.StringOutput;
+import gg.jte.runtime.TemplateUtils;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import test.Model;
 
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +25,7 @@ public class TemplateEngineTest {
 
     @BeforeAll
     static void beforeAll() {
-        templateEngine = TemplateEngine.createPrecompiled(Path.of("jte-classes"), ContentType.Html);
+        templateEngine = TemplateEngine.createPrecompiled(Paths.get("jte-classes"), ContentType.Html);
     }
 
     @BeforeEach
@@ -53,7 +54,7 @@ public class TemplateEngineTest {
 
     @Test
     void unusedTag() {
-        templateEngine.renderTag("tag/unused.jte", Map.of("param1", "One", "param2", "Two"), output);
+        templateEngine.renderTag("tag/unused.jte", TemplateUtils.toMap("param1", "One", "param2", "Two"), output);
         thenOutputIs("One is One, two is Two.");
     }
 

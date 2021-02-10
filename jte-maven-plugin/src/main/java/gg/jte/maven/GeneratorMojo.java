@@ -9,6 +9,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_SOURCES;
@@ -52,8 +53,8 @@ public class GeneratorMojo extends AbstractMojo {
 
         long start = System.nanoTime();
 
-        Path source = Path.of(sourceDirectory);
-        Path target = Path.of(targetDirectory);
+        Path source = Paths.get(sourceDirectory);
+        Path target = Paths.get(targetDirectory);
 
         getLog().info("Generating jte templates found in " + source);
 

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -64,8 +65,8 @@ public class CompilerMojo extends AbstractMojo {
 
         long start = System.nanoTime();
 
-        Path source = Path.of(sourceDirectory);
-        Path target = Path.of(targetDirectory);
+        Path source = Paths.get(sourceDirectory);
+        Path target = Paths.get(targetDirectory);
 
         getLog().info("Precompiling jte templates found in " + source);
 

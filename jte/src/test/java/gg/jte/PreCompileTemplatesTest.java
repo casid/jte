@@ -21,12 +21,15 @@ public class PreCompileTemplatesTest {
     void precompileAll() {
         TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Paths.get("src/test/resources/benchmark")), Paths.get("jte-classes"), ContentType.Plain);
         templateEngine.cleanAll();
-        int amount = templateEngine.precompileAll();
+        List<String> javaFiles = templateEngine.precompileAll();
 
         StringOutput output = new StringOutput();
         templateEngine.render("welcome.jte", new WelcomePage(12), output);
         assertThat(output.toString()).contains("This page has 12 visits already.");
-        assertThat(amount).isEqualTo(2);
+        assertThat(javaFiles).hasSize(2);
+        assertThat(javaFiles).containsExactlyInAnyOrder(
+                "gg/jte/generated/layout/JtepageGenerated.java",
+                "gg/jte/generated/JtewelcomeGenerated.java");
     }
 
     @Test

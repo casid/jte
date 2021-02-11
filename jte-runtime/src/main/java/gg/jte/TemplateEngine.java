@@ -285,26 +285,26 @@ public final class TemplateEngine {
     /**
      * Generates all template classes in the sources directory, to the compiled template classes directory.
      * This only generates .java files, not .class files.
-     * @return amount of templates that were generated
+     * @return list of .java template files that were generated
      */
-    public int generateAll() {
+    public List<String> generateAll() {
         return templateLoader.generateAll();
     }
 
     /**
      * Compiles all templates located in the sources directory, to the compiled template classes directory.
-     * @return amount of templates that were compiled
+     * @return list of .java template files that were compiled
      */
-    public int precompileAll() {
+    public List<String> precompileAll() {
         return precompileAll(null);
     }
 
     /**
      * Compiles all templates located in the sources directory, to the compiled template classes directory.
      * @param compilePath additional compile path arguments for the Java compiler.
-     * @return amount of templates that were compiled
+     * @return list of .java template files that were compiled
      */
-    public int precompileAll(List<String> compilePath) {
+    public List<String> precompileAll(List<String> compilePath) {
         return templateLoader.precompileAll(compilePath);
     }
 

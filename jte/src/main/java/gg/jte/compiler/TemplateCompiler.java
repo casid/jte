@@ -13,6 +13,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class TemplateCompiler extends TemplateLoader {
 
@@ -60,16 +61,16 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     @Override
-    public int generateAll() {
+    public List<String> generateAll() {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames());
-        return classDefinitions.size();
+        return classDefinitions.stream().map(ClassDefinition::getJavaFileName).collect(Collectors.toList());
     }
 
-    public int precompileAll(List<String> compilePath) {
+    public List<String> precompileAll(List<String> compilePath) {
         return precompile(codeResolver.resolveAllTemplateNames(), compilePath);
     }
 
-    public int precompile(List<String> names, List<String> compilePath) {
+    public List<String> precompile(List<String> names, List<String> compilePath) {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(names);
 
         String[] files = new String[classDefinitions.size()];
@@ -80,7 +81,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         ClassFilesCompiler.compile(files, compilePath, compileArgs, classDirectory, templateByClassName);
 
-        return files.length;
+        return classDefinitions.stream().map(ClassDefinition::getJavaFileName).collect(Collectors.toList());
     }
 
     private LinkedHashSet<ClassDefinition> generate(List<String> names) {

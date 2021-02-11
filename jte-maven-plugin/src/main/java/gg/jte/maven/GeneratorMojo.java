@@ -67,7 +67,7 @@ public class GeneratorMojo extends AbstractMojo {
         int amount;
         try {
             templateEngine.cleanAll();
-            amount = templateEngine.generateAll();
+            amount = templateEngine.generateAll().size();
         } catch (Exception e) {
             getLog().error("Failed to generate templates.");
             getLog().error(e);

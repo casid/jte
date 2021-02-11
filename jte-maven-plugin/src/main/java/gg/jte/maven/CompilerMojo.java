@@ -83,7 +83,7 @@ public class CompilerMojo extends AbstractMojo {
         int amount;
         try {
             templateEngine.cleanAll();
-            amount = templateEngine.precompileAll(compilePath);
+            amount = templateEngine.precompileAll(compilePath).size();
         } catch (Exception e) {
             getLog().error("Failed to precompile templates.");
             getLog().error(e);

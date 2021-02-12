@@ -47,11 +47,11 @@
         <module>jte-runtime</module>
         <module>jte</module>
         <module>jte-maven-plugin</module>
+        <module>jte-gradle-plugin</module>
         <module>jte-runtime-test</module>
         <module>jte-runtime-cp-test</module>
         <module>jte-test-report</module>
         <module>jte-deploy-nexus</module>
-        <module>jte-gradle-plugin</module>
     </modules>
 
     <dependencies>

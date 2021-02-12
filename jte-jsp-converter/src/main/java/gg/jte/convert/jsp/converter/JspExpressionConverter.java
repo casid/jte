@@ -1,5 +1,6 @@
 package gg.jte.convert.jsp.converter;
 
+import gg.jte.runtime.StringUtils;
 import org.apache.el.lang.ExpressionBuilder;
 import org.apache.el.parser.*;
 
@@ -28,7 +29,7 @@ public class JspExpressionConverter {
     public JspExpressionConverter(String el) {
         this.el = el;
 
-        if (el == null || el.isBlank()) {
+        if (el == null || StringUtils.isBlank(el)) {
             root = null;
             result = new StringBuilder();
         } else {

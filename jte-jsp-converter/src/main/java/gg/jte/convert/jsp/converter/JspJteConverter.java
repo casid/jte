@@ -6,6 +6,7 @@ import gg.jte.convert.jsp.BodyConverter;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.JtpConverter;
 import org.apache.jasper.compiler.JtpCustomTag;
+import org.xml.sax.Attributes;
 
 import static gg.jte.convert.jsp.converter.JspExpressionConverter.convertAttributeValue;
 
@@ -13,8 +14,8 @@ public class JspJteConverter implements CustomTagConverter {
 
     @Override
     public void convert(JtpConverter converter, JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
-        var jteTagPath = tag.getAttribute("jte");
-        var attributes = tag.getAttributes();
+        String jteTagPath = tag.getAttribute("jte");
+        Attributes attributes = tag.getAttributes();
 
         String pathWithoutExtension = jteTagPath.substring(0, jteTagPath.length() - 4);
         String tagCall = pathWithoutExtension.replace('/', '.');

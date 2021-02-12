@@ -23,7 +23,7 @@ public class JtpParser {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         ServletContext context = new JspCServletContext(log, resourceBase, classLoader, jspc.isValidateXml(), jspc.isBlockExternal());
 
-        var scanner = new TldScanner(context, true, jspc.isValidateTld(), jspc.isBlockExternal());
+        TldScanner scanner = new TldScanner(context, true, jspc.isValidateTld(), jspc.isBlockExternal());
         scanner.setClassLoader(classLoader);
 
         try {
@@ -32,10 +32,10 @@ public class JtpParser {
             throw new JasperException(e);
         }
 
-        var tldCache = new TldCache(context, scanner.getUriTldResourcePathMap(), scanner.getTldResourcePathTaglibXmlMap());
+        TldCache tldCache = new TldCache(context, scanner.getUriTldResourcePathMap(), scanner.getTldResourcePathTaglibXmlMap());
         context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME, tldCache);
 
-        var jspConfig = new JspConfig(context);
+        JspConfig jspConfig = new JspConfig(context);
 
         JspRuntimeContext runtimeContext = new JspRuntimeContext(context, jspc);
         JspCompilationContext compilationContext = new JspCompilationContext("", new Options() {

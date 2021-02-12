@@ -15,7 +15,7 @@ public class JstlFmtParamConverter implements CustomTagConverter {
     public void convert(JtpConverter converter, JtpCustomTag tag, ConverterOutput output, BodyConverter bodyConverter) throws JasperException {
         output.append(", ");
 
-        var value = tag.getAttribute("value");
+        String value = tag.getAttribute("value");
         if (value != null) {
             output.append(convertAttributeValue(value));
         }

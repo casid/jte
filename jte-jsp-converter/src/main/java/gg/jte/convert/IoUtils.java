@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 public class IoUtils {
     public static String readFile(Path file) {
         try {
-            return Files.readString(file);
+            return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

@@ -29,9 +29,9 @@ jobs:
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Test Gradle Plugin Precompile
-        run: cd jte-gradle-plugin-test && ./gradlew test
+        run: cd ../jte-gradle-plugin-test && ./gradlew test
       - name: Test Gradle Plugin Generate
-        run: cd jte-gradle-plugin-cp-test && ./gradlew test
+        run: cd ../jte-gradle-plugin-cp-test && ./gradlew test
 
 
   coverage:

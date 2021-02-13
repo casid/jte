@@ -1,0 +1,38 @@
+import gg.jte.ContentType
+import java.nio.file.Path
+
+plugins {
+    id 'java'
+    id 'gg.jte.gradle' version '1.6.1-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation('gg.jte:jte-runtime:1.6.1-SNAPSHOT')
+    testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
+    testImplementation('org.assertj:assertj-core:3.15.0')
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
+}
+
+tasks.precompileJte {
+    sourceDirectory = Path.of(project.projectDir.absolutePath, "src", "main", "jte")
+    targetDirectory = Path.of(project.projectDir.absolutePath, "jte-classes")
+    compilePath = sourceSets.main.runtimeClasspath
+    contentType = ContentType.Html
+}
+
+tasks.precompileJte {
+    dependsOn(tasks.compileJava)
+}
+
+tasks.test {
+    dependsOn(tasks.precompileJte)
+}

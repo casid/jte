@@ -2,86 +2,86 @@ package gg.jte.gradle;
 
 import gg.jte.ContentType;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.Optional;
 
 import java.nio.file.Path;
 
-public class JteTaskBase extends DefaultTask implements JteParameters {
+public class JteTaskBase extends DefaultTask {
 
     protected Path sourceDirectory;
     protected Path targetDirectory;
     protected ContentType contentType;
-    protected boolean trimControlStructures;
+    protected Boolean trimControlStructures;
     protected String[] htmlTags;
     protected String[] htmlAttributes;
-    protected boolean htmlCommentsPreserved;
+    protected Boolean htmlCommentsPreserved;
 
-    @Override
+    @InputDirectory
     public Path getSourceDirectory() {
         return sourceDirectory;
     }
 
-    @Override
     public void setSourceDirectory(Path value) {
         sourceDirectory = value;
     }
 
-    @Override
+    @InputDirectory
     public Path getTargetDirectory() {
         return targetDirectory;
     }
 
-    @Override
     public void setTargetDirectory(Path value) {
         targetDirectory = value;
     }
 
-    @Override
+    @Input
     public ContentType getContentType() {
         return contentType;
     }
 
-    @Override
     public void setContentType(ContentType value) {
         contentType = value;
     }
 
-    @Override
-    public boolean getTrimControlStructures() {
+    @Input
+    @Optional
+    public Boolean getTrimControlStructures() {
         return trimControlStructures;
     }
 
-    @Override
-    public void setTrimControlStructures(boolean value) {
+    public void setTrimControlStructures(Boolean value) {
         trimControlStructures = value;
     }
 
-    @Override
+    @Input
+    @Optional
     public String[] getHtmlTags() {
         return htmlTags;
     }
 
-    @Override
     public void setHtmlTags(String[] value) {
         htmlTags = value;
     }
 
-    @Override
+    @Input
+    @Optional
     public String[] getHtmlAttributes() {
         return htmlAttributes;
     }
 
-    @Override
     public void setHtmlAttributes(String[] value) {
         htmlAttributes = value;
     }
 
-    @Override
-    public boolean getHtmlCommentPreserved() {
+    @Input
+    @Optional
+    public Boolean getHtmlCommentsPreserved() {
         return htmlCommentsPreserved;
     }
 
-    @Override
-    public void setHtmlCommentPreserved(boolean value) {
+    public void setHtmlCommentsPreserved(Boolean value) {
         htmlCommentsPreserved = value;
     }
 }

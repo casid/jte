@@ -24,10 +24,10 @@ public class GenerateJteTask extends JteTaskBase {
         logger.info("Generating jte templates found in " + sourceDirectory);
 
         TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(sourceDirectory), targetDirectory, contentType);
-        templateEngine.setTrimControlStructures(trimControlStructures);
+        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(trimControlStructures));
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);
-        templateEngine.setHtmlCommentsPreserved(htmlCommentsPreserved);
+        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
 
         int amount;
         try {

@@ -3,49 +3,76 @@ package gg.jte.gradle;
 import gg.jte.TemplateEngine;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.resolve.DirectoryCodeResolver;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class PrecompileJteTask extends PrecompileJteBase {
+public class PrecompileJteTask extends JteTaskBase {
+
+    private FileCollection compilePath;
+    private String htmlPolicyClass;
+    private String[] compileArgs;
+
+    @Nested
+    public FileCollection getCompilePath() {
+        return compilePath;
+    }
+
+    public void setCompilePath(FileCollection compilePath) {
+        this.compilePath = compilePath;
+    }
+
+    @Input
+    @Optional
+    public String getHtmlPolicyClass() {
+        return htmlPolicyClass;
+    }
+
+    public void setHtmlPolicyClass(String htmlPolicyClass) {
+        this.htmlPolicyClass = htmlPolicyClass;
+    }
+
+    @Input
+    @Optional
+    public String[] getCompileArgs() {
+        return compileArgs;
+    }
+
+    public void setCompileArgs(String[] compileArgs) {
+        this.compileArgs = compileArgs;
+    }
 
     @TaskAction
-    public void execute() throws URISyntaxException {
+    public void execute() {
         Logger logger = getLogger();
         long start = System.nanoTime();
 
         logger.info("Precompiling jte templates found in " + sourceDirectory);
 
         TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(sourceDirectory), targetDirectory, contentType);
-        templateEngine.setTrimControlStructures(trimControlStructures);
+        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(trimControlStructures));
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);
         if (htmlPolicyClass != null) {
             templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass));
         }
-        templateEngine.setHtmlCommentsPreserved(htmlCommentsPreserved);
+        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
         templateEngine.setCompileArgs(compileArgs);
-
-        if (compilePath == null) {
-            compilePath = new ArrayList<>();
-        }
-
-        // Somehow it doesn't link the dependencies, so we need to provide the path to jte-runtime and others to make it work
-        compilePath.add(new File(PrecompileJteTask.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toPath());
 
         int amount;
         try {
             templateEngine.cleanAll();
-            amount = templateEngine.precompileAll(compilePath.stream().map(path -> path.toAbsolutePath().toString()).collect(Collectors.toList())).size();
+            List<String> compilePathFiles = compilePath.getFiles().stream().map(File::getAbsolutePath).collect(Collectors.toList());
+            amount = templateEngine.precompileAll(compilePathFiles).size();
         } catch (Exception e) {
             logger.error("Failed to precompile templates.", e);
 
@@ -68,10 +95,12 @@ public class PrecompileJteTask extends PrecompileJteBase {
     }
 
     private URLClassLoader createProjectClassLoader() throws IOException {
-        URL[] runtimeUrls = new URL[compilePath.size()];
-        for (int i = 0; i < compilePath.size(); i++) {
-            Path element = compilePath.get(i);
-            runtimeUrls[i] = element.toFile().toURI().toURL();
+        List<File> files = new ArrayList<>(compilePath.getFiles());
+
+        URL[] runtimeUrls = new URL[files.size()];
+        for (int i = 0; i < files.size(); i++) {
+            File element = files.get(i);
+            runtimeUrls[i] = element.toURI().toURL();
         }
         return new URLClassLoader(runtimeUrls, Thread.currentThread().getContextClassLoader());
     }

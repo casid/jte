@@ -3,7 +3,7 @@ package gg.jte.gradle;
 import java.nio.file.Path;
 import java.util.List;
 
-public class CompileJteBase extends JteTaskBase {
+public class PrecompileJteBase extends JteTaskBase {
 
     protected List<Path> compilePath;
     protected String htmlPolicyClass;

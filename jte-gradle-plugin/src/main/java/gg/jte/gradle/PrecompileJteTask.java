@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class CompileJteTask extends CompileJteBase {
+public class PrecompileJteTask extends PrecompileJteBase {
 
     @TaskAction
     public void execute() throws URISyntaxException {
@@ -40,7 +40,7 @@ public class CompileJteTask extends CompileJteBase {
         }
 
         // Somehow it doesn't link the dependencies, so we need to provide the path to jte-runtime and others to make it work
-        compilePath.add(new File(CompileJteTask.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toPath());
+        compilePath.add(new File(PrecompileJteTask.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toPath());
 
         int amount;
         try {

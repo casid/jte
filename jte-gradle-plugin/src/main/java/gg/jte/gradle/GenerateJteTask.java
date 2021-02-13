@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 public class GenerateJteTask extends JteTaskBase {
 
     public GenerateJteTask() {
-        super();
         targetDirectory = Paths.get(getProject().getBuildDir().getAbsolutePath(), "generated-sources", "jte");
     }
 

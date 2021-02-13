@@ -5,10 +5,11 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.OutputDirectory;
 
 import java.nio.file.Path;
 
-public class JteTaskBase extends DefaultTask {
+public abstract class JteTaskBase extends DefaultTask {
 
     protected Path sourceDirectory;
     protected Path targetDirectory;
@@ -27,7 +28,8 @@ public class JteTaskBase extends DefaultTask {
         sourceDirectory = value;
     }
 
-    @InputDirectory
+    @OutputDirectory
+    @Optional
     public Path getTargetDirectory() {
         return targetDirectory;
     }

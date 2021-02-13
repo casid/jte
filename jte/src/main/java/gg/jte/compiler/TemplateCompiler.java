@@ -3,6 +3,7 @@ package gg.jte.compiler;
 import gg.jte.CodeResolver;
 import gg.jte.ContentType;
 import gg.jte.TemplateException;
+import gg.jte.TemplateNotFoundException;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.html.OwaspHtmlPolicy;
 import gg.jte.runtime.*;
@@ -186,7 +187,7 @@ public class TemplateCompiler extends TemplateLoader {
             if (debugInfo != null) {
                 message += ", referenced at " + debugInfo.name + ":" + debugInfo.line;
             }
-            throw new TemplateException(message);
+            throw new TemplateNotFoundException(message);
         }
         return code;
     }

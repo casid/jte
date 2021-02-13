@@ -1,6 +1,6 @@
 package gg.jte;
 
-public final class TemplateException extends RuntimeException {
+public class TemplateException extends RuntimeException {
     public TemplateException(String message) {
         super(message);
     }

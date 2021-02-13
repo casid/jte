@@ -249,6 +249,15 @@ public final class TemplateEngine {
         return new TemplateException(message, e);
     }
 
+    public boolean hasTemplate(String name) {
+        try {
+            resolveTemplate(name);
+            return true;
+        } catch (TemplateNotFoundException e) {
+            return false;
+        }
+    }
+
     public List<String> getTemplatesUsing(String name) {
         if (name.startsWith(Constants.TAG_DIRECTORY) || name.startsWith(Constants.LAYOUT_DIRECTORY)) {
             return templateLoader.getTemplatesUsing(name);

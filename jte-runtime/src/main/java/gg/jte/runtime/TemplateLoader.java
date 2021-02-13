@@ -1,6 +1,7 @@
 package gg.jte.runtime;
 
 import gg.jte.TemplateException;
+import gg.jte.TemplateNotFoundException;
 import gg.jte.html.HtmlPolicy;
 
 import java.net.MalformedURLException;
@@ -25,7 +26,7 @@ public abstract class TemplateLoader {
             Class<?> clazz = getClassLoader().loadClass(templateInfo.fullName);
             return new Template(name, templateType, clazz);
         } catch (Exception e) {
-            throw new TemplateException("Failed to load " + name, e);
+            throw new TemplateNotFoundException("Failed to load " + name, e);
         }
     }
 

@@ -9,9 +9,9 @@ import org.gradle.api.tasks.TaskAction;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
-public class GeneratorMojoTask extends JteTaskBase {
+public class GenerateJteTask extends JteTaskBase {
 
-    public GeneratorMojoTask() {
+    public GenerateJteTask() {
         super();
         targetDirectory = Paths.get(getProject().getBuildDir().getAbsolutePath(), "generated-sources", "jte");
     }

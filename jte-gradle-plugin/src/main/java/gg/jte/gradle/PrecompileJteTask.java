@@ -72,7 +72,7 @@ public class PrecompileJteTask extends JteTaskBase {
         try {
             templateEngine.cleanAll();
             List<String> compilePathFiles = compilePath.getFiles().stream().map(File::getAbsolutePath).collect(Collectors.toList());
-            amount = templateEngine.precompileAll(compilePathFiles).size();
+            amount = templateEngine.precompileAll(compilePathFiles);
         } catch (Exception e) {
             logger.error("Failed to precompile templates.", e);
 

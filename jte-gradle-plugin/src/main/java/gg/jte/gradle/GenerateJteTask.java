@@ -31,7 +31,7 @@ public class GenerateJteTask extends JteTaskBase {
         int amount;
         try {
             templateEngine.cleanAll();
-            amount = templateEngine.generateAll().size();
+            amount = templateEngine.generateAll();
         } catch (Exception e) {
             logger.error("Failed to generate templates.", e);
 

@@ -11,12 +11,12 @@ repositories {
 }
 
 dependencies {
-    implementation('gg.jte:jte:1.6.1-SNAPSHOT')
-    implementation('gg.jte:jte-runtime:1.6.1-SNAPSHOT')
+    implementation('gg.jte:jte:1.6.0')
+    implementation('gg.jte:jte-runtime:1.6.0')
 }
 
 group = 'gg.jte'
-version = '1.6.1-SNAPSHOT'
+version = '1.6.0'
 
 // See https://docs.gradle.org/nightly/userguide/publishing_gradle_plugins.html
 pluginBundle {

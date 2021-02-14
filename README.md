@@ -16,7 +16,7 @@
 
 ## TLDR
 
-jte is a lot of fun to work with! Have a look how it feels like in IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
+jte is a lot of fun to work with! This is IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
 
 <img alt="jte in IntelliJ" src="jte-intellij.gif" width="696" />
 

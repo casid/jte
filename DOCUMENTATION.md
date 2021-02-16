@@ -458,7 +458,7 @@ TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory
 
 There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
 
-> It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte compiler plugin always matches your jte dependency.
+> It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte maven plugin always matches your jte dependency.
 
 ```xml
 <plugin>
@@ -496,15 +496,6 @@ plugins {
     id 'gg.jte.gradle' version '${jte.version}'
 }
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
-test {
-    useJUnitPlatform()
-}
-
 dependencies {
     implementation('gg.jte:jte:${jte.version}')
 }
@@ -537,9 +528,11 @@ While this provides you with a nice self-containing jar, it has some limitations
 TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Html);
 ```
 
-There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
+#### Maven
 
-> It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte compiler plugin always matches your jte dependency.
+There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to generate all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
+
+> It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte maven plugin always matches your jte dependency.
 
 ```xml
 <plugin>

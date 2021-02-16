@@ -21,6 +21,8 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
   - [JavaScript attributes](#javascript-attributes)
 - [Hot Reloading](#hot-reloading)
 - [Precompiling Templates](#precompiling-templates)
+  - [Using a directory on your server](#using-a-directory-on-your-server-recommended)
+  - [Using the application class loader](#using-the-application-class-loader-since-120)
 
 ## Rendering a template
 
@@ -452,6 +454,8 @@ Path targetDirectory = Path.of("jte-classes"); // This is the directoy where com
 TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory, ContentType.Html);
 ```
 
+#### Maven
+
 There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
 
 > It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte compiler plugin always matches your jte dependency.
@@ -475,6 +479,50 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
         </execution>
     </executions>
 </plugin>
+```
+
+#### Gradle
+
+Since 1.6.0 there is a <a href="https://plugins.gradle.org/plugin/gg.jte.gradle">Gradle plugin</a> you can use to precompile all templates during the Gradle build. Please note that paths specified in Java need to match those specified in Gradle. 
+
+> Make sure that the jte gradle plugin version always matches the jte dependency version.
+
+```groovy
+import gg.jte.ContentType
+import java.nio.file.Paths
+
+plugins {
+    id 'java'
+    id 'gg.jte.gradle' version '${jte.version}'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation('gg.jte:jte:${jte.version}')
+}
+
+tasks.precompileJte {
+    sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
+    targetDirectory = Paths.get(project.projectDir.absolutePath, "jte-classes")
+    compilePath = sourceSets.main.runtimeClasspath
+    contentType = ContentType.Html
+}
+
+tasks.precompileJte {
+    dependsOn(tasks.compileJava)
+}
+
+tasks.test {
+    dependsOn(tasks.precompileJte)
+}
 ```
 
 ### Using the application class loader (since 1.2.0)

@@ -553,3 +553,34 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
     </executions>
 </plugin>
 ```
+
+#### Gradle
+
+Since 1.6.0 there is a <a href="https://plugins.gradle.org/plugin/gg.jte.gradle">Gradle plugin</a> you can use to generate all templates during the Gradle build. Please note that paths specified in Java need to match those specified in Gradle. 
+
+> Make sure that the jte gradle plugin version always matches the jte dependency version.
+
+```groovy
+import gg.jte.ContentType
+import java.nio.file.Paths
+
+plugins {
+    id 'java'
+    id 'gg.jte.gradle' version '${jte.version}'
+}
+
+dependencies {
+    implementation('gg.jte:jte:${jte.version}')
+}
+
+tasks.generateJte {
+    sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
+    contentType = ContentType.Html
+}
+
+sourceSets.main.java.srcDirs += tasks.generateJte.targetDirectory
+
+tasks.compileJava {
+    dependsOn(tasks.generateJte)
+}
+```

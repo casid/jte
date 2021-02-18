@@ -3,10 +3,12 @@ package gg.jte.output;
 import gg.jte.TemplateOutput;
 import org.junit.jupiter.api.Test;
 
-public abstract class AbstractTemplateOutputTest {
-    TemplateOutput output = createTemplateOutput();
+import java.io.IOException;
 
-    abstract TemplateOutput createTemplateOutput();
+public abstract class AbstractTemplateOutputTest<T extends TemplateOutput> {
+    T output = createTemplateOutput();
+
+    abstract T createTemplateOutput();
 
     abstract void thenOutputIs(String expected);
 
@@ -72,5 +74,11 @@ public abstract class AbstractTemplateOutputTest {
         output.writeUserContent('b');
 
         thenOutputIs("ab");
+    }
+
+    @Test
+    void unusedWriterMethodsAreNoops() throws IOException {
+        output.getWriter().flush();
+        output.getWriter().close();
     }
 }

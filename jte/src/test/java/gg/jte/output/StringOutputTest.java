@@ -1,13 +1,11 @@
 package gg.jte.output;
 
-import gg.jte.TemplateOutput;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class StringOutputTest extends AbstractTemplateOutputTest {
+public class StringOutputTest extends AbstractTemplateOutputTest<StringOutput> {
     @Override
-    TemplateOutput createTemplateOutput() {
-        return output = new StringOutput();
+    StringOutput createTemplateOutput() {
+        return new StringOutput();
     }
 
     @Override

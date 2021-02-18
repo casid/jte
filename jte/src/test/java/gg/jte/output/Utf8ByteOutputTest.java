@@ -9,8 +9,12 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class Utf8ByteOutputTest {
-    Utf8ByteOutput output = new Utf8ByteOutput(16, 8); // Small chunk size for tests
+public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutput> {
+
+    @Override
+    Utf8ByteOutput createTemplateOutput() {
+        return new Utf8ByteOutput(16, 8); // Small chunk size for tests;
+    }
 
     @Test
     void empty() {
@@ -138,7 +142,7 @@ public class Utf8ByteOutputTest {
         thenOutputIs("�foo");
     }
 
-    private void thenOutputIs(String expected) {
+    protected void thenOutputIs(String expected) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
             output.writeTo(os);

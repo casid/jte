@@ -7,12 +7,12 @@ import java.io.StringWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PrintWriterOutputTest extends AbstractTemplateOutputTest {
+public class PrintWriterOutputTest extends AbstractTemplateOutputTest<PrintWriterOutput> {
 
     private StringWriter writer;
 
     @Override
-    TemplateOutput createTemplateOutput() {
+    PrintWriterOutput createTemplateOutput() {
         writer = new StringWriter();
         return new PrintWriterOutput(new PrintWriter(writer));
     }

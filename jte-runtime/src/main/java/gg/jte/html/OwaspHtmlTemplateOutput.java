@@ -95,6 +95,11 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     }
 
     @Override
+    public void writeBinaryContent(byte[] value) {
+        templateOutput.writeBinaryContent(value);
+    }
+
+    @Override
     public void writeUserContent(boolean value) {
         templateOutput.writeUserContent(value);
     }

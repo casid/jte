@@ -97,6 +97,8 @@ public abstract class TemplateLoader {
 
     public abstract void setHtmlCommentsPreserved(boolean htmlCommentsPreserved);
 
+    public abstract void setBinaryStaticContent(boolean binaryStaticContent);
+
     public abstract void setCompileArgs(String[] compileArgs);
 
     public abstract List<String> getTemplatesUsing(String name);

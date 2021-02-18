@@ -2,22 +2,23 @@ package gg.jte.benchmark;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
+import gg.jte.output.Utf8ByteOutput;
 import gg.jte.resolve.ResourceCodeResolver;
-import gg.jte.output.StringOutput;
 
 import java.util.concurrent.TimeUnit;
 
-class Benchmark {
+class Benchmark_Binary {
 
     private final TemplateEngine templateEngine;
 
     public static void main(String[] args) {
-        new Benchmark().run();
+        new Benchmark_Binary().run();
     }
 
-    Benchmark() {
+    Benchmark_Binary() {
         templateEngine = TemplateEngine.create(new ResourceCodeResolver("benchmark"), ContentType.Html);
         templateEngine.setTrimControlStructures(true);
+        templateEngine.setBinaryStaticContent(true);
     }
 
     public void run() {
@@ -42,8 +43,8 @@ class Benchmark {
         System.out.println();
     }
 
-    StringOutput render(Page page) {
-        StringOutput output = new StringOutput();
+    Utf8ByteOutput render(Page page) {
+        Utf8ByteOutput output = new Utf8ByteOutput();
         templateEngine.render(page.getTemplate(), page, output);
         return output;
     }

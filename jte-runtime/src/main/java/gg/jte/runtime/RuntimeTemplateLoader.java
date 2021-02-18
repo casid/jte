@@ -66,6 +66,11 @@ public class RuntimeTemplateLoader extends TemplateLoader {
     }
 
     @Override
+    public void setBinaryStaticContent(boolean binaryStaticContent) {
+        // Ignored
+    }
+
+    @Override
     public void setCompileArgs(String[] compileArgs) {
         // Ignored
     }

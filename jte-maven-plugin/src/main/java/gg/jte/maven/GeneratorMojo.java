@@ -47,6 +47,9 @@ public class GeneratorMojo extends AbstractMojo {
     @Parameter(readonly = true)
     public boolean htmlCommentsPreserved;
 
+    @Parameter(readonly = true)
+    public boolean binaryStaticContent;
+
 
     @Override
     public void execute() {
@@ -63,6 +66,7 @@ public class GeneratorMojo extends AbstractMojo {
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);
         templateEngine.setHtmlCommentsPreserved(htmlCommentsPreserved);
+        templateEngine.setBinaryStaticContent(binaryStaticContent);
 
         int amount;
         try {

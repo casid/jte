@@ -10,11 +10,17 @@ import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static gg.jte.runtime.Constants.TEXT_PART_BINARY;
 
 public class TemplateCompiler extends TemplateLoader {
 
@@ -33,6 +39,7 @@ public class TemplateCompiler extends TemplateLoader {
     private String[] htmlAttributes;
     private String [] compileArgs;
     private boolean htmlCommentsPreserved;
+    private boolean binaryStaticContent;
 
     public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, ContentType contentType, ClassLoader parentClassLoader) {
         super(classDirectory);
@@ -107,6 +114,17 @@ public class TemplateCompiler extends TemplateLoader {
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
+
+            List<byte[]> textParts = classDefinition.getBinaryTextParts();
+            if (!textParts.isEmpty()) {
+                try (OutputStream os = Files.newOutputStream(classDirectory.resolve(classDefinition.getBinaryTextPartsFileName()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
+                    for (byte[] textPart : textParts) {
+                        os.write(textPart);
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
         }
         return classDefinitions;
     }
@@ -124,7 +142,7 @@ public class TemplateCompiler extends TemplateLoader {
         this.templateDependencies.put(name, templateDependencies);
 
         ClassDefinition templateDefinition = new ClassDefinition(templateInfo.fullName);
-        templateDefinition.setCode(codeGenerator.getCode());
+        templateDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
         classDefinitions.add(templateDefinition);
 
         templateByClassName.put(templateDefinition.getName(), templateInfo);
@@ -170,7 +188,7 @@ public class TemplateCompiler extends TemplateLoader {
         CodeGenerator codeGenerator = new CodeGenerator(classInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, type, codeGenerator, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures, htmlCommentsPreserved).parse();
 
-        classDefinition.setCode(codeGenerator.getCode());
+        classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
         templateByClassName.put(classDefinition.getName(), classInfo);
 
         if (DEBUG) {
@@ -250,6 +268,11 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     @Override
+    public void setBinaryStaticContent(boolean binaryStaticContent) {
+        this.binaryStaticContent = binaryStaticContent;
+    }
+
+    @Override
     public void setCompileArgs(String[] compileArgs) {
         this.compileArgs = compileArgs;
     }
@@ -260,6 +283,7 @@ public class TemplateCompiler extends TemplateLoader {
         private final LinkedHashSet<ClassDefinition> classDefinitions;
         private final LinkedHashSet<String> templateDependencies;
         private final List<ParamInfo> parameters = new ArrayList<>();
+        private final List<byte[]> binaryTextParts = new ArrayList<>();
 
         private boolean hasWrittenPackage;
         private boolean hasWrittenClass;
@@ -341,11 +365,16 @@ public class TemplateCompiler extends TemplateLoader {
         @Override
         public void onComplete() {
             int lineCount = 2;
+            if (!binaryTextParts.isEmpty()) {
+                lineCount += binaryTextParts.size() + 1;
+            }
             javaCode.insertFieldLines(lineCount);
 
             StringBuilder fields = new StringBuilder(64 + 32 * lineCount);
             javaCode.addNameField(fields, classInfo.name);
             javaCode.addLineInfoField(fields);
+            writeBinaryTextParts(fields);
+
             javaCode.insertFields(fields);
 
             javaCode.append("\t}\n");
@@ -386,6 +415,40 @@ public class TemplateCompiler extends TemplateLoader {
             this.classInfo.lineInfo = javaCode.getLineInfo();
         }
 
+        private void writeBinaryTextParts(StringBuilder fields) {
+            if (binaryTextParts.isEmpty()) {
+                return;
+            }
+
+            writeBinaryTextPartsContent(fields);
+            writeBinaryTextPartsConstants(fields);
+        }
+
+        private void writeBinaryTextPartsContent(StringBuilder fields) {
+            String contentFileName = new ClassDefinition(classInfo.className).getBinaryTextPartsFileName();
+
+            fields.append("\tprivate static final gg.jte.runtime.BinaryContent BINARY_CONTENT = gg.jte.runtime.BinaryContent.load(")
+                    .append(classInfo.className)
+                    .append(".class, \"")
+                    .append(contentFileName)
+                    .append("\", ");
+
+            for (int i = 0; i < binaryTextParts.size(); ++i) {
+                if (i > 0) {
+                    fields.append(',');
+                }
+                fields.append(binaryTextParts.get(i).length);
+            }
+
+            fields.append(");\n");
+        }
+
+        private void writeBinaryTextPartsConstants(StringBuilder fields) {
+            for (int i = 0; i < binaryTextParts.size(); ++i) {
+                fields.append("\tprivate static final byte[] ").append(TEXT_PART_BINARY).append(i).append(" = BINARY_CONTENT.get(").append(i).append(");\n");
+            }
+        }
+
         @Override
         public void onError( String message ) {
             DebugInfo debugInfo = getCurrentDebugInfo();
@@ -398,6 +461,26 @@ public class TemplateCompiler extends TemplateLoader {
                 return;
             }
 
+            if (binaryStaticContent) {
+                writeTextBinary(depth, textPart);
+            } else {
+                writeTextString(depth, textPart);
+            }
+        }
+
+        private void writeTextBinary(int depth, String textPart) {
+            writeIndentation(depth);
+
+
+            javaCode.append("jteOutput.writeBinaryContent(");
+            javaCode.append(TEXT_PART_BINARY).append(binaryTextParts.size());
+            javaCode.append(");\n");
+
+            byte[] bytes = textPart.getBytes(StandardCharsets.UTF_8);
+            binaryTextParts.add(bytes);
+        }
+
+        private void writeTextString(int depth, String textPart) {
             final int length = textPart.length();
             if (length < 65535 / 6) {
                 // Optimization for strings that definitely fit into a single string literal
@@ -707,6 +790,10 @@ public class TemplateCompiler extends TemplateLoader {
 
         public String getCode() {
             return javaCode.getCode();
+        }
+
+        public List<byte[]> getBinaryTextParts() {
+            return binaryTextParts;
         }
 
         class ContentProcessor {

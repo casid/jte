@@ -38,6 +38,11 @@ final class CodeBuilder {
         return this;
     }
 
+    public CodeBuilder append(int integer) {
+        javaCode.append(integer);
+        return this;
+    }
+
     public CodeBuilder finishTemplateLine() {
         ++currentTemplateLine;
         return this;

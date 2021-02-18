@@ -1,19 +1,27 @@
 package gg.jte.compiler;
 
+import java.util.List;
+
 public final class ClassDefinition {
     private final String name;
     private String code;
+    private List<byte[]> binaryTextParts;
 
     ClassDefinition(String name) {
         this.name = name;
     }
 
-    void setCode(String code) {
+    void setCode(String code, List<byte[]> binaryTextParts) {
         this.code = code;
+        this.binaryTextParts = binaryTextParts;
     }
 
     public String getCode() {
         return code;
+    }
+
+    public List<byte[]> getBinaryTextParts() {
+        return binaryTextParts;
     }
 
     public String getName() {
@@ -37,5 +45,9 @@ public final class ClassDefinition {
 
     public String getJavaFileName() {
         return getName().replace('.', '/') + ".java";
+    }
+
+    public String getBinaryTextPartsFileName() {
+        return getName().replace('.', '/') + ".bin";
     }
 }

@@ -9,4 +9,5 @@ public interface Constants {
     String PACKAGE_NAME = "gg.jte.generated";
     String NAME_FIELD = "JTE_NAME";
     String LINE_INFO_FIELD = "JTE_LINE_INFO";
+    String TEXT_PART_BINARY = "TEXT_PART_BINARY_";
 }

@@ -1,12 +1,17 @@
 package gg.jte;
 
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("unused") // Methods are called by generated templates
 public interface TemplateOutput {
     Writer getWriter();
 
     void writeContent(String value);
+
+    default void writeBinaryContent(byte[] value) {
+        writeContent(new String(value, StandardCharsets.UTF_8));
+    }
 
     default void writeUserContent(String value) {
         if (value != null) {

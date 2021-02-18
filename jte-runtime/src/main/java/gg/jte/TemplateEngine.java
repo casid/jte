@@ -439,4 +439,13 @@ public final class TemplateEngine {
     public void setHtmlCommentsPreserved(boolean htmlCommentsPreserved) {
         templateLoader.setHtmlCommentsPreserved(htmlCommentsPreserved);
     }
+
+    /**
+     * Experimental setting, that UTF-8 encodes all static template parts.
+     *
+     * @param binaryStaticContent true, to pre-generate UTF-8 encoded byte arrays for all static template parts
+     */
+    public void setBinaryStaticContent(boolean binaryStaticContent) {
+        templateLoader.setBinaryStaticContent(binaryStaticContent);
+    }
 }

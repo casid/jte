@@ -57,6 +57,9 @@ public class CompilerMojo extends AbstractMojo {
     public boolean htmlCommentsPreserved;
 
     @Parameter(readonly = true)
+    public boolean binaryStaticContent;
+
+    @Parameter(readonly = true)
     public String[] compileArgs;
 
 
@@ -78,6 +81,7 @@ public class CompilerMojo extends AbstractMojo {
             templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass));
         }
         templateEngine.setHtmlCommentsPreserved(htmlCommentsPreserved);
+        templateEngine.setBinaryStaticContent(binaryStaticContent);
         templateEngine.setCompileArgs(compileArgs);
 
         int amount;

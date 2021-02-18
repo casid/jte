@@ -38,7 +38,7 @@ public final class Utf8ByteOutput extends Writer implements TemplateOutput {
      * Constructs an output with custom settings.
      * This output maintains a list of binary chunks. Pre-encoded data is passed as is, while internal buffers are created for dynamic data as needed.
      * @param chunkSize The size in bytes for chunks of dynamic data.
-     * @param tempBufferSize The size for the temporary buffer used intermediate String encoding.
+     * @param tempBufferSize The size for the temporary buffer used for intermediate String encoding.
      */
     public Utf8ByteOutput(int chunkSize, int tempBufferSize) {
         this.chunkSize = chunkSize;
@@ -211,7 +211,7 @@ public final class Utf8ByteOutput extends Writer implements TemplateOutput {
     private void appendLatin1(String s) {
         int len = s.length();
 
-        for (int i = 0; i < len; i ++) {
+        for (int i = 0; i < len; ++i) {
             doAppend((byte) s.charAt(i));
         }
     }

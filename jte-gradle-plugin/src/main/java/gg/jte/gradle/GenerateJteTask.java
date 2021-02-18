@@ -27,6 +27,7 @@ public class GenerateJteTask extends JteTaskBase {
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);
         templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
+        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(binaryStaticContent));
 
         int amount;
         try {

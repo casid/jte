@@ -18,6 +18,7 @@ public abstract class JteTaskBase extends DefaultTask {
     protected String[] htmlTags;
     protected String[] htmlAttributes;
     protected Boolean htmlCommentsPreserved;
+    protected Boolean binaryStaticContent;
 
     @InputDirectory
     public Path getSourceDirectory() {
@@ -85,5 +86,15 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setHtmlCommentsPreserved(Boolean value) {
         htmlCommentsPreserved = value;
+    }
+
+    public void setBinaryStaticContent(Boolean binaryStaticContent) {
+        this.binaryStaticContent = binaryStaticContent;
+    }
+
+    @Input
+    @Optional
+    public Boolean getBinaryStaticContent() {
+        return binaryStaticContent;
     }
 }

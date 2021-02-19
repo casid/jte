@@ -23,6 +23,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
 - [Precompiling Templates](#precompiling-templates)
   - [Using a directory on your server](#using-a-directory-on-your-server-recommended)
   - [Using the application class loader](#using-the-application-class-loader-since-120)
+- [Binary rendering for max throughput](#binary-rendering-for-max-throughput)
 
 ## Rendering a template
 
@@ -584,3 +585,40 @@ tasks.compileJava {
     dependsOn(tasks.generateJte)
 }
 ```
+
+## Binary rendering for max throughput
+
+Most template parts are static content and only few parts of a template are dynamic. It is wasteful to convert those static parts over and over on every request, if your web-framework sends binary UTF-8 content to the user. Since jte 1.7.0 it is possible to encode those static parts at compile time:
+
+```java
+templateEngine.setBinaryStaticContent(true);
+```
+
+This generates a binary content resource for each template at compile time. Those pre-encoded UTF-8 byte[] arrays are loaded in memory from the resource file together with the template class. This also implies, that the constant pool is released of holding template strings.
+
+To fully utilize binary templates you need to use a binary template output, like `Utf8ByteOutput`. This output is heavily optimized to consume as little CPU and memory as possible when using binary templates.
+
+> Hint: You will only see a performance increase if you use binaryStaticContent in tandem with a binary output. Other outputs convert the pre-encoded byte[] arrays back to Java Strings and defeat this optimization.
+
+Example usage with `HttpServletResponse`:
+
+```java
+Utf8ByteOutput output = new Utf8ByteOutput();
+templateEngine.render(template, page, output);
+
+response.setContentLength(output.getContentLength());
+response.setContentType("text/html");
+response.setCharacterEncoding("UTF-8");
+response.setStatus(page.getStatusCode());
+
+try (OutputStream os = response.getOutputStream()) {
+    output.writeTo(os);
+}
+```
+
+There are a few pretty cool things going on here:
+- We know about the binary content-length directly after rendering, at no additional cost
+- All static parts are streamed directly to the output stream, without any copying / encoding overhead
+- Dynamic parts are usually small - and written to very efficiently to internal chunks during rendering
+
+With binary content you will be able to render millions of pages per second (in case there's no DB or other external service interaction, heh) - with very little CPU, memory and GC usage.

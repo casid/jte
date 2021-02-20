@@ -5,6 +5,7 @@ public final class ClassInfo {
     public final String className;
     public final String packageName;
     public final String fullName;
+    public final String extension;
     public int[] lineInfo;
 
     public ClassInfo(String name, String parentPackage) {
@@ -13,6 +14,9 @@ public final class ClassInfo {
         int endIndex = name.lastIndexOf('.');
         if (endIndex == -1) {
             endIndex = name.length();
+            extension = null;
+        } else {
+            extension = name.substring(endIndex + 1);
         }
 
         int startIndex = name.lastIndexOf('/');

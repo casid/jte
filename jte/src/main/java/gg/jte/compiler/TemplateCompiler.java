@@ -3,6 +3,8 @@ package gg.jte.compiler;
 import gg.jte.*;
 import gg.jte.compiler.java.ClassFilesCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
+import gg.jte.compiler.kotlin.KotlinClassFilesCompiler;
+import gg.jte.compiler.kotlin.KotlinCodeGenerator;
 import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
 
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class TemplateCompiler extends TemplateLoader {
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     private final TemplateConfig config;
     private final CodeResolver codeResolver;
@@ -58,7 +60,7 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public List<String> generateAll() {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames());
-        return classDefinitions.stream().map(ClassDefinition::getJavaFileName).collect(Collectors.toList());
+        return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
     public List<String> precompileAll(List<String> compilePath) {
@@ -71,12 +73,14 @@ public class TemplateCompiler extends TemplateLoader {
         String[] files = new String[classDefinitions.size()];
         int i = 0;
         for (ClassDefinition classDefinition : classDefinitions) {
-            files[i++] = classDirectory.resolve(classDefinition.getJavaFileName()).toFile().getAbsolutePath();
+            files[i++] = classDirectory.resolve(classDefinition.getSourceFileName()).toFile().getAbsolutePath();
         }
 
-        ClassFilesCompiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
+        // TODO determine how to compile stuff?
+        // ClassFilesCompiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
+        KotlinClassFilesCompiler.compile(classDirectory, files);
 
-        return classDefinitions.stream().map(ClassDefinition::getJavaFileName).collect(Collectors.toList());
+        return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
     private LinkedHashSet<ClassDefinition> generate(List<String> names) {
@@ -96,7 +100,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         for (ClassDefinition classDefinition : classDefinitions) {
-            try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getJavaFileName()))) {
+            try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getSourceFileName()))) {
                 fileOutput.writeContent(classDefinition.getCode());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -123,12 +127,12 @@ public class TemplateCompiler extends TemplateLoader {
 
         ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
-        JavaCodeGenerator codeGenerator = new JavaCodeGenerator(this, this.config, paramOrder, templateInfo, classDefinitions, templateDependencies);
+        CodeGenerator codeGenerator = createCodeGenerator(templateInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, TemplateType.Template, codeGenerator, config).parse();
 
         this.templateDependencies.put(name, templateDependencies);
 
-        ClassDefinition templateDefinition = new ClassDefinition(templateInfo.fullName);
+        ClassDefinition templateDefinition = new ClassDefinition(templateInfo.fullName, templateInfo);
         templateDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
         classDefinitions.add(templateDefinition);
 
@@ -163,7 +167,7 @@ public class TemplateCompiler extends TemplateLoader {
         templateDependencies.add(name);
         ClassInfo classInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
-        ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName);
+        ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName, classInfo);
         if (classDefinitions.contains(classDefinition)) {
             return classInfo;
         }
@@ -172,7 +176,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         classDefinitions.add(classDefinition);
 
-        JavaCodeGenerator codeGenerator = new JavaCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+        CodeGenerator codeGenerator = createCodeGenerator(classInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, type, codeGenerator, config).parse();
 
         classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
@@ -183,6 +187,14 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         return classInfo;
+    }
+
+    private CodeGenerator createCodeGenerator(ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+        if ("kte".equals(classInfo.extension)) {
+            return new KotlinCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+        } else {
+            return new JavaCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+        }
     }
 
     private String resolveCode(String name, DebugInfo debugInfo) {

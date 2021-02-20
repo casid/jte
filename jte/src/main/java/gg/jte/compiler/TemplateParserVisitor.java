@@ -7,7 +7,7 @@ import java.util.List;
 public interface TemplateParserVisitor {
     void onImport(String importClass);
 
-    void onParam(ParamInfo parameter);
+    void onParam(String parameter);
 
     void onParamsComplete();
 

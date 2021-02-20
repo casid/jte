@@ -1,7 +1,6 @@
 package gg.jte.runtime;
 
 public interface Constants {
-    String TAG_EXTENSION = ".jte";
     String TAG_DIRECTORY = "tag/";
     String LAYOUT_DIRECTORY = "layout/";
     String CLASS_PREFIX = "Jte";

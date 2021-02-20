@@ -1,17 +1,17 @@
 package gg.jte;
 
+import gg.jte.output.StringOutput;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import gg.jte.output.StringOutput;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-public class TemplateEngineTest {
-    String templateName = "test/template.jte";
+public class TemplateEngine_KotlinTest {
+    String templateName = "test/template.kte";
 
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
     TemplateEngine templateEngine = TemplateEngine.create(dummyCodeResolver, ContentType.Plain);
@@ -109,27 +109,13 @@ public class TemplateEngineTest {
 
     @Test
     void helloLength() {
-        givenTemplate("'${model.hello}' has length: ${model.hello.length()}");
+        givenTemplate("'${model.hello}' has length: ${model.hello.length}");
         thenOutputIs("'Hello' has length: 5");
     }
 
     @Test
-    void simpleTemplateName() {
-        templateName = "Simple";
-        givenTemplate("Hello");
-        thenOutputIs("Hello");
-    }
-
-    @Test
-    void simpleTemplateNameWithExtension() {
-        templateName = "Simple.txt";
-        givenTemplate("Hello");
-        thenOutputIs("Hello");
-    }
-
-    @Test
-    void simpleTemplateNameWithMultipleExtensions() {
-        templateName = "Simple.txt.jte";
+    void templateNameWithMultipleExtensions() {
+        templateName = "Simple.txt.kte";
         givenTemplate("Hello");
         thenOutputIs("Hello");
     }
@@ -297,13 +283,13 @@ public class TemplateEngineTest {
 
     @Test
     void ternaryOperator() {
-        givenTemplate("${model.x > 0 ? \"Yay\" : \"Nay\"}");
+        givenTemplate("${if (model.x > 0) \"Yay\" else \"Nay\"}");
         thenOutputIs("Yay");
     }
 
     @Test
     void variable() {
-        givenTemplate("!{int y = 50}${y}");
+        givenTemplate("!{val y = 50}${y}");
         thenOutputIs("50");
     }
 
@@ -333,8 +319,8 @@ public class TemplateEngineTest {
 
     @Test
     void tag() {
-        givenTag("card", "@param java.lang.String firstParam\n" +
-                "@param int secondParam\n" +
+        givenTag("card", "@param firstParam:String\n" +
+                "@param secondParam:Int\n" +
                 "One: ${firstParam}, two: ${secondParam}");
         givenTemplate("@tag.card(model.hello, model.x), That was a tag!");
         thenOutputIs("One: Hello, two: 42, That was a tag!");
@@ -1021,11 +1007,11 @@ public class TemplateEngineTest {
     }
 
     private void givenTag(String name, String code) {
-        dummyCodeResolver.givenCode("tag/" + name + ".jte", code);
+        dummyCodeResolver.givenCode("tag/" + name + ".kte", code);
     }
 
     private void givenTemplate(String template) {
-        template = "@param gg.jte.TemplateEngineTest.Model model\n" + template;
+        template = "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" + template;
         givenRawTemplate(template);
     }
 

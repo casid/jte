@@ -57,7 +57,7 @@ public class DirectoryCodeResolver implements CodeResolver {
             return stream
                     .filter(p -> !Files.isDirectory(p))
                     .map(p -> root.relativize(p).toString().replace('\\', '/'))
-                    .filter(s -> s.endsWith(".jte"))
+                    .filter(s -> s.endsWith(".jte") || s.endsWith(".kte"))
                     .collect(Collectors.toList());
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to resolve all templates in " + root, e);
@@ -93,7 +93,7 @@ public class DirectoryCodeResolver implements CodeResolver {
                     List<WatchEvent<?>> events = watchKey.pollEvents();
                     for (WatchEvent<?> event : events) {
                         String eventContext = event.context().toString();
-                        if (!eventContext.endsWith(".jte")) {
+                        if (!eventContext.endsWith(".jte") && !eventContext.endsWith(".kte")) {
                             continue;
                         }
 

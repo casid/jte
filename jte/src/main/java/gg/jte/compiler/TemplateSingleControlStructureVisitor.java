@@ -15,7 +15,7 @@ class TemplateSingleControlStructureVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onParam(ParamInfo parameter) {
+    public void onParam(String parameter) {
         // not relevant
     }
 

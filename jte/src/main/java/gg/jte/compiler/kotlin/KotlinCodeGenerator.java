@@ -1,9 +1,10 @@
-package gg.jte.compiler.java;
+package gg.jte.compiler.kotlin;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.compiler.*;
+import gg.jte.compiler.java.JavaParamInfo;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import gg.jte.runtime.DebugInfo;
@@ -17,12 +18,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static gg.jte.runtime.Constants.TEXT_PART_BINARY;
 
-public class JavaCodeGenerator implements CodeGenerator {
+public class KotlinCodeGenerator implements CodeGenerator {
     private final TemplateCompiler compiler;
     private final TemplateConfig config;
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder;
     private final ClassInfo classInfo;
-    private final CodeBuilder javaCode = new CodeBuilder();
+    private final CodeBuilder kotlinCode = new CodeBuilder();
     private final LinkedHashSet<ClassDefinition> classDefinitions;
     private final LinkedHashSet<String> templateDependencies;
     private final List<ParamInfo> parameters = new ArrayList<>();
@@ -31,7 +32,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     private boolean hasWrittenPackage;
     private boolean hasWrittenClass;
 
-    public JavaCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+    public KotlinCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
         this.compiler = compiler;
         this.config = config;
         this.paramOrder = paramOrder;
@@ -43,36 +44,37 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onImport(String importClass) {
         writePackageIfRequired();
-        javaCode.append("import ").append(importClass).append(";\n");
+        kotlinCode.append("import ").append(importClass).append("\n");
     }
 
     private void writePackageIfRequired() {
         if (!hasWrittenPackage) {
-            javaCode.append("package " + classInfo.packageName + ";\n");
+            kotlinCode.append("package " + classInfo.packageName + "\n");
             hasWrittenPackage = true;
         }
     }
 
     @Override
     public void onParam(String parameter) {
-        ParamInfo paramInfo = JavaParamInfo.parse(parameter, this);
+        ParamInfo paramInfo = KotlinParamInfo.parse(parameter, this);
 
         writePackageIfRequired();
         if (!hasWrittenClass) {
             writeClass();
         }
 
-        javaCode.append(", ").append(paramInfo.type).append(' ').append(paramInfo.name);
+        kotlinCode.append(", ").append(paramInfo.name).append(':').append(paramInfo.type);
 
         parameters.add(paramInfo);
     }
 
     private void writeClass() {
-        javaCode.append("public final class ").append(classInfo.className).append(" {\n");
-        javaCode.markFieldsIndex();
-        javaCode.append("\tpublic static void render(");
+        kotlinCode.append("class ").append(classInfo.className).append(" {\n");
+        kotlinCode.append("companion object {\n");
+        kotlinCode.markFieldsIndex();
+        kotlinCode.append("\t@JvmStatic fun render(");
         writeTemplateOutputParam();
-        javaCode.append(", gg.jte.html.HtmlInterceptor jteHtmlInterceptor");
+        kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
 
         hasWrittenClass = true;
     }
@@ -87,9 +89,9 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     private void writeTemplateOutputParam() {
         if (config.contentType == ContentType.Html) {
-            javaCode.append("gg.jte.html.HtmlTemplateOutput jteOutput");
+            kotlinCode.append("jteOutput:gg.jte.html.HtmlTemplateOutput");
         } else {
-            javaCode.append("gg.jte.TemplateOutput jteOutput");
+            kotlinCode.append("jteOutput:gg.jte.TemplateOutput");
         }
     }
 
@@ -100,14 +102,14 @@ public class JavaCodeGenerator implements CodeGenerator {
             writeClass();
         }
 
-        javaCode.append(") {\n");
+        kotlinCode.append(") {\n");
 
         paramOrder.put(classInfo.name, parameters);
     }
 
     @Override
     public void onLineFinished() {
-        javaCode.finishTemplateLine();
+        kotlinCode.finishTemplateLine();
     }
 
     @Override
@@ -116,68 +118,70 @@ public class JavaCodeGenerator implements CodeGenerator {
         if (!binaryTextParts.isEmpty()) {
             lineCount += binaryTextParts.size() + 1;
         }
-        javaCode.insertFieldLines(lineCount);
+        kotlinCode.insertFieldLines(lineCount);
 
         StringBuilder fields = new StringBuilder(64 + 32 * lineCount);
         addNameField(fields, classInfo.name);
         addLineInfoField(fields);
         writeBinaryTextParts(fields);
 
-        javaCode.insertFields(fields);
+        kotlinCode.insertFields(fields);
 
-        javaCode.append("\t}\n");
+        kotlinCode.append("\t}\n");
 
-        javaCode.append("\tpublic static void renderMap(");
+        kotlinCode.append("\t@JvmStatic fun renderMap(");
         writeTemplateOutputParam();
-        javaCode.append(", gg.jte.html.HtmlInterceptor jteHtmlInterceptor");
+        kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
 
-        javaCode.append(", java.util.Map<String, Object> params) {\n");
+        kotlinCode.append(", params:java.util.Map<String, Object>) {\n");
         for (ParamInfo parameter : parameters) {
             if (parameter.varargs) {
                 continue;
             }
 
-            javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = (").append(parameter.type);
+            kotlinCode.append("\t\tval ").append(parameter.name).append(" = ");
             if (parameter.defaultValue != null) {
-                javaCode.append(")params.getOrDefault(\"").append(parameter.name).append("\", ");
+                kotlinCode.append("params.getOrDefault(\"").append(parameter.name).append("\", ");
                 writeJavaCodeWithContentSupport(0, parameter.defaultValue);
-                javaCode.append(");\n");
+                kotlinCode.append(")");
             } else {
-                javaCode.append(")params.get(\"").append(parameter.name).append("\");\n");
+                kotlinCode.append("params.get(\"").append(parameter.name).append("\")");
             }
+            kotlinCode.append(" as ").append(parameter.type).append("\n");
         }
-        javaCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
+        kotlinCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
 
         for (ParamInfo parameter : parameters) {
             if (parameter.varargs) {
                 continue;
             }
 
-            javaCode.append(", ").append(parameter.name);
+            kotlinCode.append(", ").append(parameter.name);
         }
-        javaCode.append(");\n");
-        javaCode.append("\t}\n");
+        kotlinCode.append(");\n");
+        kotlinCode.append("\t}\n");
 
-        javaCode.append("}\n");
+        kotlinCode.append("}\n");
+        kotlinCode.append("}\n");
 
-        this.classInfo.lineInfo = javaCode.getLineInfo();
-    }
-
-    private void addLineInfoField(StringBuilder fields) {
-        fields.append("\tpublic static final int[] ").append(Constants.LINE_INFO_FIELD).append(" = {");
-        for (int i = 0; i < javaCode.getCurrentCodeLine(); ++i) {
-            if (i > 0) {
-                fields.append(',');
-            }
-            fields.append(javaCode.getLineInfo(i));
-        }
-        fields.append("};\n");
+        this.classInfo.lineInfo = kotlinCode.getLineInfo();
     }
 
     private void addNameField(StringBuilder fields, String name) {
-        fields.append("\tpublic static final String ").append(Constants.NAME_FIELD).append(" = \"");
+        fields.append("\t@JvmStatic val ").append(Constants.NAME_FIELD).append(" = \"");
         fields.append(name);
-        fields.append("\";\n");
+        fields.append("\"\n");
+    }
+
+    private void addLineInfoField(StringBuilder fields) {
+        fields.append("\t@JvmStatic val ").append(Constants.LINE_INFO_FIELD).append(" = intArrayOf(");
+        for (int i = 0; i < kotlinCode.getCurrentCodeLine(); ++i) {
+            if (i > 0) {
+                fields.append(',');
+            }
+            fields.append(kotlinCode.getLineInfo(i));
+        }
+        fields.append(")\n");
     }
 
     private void writeBinaryTextParts(StringBuilder fields) {
@@ -190,7 +194,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private void writeBinaryTextPartsContent(StringBuilder fields) {
-        String contentFileName = new ClassDefinition(classInfo.className, "java").getBinaryTextPartsFileName();
+        String contentFileName = new ClassDefinition(classInfo.className, "kt").getBinaryTextPartsFileName();
 
         fields.append("\tprivate static final gg.jte.runtime.BinaryContent BINARY_CONTENT = gg.jte.runtime.BinaryContent.load(")
                 .append(classInfo.className)
@@ -236,10 +240,9 @@ public class JavaCodeGenerator implements CodeGenerator {
     private void writeTextBinary(int depth, String textPart) {
         writeIndentation(depth);
 
-
-        javaCode.append("jteOutput.writeBinaryContent(");
-        javaCode.append(TEXT_PART_BINARY).append(binaryTextParts.size());
-        javaCode.append(");\n");
+        kotlinCode.append("jteOutput.writeBinaryContent(");
+        kotlinCode.append(TEXT_PART_BINARY).append(binaryTextParts.size());
+        kotlinCode.append(")\n");
 
         byte[] bytes = textPart.getBytes(StandardCharsets.UTF_8);
         binaryTextParts.add(bytes);
@@ -281,9 +284,9 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     private void writeText(int depth, String text) {
         writeIndentation(depth);
-        javaCode.append("jteOutput.writeContent(\"");
-        appendEscaped(javaCode.getStringBuilder(), text);
-        javaCode.append("\");\n");
+        kotlinCode.append("jteOutput.writeContent(\"");
+        appendEscaped(kotlinCode.getStringBuilder(), text);
+        kotlinCode.append("\")\n");
     }
 
     @Override
@@ -294,7 +297,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
         writeIndentation(depth);
-        javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", null);\n");
+        kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", null);\n");
 
         writeCodePart(depth, codePart);
     }
@@ -302,7 +305,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
         writeIndentation(depth);
-        javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\");\n");
+        kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\");\n");
 
         writeCodePart(depth, codePart);
     }
@@ -311,7 +314,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     public void onUnsafeCodePart(int depth, String codePart) {
         if (config.contentType == ContentType.Html) {
             writeIndentation(depth);
-            javaCode.append("jteOutput.setContext(null, null);\n");
+            kotlinCode.append("jteOutput.setContext(null, null)\n");
         }
 
         writeCodePart(depth, codePart);
@@ -320,93 +323,93 @@ public class JavaCodeGenerator implements CodeGenerator {
     private void writeCodePart(int depth, String codePart) {
         writeIndentation(depth);
 
-        javaCode.append("jteOutput.writeUserContent(");
+        kotlinCode.append("jteOutput.writeUserContent(");
         writeJavaCodeWithContentSupport(depth, codePart);
-        javaCode.append(");\n");
+        kotlinCode.append(")\n");
     }
 
     @Override
     public void onCodeStatement(int depth, String codePart) {
         writeIndentation(depth);
         writeJavaCodeWithContentSupport(depth, codePart);
-        javaCode.append(";\n");
+        kotlinCode.append("\n");
     }
 
     @Override
     public void onConditionStart(int depth, String condition) {
         writeIndentation(depth);
 
-        javaCode.append("if (");
-        javaCode.append(condition);
-        javaCode.append(") {\n");
+        kotlinCode.append("if (");
+        kotlinCode.append(condition);
+        kotlinCode.append(") {\n");
     }
 
     @Override
     public void onConditionElse(int depth, String condition) {
         writeIndentation(depth);
-        javaCode.append("} else if (");
-        javaCode.append(condition);
-        javaCode.append(") {\n");
+        kotlinCode.append("} else if (");
+        kotlinCode.append(condition);
+        kotlinCode.append(") {\n");
     }
 
     @Override
     public void onConditionElse(int depth) {
         writeIndentation(depth);
-        javaCode.append("} else {\n");
+        kotlinCode.append("} else {\n");
     }
 
     @Override
     public void onConditionEnd(int depth) {
         writeIndentation(depth);
-        javaCode.append("}\n");
+        kotlinCode.append("}\n");
     }
 
     @Override
     public void onForLoopStart(int depth, String codePart) {
         writeIndentation(depth);
-        javaCode.append("for (").append(codePart).append(") {\n");
+        kotlinCode.append("for (").append(codePart).append(") {\n");
     }
 
     @Override
     public void onForLoopEnd(int depth) {
         writeIndentation(depth);
-        javaCode.append("}\n");
+        kotlinCode.append("}\n");
     }
 
     @Override
     public void onTag(int depth, TemplateType type, String name, List<String> params) {
         String directory = type == TemplateType.Layout ? Constants.LAYOUT_DIRECTORY : Constants.TAG_DIRECTORY;
-        String tagName = directory + name.replace('.', '/') + ".jte";
+        String tagName = directory + name.replace('.', '/') + ".kte";
         ClassInfo tagInfo = compiler.generateTagOrLayout(type, tagName, classDefinitions, templateDependencies, getCurrentDebugInfo());
 
         writeIndentation(depth);
 
-        javaCode.append(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
+        kotlinCode.append(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
 
         appendParams(depth, tagName, params);
-        javaCode.append(");\n");
+        kotlinCode.append(");\n");
     }
 
     @Override
     public void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
-        javaCode.append("jteHtmlInterceptor.onHtmlTagOpened(\"").append(htmlTag.name).append("\", ");
+        kotlinCode.append("jteHtmlInterceptor.onHtmlTagOpened(\"").append(htmlTag.name).append("\", ");
         writeAttributeMap(htmlTag);
-        javaCode.append(", jteOutput);\n");
+        kotlinCode.append(", jteOutput);\n");
     }
 
     @Override
     public void onInterceptHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
         writeIndentation(depth);
-        javaCode.append("jteHtmlInterceptor.onHtmlAttributeStarted(\"").append(htmlAttribute.name).append("\", ");
+        kotlinCode.append("jteHtmlInterceptor.onHtmlAttributeStarted(\"").append(htmlAttribute.name).append("\", ");
         writeAttributeMap(currentHtmlTag);
-        javaCode.append(", jteOutput);\n");
+        kotlinCode.append(", jteOutput);\n");
     }
 
     @Override
     public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
-        javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput);\n");
+        kotlinCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput);\n");
     }
 
     @Override
@@ -425,7 +428,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private void writeAttributeMap(TemplateParser.HtmlTag htmlTag) {
-        javaCode.append("gg.jte.runtime.TemplateUtils.toMap(");
+        kotlinCode.append("gg.jte.runtime.TemplateUtils.toMap(");
         boolean firstWritten = false;
         for (TemplateParser.HtmlAttribute attribute : htmlTag.attributes) {
             if (attribute.value == null) {
@@ -433,26 +436,26 @@ public class JavaCodeGenerator implements CodeGenerator {
             }
 
             if (firstWritten) {
-                javaCode.append(",");
+                kotlinCode.append(",");
             } else {
                 firstWritten = true;
             }
-            javaCode.append("\"").append(attribute.name).append("\",");
+            kotlinCode.append("\"").append(attribute.name).append("\",");
             String javaExpression = extractJavaExpression(attribute.value);
             if (javaExpression != null) {
-                javaCode.append(javaExpression);
+                kotlinCode.append(javaExpression);
             } else {
-                javaCode.append("\"").append(attribute.value).append("\"");
+                kotlinCode.append("\"").append(attribute.value).append("\"");
             }
         }
-        javaCode.append(")");
+        kotlinCode.append(")");
     }
 
     private void writeJavaCodeWithContentSupport(int depth, String code) {
         if (code.contains("@`")) {
             new ContentProcessor(depth, code).process();
         } else {
-            javaCode.append(code);
+            kotlinCode.append(code);
         }
     }
 
@@ -471,7 +474,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private DebugInfo getCurrentDebugInfo() {
-        return new DebugInfo(classInfo.name, javaCode.getCurrentTemplateLine() + 1);
+        return new DebugInfo(classInfo.name, kotlinCode.getCurrentTemplateLine() + 1);
     }
 
     private void appendParams(int depth, String name, List<String> params) {
@@ -507,7 +510,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private void appendParam(int depth, String param) {
-        javaCode.append(", ");
+        kotlinCode.append(", ");
         writeJavaCodeWithContentSupport(depth, param);
     }
 
@@ -526,7 +529,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     private void writeIndentation(int depth) {
         for (int i = 0; i < depth + 2; ++i) {
-            javaCode.append('\t');
+            kotlinCode.append('\t');
         }
     }
 
@@ -555,7 +558,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public String getCode() {
-        return javaCode.getCode();
+        return kotlinCode.getCode();
     }
 
     @Override
@@ -595,7 +598,7 @@ public class JavaCodeGenerator implements CodeGenerator {
                 } else if (currentChar == '`') {
                     if (nestedCount == 0) {
                         endIndex = i;
-                        writeJavaCode();
+                        writeCode();
                     } else {
                         --nestedCount;
                     }
@@ -603,31 +606,31 @@ public class JavaCodeGenerator implements CodeGenerator {
             }
 
             if (lastWrittenIndex + 1 < param.length()) {
-                javaCode.append(param, lastWrittenIndex + 1, param.length());
+                kotlinCode.append(param, lastWrittenIndex + 1, param.length());
             }
         }
 
-        private void writeJavaCode() {
-            javaCode.append(param, lastWrittenIndex + 1, startIndex - 2);
+        private void writeCode() {
+            kotlinCode.append(param, lastWrittenIndex + 1, startIndex - 2);
 
-            javaCode.append("new ").append(getContentClass()).append("() {\n");
+            kotlinCode.append("new ").append(getContentClass()).append("() {\n");
 
             writeIndentation(depth + 1);
-            javaCode.append("public void writeTo(");
+            kotlinCode.append("public void writeTo(");
             writeTemplateOutputParam();
-            javaCode.append(") {\n");
+            kotlinCode.append(") {\n");
 
-            TemplateParser parser = new TemplateParser(param, TemplateType.Content, JavaCodeGenerator.this, config);
+            TemplateParser parser = new TemplateParser(param, TemplateType.Content, KotlinCodeGenerator.this, config);
             parser.setStartIndex(startIndex);
             parser.setEndIndex(endIndex);
             parser.setParamsComplete(true);
             parser.parse(depth + 2);
 
             writeIndentation(depth + 1);
-            javaCode.append("}\n");
+            kotlinCode.append("}\n");
 
             writeIndentation(depth);
-            javaCode.append("}");
+            kotlinCode.append("}");
 
             lastWrittenIndex = endIndex;
 

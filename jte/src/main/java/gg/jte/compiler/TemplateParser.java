@@ -1,6 +1,7 @@
 package gg.jte.compiler;
 
 import gg.jte.ContentType;
+import gg.jte.TemplateConfig;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.html.HtmlPolicyException;
 import gg.jte.runtime.StringUtils;
@@ -12,6 +13,7 @@ final class TemplateParser {
     private final String templateCode;
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
+    private final TemplateConfig config;
     private final ContentType contentType;
     private final HtmlPolicy htmlPolicy;
     private final String[] htmlTags;
@@ -50,16 +52,17 @@ final class TemplateParser {
     private char previousChar0;
     private char currentChar;
 
-    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, ContentType contentType, HtmlPolicy htmlPolicy, String[] htmlTags, String[] htmlAttributes, boolean trimControlStructures, boolean htmlCommentsPreserved) {
+    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, TemplateConfig config) {
         this.templateCode = templateCode;
         this.type = type;
         this.visitor = visitor;
-        this.contentType = contentType;
-        this.htmlPolicy = htmlPolicy;
-        this.htmlTags = htmlTags;
-        this.htmlAttributes = htmlAttributes;
-        this.trimControlStructures = trimControlStructures;
-        this.htmlCommentsPreserved = htmlCommentsPreserved;
+        this.config = config;
+        this.contentType = config.contentType;
+        this.htmlPolicy = config.htmlPolicy;
+        this.htmlTags = config.htmlTags;
+        this.htmlAttributes = config.htmlAttributes;
+        this.trimControlStructures = config.trimControlStructures;
+        this.htmlCommentsPreserved = config.htmlCommentsPreserved;
 
         this.startIndex = 0;
         this.endIndex = templateCode.length();
@@ -374,7 +377,7 @@ final class TemplateParser {
         }
 
         try {
-            TemplateParser templateParser = new TemplateParser(templateCode, type, new TemplateParametersCompleteVisitor(), contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures, htmlCommentsPreserved);
+            TemplateParser templateParser = new TemplateParser(templateCode, type, new TemplateParametersCompleteVisitor(), config);
             templateParser.setStartIndex(startIndex);
             templateParser.parse();
         } catch (TemplateParametersCompleteVisitor.Result result) {

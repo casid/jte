@@ -1,6 +1,6 @@
 package gg.jte.compiler;
 
-import gg.jte.ContentType;
+import gg.jte.TemplateConfig;
 import gg.jte.runtime.TemplateType;
 
 import java.util.Arrays;
@@ -17,7 +17,7 @@ final class LineInfo {
         }
 
         try {
-            TemplateParser templateParser = new TemplateParser(templateCode, TemplateType.Template, new TemplateSingleControlStructureVisitor(), ContentType.Plain, null, null, null, false, false);
+            TemplateParser templateParser = new TemplateParser(templateCode, TemplateType.Template, new TemplateSingleControlStructureVisitor(), TemplateConfig.PLAIN);
             templateParser.setStartIndex(startLineIndex);
             templateParser.setEndIndex(endLineIndex);
             if (mode == TemplateParser.Mode.ConditionEnd) {

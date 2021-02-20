@@ -2,7 +2,6 @@ package gg.jte.runtime;
 
 import gg.jte.TemplateException;
 import gg.jte.TemplateNotFoundException;
-import gg.jte.html.HtmlPolicy;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -86,20 +85,6 @@ public abstract class TemplateLoader {
             throw new TemplateException("Failed to create class loader for " + classDirectory, e);
         }
     }
-
-    public abstract void setHtmlPolicy(HtmlPolicy htmlPolicy);
-
-    public abstract void setTrimControlStructures(boolean value);
-
-    public abstract void setHtmlTags(String[] htmlTags);
-
-    public abstract void setHtmlAttributes(String[] htmlAttributes);
-
-    public abstract void setHtmlCommentsPreserved(boolean htmlCommentsPreserved);
-
-    public abstract void setBinaryStaticContent(boolean binaryStaticContent);
-
-    public abstract void setCompileArgs(String[] compileArgs);
 
     public abstract List<String> getTemplatesUsing(String name);
 

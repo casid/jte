@@ -1,11 +1,6 @@
 package gg.jte.compiler;
 
-import gg.jte.CodeResolver;
-import gg.jte.ContentType;
-import gg.jte.TemplateException;
-import gg.jte.TemplateNotFoundException;
-import gg.jte.html.HtmlPolicy;
-import gg.jte.html.OwaspHtmlPolicy;
+import gg.jte.*;
 import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
 
@@ -26,25 +21,18 @@ public class TemplateCompiler extends TemplateLoader {
 
     public static final boolean DEBUG = false;
 
+    private final TemplateConfig config;
     private final CodeResolver codeResolver;
-    private final ContentType contentType;
     private final ClassLoader parentClassLoader;
 
     private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
-    private boolean trimControlStructures;
-    private HtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
-    private String[] htmlTags;
-    private String[] htmlAttributes;
-    private String [] compileArgs;
-    private boolean htmlCommentsPreserved;
-    private boolean binaryStaticContent;
 
-    public TemplateCompiler(CodeResolver codeResolver, Path classDirectory, ContentType contentType, ClassLoader parentClassLoader) {
+    public TemplateCompiler(TemplateConfig config, CodeResolver codeResolver, Path classDirectory, ClassLoader parentClassLoader) {
         super(classDirectory);
+        this.config = config;
         this.codeResolver = codeResolver;
-        this.contentType = contentType;
         this.parentClassLoader = parentClassLoader;
     }
 
@@ -87,7 +75,7 @@ public class TemplateCompiler extends TemplateLoader {
             files[i++] = classDirectory.resolve(classDefinition.getJavaFileName()).toFile().getAbsolutePath();
         }
 
-        ClassFilesCompiler.compile(files, compilePath, compileArgs, classDirectory, templateByClassName);
+        ClassFilesCompiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
 
         return classDefinitions.stream().map(ClassDefinition::getJavaFileName).collect(Collectors.toList());
     }
@@ -137,7 +125,7 @@ public class TemplateCompiler extends TemplateLoader {
         ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
         CodeGenerator codeGenerator = new CodeGenerator(templateInfo, classDefinitions, templateDependencies);
-        new TemplateParser(code, TemplateType.Template, codeGenerator, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures, htmlCommentsPreserved).parse();
+        new TemplateParser(code, TemplateType.Template, codeGenerator, config).parse();
 
         this.templateDependencies.put(name, templateDependencies);
 
@@ -186,7 +174,7 @@ public class TemplateCompiler extends TemplateLoader {
         classDefinitions.add(classDefinition);
 
         CodeGenerator codeGenerator = new CodeGenerator(classInfo, classDefinitions, templateDependencies);
-        new TemplateParser(code, type, codeGenerator, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures, htmlCommentsPreserved).parse();
+        new TemplateParser(code, type, codeGenerator, config).parse();
 
         classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
         templateByClassName.put(classDefinition.getName(), classInfo);
@@ -242,41 +230,6 @@ public class TemplateCompiler extends TemplateLoader {
         return result;
     }
 
-    @Override
-    public void setTrimControlStructures(boolean value) {
-        this.trimControlStructures = value;
-    }
-
-    @Override
-    public void setHtmlPolicy(HtmlPolicy htmlPolicy) {
-        this.htmlPolicy = htmlPolicy;
-    }
-
-    @Override
-    public void setHtmlTags(String[] htmlTags) {
-        this.htmlTags = htmlTags;
-    }
-
-    @Override
-    public void setHtmlAttributes(String[] htmlAttributes) {
-        this.htmlAttributes = htmlAttributes;
-    }
-
-    @Override
-    public void setHtmlCommentsPreserved(boolean htmlCommentsPreserved) {
-        this.htmlCommentsPreserved = htmlCommentsPreserved;
-    }
-
-    @Override
-    public void setBinaryStaticContent(boolean binaryStaticContent) {
-        this.binaryStaticContent = binaryStaticContent;
-    }
-
-    @Override
-    public void setCompileArgs(String[] compileArgs) {
-        this.compileArgs = compileArgs;
-    }
-
     private class CodeGenerator implements TemplateParserVisitor {
         private final ClassInfo classInfo;
         private final CodeBuilder javaCode = new CodeBuilder();
@@ -330,7 +283,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         private String getContentClass() {
-            if (contentType == ContentType.Html) {
+            if (config.contentType == ContentType.Html) {
                 return "gg.jte.html.HtmlContent";
             } else {
                 return "gg.jte.Content";
@@ -338,7 +291,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         private void writeTemplateOutputParam() {
-            if (contentType == ContentType.Html) {
+            if (config.contentType == ContentType.Html) {
                 javaCode.append("gg.jte.html.HtmlTemplateOutput jteOutput");
             } else {
                 javaCode.append("gg.jte.TemplateOutput jteOutput");
@@ -461,7 +414,7 @@ public class TemplateCompiler extends TemplateLoader {
                 return;
             }
 
-            if (binaryStaticContent) {
+            if (config.binaryStaticContent) {
                 writeTextBinary(depth, textPart);
             } else {
                 writeTextString(depth, textPart);
@@ -544,7 +497,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         @Override
         public void onUnsafeCodePart(int depth, String codePart) {
-            if (contentType == ContentType.Html) {
+            if (config.contentType == ContentType.Html) {
                 writeIndentation(depth);
                 javaCode.append("jteOutput.setContext(null, null);\n");
             }
@@ -850,7 +803,7 @@ public class TemplateCompiler extends TemplateLoader {
                 writeTemplateOutputParam();
                 javaCode.append(") {\n");
 
-                TemplateParser parser = new TemplateParser(param, TemplateType.Content, CodeGenerator.this, contentType, htmlPolicy, htmlTags, htmlAttributes, trimControlStructures, htmlCommentsPreserved);
+                TemplateParser parser = new TemplateParser(param, TemplateType.Content, CodeGenerator.this, config);
                 parser.setStartIndex(startIndex);
                 parser.setEndIndex(endIndex);
                 parser.setParamsComplete(true);

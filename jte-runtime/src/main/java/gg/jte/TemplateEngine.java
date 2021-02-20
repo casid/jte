@@ -24,6 +24,7 @@ public final class TemplateEngine {
     private final TemplateLoader templateLoader;
     private final TemplateMode templateMode;
     private final ConcurrentMap<String, Template> templateCache;
+    private final TemplateConfig config;
     private final ContentType contentType;
     private final Path classDirectory;
     private final ClassLoader parentClassLoader;
@@ -134,7 +135,9 @@ public final class TemplateEngine {
             throw new NullPointerException("Content type must be specified.");
         }
 
-        this.templateLoader = createTemplateLoader(codeResolver, classDirectory, contentType, templateMode, parentClassLoader);
+        this.config = new TemplateConfig(contentType);
+
+        this.templateLoader = createTemplateLoader(config, codeResolver, classDirectory, templateMode, parentClassLoader);
         this.templateMode = templateMode;
         this.templateCache = new ConcurrentHashMap<>();
         this.contentType = contentType;
@@ -146,13 +149,13 @@ public final class TemplateEngine {
         }
     }
 
-    private static TemplateLoader createTemplateLoader(CodeResolver codeResolver, Path classDirectory, ContentType contentType, TemplateMode templateMode, ClassLoader parentClassLoader) {
+    private static TemplateLoader createTemplateLoader(TemplateConfig config, CodeResolver codeResolver, Path classDirectory, TemplateMode templateMode, ClassLoader parentClassLoader) {
         if (templateMode == TemplateMode.Precompiled) {
             return new RuntimeTemplateLoader(classDirectory, parentClassLoader);
         } else {
             try {
                 Class<?> compilerClass = Class.forName("gg.jte.compiler.TemplateCompiler");
-                return (TemplateLoader)compilerClass.getConstructor(CodeResolver.class, Path.class, ContentType.class, ClassLoader.class).newInstance(codeResolver, classDirectory, contentType, parentClassLoader);
+                return (TemplateLoader)compilerClass.getConstructor(TemplateConfig.class, CodeResolver.class, Path.class, ClassLoader.class).newInstance(config, codeResolver, classDirectory, parentClassLoader);
             } catch (Exception e) {
                 throw new TemplateException("TemplateCompiler could not be located. Maybe jte isn't on your classpath?", e);
             }
@@ -379,7 +382,7 @@ public final class TemplateEngine {
      * @param compileArgs for instance templateEngine.setCompileArgs("--enable-preview", "--release", "" + Runtime.version().feature());
      */
     public void setCompileArgs(String ... compileArgs) {
-        templateLoader.setCompileArgs(compileArgs);
+        config.compileArgs = compileArgs;
     }
 
     /**
@@ -387,7 +390,7 @@ public final class TemplateEngine {
      * @param value true, to enable
      */
     public void setTrimControlStructures(boolean value) {
-        templateLoader.setTrimControlStructures(value);
+        config.trimControlStructures = value;
     }
 
     /**
@@ -399,7 +402,7 @@ public final class TemplateEngine {
         if (htmlPolicy == null) {
             throw new NullPointerException("htmlPolicy must not be null");
         }
-        templateLoader.setHtmlPolicy(htmlPolicy);
+        config.htmlPolicy = htmlPolicy;
     }
 
     /**
@@ -408,7 +411,7 @@ public final class TemplateEngine {
      * @param htmlTags tags to be intercepted, for instance setHtmlTags("form", "input");
      */
     public void setHtmlTags(String ... htmlTags) {
-        templateLoader.setHtmlTags(htmlTags);
+        config.htmlTags = htmlTags;
     }
 
     /**
@@ -418,7 +421,7 @@ public final class TemplateEngine {
      * @param htmlAttributes attributes to be intercepted, for instance setHtmlAttributes("class");
      */
     public void setHtmlAttributes(String ... htmlAttributes) {
-        templateLoader.setHtmlAttributes(htmlAttributes);
+        config.htmlAttributes = htmlAttributes;
     }
 
     /**
@@ -437,7 +440,7 @@ public final class TemplateEngine {
      * @param htmlCommentsPreserved true, to preserve HTML comments in templates
      */
     public void setHtmlCommentsPreserved(boolean htmlCommentsPreserved) {
-        templateLoader.setHtmlCommentsPreserved(htmlCommentsPreserved);
+        config.htmlCommentsPreserved = htmlCommentsPreserved;
     }
 
     /**
@@ -446,6 +449,6 @@ public final class TemplateEngine {
      * @param binaryStaticContent true, to pre-generate UTF-8 encoded byte arrays for all static template parts
      */
     public void setBinaryStaticContent(boolean binaryStaticContent) {
-        templateLoader.setBinaryStaticContent(binaryStaticContent);
+        config.binaryStaticContent = binaryStaticContent;
     }
 }

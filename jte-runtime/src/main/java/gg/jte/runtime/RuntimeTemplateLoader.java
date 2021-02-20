@@ -1,7 +1,5 @@
 package gg.jte.runtime;
 
-import gg.jte.html.HtmlPolicy;
-
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -38,41 +36,6 @@ public class RuntimeTemplateLoader extends TemplateLoader {
     @Override
     protected ClassLoader getClassLoader() {
         return singleClassLoader;
-    }
-
-    @Override
-    public void setTrimControlStructures(boolean value) {
-        // ignored
-    }
-
-    @Override
-    public void setHtmlPolicy(HtmlPolicy htmlPolicy) {
-        // ignored
-    }
-
-    @Override
-    public void setHtmlTags(String[] htmlTags) {
-        // ignored
-    }
-
-    @Override
-    public void setHtmlAttributes(String[] htmlAttributes) {
-        // ignored
-    }
-
-    @Override
-    public void setHtmlCommentsPreserved(boolean htmlCommentsPreserved) {
-        // ignored
-    }
-
-    @Override
-    public void setBinaryStaticContent(boolean binaryStaticContent) {
-        // Ignored
-    }
-
-    @Override
-    public void setCompileArgs(String[] compileArgs) {
-        // Ignored
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class ClassFilesCompiler {
+public class JavaClassFilesCompiler {
     public static void compile(String[] files, List<String> compilePath, String[] compileArgs, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         List<String> args = new ArrayList<>(files.length);
 

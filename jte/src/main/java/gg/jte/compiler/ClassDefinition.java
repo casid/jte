@@ -59,4 +59,8 @@ public final class ClassDefinition {
     public String getBinaryTextPartsFileName() {
         return getName().replace('.', '/') + ".bin";
     }
+
+    public String getExtension() {
+        return extension;
+    }
 }

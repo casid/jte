@@ -36,7 +36,7 @@ public abstract class TemplateLoader {
 
         for (StackTraceElement stackTraceElement : stackTrace) {
             if (stackTraceElement.getClassName().startsWith(Constants.PACKAGE_NAME)) {
-                ClassInfo classInfo = getClassInfo(classLoader, stackTraceElement.getClassName());
+                ClassInfo classInfo = getClassInfo(classLoader, getClassName(stackTraceElement));
                 if (classInfo != null) {
                     return new DebugInfo(classInfo.name, resolveLineNumber(classInfo, stackTraceElement.getLineNumber()));
                 }
@@ -44,6 +44,14 @@ public abstract class TemplateLoader {
         }
 
         return null;
+    }
+
+    private String getClassName(StackTraceElement stackTraceElement) {
+        String className = stackTraceElement.getClassName();
+        if (className.endsWith("$Companion")) {
+            return className.substring(0, className.length() - "$Companion".length());
+        }
+        return className;
     }
 
     protected abstract ClassInfo getClassInfo(ClassLoader classLoader, String className);

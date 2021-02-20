@@ -8,7 +8,7 @@ public class KotlinParamInfo {
         String type;
         String name;
         String defaultValue;
-        boolean varargs;
+        boolean varargs = parameterString.startsWith("vararg");
 
         int nameStartIndex = -1;
         int nameEndIndex = -1;
@@ -16,8 +16,7 @@ public class KotlinParamInfo {
         int typeEndIndex = -1;
         int defaultValueStartIndex = -1;
         int genericDepth = 0;
-        int varArgsIndex = parameterString.indexOf("...");
-        for (int i = 0; i < parameterString.length(); ++i) {
+        for (int i = varargs ? 7 : 0; i < parameterString.length(); ++i) {
             char character = parameterString.charAt(i);
 
             if (character == '<') {
@@ -43,14 +42,14 @@ public class KotlinParamInfo {
                     typeStartIndex = i;
                 }
             } else if (typeEndIndex == -1) {
-                if ((Character.isWhitespace(character) && i > varArgsIndex) || character == '=') {
+                if ((Character.isWhitespace(character)) || character == '=') {
                     typeEndIndex = i;
                 } else if (i == parameterString.length() - 1) {
                     typeEndIndex = i + 1;
                     break;
                 }
             } else if (defaultValueStartIndex == -1) {
-                if (!Character.isWhitespace(character)) {
+                if (!Character.isWhitespace(character) && character != '=') {
                     defaultValueStartIndex = i;
                 }
             }
@@ -66,8 +65,8 @@ public class KotlinParamInfo {
             nameEndIndex = parameterString.length();
         }
 
-        if (nameStartIndex == -1) {
-            visitor.onError("Missing parameter name: '@param " + parameterString + "'");
+        if (typeStartIndex == -1) {
+            visitor.onError("Missing parameter type: '@param " + parameterString + "'");
         }
 
         name = parameterString.substring(nameStartIndex, nameEndIndex);
@@ -77,8 +76,6 @@ public class KotlinParamInfo {
         } else {
             defaultValue = parameterString.substring(defaultValueStartIndex);
         }
-
-        varargs = varArgsIndex != -1;
 
         return new ParamInfo(type, name, defaultValue, varargs);
     }

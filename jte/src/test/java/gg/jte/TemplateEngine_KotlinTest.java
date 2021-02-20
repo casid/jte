@@ -202,7 +202,7 @@ public class TemplateEngine_KotlinTest {
     @Test
     void loop() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("@for (int i : model.array)" +
+        givenTemplate("@for (i in model.array)" +
                 "${i}" +
                 "@endfor");
         thenOutputIs("123");
@@ -211,7 +211,7 @@ public class TemplateEngine_KotlinTest {
     @Test
     void loopWithCondition() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("@for (int i : model.array)" +
+        givenTemplate("@for (i in model.array)" +
                 "@if (i > 1)" +
                 "${i}" +
                 "@endif" +
@@ -222,9 +222,9 @@ public class TemplateEngine_KotlinTest {
     @Test
     void classicLoop() {
         model.array = new int[]{10, 20, 30};
-        givenTemplate("@for (int i = 0; i < model.array.length; ++i)" +
+        givenTemplate("@for (i in model.array.indices)" +
                 "Index ${i} is ${model.array[i]}" +
-                "@if (i < model.array.length - 1)" +
+                "@if (i < model.array.size - 1)" +
                 "<br>" +
                 "@endif" +
                 "@endfor");
@@ -234,8 +234,8 @@ public class TemplateEngine_KotlinTest {
     @Test
     void loopWithVariable() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("@for (int i : model.array)" +
-                "!{int y = i + 1}" +
+        givenTemplate("@for (i in model.array)" +
+                "!{var y = i + 1}" +
                 "${y}" +
                 "@endfor");
         thenOutputIs("234");
@@ -244,7 +244,7 @@ public class TemplateEngine_KotlinTest {
     @Test
     void loopInContentBlock() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("${@`@for (int i : model.array)" +
+        givenTemplate("${@`@for (i in model.array)" +
                 "${i}" +
                 "@endfor`}");
         thenOutputIs("123");
@@ -253,7 +253,7 @@ public class TemplateEngine_KotlinTest {
     @Test
     void unsafeInContentBlock() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("${@`$unsafe{model.array.length}`}");
+        givenTemplate("${@`$unsafe{model.array.size}`}");
         thenOutputIs("3");
     }
 
@@ -271,7 +271,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void variableInContentBlock() {
-        givenTemplate("${@`!{int x = 5;}${x}`}");
+        givenTemplate("${@`!{var x = 5;}${x}`}");
         thenOutputIs("5");
     }
 
@@ -328,7 +328,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void tag_content() {
-        givenTag("card", "@param gg.jte.Content content\n" +
+        givenTag("card", "@param content:gg.jte.Content\n" +
                 "<span>${content}</span>");
         givenTemplate("@tag.card(@`<b>${model.hello}</b>`), That was a tag!");
         thenOutputIs("<span><b>Hello</b></span>, That was a tag!");
@@ -336,7 +336,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void tag_content_comma() {
-        givenTag("card", "@param gg.jte.Content content\n" +
+        givenTag("card", "@param content:gg.jte.Content\n" +
                 "<span>${content}</span>");
         givenTemplate("@tag.card(@`<b>Hello, ${model.hello}</b>`), That was a tag!");
         thenOutputIs("<span><b>Hello, Hello</b></span>, That was a tag!");
@@ -344,10 +344,11 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void tagWithGenericParam() {
-        givenTag("entry", "@param java.util.Map.Entry<String, java.util.List<String>> entry\n" +
-                "${entry.getKey()}: ${entry.getValue().toString()}");
-        givenRawTemplate("@param java.util.Map<String, java.util.List<String>> map\n" +
-                "@for(java.util.Map.Entry entry : map.entrySet())@tag.entry(entry)\n@endfor");
+        givenTag("entry", "@param list:List<String>?\n" +
+                "${list.toString()}");
+        givenRawTemplate("@param map:Map<String, List<String>>\n" +
+                "@tag.entry(map[\"one\"])\n" +
+                "@tag.entry(map[\"two\"])\n");
 
         Map<String, List<String>> model = new TreeMap<>();
         model.put("one", Arrays.asList("1", "2"));
@@ -356,24 +357,24 @@ public class TemplateEngine_KotlinTest {
         StringOutput output = new StringOutput();
         templateEngine.render(templateName, model, output);
 
-        assertThat(output.toString()).isEqualTo("one: [1, 2]\ntwo: [6, 7]\n");
+        assertThat(output.toString()).isEqualTo("[1, 2]\n[6, 7]\n");
     }
 
     @Test
     void tagWithMethodCallForParam() {
-        givenTag("card", "@param java.lang.String firstParam\n" +
-                "@param int secondParam\n" +
+        givenTag("card", "@param firstParam:String\n" +
+                "@param secondParam:Int\n" +
                 "One: ${firstParam}, two: ${secondParam}");
-        givenTemplate("@tag.card(model.getAnotherWorld(), model.x), That was a tag!");
+        givenTemplate("@tag.card(model.anotherWorld, model.x), That was a tag!");
         thenOutputIs("One: Another World, two: 42, That was a tag!");
     }
 
     @Test
     void tagInTag() {
-        givenTag("divTwo", "@param int amount\n" +
+        givenTag("divTwo", "@param amount:Int\n" +
                 "Divided by two is ${amount / 2}!");
-        givenTag("card", "@param java.lang.String firstParam\n" +
-                "@param int secondParam\n" +
+        givenTag("card", "@param firstParam:String\n" +
+                "@param secondParam:Int\n" +
                 "${firstParam}, @tag.divTwo(secondParam)");
         givenTemplate("@tag.card (model.hello, model.x) That was a tag in a tag!");
         thenOutputIs("Hello, Divided by two is 21! That was a tag in a tag!");
@@ -381,7 +382,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void sameTagReused() {
-        givenTag("divTwo", "@param int amount\n" +
+        givenTag("divTwo", "@param amount:Int\n" +
                 "${amount / 2}!");
         givenTemplate("@tag.divTwo(model.x),@tag.divTwo(2 * model.x)");
         thenOutputIs("21!,42!");
@@ -389,7 +390,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void tagRecursion() {
-        givenTag("recursion", "@param int amount\n" +
+        givenTag("recursion", "@param amount:Int\n" +
                 "${amount}" +
                 "@if (amount > 0)" +
                 "@tag.recursion(amount - 1)" +
@@ -410,7 +411,7 @@ public class TemplateEngine_KotlinTest {
     void tagWithoutParams_paramPassed() {
         givenTag("basic", "I do nothing!");
         givenTemplate("@tag.basic(42)");
-        thenRenderingFailsWithException().hasMessageStartingWith("Failed to compile template, error at test/template.jte:2");
+        thenRenderingFailsWithException().hasMessageStartingWith("Failed to compile template, error at test/template.kte:2");
     }
 
     @Test
@@ -422,8 +423,8 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void tagWithNamedParam() {
-        givenTag("named", "@param int one\n" +
-                "@param int two\n" +
+        givenTag("named", "@param one:Int\n" +
+                "@param two:Int\n" +
                 "${one}, ${two}");
         givenTemplate("@tag.named(two = 2, one = 1)");
         thenOutputIs("1, 2");
@@ -431,9 +432,9 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void tagWithNamedParamString() {
-        givenTag("named", "@param int one\n" +
-                "@param int two\n" +
-                "@param String three\n" +
+        givenTag("named", "@param one:Int\n" +
+                "@param two:Int\n" +
+                "@param three:String\n" +
                 "${one}, ${two}, ${three}");
         givenTemplate("@tag.named(\n" +
                 "two = 2,\n" +
@@ -444,17 +445,17 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void tagWithNamedParam_ternary() {
-        givenTag("named", "@param int one\n" +
-                "@param int two\n" +
+        givenTag("named", "@param one:Int\n" +
+                "@param two:Int\n" +
                 "${one}, ${two}");
-        givenTemplate("@tag.named(two = 1 == 2 ? 1 : 0, one = 1)");
+        givenTemplate("@tag.named(two = if(1 == 2) 1 else 0, one = 1)");
         thenOutputIs("1, 0");
     }
 
     @Test
     void tagWithDefaultParam() {
-        givenTag("named", "@param int one = 1\n" +
-                "@param int two = 2\n" +
+        givenTag("named", "@param one:Int = 1\n" +
+                "@param two:Int = 2\n" +
                 "${one}, ${two}");
         givenTemplate("@tag.named()");
 
@@ -463,8 +464,8 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void tagWithDefaultParam_firstSet() {
-        givenTag("named", "@param int one = 1\n" +
-                "@param int two = 2\n" +
+        givenTag("named", "@param one:Int = 1\n" +
+                "@param two:Int = 2\n" +
                 "${one}, ${two}");
         givenTemplate("@tag.named(one = 6)");
 
@@ -473,8 +474,8 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void tagWithDefaultParam_secondSet() {
-        givenTag("named", "@param int one = 1\n" +
-                "@param int two = 2\n" +
+        givenTag("named", "@param one:Int = 1\n" +
+                "@param two:Int = 2\n" +
                 "${one}, ${two}");
         givenTemplate("@tag.named(two= 5)");
 
@@ -484,8 +485,8 @@ public class TemplateEngine_KotlinTest {
     @Test
     void tagWithVarArgs1() {
         givenTag("varargs",
-                "@param String ... values\n" +
-                "@for(String value : values)${value} @endfor");
+                "@param vararg values:String\n" +
+                "@for(value in values)${value} @endfor");
         givenTemplate("@tag.varargs(\"Hello\")");
         thenOutputIs("Hello ");
     }
@@ -493,8 +494,8 @@ public class TemplateEngine_KotlinTest {
     @Test
     void tagWithVarArgs2() {
         givenTag("varargs",
-                "@param String ... values\n" +
-                "@for(String value : values)${value} @endfor");
+                "@param vararg values:String\n" +
+                "@for(value in values)${value} @endfor");
         givenTemplate("@tag.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
     }
@@ -502,20 +503,10 @@ public class TemplateEngine_KotlinTest {
     @Test
     void tagWithVarArgs3() {
         givenTag("localize",
-                "@param String key\n" +
-                "@param String ... values\n" +
-                "${key} with @for(String value : values)${value} @endfor");
+                "@param key:String\n" +
+                "@param vararg values:String\n" +
+                "${key} with @for(value in values)${value} @endfor");
         givenTemplate("@tag.localize(key = \"test.key\", \"Hello\", \"World\")");
-        thenOutputIs("test.key with Hello World ");
-    }
-
-    @Test
-    void tagWithVarArgs4() {
-        givenTag("localize",
-                "@param String key\n" +
-                        "@param String ... values\n" +
-                        "${key} with @for(String value : values)${value} @endfor");
-        givenTemplate("@tag.localize(\"test.key\", \"Hello\", \"World\")");
         thenOutputIs("test.key with Hello World ");
     }
 
@@ -529,13 +520,13 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void commentBeforeImports() {
-        givenRawTemplate("<%--This is a comment--%>@import gg.jte.TemplateEngineTest.Model\n@param Model model\n" + "!{model.setX(12)}${model.x}");
+        givenRawTemplate("<%--This is a comment--%>@import gg.jte.TemplateEngine_KotlinTest.Model\n@param model:Model\n" + "!{model.setX(12)}${model.x}");
         thenOutputIs("12");
     }
 
     @Test
     void commentBeforeParams() {
-        givenRawTemplate("<%--This is a comment--%>@param gg.jte.TemplateEngineTest.Model model\n" + "!{model.setX(12)}${model.x}");
+        givenRawTemplate("<%--This is a comment--%>@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" + "!{model.setX(12)}${model.x}");
         thenOutputIs("12");
     }
 
@@ -589,14 +580,14 @@ public class TemplateEngine_KotlinTest {
     @Test
     void paramWithoutName() {
         givenRawTemplate("@param int\n");
-        thenRenderingFailsWithException().hasMessage("Failed to compile test/template.jte, error at line 1: Missing parameter name: '@param int'");
+        thenRenderingFailsWithException().hasMessage("Failed to compile test/template.kte, error at line 1: Missing parameter type: '@param int'");
     }
 
     @Test
     void layout() {
-        givenLayout("main", "@param gg.jte.TemplateEngineTest.Model model\n" +
-                "@param gg.jte.Content content\n" +
-                "@param gg.jte.Content footer\n" +
+        givenLayout("main", "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                "@param content:gg.jte.Content\n" +
+                "@param footer:gg.jte.Content\n" +
                 "<body>\n" +
                 "<b>Welcome to my site - you are on page ${model.x}</b>\n" +
                 "\n" +
@@ -637,18 +628,18 @@ public class TemplateEngine_KotlinTest {
     @Test
     void nestedLayouts() {
         givenLayout("main",
-                "@param gg.jte.Content header = null\n" +
-                "@param gg.jte.Content content\n" +
-                "@param gg.jte.Content footer = null\n" +
+                "@param header:gg.jte.Content? = null\n" +
+                "@param content:gg.jte.Content\n" +
+                "@param footer:gg.jte.Content? = null\n" +
                 "@if(header != null)<header>${header}</header>@endif" +
                 "<content>${content}</content>" +
                 "@if(footer != null)<footer>${footer}</footer>@endif");
         givenLayout("mainExtended",
-                "@param gg.jte.Content header = null\n" +
-                "@param gg.jte.Content contentPrefix = null\n" +
-                "@param gg.jte.Content content\n" +
-                "@param gg.jte.Content contentSuffix = null\n" +
-                "@param gg.jte.Content footer = null\n" +
+                "@param header:gg.jte.Content? = null\n" +
+                "@param contentPrefix:gg.jte.Content? = null\n" +
+                "@param content:gg.jte.Content\n" +
+                "@param contentSuffix:gg.jte.Content? = null\n" +
+                "@param footer:gg.jte.Content? = null\n" +
                 "@layout.main(header = header, content = @`" +
                 "@if(contentPrefix != null)${contentPrefix}@endif" +
                 "<b>${content}</b>" +
@@ -675,9 +666,9 @@ public class TemplateEngine_KotlinTest {
     @Test
     void layoutWithNamedParams() {
         givenLayout("main",
-                "@param int status = 5\n" +
-                "@param int duration = -1\n" +
-                "@param gg.jte.Content content\n" +
+                "@param status:Int = 5\n" +
+                "@param duration:Int = -1\n" +
+                "@param content:gg.jte.Content\n" +
                 "Hello, ${content} your status is ${status}, the duration is ${duration}");
 
         givenTemplate("@layout.main(content = @`" +
@@ -689,10 +680,10 @@ public class TemplateEngine_KotlinTest {
     @Test
     void layoutWithNamedParams_noNames() {
         givenLayout("main",
-                "@param int status = 5\n" +
-                        "@param int duration = -1\n" +
-                        "@param gg.jte.Content content\n" +
-                        "Hello, ${content} your status is ${status}, the duration is ${duration}");
+                "@param status:Int = 5\n" +
+                "@param duration:Int = -1\n" +
+                "@param content:gg.jte.Content\n" +
+                "Hello, ${content} your status is ${status}, the duration is ${duration}");
 
         givenTemplate("@layout.main(42, 10, @`Sir`)");
 
@@ -702,8 +693,8 @@ public class TemplateEngine_KotlinTest {
     @Test
     void layoutWithVarArgs() {
         givenLayout("varargs",
-                "@param String ... values\n" +
-                        "@for(String value : values)${value} @endfor");
+                "@param vararg values:String\n" +
+                        "@for(value in values)${value} @endfor");
         givenTemplate("@layout.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
     }
@@ -711,9 +702,9 @@ public class TemplateEngine_KotlinTest {
     @Test
     void enumCheck() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngineTest.Model\n" +
-                        "@import gg.jte.TemplateEngineTest.ModelType\n" +
-                        "@param Model model\n" +
+                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                        "@import gg.jte.TemplateEngine_KotlinTest.ModelType\n" +
+                        "@param model:Model\n" +
                         "@if (model.type == ModelType.One)" +
                         "one" +
                         "@else" +
@@ -761,14 +752,14 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void snakeCaseCanBeCompiled() {
-        templateName = "snake-case.jte";
+        templateName = "snake-case.kte";
         givenTemplate("Hello");
         thenOutputIs("Hello");
     }
 
     @Test
     void classPrefix() {
-        templateName = "test/404.jte";
+        templateName = "test/404.kte";
         givenTemplate("Hello");
         thenOutputIs("Hello");
     }
@@ -789,74 +780,74 @@ public class TemplateEngine_KotlinTest {
     @Test
     void exceptionLineNumber1() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngineTest.Model\n" +
+                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
                 "\n" +
-                "@param gg.jte.TemplateEngineTest.Model model\n" +
+                "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
                 "\n" +
                 "${model.getThatThrows()}\n"
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
-                .hasMessage("Failed to render test/template.jte, error at test/template.jte:5");
+                .hasMessage("Failed to render test/template.kte, error at test/template.kte:5");
     }
 
     @Test
     void exceptionLineNumber2() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngineTest.Model\n" +
+                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
                         "\n\n\n" +
-                        "@param gg.jte.TemplateEngineTest.Model model\n" +
+                        "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
                         "\n" +
                         "${model.getThatThrows()}\n"
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
-                .hasMessage("Failed to render test/template.jte, error at test/template.jte:7");
+                .hasMessage("Failed to render test/template.kte, error at test/template.kte:7");
     }
 
     @Test
     void exceptionLineNumber3() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngineTest.Model\n" +
+                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
                         "\n" +
-                        "@param gg.jte.TemplateEngineTest.Model model\n" +
+                        "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
                         "\n" +
                         "${model.hello} ${model.getThatThrows()}\n"
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
-                .hasMessage("Failed to render test/template.jte, error at test/template.jte:5");
+                .hasMessage("Failed to render test/template.kte, error at test/template.kte:5");
     }
 
     @Test
     void exceptionLineNumber4() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngineTest.Model\n" +
+                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
                         "\n" +
-                        "@param gg.jte.TemplateEngineTest.Model model\n" +
+                        "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
                         "\n" +
                         "${model.hello}\n" +
-                        "@for(int i = 0; i < 3; i++)\n" +
+                        "@for(i in 1..3)\n" +
                         "\t${i}\n" +
                         "\t${model.getThatThrows()}\n" +
                         "@endfor\n"
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
-                .hasMessage("Failed to render test/template.jte, error at test/template.jte:8");
+                .hasMessage("Failed to render test/template.kte, error at test/template.kte:8");
     }
 
     @Test
     void exceptionLineNumber5() {
-        givenTag("model", "@param gg.jte.TemplateEngineTest.Model model\n" +
-                "@param int i = 0\n" +
+        givenTag("model", "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                "@param i:Int = 0\n" +
                 "i is: ${i}\n" +
                 "${model.getThatThrows()}");
         givenTemplate("@tag.model(model)");
 
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
-                .hasMessage("Failed to render test/template.jte, error at tag/model.jte:4");
+                .hasMessage("Failed to render test/template.kte, error at tag/model.kte:4");
     }
 
     @Test
@@ -875,29 +866,28 @@ public class TemplateEngine_KotlinTest {
     @Test
     void emptyLayout() {
         givenLayout("test", "");
-        givenTemplate(
-                "@layout.test()");
+        givenTemplate("@layout.test()");
         thenOutputIs("");
     }
 
     @Test
     void compileError0() {
         thenRenderingFailsWithException()
-            .hasMessage("test/template.jte not found");
+            .hasMessage("test/template.kte not found");
     }
 
     @Test
     void compileError1() {
         givenTemplate("@tag.model(model)");
         thenRenderingFailsWithException()
-            .hasMessage("tag/model.jte not found, referenced at test/template.jte:2");
+            .hasMessage("tag/model.kte not found, referenced at test/template.kte:2");
     }
 
     @Test
     void compileError2() {
         givenTemplate("Hello\n@layout.page(model)");
         thenRenderingFailsWithException()
-                .hasMessage("layout/page.jte not found, referenced at test/template.jte:3");
+                .hasMessage("layout/page.kte not found, referenced at test/template.kte:3");
     }
 
     @Test
@@ -907,52 +897,52 @@ public class TemplateEngine_KotlinTest {
                 "${model.helloUnknown}");
 
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at test/template.jte:4\n")
-                .hasMessageContaining("cannot find symbol")
+                .hasMessageStartingWith("Failed to compile template, error at test/template.kte:4\n")
+                .hasMessageContaining("Unresolved reference")
                 .hasMessageContaining("model.helloUnknown");
     }
 
     @Test
     void compileError4() {
-        givenTag("test", "@param gg.jte.TemplateEngineTest.Model model\nThis will not compile!\n${model.helloUnknown}\n!!");
+        givenTag("test", "@param model:gg.jte.TemplateEngine_KotlinTest.Model\nThis will not compile!\n${model.helloUnknown}\n!!");
         givenTemplate("@tag.test(model)");
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at tag/test.jte:3\n")
-                .hasMessageContaining("cannot find symbol")
+                .hasMessageStartingWith("Failed to compile template, error at tag/test.kte:3\n")
+                .hasMessageContaining("Unresolved reference")
                 .hasMessageContaining("model.helloUnknown");
     }
 
     @Test
     void compileError5() {
-        givenTag("test", "@param gg.jte.TemplateEngineTest.Model model\n" +
+        givenTag("test", "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
                 "${\n" +
                 "@`\n" +
                 "This will not compile!\n${model.helloUnknown}\n!!\n" +
                 "`}");
         givenTemplate("@tag.test(model)");
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at tag/test.jte:5\n")
-                .hasMessageContaining("cannot find symbol")
+                .hasMessageStartingWith("Failed to compile template, error at tag/test.kte:5\n")
+                .hasMessageContaining("Unresolved reference")
                 .hasMessageContaining("model.helloUnknown");
     }
 
     @Test
     void calledWithWrongParam1() {
-        givenRawTemplate("@param String hello\n${hello}");
-        thenRenderingFailsWithException().hasMessage("Failed to render test/template.jte, type mismatch for parameter: Expected java.lang.String, got gg.jte.TemplateEngineTest$Model");
+        givenRawTemplate("@param hello:String\n${hello}");
+        thenRenderingFailsWithException().hasMessage("Failed to render test/template.kte, type mismatch for parameter: Expected java.lang.String, got gg.jte.TemplateEngine_KotlinTest$Model");
     }
 
     @Test
     void calledWithWrongParam2() {
-        givenRawTemplate("@param int x\n${x}");
-        thenRenderingFailsWithException().hasMessage("Failed to render test/template.jte, type mismatch for parameter: Expected int, got gg.jte.TemplateEngineTest$Model");
+        givenRawTemplate("@param x:Int\n${x}");
+        thenRenderingFailsWithException().hasMessage("Failed to render test/template.kte, type mismatch for parameter: Expected int, got gg.jte.TemplateEngine_KotlinTest$Model");
     }
 
     @Test
     void calledWithWrongParam3() {
         model = null;
-        givenRawTemplate("@param int x\n${x}");
-        thenRenderingFailsWithException().hasMessage("Failed to render test/template.jte, type mismatch for parameter: Expected int, got null");
+        givenRawTemplate("@param x:Int\n${x}");
+        thenRenderingFailsWithException().hasMessage("Failed to render test/template.kte, type mismatch for parameter: Expected int, got null");
     }
 
     @Test
@@ -964,7 +954,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void getParamInfo_one() {
-        givenRawTemplate("@param int foo\nHello World!");
+        givenRawTemplate("@param foo:Int\nHello World!");
         Map<String, Class<?>> params = templateEngine.getParamInfo(templateName);
         assertThat(params).hasSize(1);
         assertThat(params).containsEntry("foo", int.class);
@@ -972,7 +962,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void getParamInfo_some() {
-        givenRawTemplate("@import gg.jte.Content\n@param int foo\n@param Content content\nHello World!");
+        givenRawTemplate("@import gg.jte.Content\n@param foo:Int\n@param content:Content\nHello World!");
         Map<String, Class<?>> params = templateEngine.getParamInfo(templateName);
         assertThat(params).hasSize(2);
         assertThat(params).containsEntry("foo", int.class);
@@ -981,7 +971,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void getParamInfo_lazy() {
-        givenRawTemplate("@param int foo\nHello World!");
+        givenRawTemplate("@param foo:Int\nHello World!");
         Map<String, Class<?>> params1 = templateEngine.getParamInfo(templateName);
         Map<String, Class<?>> params2 = templateEngine.getParamInfo(templateName);
 
@@ -993,17 +983,6 @@ public class TemplateEngine_KotlinTest {
     void missingContentType() {
         Throwable throwable = catchThrowable(() -> TemplateEngine.create(dummyCodeResolver, null));
         assertThat(throwable).isInstanceOf(NullPointerException.class).hasMessage("Content type must be specified.");
-    }
-
-    @Test
-    void compileArgs_enablePreview() {
-        if (TestUtils.isLegacyJavaVersion()) {
-            return;
-        }
-
-        templateEngine.setCompileArgs("--enable-preview");
-        givenRawTemplate("Hello World!");
-        thenRenderingFailsWithException().hasMessageContaining("--enable-preview must be used with either -source or --release");
     }
 
     private void givenTag(String name, String code) {
@@ -1020,7 +999,7 @@ public class TemplateEngine_KotlinTest {
     }
 
     private void givenLayout(String name, String code) {
-        dummyCodeResolver.givenCode("layout/" + name + ".jte", code);
+        dummyCodeResolver.givenCode("layout/" + name + ".kte", code);
     }
 
     private void thenOutputIs(String expected) {

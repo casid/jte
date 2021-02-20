@@ -1,7 +1,7 @@
 package gg.jte.compiler;
 
 import gg.jte.*;
-import gg.jte.compiler.java.ClassFilesCompiler;
+import gg.jte.compiler.java.JavaClassFilesCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
 import gg.jte.compiler.kotlin.KotlinClassFilesCompiler;
 import gg.jte.compiler.kotlin.KotlinCodeGenerator;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class TemplateCompiler extends TemplateLoader {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     private final TemplateConfig config;
     private final CodeResolver codeResolver;
@@ -70,15 +70,24 @@ public class TemplateCompiler extends TemplateLoader {
     public List<String> precompile(List<String> names, List<String> compilePath) {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(names);
 
+        boolean hasKotlinClasses = false;
+
         String[] files = new String[classDefinitions.size()];
         int i = 0;
         for (ClassDefinition classDefinition : classDefinitions) {
             files[i++] = classDirectory.resolve(classDefinition.getSourceFileName()).toFile().getAbsolutePath();
+            if ("kt".equals(classDefinition.getExtension())) {
+                hasKotlinClasses = true;
+            }
         }
 
-        // TODO determine how to compile stuff?
-        // ClassFilesCompiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
-        KotlinClassFilesCompiler.compile(classDirectory, files);
+        // TODO we probably want kotlin in its own, optional module, so we need to make an interface for the compiler and resolve it dynamically...
+        if (hasKotlinClasses) {
+            // TODO investigate if it is possible to have both kte and jte in one project.
+            KotlinClassFilesCompiler.compile(classDirectory, files, templateByClassName);
+        } else {
+            JavaClassFilesCompiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
+        }
 
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }

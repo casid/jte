@@ -4,7 +4,6 @@ import gg.jte.ContentType;
 import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.compiler.*;
-import gg.jte.compiler.java.JavaParamInfo;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import gg.jte.runtime.DebugInfo;
@@ -63,7 +62,11 @@ public class KotlinCodeGenerator implements CodeGenerator {
             writeClass();
         }
 
-        kotlinCode.append(", ").append(paramInfo.name).append(':').append(paramInfo.type);
+        kotlinCode.append(", ");
+        if (paramInfo.varargs) {
+            kotlinCode.append("vararg ");
+        }
+        kotlinCode.append(paramInfo.name).append(':').append(paramInfo.type);
 
         parameters.add(paramInfo);
     }
@@ -133,7 +136,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
 
-        kotlinCode.append(", params:java.util.Map<String, Object>) {\n");
+        kotlinCode.append(", params:Map<String, Object>) {\n");
         for (ParamInfo parameter : parameters) {
             if (parameter.varargs) {
                 continue;
@@ -141,9 +144,9 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
             kotlinCode.append("\t\tval ").append(parameter.name).append(" = ");
             if (parameter.defaultValue != null) {
-                kotlinCode.append("params.getOrDefault(\"").append(parameter.name).append("\", ");
-                writeJavaCodeWithContentSupport(0, parameter.defaultValue);
-                kotlinCode.append(")");
+                kotlinCode.append("params.getOrElse(\"").append(parameter.name).append("\") {");
+                writeCodeWithContentSupport(0, parameter.defaultValue);
+                kotlinCode.append("}");
             } else {
                 kotlinCode.append("params.get(\"").append(parameter.name).append("\")");
             }
@@ -324,14 +327,14 @@ public class KotlinCodeGenerator implements CodeGenerator {
         writeIndentation(depth);
 
         kotlinCode.append("jteOutput.writeUserContent(");
-        writeJavaCodeWithContentSupport(depth, codePart);
+        writeCodeWithContentSupport(depth, codePart);
         kotlinCode.append(")\n");
     }
 
     @Override
     public void onCodeStatement(int depth, String codePart) {
         writeIndentation(depth);
-        writeJavaCodeWithContentSupport(depth, codePart);
+        writeCodeWithContentSupport(depth, codePart);
         kotlinCode.append("\n");
     }
 
@@ -451,7 +454,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         kotlinCode.append(")");
     }
 
-    private void writeJavaCodeWithContentSupport(int depth, String code) {
+    private void writeCodeWithContentSupport(int depth, String code) {
         if (code.contains("@`")) {
             new ContentProcessor(depth, code).process();
         } else {
@@ -511,7 +514,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     private void appendParam(int depth, String param) {
         kotlinCode.append(", ");
-        writeJavaCodeWithContentSupport(depth, param);
+        writeCodeWithContentSupport(depth, param);
     }
 
     private int getParameterIndex(String name, List<ParamInfo> paramInfos, ParamCallInfo paramCallInfo) {
@@ -613,10 +616,10 @@ public class KotlinCodeGenerator implements CodeGenerator {
         private void writeCode() {
             kotlinCode.append(param, lastWrittenIndex + 1, startIndex - 2);
 
-            kotlinCode.append("new ").append(getContentClass()).append("() {\n");
+            kotlinCode.append("object : ").append(getContentClass()).append(" {\n");
 
             writeIndentation(depth + 1);
-            kotlinCode.append("public void writeTo(");
+            kotlinCode.append("override fun writeTo(");
             writeTemplateOutputParam();
             kotlinCode.append(") {\n");
 

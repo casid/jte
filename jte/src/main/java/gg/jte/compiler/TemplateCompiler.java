@@ -3,8 +3,6 @@ package gg.jte.compiler;
 import gg.jte.*;
 import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
-import gg.jte.compiler.kotlin.KotlinClassCompiler;
-import gg.jte.compiler.kotlin.KotlinCodeGenerator;
 import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
 
@@ -96,7 +94,7 @@ public class TemplateCompiler extends TemplateLoader {
                 Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinClassCompiler");
                 return (ClassCompiler)compilerClass.getConstructor().newInstance();
             } catch (Exception e) {
-                // TODO throw
+                // TODO throw helpful exception
                 throw new TemplateException("?", e);
             }
         } else {
@@ -212,7 +210,13 @@ public class TemplateCompiler extends TemplateLoader {
 
     private CodeGenerator createCodeGenerator(ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
         if ("kte".equals(classInfo.extension)) {
-            return new KotlinCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+            try {
+                Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinCodeGenerator");
+                return (CodeGenerator)compilerClass.getConstructor(TemplateCompiler.class, TemplateConfig.class, ConcurrentHashMap.class, ClassInfo.class, LinkedHashSet.class, LinkedHashSet.class).newInstance(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+            } catch (Exception e) {
+                // TODO throw helpful exception
+                throw new TemplateException("?", e);
+            }
         } else {
             return new JavaCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
         }

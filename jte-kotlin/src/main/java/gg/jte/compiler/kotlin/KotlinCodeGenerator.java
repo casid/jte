@@ -202,7 +202,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
         fields.append("\t@JvmStatic val BINARY_CONTENT = gg.jte.runtime.BinaryContent.load(")
                 .append(classInfo.className)
-                .append(".class, \"")
+                .append(".javaClass, \"")
                 .append(contentFileName)
                 .append("\", ");
 
@@ -218,7 +218,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     private void writeBinaryTextPartsConstants(StringBuilder fields) {
         for (int i = 0; i < binaryTextParts.size(); ++i) {
-            fields.append("\t@JvmStatic val byte[] ").append(TEXT_PART_BINARY).append(i).append(" = BINARY_CONTENT.get(").append(i).append(");\n");
+            fields.append("\t@JvmStatic val ").append(TEXT_PART_BINARY).append(i).append(" = BINARY_CONTENT.get(").append(i).append(")\n");
         }
     }
 

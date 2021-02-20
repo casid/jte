@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused") // Used by gg.jte.compiler.TemplateCompiler
 public class KotlinClassCompiler implements ClassCompiler {
     @Override
     public void compile(String[] files, List<String> compilePath, String[] compileArgs, Path classDirectory, Map<String, ClassInfo> templateByClassName) {

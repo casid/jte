@@ -9,7 +9,7 @@ import gg.jte.runtime.TemplateType;
 
 import java.util.*;
 
-final class TemplateParser {
+public final class TemplateParser {
     private final String templateCode;
     private final TemplateType type;
     private final TemplateParserVisitor visitor;
@@ -52,7 +52,7 @@ final class TemplateParser {
     private char previousChar0;
     private char currentChar;
 
-    TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, TemplateConfig config) {
+    public TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, TemplateConfig config) {
         this.templateCode = templateCode;
         this.type = type;
         this.visitor = visitor;

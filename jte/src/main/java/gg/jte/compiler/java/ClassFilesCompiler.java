@@ -1,4 +1,4 @@
-package gg.jte.compiler;
+package gg.jte.compiler.java;
 
 import gg.jte.TemplateException;
 import gg.jte.runtime.ClassInfo;

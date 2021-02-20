@@ -7,7 +7,7 @@ public final class ClassDefinition {
     private String code;
     private List<byte[]> binaryTextParts;
 
-    ClassDefinition(String name) {
+    public ClassDefinition(String name) {
         this.name = name;
     }
 

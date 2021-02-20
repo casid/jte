@@ -1,12 +1,12 @@
 package gg.jte.compiler;
 
-final class ParamInfo {
-    final String type;
-    final String name;
-    final String defaultValue;
-    final boolean varargs;
+public final class ParamInfo {
+    public final String type;
+    public final String name;
+    public final String defaultValue;
+    public final boolean varargs;
 
-    ParamInfo(String parameterString, TemplateParserVisitor visitor) {
+    public ParamInfo(String parameterString, TemplateParserVisitor visitor) {
         int typeStartIndex = -1;
         int typeEndIndex = -1;
         int nameStartIndex = -1;

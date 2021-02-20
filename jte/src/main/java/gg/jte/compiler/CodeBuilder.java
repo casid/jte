@@ -5,7 +5,7 @@ import gg.jte.runtime.Constants;
 import java.util.Arrays;
 
 @SuppressWarnings("UnusedReturnValue")
-final class CodeBuilder {
+public final class CodeBuilder {
     private static final int INITIAL_CAPACITY = 10;
     private static final int LOAD_FACTOR = 2;
 

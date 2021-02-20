@@ -4,7 +4,7 @@ import gg.jte.runtime.TemplateType;
 
 import java.util.List;
 
-interface TemplateParserVisitor {
+public interface TemplateParserVisitor {
     void onImport(String importClass);
 
     void onParam(ParamInfo parameter);

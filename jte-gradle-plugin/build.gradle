@@ -18,6 +18,11 @@ dependencies {
 group = 'gg.jte'
 version = '1.8.0-SNAPSHOT'
 
+compileJava   {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
 // See https://docs.gradle.org/nightly/userguide/publishing_gradle_plugins.html
 pluginBundle {
     website = 'https://jte.gg'

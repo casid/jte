@@ -1,5 +1,6 @@
-package gg.jte;
+package gg.jte.kotlin;
 
+import gg.jte.*;
 import gg.jte.output.StringOutput;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-public class TemplateEngine_KotlinTest {
+public class TemplateEngineTest {
     String templateName = "test/template.kte";
 
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
@@ -294,16 +295,6 @@ public class TemplateEngine_KotlinTest {
     }
 
     @Test
-    void variable_modern() {
-        if (TestUtils.isLegacyJavaVersion()) {
-            return;
-        }
-
-        givenTemplate("!{var y = 50}${y}");
-        thenOutputIs("50");
-    }
-
-    @Test
     void braceInJavaString() {
         model.hello = ":-)";
         givenTemplate("@if(\":-)\".equals(model.hello))this is a smiley@endif");
@@ -520,13 +511,13 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void commentBeforeImports() {
-        givenRawTemplate("<%--This is a comment--%>@import gg.jte.TemplateEngine_KotlinTest.Model\n@param model:Model\n" + "!{model.setX(12)}${model.x}");
+        givenRawTemplate("<%--This is a comment--%>@import gg.jte.kotlin.TemplateEngineTest.Model\n@param model:Model\n" + "!{model.setX(12)}${model.x}");
         thenOutputIs("12");
     }
 
     @Test
     void commentBeforeParams() {
-        givenRawTemplate("<%--This is a comment--%>@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" + "!{model.setX(12)}${model.x}");
+        givenRawTemplate("<%--This is a comment--%>@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" + "!{model.setX(12)}${model.x}");
         thenOutputIs("12");
     }
 
@@ -585,7 +576,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void layout() {
-        givenLayout("main", "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
+        givenLayout("main", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
                 "@param content:gg.jte.Content\n" +
                 "@param footer:gg.jte.Content\n" +
                 "<body>\n" +
@@ -702,8 +693,8 @@ public class TemplateEngine_KotlinTest {
     @Test
     void enumCheck() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
-                        "@import gg.jte.TemplateEngine_KotlinTest.ModelType\n" +
+                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
+                        "@import gg.jte.kotlin.TemplateEngineTest.ModelType\n" +
                         "@param model:Model\n" +
                         "@if (model.type == ModelType.One)" +
                         "one" +
@@ -780,9 +771,9 @@ public class TemplateEngine_KotlinTest {
     @Test
     void exceptionLineNumber1() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
                 "\n" +
-                "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
                 "\n" +
                 "${model.getThatThrows()}\n"
         );
@@ -794,9 +785,9 @@ public class TemplateEngine_KotlinTest {
     @Test
     void exceptionLineNumber2() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
                         "\n\n\n" +
-                        "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                        "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
                         "\n" +
                         "${model.getThatThrows()}\n"
         );
@@ -808,9 +799,9 @@ public class TemplateEngine_KotlinTest {
     @Test
     void exceptionLineNumber3() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
                         "\n" +
-                        "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                        "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
                         "\n" +
                         "${model.hello} ${model.getThatThrows()}\n"
         );
@@ -822,9 +813,9 @@ public class TemplateEngine_KotlinTest {
     @Test
     void exceptionLineNumber4() {
         givenRawTemplate(
-                "@import gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
                         "\n" +
-                        "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
+                        "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
                         "\n" +
                         "${model.hello}\n" +
                         "@for(i in 1..3)\n" +
@@ -839,7 +830,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void exceptionLineNumber5() {
-        givenTag("model", "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
+        givenTag("model", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
                 "@param i:Int = 0\n" +
                 "i is: ${i}\n" +
                 "${model.getThatThrows()}");
@@ -904,7 +895,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void compileError4() {
-        givenTag("test", "@param model:gg.jte.TemplateEngine_KotlinTest.Model\nThis will not compile!\n${model.helloUnknown}\n!!");
+        givenTag("test", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\nThis will not compile!\n${model.helloUnknown}\n!!");
         givenTemplate("@tag.test(model)");
         thenRenderingFailsWithException()
                 .hasMessageStartingWith("Failed to compile template, error at tag/test.kte:3\n")
@@ -914,7 +905,7 @@ public class TemplateEngine_KotlinTest {
 
     @Test
     void compileError5() {
-        givenTag("test", "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" +
+        givenTag("test", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
                 "${\n" +
                 "@`\n" +
                 "This will not compile!\n${model.helloUnknown}\n!!\n" +
@@ -929,13 +920,13 @@ public class TemplateEngine_KotlinTest {
     @Test
     void calledWithWrongParam1() {
         givenRawTemplate("@param hello:String\n${hello}");
-        thenRenderingFailsWithException().hasMessage("Failed to render test/template.kte, type mismatch for parameter: Expected java.lang.String, got gg.jte.TemplateEngine_KotlinTest$Model");
+        thenRenderingFailsWithException().hasMessage("Failed to render test/template.kte, type mismatch for parameter: Expected java.lang.String, got gg.jte.kotlin.TemplateEngineTest$Model");
     }
 
     @Test
     void calledWithWrongParam2() {
         givenRawTemplate("@param x:Int\n${x}");
-        thenRenderingFailsWithException().hasMessage("Failed to render test/template.kte, type mismatch for parameter: Expected int, got gg.jte.TemplateEngine_KotlinTest$Model");
+        thenRenderingFailsWithException().hasMessage("Failed to render test/template.kte, type mismatch for parameter: Expected int, got gg.jte.kotlin.TemplateEngineTest$Model");
     }
 
     @Test
@@ -990,7 +981,7 @@ public class TemplateEngine_KotlinTest {
     }
 
     private void givenTemplate(String template) {
-        template = "@param model:gg.jte.TemplateEngine_KotlinTest.Model\n" + template;
+        template = "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" + template;
         givenRawTemplate(template);
     }
 

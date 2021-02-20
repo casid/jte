@@ -1,9 +1,9 @@
 package gg.jte.compiler;
 
 import gg.jte.*;
-import gg.jte.compiler.java.JavaClassFilesCompiler;
+import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
-import gg.jte.compiler.kotlin.KotlinClassFilesCompiler;
+import gg.jte.compiler.kotlin.KotlinClassCompiler;
 import gg.jte.compiler.kotlin.KotlinCodeGenerator;
 import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
@@ -70,26 +70,38 @@ public class TemplateCompiler extends TemplateLoader {
     public List<String> precompile(List<String> names, List<String> compilePath) {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(names);
 
-        boolean hasKotlinClasses = false;
+        Set<String> extensions = new HashSet<>();
 
         String[] files = new String[classDefinitions.size()];
         int i = 0;
         for (ClassDefinition classDefinition : classDefinitions) {
             files[i++] = classDirectory.resolve(classDefinition.getSourceFileName()).toFile().getAbsolutePath();
-            if ("kt".equals(classDefinition.getExtension())) {
-                hasKotlinClasses = true;
-            }
+            extensions.add(classDefinition.getExtension());
         }
 
-        // TODO we probably want kotlin in its own, optional module, so we need to make an interface for the compiler and resolve it dynamically...
-        if (hasKotlinClasses) {
-            // TODO investigate if it is possible to have both kte and jte in one project.
-            KotlinClassFilesCompiler.compile(classDirectory, files, templateByClassName);
-        } else {
-            JavaClassFilesCompiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
+        // TODO investigate if it is possible to have both kte and jte in one project.
+        if (extensions.size() > 1) {
+            throw new UnsupportedOperationException("Currently all templates are required to be of the same type. Got " + extensions);
         }
+
+        ClassCompiler compiler = createCompiler(extensions.iterator().next());
+        compiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
 
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
+    }
+
+    private ClassCompiler createCompiler(String extension) {
+        if ("kt".equals(extension)) {
+            try {
+                Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinClassCompiler");
+                return (ClassCompiler)compilerClass.getConstructor().newInstance();
+            } catch (Exception e) {
+                // TODO throw
+                throw new TemplateException("?", e);
+            }
+        } else {
+            return new JavaClassCompiler();
+        }
     }
 
     private LinkedHashSet<ClassDefinition> generate(List<String> names) {

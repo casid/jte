@@ -46,6 +46,7 @@
     <modules>
         <module>jte-runtime</module>
         <module>jte</module>
+        <module>jte-kotlin</module>
         <module>jte-maven-plugin</module>
         <module>jte-runtime-test</module>
         <module>jte-runtime-cp-test</module>

@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static gg.jte.runtime.Constants.TEXT_PART_BINARY;
 
+@SuppressWarnings("unused") // Used by TemplateCompiler
 public class KotlinCodeGenerator implements CodeGenerator {
     private final TemplateCompiler compiler;
     private final TemplateConfig config;
@@ -199,7 +200,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private void writeBinaryTextPartsContent(StringBuilder fields) {
         String contentFileName = new ClassDefinition(classInfo.className, "kt").getBinaryTextPartsFileName();
 
-        fields.append("\tprivate static final gg.jte.runtime.BinaryContent BINARY_CONTENT = gg.jte.runtime.BinaryContent.load(")
+        fields.append("\t@JvmStatic val BINARY_CONTENT = gg.jte.runtime.BinaryContent.load(")
                 .append(classInfo.className)
                 .append(".class, \"")
                 .append(contentFileName)
@@ -217,7 +218,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     private void writeBinaryTextPartsConstants(StringBuilder fields) {
         for (int i = 0; i < binaryTextParts.size(); ++i) {
-            fields.append("\tprivate static final byte[] ").append(TEXT_PART_BINARY).append(i).append(" = BINARY_CONTENT.get(").append(i).append(");\n");
+            fields.append("\t@JvmStatic val byte[] ").append(TEXT_PART_BINARY).append(i).append(" = BINARY_CONTENT.get(").append(i).append(");\n");
         }
     }
 

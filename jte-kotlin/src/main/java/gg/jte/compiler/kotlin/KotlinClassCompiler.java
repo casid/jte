@@ -1,6 +1,7 @@
 package gg.jte.compiler.kotlin;
 
 import gg.jte.TemplateException;
+import gg.jte.compiler.ClassCompiler;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import org.jetbrains.kotlin.cli.common.ExitCode;
@@ -21,8 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class KotlinClassFilesCompiler {
-    public static void compile(Path classDirectory, String[] files, Map<String, ClassInfo> templateByClassName) {
+public class KotlinClassCompiler implements ClassCompiler {
+    @Override
+    public void compile(String[] files, List<String> compilePath, String[] compileArgs, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         K2JVMCompilerArguments compilerArguments = new K2JVMCompilerArguments();
         //compilerArguments.setJvmTarget("");
         compilerArguments.setJavaParameters(true);
@@ -49,7 +51,7 @@ public class KotlinClassFilesCompiler {
                     try {
                         classpath.append(new File(url.toURI()));
                     } catch (URISyntaxException e) {
-                        e.printStackTrace(); // TODO
+                        throw new TemplateException("Failed to append classpath for " + url, e);
                     }
                 }
             }
@@ -95,7 +97,7 @@ public class KotlinClassFilesCompiler {
         }
 
         @Override
-        public void report(CompilerMessageSeverity severity, String s, CompilerMessageLocation location) {
+        public void report(CompilerMessageSeverity severity, @SuppressWarnings("NullableProblems") String s, CompilerMessageLocation location) {
             if (severity.isError()) {
                 if ((location != null) && (location.getLineContent() != null)) {
                     if (className == null) {

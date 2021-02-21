@@ -62,4 +62,22 @@ public interface TemplateOutput {
     default void writeUserContent(char value) {
         writeUserContent(String.valueOf(value));
     }
+
+    default void writeUserContent(Boolean value) {
+        if (value != null) {
+            writeUserContent(value.booleanValue());
+        }
+    }
+
+    default void writeUserContent(Number value) {
+        if (value != null) {
+            writeUserContent(value.toString());
+        }
+    }
+
+    default void writeUserContent(Character value) {
+        if (value != null) {
+            writeUserContent(value.charValue());
+        }
+    }
 }

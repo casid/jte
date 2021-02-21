@@ -14,19 +14,11 @@
     <name>jte</name>
 
     <properties>
-        <kotlin.version>1.3.71</kotlin.version>
         <maven.deploy.skip>false</maven.deploy.skip>
         <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-compiler-embeddable</artifactId>
-            <version>${kotlin.version}</version>
-            <!-- TODO make this dependency optional! -->
-        </dependency>
-
         <dependency>
             <groupId>gg.jte</groupId>
             <artifactId>jte-runtime</artifactId>

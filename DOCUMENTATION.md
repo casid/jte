@@ -488,6 +488,11 @@ Since 1.6.0 there is a <a href="https://plugins.gradle.org/plugin/gg.jte.gradle"
 
 > Make sure that the jte gradle plugin version always matches the jte dependency version.
 
+
+
+<details open>
+<summary>Groovy</summary>
+
 ```groovy
 import gg.jte.ContentType
 import java.nio.file.Paths
@@ -516,6 +521,41 @@ tasks.test {
     dependsOn(tasks.precompileJte)
 }
 ```
+
+</details>
+<details>
+<summary>Kotlin</summary>
+
+```kotlin
+import gg.jte.ContentType
+import java.nio.file.Path
+
+plugins {
+    java
+    id("gg.jte.gradle") version("${jte.version}")
+}
+
+dependencies {
+    implementation("gg.jte:jte:${jte.version}")
+}
+
+tasks.precompileJte {
+    sourceDirectory = Path.of(project.projectDir.absolutePath, "src", "main", "jte")
+    targetDirectory = Path.of(project.projectDir.absolutePath, "jte-classes")
+    compilePath = project.the<SourceSetContainer>()["main"].runtimeClasspath
+    contentType = ContentType.Html
+}
+
+tasks.precompileJte {
+    dependsOn(tasks.compileJava)
+}
+
+tasks.test {
+    dependsOn(tasks.precompileJte)
+}
+```
+
+</details>
 
 ### Using the application class loader (since 1.2.0)
 
@@ -561,6 +601,9 @@ Since 1.6.0 there is a <a href="https://plugins.gradle.org/plugin/gg.jte.gradle"
 
 > Make sure that the jte gradle plugin version always matches the jte dependency version.
 
+<details open>
+<summary>Groovy</summary>
+
 ```groovy
 import gg.jte.ContentType
 import java.nio.file.Paths
@@ -585,6 +628,38 @@ tasks.compileJava {
     dependsOn(tasks.generateJte)
 }
 ```
+
+</details>
+<details>
+<summary>Kotlin</summary>
+
+```kotlin
+import gg.jte.ContentType
+import java.nio.file.Path
+
+plugins {
+    java
+    id("gg.jte.gradle") version("${jte.version}")
+}
+
+dependencies {
+    implementation("gg.jte:jte:${jte.version}")
+}
+
+tasks.generateJte {
+    sourceDirectory = Path.of(project.projectDir.absolutePath, "src", "main", "jte")
+    contentType = ContentType.Html
+}
+
+// Help! If someone knows how to write this line in Kotlin DSL, I'm happy for a PR :-)
+sourceSets.main.java.srcDirs += tasks.generateJte.targetDirectory
+
+tasks.compileJava {
+    dependsOn(tasks.generateJte)
+}
+```
+
+</details>
 
 ## Binary rendering for max throughput
 

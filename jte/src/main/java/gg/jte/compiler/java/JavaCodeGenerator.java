@@ -282,7 +282,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     private void writeText(int depth, String text) {
         writeIndentation(depth);
         javaCode.append("jteOutput.writeContent(\"");
-        appendEscaped(javaCode.getStringBuilder(), text);
+        javaCode.appendEscaped(text);
         javaCode.append("\");\n");
     }
 
@@ -527,29 +527,6 @@ public class JavaCodeGenerator implements CodeGenerator {
     private void writeIndentation(int depth) {
         for (int i = 0; i < depth + 2; ++i) {
             javaCode.append('\t');
-        }
-    }
-
-    private void appendEscaped(StringBuilder javaCode, String text) {
-        for (int i = 0; i < text.length(); ++i) {
-            char c = text.charAt(i);
-            if (c == '\"') {
-                javaCode.append("\\\"");
-            } else if (c == '\n') {
-                javaCode.append("\\n");
-            } else if (c == '\t') {
-                javaCode.append("\\t");
-            } else if (c == '\r') {
-                javaCode.append("\\r");
-            } else if (c == '\f') {
-                javaCode.append("\\f");
-            } else if (c == '\b') {
-                javaCode.append("\\b");
-            } else if (c == '\\') {
-                javaCode.append("\\\\");
-            } else {
-                javaCode.append(c);
-            }
         }
     }
 

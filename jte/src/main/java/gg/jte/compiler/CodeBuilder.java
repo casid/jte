@@ -43,6 +43,31 @@ public final class CodeBuilder {
         return this;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
+    public CodeBuilder appendEscaped(String text) {
+        for (int i = 0; i < text.length(); ++i) {
+            char c = text.charAt(i);
+            if (c == '\"') {
+                code.append("\\\"");
+            } else if (c == '\n') {
+                code.append("\\n");
+            } else if (c == '\t') {
+                code.append("\\t");
+            } else if (c == '\r') {
+                code.append("\\r");
+            } else if (c == '\f') {
+                code.append("\\f");
+            } else if (c == '\b') {
+                code.append("\\b");
+            } else if (c == '\\') {
+                code.append("\\\\");
+            } else {
+                code.append(c);
+            }
+        }
+        return this;
+    }
+
     public CodeBuilder finishTemplateLine() {
         ++currentTemplateLine;
         return this;
@@ -101,10 +126,6 @@ public final class CodeBuilder {
 
     public int[] getLineInfo() {
         return Arrays.copyOf(lineInfo, currentCodeLine);
-    }
-
-    public StringBuilder getStringBuilder() {
-        return code;
     }
 
     public int getCurrentCodeLine() {

@@ -289,7 +289,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private void writeText(int depth, String text) {
         writeIndentation(depth);
         kotlinCode.append("jteOutput.writeContent(\"");
-        appendEscaped(kotlinCode.getStringBuilder(), text);
+        kotlinCode.appendEscaped(text);
         kotlinCode.append("\")\n");
     }
 
@@ -301,7 +301,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
         writeIndentation(depth);
-        kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", null);\n");
+        kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", null)\n");
 
         writeCodePart(depth, codePart);
     }
@@ -309,7 +309,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
         writeIndentation(depth);
-        kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\");\n");
+        kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\")\n");
 
         writeCodePart(depth, codePart);
     }
@@ -399,7 +399,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         writeIndentation(depth);
         kotlinCode.append("jteHtmlInterceptor.onHtmlTagOpened(\"").append(htmlTag.name).append("\", ");
         writeAttributeMap(htmlTag);
-        kotlinCode.append(", jteOutput);\n");
+        kotlinCode.append(", jteOutput)\n");
     }
 
     @Override
@@ -407,13 +407,13 @@ public class KotlinCodeGenerator implements CodeGenerator {
         writeIndentation(depth);
         kotlinCode.append("jteHtmlInterceptor.onHtmlAttributeStarted(\"").append(htmlAttribute.name).append("\", ");
         writeAttributeMap(currentHtmlTag);
-        kotlinCode.append(", jteOutput);\n");
+        kotlinCode.append(", jteOutput)\n");
     }
 
     @Override
     public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
-        kotlinCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput);\n");
+        kotlinCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput)\n");
     }
 
     @Override
@@ -534,29 +534,6 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private void writeIndentation(int depth) {
         for (int i = 0; i < depth + 2; ++i) {
             kotlinCode.append('\t');
-        }
-    }
-
-    private void appendEscaped(StringBuilder javaCode, String text) {
-        for (int i = 0; i < text.length(); ++i) {
-            char c = text.charAt(i);
-            if (c == '\"') {
-                javaCode.append("\\\"");
-            } else if (c == '\n') {
-                javaCode.append("\\n");
-            } else if (c == '\t') {
-                javaCode.append("\\t");
-            } else if (c == '\r') {
-                javaCode.append("\\r");
-            } else if (c == '\f') {
-                javaCode.append("\\f");
-            } else if (c == '\b') {
-                javaCode.append("\\b");
-            } else if (c == '\\') {
-                javaCode.append("\\\\");
-            } else {
-                javaCode.append(c);
-            }
         }
     }
 

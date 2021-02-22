@@ -10,8 +10,8 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
   - [Loops](#loops)
 - [Comments](#comments)
 - [Tags](#tags)
-- [Content](#content)
 - [Layouts](#layouts)
+- [Content](#content)
 - [Variables](#variables)
 - [HTML Rendering](#html-rendering)
   - [Smart Attributes](#smart-attributes)
@@ -219,11 +219,19 @@ And call it like this:
 @tag.list(title = "Things to do", "Cook dinner", "Eat", "Netflix and Chill")
 ```
 
+## Layouts
+
+Layouts have the same features as tags. All layouts must be located within the `layout` directory in the jte root directory.
+
+You can use layouts to better distinguish page layouts from regular tags, but you don't have to.
+
+Layouts usually contain of one or several [content blocks](#content).
+
 ## Content
 
 `gg.jte.Content` is a special parameter type to pass template code to tags, much like lambdas in Java. They are particularly useful to share structure between different templates.
 
-Here is an example tag with a content block:
+Here is an example layout with a content block:
 
 ```htm
 @import org.example.Page
@@ -252,13 +260,13 @@ Here is an example tag with a content block:
 </body>
 ```
 
-The shorthand to create content blocks within jte templates is an `@`followed by two backticks. Let's call the tag we just created and pass a a page content and footer:
+The shorthand to create content blocks within jte templates is an `@`followed by two backticks. Let's call the layout we just created and pass a a page content and footer:
 
 ```htm
 @import org.example.WelcomePage
 @param WelcomePage welcomePage
 
-@tag.page(
+@layout.page(
     page = welcomePage,
     content = @`
         <p>Welcome, ${welcomePage.getUserName()}.</p>
@@ -268,12 +276,6 @@ The shorthand to create content blocks within jte templates is an `@`followed by
     `
 )
 ```
-
-## Layouts
-
-Layouts have the same features as tags. All layouts must be located within the `layout` directory in the jte root directory.
-
-You can use layouts to better distinguish page layouts from regular tags, but you don't have to.
 
 ## Variables
 

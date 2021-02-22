@@ -268,6 +268,12 @@ The shorthand to create content blocks within jte templates is an `@`followed by
 )
 ```
 
+## Layouts
+
+Layouts have the same features as tags. All layouts must be located within the `layout` directory in the jte root directory.
+
+You can use layouts to better distinguish page layouts from regular tags, but you don't have to.
+
 ## Variables
 
 Local variables can be declared like this:

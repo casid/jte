@@ -30,6 +30,8 @@ public class DirectoryCodeResolver implements CodeResolver {
             Path file = root.resolve(name);
             modificationTimes.put(name, getLastModified(file));
             return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+        } catch (NoSuchFileException e) {
+            return null;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

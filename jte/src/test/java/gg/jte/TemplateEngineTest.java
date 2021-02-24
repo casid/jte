@@ -1020,6 +1020,13 @@ public class TemplateEngineTest {
         thenRenderingFailsWithException().hasMessageContaining("--enable-preview must be used with either -source or --release");
     }
 
+    @Test
+    void kteTemplate() {
+        templateName = "test/template.kte";
+        givenRawTemplate("Hello Kotlin!");
+        thenRenderingFailsWithException().hasMessage("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + ".jte", code);
     }

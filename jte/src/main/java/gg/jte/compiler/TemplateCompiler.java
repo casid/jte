@@ -88,14 +88,13 @@ public class TemplateCompiler extends TemplateLoader {
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
-    private ClassCompiler createCompiler(String extension) {
+    ClassCompiler createCompiler(String extension) {
         if ("kt".equals(extension)) {
             try {
                 Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinClassCompiler");
                 return (ClassCompiler)compilerClass.getConstructor().newInstance();
             } catch (Exception e) {
-                // TODO throw helpful exception
-                throw new TemplateException("?", e);
+                throw new TemplateException("Failed to create kotlin compiler. To compile .kte files, you need to add gg.jte:jte-kotlin to your project.", e);
             }
         } else {
             return new JavaClassCompiler();
@@ -214,8 +213,7 @@ public class TemplateCompiler extends TemplateLoader {
                 Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinCodeGenerator");
                 return (CodeGenerator)compilerClass.getConstructor(TemplateCompiler.class, TemplateConfig.class, ConcurrentHashMap.class, ClassInfo.class, LinkedHashSet.class, LinkedHashSet.class).newInstance(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
             } catch (Exception e) {
-                // TODO throw helpful exception
-                throw new TemplateException("?", e);
+                throw new TemplateException("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.", e);
             }
         } else {
             return new JavaCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);

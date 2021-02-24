@@ -660,8 +660,11 @@ tasks.generateJte {
     contentType = ContentType.Html
 }
 
-// Help! If someone knows how to write this line in Kotlin DSL, I'm happy for a PR :-)
-sourceSets.main.java.srcDirs += tasks.generateJte.targetDirectory
+sourceSets {
+    main {
+        java.srcDirs(tasks.generateJte.get().targetDirectory)
+    }
+}
 
 tasks.compileJava {
     dependsOn(tasks.generateJte)

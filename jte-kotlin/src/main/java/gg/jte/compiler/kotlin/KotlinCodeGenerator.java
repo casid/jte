@@ -172,13 +172,13 @@ public class KotlinCodeGenerator implements CodeGenerator {
     }
 
     private void addNameField(StringBuilder fields, String name) {
-        fields.append("\t@JvmStatic val ").append(Constants.NAME_FIELD).append(" = \"");
+        fields.append("\t@JvmField val ").append(Constants.NAME_FIELD).append(" = \"");
         fields.append(name);
         fields.append("\"\n");
     }
 
     private void addLineInfoField(StringBuilder fields) {
-        fields.append("\t@JvmStatic val ").append(Constants.LINE_INFO_FIELD).append(" = intArrayOf(");
+        fields.append("\t@JvmField val ").append(Constants.LINE_INFO_FIELD).append(" = intArrayOf(");
         for (int i = 0; i < kotlinCode.getCurrentCodeLine(); ++i) {
             if (i > 0) {
                 fields.append(',');

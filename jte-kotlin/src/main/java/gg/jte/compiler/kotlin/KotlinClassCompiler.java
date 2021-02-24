@@ -32,6 +32,33 @@ public class KotlinClassCompiler implements ClassCompiler {
         compilerArguments.setNoStdlib(true);
         compilerArguments.setDestination(classDirectory.toFile().getAbsolutePath());
 
+        compilerArguments.setFreeArgs(Arrays.asList(files));
+
+        compilerArguments.setClasspath(resolveClasspath(compilePath));
+
+        K2JVMCompiler compiler = new K2JVMCompiler();
+
+        SimpleKotlinCompilerMessageCollector messageCollector = new SimpleKotlinCompilerMessageCollector(templateByClassName);
+        ExitCode exitCode = compiler.exec(messageCollector, new Services.Builder().build(), compilerArguments);
+
+        if (exitCode != ExitCode.OK && exitCode != ExitCode.COMPILATION_ERROR) {
+            throw new TemplateException(messageCollector.getErrorMessage());
+        }
+
+        if (messageCollector.hasErrors()) {
+            throw new TemplateException(messageCollector.getErrorMessage());
+        }
+    }
+
+    private String resolveClasspath(List<String> compilePath) {
+        if (compilePath != null) {
+            return String.join(File.pathSeparator, compilePath);
+        } else {
+            return resolveClasspathFromClassLoader();
+        }
+    }
+
+    private String resolveClasspathFromClassLoader() {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         StringBuilder classpath = new StringBuilder();
@@ -58,22 +85,7 @@ public class KotlinClassCompiler implements ClassCompiler {
             }
         }
 
-        compilerArguments.setFreeArgs(Arrays.asList(files));
-
-        compilerArguments.setClasspath(classpath.toString());
-
-        K2JVMCompiler compiler = new K2JVMCompiler();
-
-        SimpleKotlinCompilerMessageCollector messageCollector = new SimpleKotlinCompilerMessageCollector(templateByClassName);
-        ExitCode exitCode = compiler.exec(messageCollector, new Services.Builder().build(), compilerArguments);
-
-        if (exitCode != ExitCode.OK && exitCode != ExitCode.COMPILATION_ERROR) {
-            throw new TemplateException(messageCollector.getErrorMessage());
-        }
-
-        if (messageCollector.hasErrors()) {
-            throw new TemplateException(messageCollector.getErrorMessage());
-        }
+        return classpath.toString();
     }
 
     private static class SimpleKotlinCompilerMessageCollector implements MessageCollector {

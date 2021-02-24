@@ -14,9 +14,9 @@
     <name>jte-kotlin</name>
 
     <properties>
-        <kotlin.version>1.4.30</kotlin.version>
         <maven.deploy.skip>false</maven.deploy.skip>
         <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
+        <kotlin.version>1.4.30</kotlin.version>
     </properties>
 
     <dependencies>

@@ -42,8 +42,6 @@ public class GenerateJteTask extends JteTaskBase {
         long end = System.nanoTime();
         long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
         logger.info("Successfully generated " + amount + " jte file" + (amount == 1 ? "" : "s") + " in " + duration + "s to " + targetDirectory);
-
-        getProject().getTasks().withType(SourceTask.class).all(sourceTask -> sourceTask.include(targetDirectory.toAbsolutePath().toString()));
     }
 
 }

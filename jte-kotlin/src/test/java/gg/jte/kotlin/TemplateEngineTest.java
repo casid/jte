@@ -976,6 +976,16 @@ public class TemplateEngineTest {
         assertThat(throwable).isInstanceOf(NullPointerException.class).hasMessage("Content type must be specified.");
     }
 
+    @Test
+    void mixedTemplates() {
+        dummyCodeResolver.givenCode("tag/foo.jte", "Hello foo");
+        dummyCodeResolver.givenCode("tag/bar.kte", "Hello bar");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.precompileAll());
+
+        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class).hasMessage("Currently all templates are required to be of the same type. Got [java, kt]");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + ".kte", code);
     }

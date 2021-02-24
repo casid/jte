@@ -77,7 +77,7 @@ public class TemplateCompiler extends TemplateLoader {
             extensions.add(classDefinition.getExtension());
         }
 
-        // TODO investigate if it is possible to have both kte and jte in one project.
+        // TODO investigate if it is possible to have both kte and jte in one project. https://discuss.kotlinlang.org/t/compiling-mixed-java-and-kotlin-files-on-the-command-line/1553/4
         if (extensions.size() > 1) {
             throw new UnsupportedOperationException("Currently all templates are required to be of the same type. Got " + extensions);
         }

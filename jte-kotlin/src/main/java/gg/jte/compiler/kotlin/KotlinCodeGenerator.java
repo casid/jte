@@ -73,7 +73,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     }
 
     private void writeClass() {
-        kotlinCode.append("class ").append(classInfo.className).append(" {\n");
+        kotlinCode.append("@Suppress(\"unused\") class ").append(classInfo.className).append(" {\n");
         kotlinCode.append("companion object {\n");
         kotlinCode.markFieldsIndex();
         kotlinCode.append("\t@JvmStatic fun render(");
@@ -137,7 +137,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
 
-        kotlinCode.append(", params:Map<String, Object>) {\n");
+        kotlinCode.append(", params:Map<String, Any>) {\n");
         for (ParamInfo parameter : parameters) {
             if (parameter.varargs) {
                 continue;

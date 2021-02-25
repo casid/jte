@@ -73,7 +73,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     }
 
     private void writeClass() {
-        kotlinCode.append("@Suppress(\"unused\") class ").append(classInfo.className).append(" {\n");
+        kotlinCode.append("class ").append(classInfo.className).append(" {\n");
         kotlinCode.append("companion object {\n");
         kotlinCode.markFieldsIndex();
         kotlinCode.append("\t@JvmStatic fun render(");

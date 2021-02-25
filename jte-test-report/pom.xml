@@ -56,6 +56,12 @@
         </dependency>
         <dependency>
             <groupId>gg.jte</groupId>
+            <artifactId>jte-kotlin</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>gg.jte</groupId>
             <artifactId>jte-runtime-test</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -63,6 +69,12 @@
         <dependency>
             <groupId>gg.jte</groupId>
             <artifactId>jte-runtime-cp-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>gg.jte</groupId>
+            <artifactId>jte-runtime-test-kotlin</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

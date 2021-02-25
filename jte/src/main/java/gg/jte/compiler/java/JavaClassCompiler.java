@@ -1,6 +1,7 @@
 package gg.jte.compiler.java;
 
 import gg.jte.TemplateException;
+import gg.jte.compiler.ClassCompiler;
 import gg.jte.runtime.ClassInfo;
 
 import javax.tools.JavaCompiler;
@@ -12,8 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class ClassFilesCompiler {
-    public static void compile(String[] files, List<String> compilePath, String[] compileArgs, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
+public class JavaClassCompiler implements ClassCompiler {
+    @Override
+    public void compile(String[] files, List<String> compilePath, String[] compileArgs, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         List<String> args = new ArrayList<>(files.length);
 
         if (compileArgs != null) {
@@ -31,7 +33,7 @@ public class ClassFilesCompiler {
         runCompiler(args.toArray(new String[0]), classDirectory, templateByClassName);
     }
 
-    private static void runCompiler(String[] args, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
+    private void runCompiler(String[] args, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();

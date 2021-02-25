@@ -26,6 +26,11 @@
             <artifactId>jte</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>gg.jte</groupId>
+            <artifactId>jte-kotlin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.maven</groupId>

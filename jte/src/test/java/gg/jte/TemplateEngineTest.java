@@ -3,7 +3,6 @@ package gg.jte;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import gg.jte.runtime.Constants;
 import gg.jte.output.StringOutput;
 
 import java.util.*;
@@ -1021,8 +1020,15 @@ public class TemplateEngineTest {
         thenRenderingFailsWithException().hasMessageContaining("--enable-preview must be used with either -source or --release");
     }
 
+    @Test
+    void kteTemplate() {
+        templateName = "test/template.kte";
+        givenRawTemplate("Hello Kotlin!");
+        thenRenderingFailsWithException().hasMessage("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.");
+    }
+
     private void givenTag(String name, String code) {
-        dummyCodeResolver.givenCode("tag/" + name + Constants.TAG_EXTENSION, code);
+        dummyCodeResolver.givenCode("tag/" + name + ".jte", code);
     }
 
     private void givenTemplate(String template) {
@@ -1035,7 +1041,7 @@ public class TemplateEngineTest {
     }
 
     private void givenLayout(String name, String code) {
-        dummyCodeResolver.givenCode("layout/" + name + Constants.TAG_EXTENSION, code);
+        dummyCodeResolver.givenCode("layout/" + name + ".jte", code);
     }
 
     private void thenOutputIs(String expected) {

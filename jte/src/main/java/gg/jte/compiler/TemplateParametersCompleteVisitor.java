@@ -12,7 +12,7 @@ class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onParam(ParamInfo parameter) {
+    public void onParam(String parameter) {
         throw new Result(false);
     }
 

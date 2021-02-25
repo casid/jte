@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
     implementation('gg.jte:jte:1.8.0-SNAPSHOT')
-    implementation('gg.jte:jte-runtime:1.8.0-SNAPSHOT')
+    implementation('gg.jte:jte-kotlin:1.8.0-SNAPSHOT')
 }
 
 group = 'gg.jte'

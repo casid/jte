@@ -1,7 +1,7 @@
 package gg.jte.compiler;
 
 import gg.jte.*;
-import gg.jte.compiler.java.ClassFilesCompiler;
+import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
 import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
@@ -58,7 +58,7 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public List<String> generateAll() {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames());
-        return classDefinitions.stream().map(ClassDefinition::getJavaFileName).collect(Collectors.toList());
+        return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
     public List<String> precompileAll(List<String> compilePath) {
@@ -68,15 +68,37 @@ public class TemplateCompiler extends TemplateLoader {
     public List<String> precompile(List<String> names, List<String> compilePath) {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(names);
 
+        Set<String> extensions = new HashSet<>();
+
         String[] files = new String[classDefinitions.size()];
         int i = 0;
         for (ClassDefinition classDefinition : classDefinitions) {
-            files[i++] = classDirectory.resolve(classDefinition.getJavaFileName()).toFile().getAbsolutePath();
+            files[i++] = classDirectory.resolve(classDefinition.getSourceFileName()).toFile().getAbsolutePath();
+            extensions.add(classDefinition.getExtension());
         }
 
-        ClassFilesCompiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
+        // TODO investigate if it is possible to have both kte and jte in one project. https://discuss.kotlinlang.org/t/compiling-mixed-java-and-kotlin-files-on-the-command-line/1553/4
+        if (extensions.size() > 1) {
+            throw new UnsupportedOperationException("Currently all templates are required to be of the same type. Got " + extensions);
+        }
 
-        return classDefinitions.stream().map(ClassDefinition::getJavaFileName).collect(Collectors.toList());
+        ClassCompiler compiler = createCompiler(extensions.iterator().next());
+        compiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
+
+        return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
+    }
+
+    ClassCompiler createCompiler(String extension) {
+        if ("kt".equals(extension)) {
+            try {
+                Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinClassCompiler");
+                return (ClassCompiler)compilerClass.getConstructor().newInstance();
+            } catch (Exception e) {
+                throw new TemplateException("Failed to create kotlin compiler. To compile .kte files, you need to add gg.jte:jte-kotlin to your project.", e);
+            }
+        } else {
+            return new JavaClassCompiler();
+        }
     }
 
     private LinkedHashSet<ClassDefinition> generate(List<String> names) {
@@ -96,7 +118,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         for (ClassDefinition classDefinition : classDefinitions) {
-            try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getJavaFileName()))) {
+            try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getSourceFileName()))) {
                 fileOutput.writeContent(classDefinition.getCode());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -123,12 +145,12 @@ public class TemplateCompiler extends TemplateLoader {
 
         ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
-        JavaCodeGenerator codeGenerator = new JavaCodeGenerator(this, this.config, paramOrder, templateInfo, classDefinitions, templateDependencies);
+        CodeGenerator codeGenerator = createCodeGenerator(templateInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, TemplateType.Template, codeGenerator, config).parse();
 
         this.templateDependencies.put(name, templateDependencies);
 
-        ClassDefinition templateDefinition = new ClassDefinition(templateInfo.fullName);
+        ClassDefinition templateDefinition = new ClassDefinition(templateInfo.fullName, templateInfo);
         templateDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
         classDefinitions.add(templateDefinition);
 
@@ -163,7 +185,7 @@ public class TemplateCompiler extends TemplateLoader {
         templateDependencies.add(name);
         ClassInfo classInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
 
-        ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName);
+        ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName, classInfo);
         if (classDefinitions.contains(classDefinition)) {
             return classInfo;
         }
@@ -172,7 +194,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         classDefinitions.add(classDefinition);
 
-        JavaCodeGenerator codeGenerator = new JavaCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+        CodeGenerator codeGenerator = createCodeGenerator(classInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, type, codeGenerator, config).parse();
 
         classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
@@ -183,6 +205,19 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         return classInfo;
+    }
+
+    private CodeGenerator createCodeGenerator(ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+        if ("kte".equals(classInfo.extension)) {
+            try {
+                Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinCodeGenerator");
+                return (CodeGenerator)compilerClass.getConstructor(TemplateCompiler.class, TemplateConfig.class, ConcurrentHashMap.class, ClassInfo.class, LinkedHashSet.class, LinkedHashSet.class).newInstance(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+            } catch (Exception e) {
+                throw new TemplateException("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.", e);
+            }
+        } else {
+            return new JavaCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+        }
     }
 
     private String resolveCode(String name, DebugInfo debugInfo) {

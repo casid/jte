@@ -1,7 +1,6 @@
 package gg.jte;
 
 import org.junit.jupiter.api.Test;
-import gg.jte.runtime.Constants;
 import gg.jte.output.StringOutput;
 
 import java.util.HashMap;
@@ -182,12 +181,12 @@ public class TemplateEngine_MapParamsTest {
 
     @SuppressWarnings("SameParameterValue")
     private void givenTag(String name, String code) {
-        dummyCodeResolver.givenCode("tag/" + name + Constants.TAG_EXTENSION, code);
+        dummyCodeResolver.givenCode("tag/" + name + ".jte", code);
     }
 
     @SuppressWarnings("SameParameterValue")
     private void givenLayout(String name, String code) {
-        dummyCodeResolver.givenCode("layout/" + name + Constants.TAG_EXTENSION, code);
+        dummyCodeResolver.givenCode("layout/" + name + ".jte", code);
     }
 
     @SuppressWarnings("SameParameterValue")

@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static gg.jte.runtime.Constants.TEXT_PART_BINARY;
 
-public class JavaCodeGenerator implements TemplateParserVisitor {
+public class JavaCodeGenerator implements CodeGenerator {
     private final TemplateCompiler compiler;
     private final TemplateConfig config;
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder;
@@ -54,15 +54,17 @@ public class JavaCodeGenerator implements TemplateParserVisitor {
     }
 
     @Override
-    public void onParam(ParamInfo parameter) {
+    public void onParam(String parameter) {
+        ParamInfo paramInfo = JavaParamInfo.parse(parameter, this);
+
         writePackageIfRequired();
         if (!hasWrittenClass) {
             writeClass();
         }
 
-        javaCode.append(", ").append(parameter.type).append(' ').append(parameter.name);
+        javaCode.append(", ").append(paramInfo.type).append(' ').append(paramInfo.name);
 
-        parameters.add(parameter);
+        parameters.add(paramInfo);
     }
 
     private void writeClass() {
@@ -117,8 +119,8 @@ public class JavaCodeGenerator implements TemplateParserVisitor {
         javaCode.insertFieldLines(lineCount);
 
         StringBuilder fields = new StringBuilder(64 + 32 * lineCount);
-        javaCode.addNameField(fields, classInfo.name);
-        javaCode.addLineInfoField(fields);
+        addNameField(fields, classInfo.name);
+        addLineInfoField(fields);
         writeBinaryTextParts(fields);
 
         javaCode.insertFields(fields);
@@ -161,6 +163,23 @@ public class JavaCodeGenerator implements TemplateParserVisitor {
         this.classInfo.lineInfo = javaCode.getLineInfo();
     }
 
+    private void addLineInfoField(StringBuilder fields) {
+        fields.append("\tpublic static final int[] ").append(Constants.LINE_INFO_FIELD).append(" = {");
+        for (int i = 0; i < javaCode.getCurrentCodeLine(); ++i) {
+            if (i > 0) {
+                fields.append(',');
+            }
+            fields.append(javaCode.getLineInfo(i));
+        }
+        fields.append("};\n");
+    }
+
+    private void addNameField(StringBuilder fields, String name) {
+        fields.append("\tpublic static final String ").append(Constants.NAME_FIELD).append(" = \"");
+        fields.append(name);
+        fields.append("\";\n");
+    }
+
     private void writeBinaryTextParts(StringBuilder fields) {
         if (binaryTextParts.isEmpty()) {
             return;
@@ -171,7 +190,7 @@ public class JavaCodeGenerator implements TemplateParserVisitor {
     }
 
     private void writeBinaryTextPartsContent(StringBuilder fields) {
-        String contentFileName = new ClassDefinition(classInfo.className).getBinaryTextPartsFileName();
+        String contentFileName = new ClassDefinition(classInfo.className, "java").getBinaryTextPartsFileName();
 
         fields.append("\tprivate static final gg.jte.runtime.BinaryContent BINARY_CONTENT = gg.jte.runtime.BinaryContent.load(")
                 .append(classInfo.className)
@@ -263,7 +282,7 @@ public class JavaCodeGenerator implements TemplateParserVisitor {
     private void writeText(int depth, String text) {
         writeIndentation(depth);
         javaCode.append("jteOutput.writeContent(\"");
-        appendEscaped(javaCode.getStringBuilder(), text);
+        javaCode.appendEscaped(text);
         javaCode.append("\");\n");
     }
 
@@ -357,7 +376,7 @@ public class JavaCodeGenerator implements TemplateParserVisitor {
     @Override
     public void onTag(int depth, TemplateType type, String name, List<String> params) {
         String directory = type == TemplateType.Layout ? Constants.LAYOUT_DIRECTORY : Constants.TAG_DIRECTORY;
-        String tagName = directory + name.replace('.', '/') + Constants.TAG_EXTENSION;
+        String tagName = directory + name.replace('.', '/') + ".jte";
         ClassInfo tagInfo = compiler.generateTagOrLayout(type, tagName, classDefinitions, templateDependencies, getCurrentDebugInfo());
 
         writeIndentation(depth);
@@ -511,33 +530,12 @@ public class JavaCodeGenerator implements TemplateParserVisitor {
         }
     }
 
-    private void appendEscaped(StringBuilder javaCode, String text) {
-        for (int i = 0; i < text.length(); ++i) {
-            char c = text.charAt(i);
-            if (c == '\"') {
-                javaCode.append("\\\"");
-            } else if (c == '\n') {
-                javaCode.append("\\n");
-            } else if (c == '\t') {
-                javaCode.append("\\t");
-            } else if (c == '\r') {
-                javaCode.append("\\r");
-            } else if (c == '\f') {
-                javaCode.append("\\f");
-            } else if (c == '\b') {
-                javaCode.append("\\b");
-            } else if (c == '\\') {
-                javaCode.append("\\\\");
-            } else {
-                javaCode.append(c);
-            }
-        }
-    }
-
+    @Override
     public String getCode() {
         return javaCode.getCode();
     }
 
+    @Override
     public List<byte[]> getBinaryTextParts() {
         return binaryTextParts;
     }

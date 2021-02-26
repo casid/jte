@@ -88,16 +88,12 @@ public class StringOutput extends Writer implements TemplateOutput {
 
     @Override
     public void write(String str) {
-        if (str != null) {
-            stringBuilder.append(str);
-        }
+        stringBuilder.append(str);
     }
 
     @Override
     public void write(String str, int off, int len) {
-        if (str != null) {
-            stringBuilder.append(str, off, len);
-        }
+        stringBuilder.append(str, off, off + len);
     }
 
     @Override

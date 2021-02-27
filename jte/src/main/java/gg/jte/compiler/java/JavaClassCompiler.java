@@ -1,5 +1,6 @@
 package gg.jte.compiler.java;
 
+import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.compiler.ClassCompiler;
 import gg.jte.runtime.ClassInfo;
@@ -15,11 +16,11 @@ import java.util.Map;
 
 public class JavaClassCompiler implements ClassCompiler {
     @Override
-    public void compile(String[] files, List<String> compilePath, String[] compileArgs, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
+    public void compile(String[] files, List<String> compilePath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         List<String> args = new ArrayList<>(files.length);
 
-        if (compileArgs != null) {
-            args.addAll(Arrays.asList(compileArgs));
+        if (config.compileArgs != null) {
+            args.addAll(Arrays.asList(config.compileArgs));
         }
         args.add("-parameters");
 

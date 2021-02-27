@@ -3,6 +3,7 @@ package gg.jte.maven;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
+import gg.jte.runtime.Constants;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -50,6 +51,9 @@ public class GeneratorMojo extends AbstractMojo {
     @Parameter(readonly = true)
     public boolean binaryStaticContent;
 
+    @Parameter(readonly = true)
+    public String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
+
 
     @Override
     public void execute() {
@@ -61,7 +65,7 @@ public class GeneratorMojo extends AbstractMojo {
 
         getLog().info("Generating jte templates found in " + source);
 
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target, ContentType.valueOf(contentType));
+        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target, ContentType.valueOf(contentType), null, packageName);
         templateEngine.setTrimControlStructures(trimControlStructures);
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);

@@ -3,7 +3,6 @@ package gg.jte.gradle;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
 import org.gradle.api.logging.Logger;
-import org.gradle.api.tasks.SourceTask;
 import org.gradle.api.tasks.TaskAction;
 
 import java.nio.file.Paths;
@@ -22,7 +21,7 @@ public class GenerateJteTask extends JteTaskBase {
 
         logger.info("Generating jte templates found in " + sourceDirectory);
 
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(sourceDirectory), targetDirectory, contentType);
+        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(sourceDirectory), targetDirectory, contentType, null, packageName);
         templateEngine.setTrimControlStructures(Boolean.TRUE.equals(trimControlStructures));
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);

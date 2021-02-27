@@ -1,6 +1,7 @@
 package gg.jte;
 
 import gg.jte.output.StringOutput;
+import gg.jte.runtime.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,7 @@ class TemplateEngine_PrecompiledReloadableTest {
         codeResolver.givenCode("hello.jte" , "Hello Word!");
 
         // Our CI did this (precompiled all templates)
-        precompiler = TemplateEngine.create(codeResolver, classDirectory, contentType);
+        precompiler = TemplateEngine.create(codeResolver, classDirectory, contentType, null, Constants.PACKAGE_NAME_PRECOMPILED);
         precompiler.precompileAll();
 
         // We start the app with a precompiled engine

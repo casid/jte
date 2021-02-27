@@ -1,5 +1,6 @@
 package gg.jte.compiler.kotlin;
 
+import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.compiler.ClassCompiler;
 import gg.jte.runtime.ClassInfo;
@@ -25,7 +26,7 @@ import java.util.Map;
 @SuppressWarnings("unused") // Used by gg.jte.compiler.TemplateCompiler
 public class KotlinClassCompiler implements ClassCompiler {
     @Override
-    public void compile(String[] files, List<String> compilePath, String[] compileArgs, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
+    public void compile(String[] files, List<String> compilePath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         K2JVMCompilerArguments compilerArguments = new K2JVMCompilerArguments();
         //compilerArguments.setJvmTarget("");
         compilerArguments.setJavaParameters(true);
@@ -38,7 +39,7 @@ public class KotlinClassCompiler implements ClassCompiler {
 
         K2JVMCompiler compiler = new K2JVMCompiler();
 
-        SimpleKotlinCompilerMessageCollector messageCollector = new SimpleKotlinCompilerMessageCollector(templateByClassName);
+        SimpleKotlinCompilerMessageCollector messageCollector = new SimpleKotlinCompilerMessageCollector(templateByClassName, config.packageName);
         ExitCode exitCode = compiler.exec(messageCollector, new Services.Builder().build(), compilerArguments);
 
         if (exitCode != ExitCode.OK && exitCode != ExitCode.COMPILATION_ERROR) {
@@ -92,12 +93,14 @@ public class KotlinClassCompiler implements ClassCompiler {
 
         private final Map<String, ClassInfo> templateByClassName;
         private final List<String> errors = new ArrayList<>();
+        private final String packageName;
 
         private String className;
         private int line;
 
-        private SimpleKotlinCompilerMessageCollector(Map<String, ClassInfo> templateByClassName) {
+        private SimpleKotlinCompilerMessageCollector(Map<String, ClassInfo> templateByClassName, String packageName) {
             this.templateByClassName = templateByClassName;
+            this.packageName = packageName;
         }
 
         @Override
@@ -130,7 +133,7 @@ public class KotlinClassCompiler implements ClassCompiler {
         private String extractClassName(CompilerMessageSourceLocation location) {
             String path = location.getPath();
             path = path.replace('/', '.').replace('\\', '.');
-            int packageIndex = path.indexOf(Constants.PACKAGE_NAME);
+            int packageIndex = path.indexOf(packageName);
 
             path = path.substring(packageIndex);
 

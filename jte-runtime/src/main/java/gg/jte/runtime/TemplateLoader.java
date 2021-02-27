@@ -11,13 +11,15 @@ import java.util.List;
 
 public abstract class TemplateLoader {
     protected final Path classDirectory;
+    protected final String packageName;
 
-    protected TemplateLoader(Path classDirectory) {
+    protected TemplateLoader(Path classDirectory, String packageName) {
         this.classDirectory = classDirectory;
+        this.packageName = packageName;
     }
 
     public Template load(String name) {
-        ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
+        ClassInfo templateInfo = new ClassInfo(name, packageName);
 
         TemplateType templateType = getTemplateType(name);
 
@@ -35,7 +37,7 @@ public abstract class TemplateLoader {
         }
 
         for (StackTraceElement stackTraceElement : stackTrace) {
-            if (stackTraceElement.getClassName().startsWith(Constants.PACKAGE_NAME)) {
+            if (stackTraceElement.getClassName().startsWith(packageName)) {
                 ClassInfo classInfo = getClassInfo(classLoader, getClassName(stackTraceElement));
                 if (classInfo != null) {
                     return new DebugInfo(classInfo.name, resolveLineNumber(classInfo, stackTraceElement.getLineNumber()));

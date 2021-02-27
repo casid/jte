@@ -58,7 +58,7 @@ public class PrecompileJteTask extends JteTaskBase {
 
         logger.info("Precompiling jte templates found in " + sourceDirectory);
 
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(sourceDirectory), targetDirectory, contentType);
+        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(sourceDirectory), targetDirectory, contentType, null, packageName);
         templateEngine.setTrimControlStructures(Boolean.TRUE.equals(trimControlStructures));
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);

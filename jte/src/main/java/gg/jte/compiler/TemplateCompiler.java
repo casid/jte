@@ -29,7 +29,7 @@ public class TemplateCompiler extends TemplateLoader {
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
 
     public TemplateCompiler(TemplateConfig config, CodeResolver codeResolver, Path classDirectory, ClassLoader parentClassLoader) {
-        super(classDirectory);
+        super(classDirectory, config.packageName);
         this.config = config;
         this.codeResolver = codeResolver;
         this.parentClassLoader = parentClassLoader;
@@ -52,7 +52,7 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     public void cleanAll() {
-        IoUtils.deleteDirectoryContent(classDirectory.resolve(Constants.PACKAGE_NAME.replace('.', '/')));
+        IoUtils.deleteDirectoryContent(classDirectory.resolve(config.packageName.replace('.', '/')));
     }
 
     @Override
@@ -83,7 +83,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         ClassCompiler compiler = createCompiler(extensions.iterator().next());
-        compiler.compile(files, compilePath, config.compileArgs, classDirectory, templateByClassName);
+        compiler.compile(files, compilePath, config, classDirectory, templateByClassName);
 
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
@@ -143,7 +143,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
 
-        ClassInfo templateInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
+        ClassInfo templateInfo = new ClassInfo(name, config.packageName);
 
         CodeGenerator codeGenerator = createCodeGenerator(templateInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, TemplateType.Template, codeGenerator, config).parse();
@@ -183,7 +183,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     public ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
         templateDependencies.add(name);
-        ClassInfo classInfo = new ClassInfo(name, Constants.PACKAGE_NAME);
+        ClassInfo classInfo = new ClassInfo(name, config.packageName);
 
         ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName, classInfo);
         if (classDefinitions.contains(classDefinition)) {

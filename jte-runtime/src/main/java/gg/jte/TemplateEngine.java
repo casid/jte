@@ -76,7 +76,25 @@ public final class TemplateEngine {
      * @return a fresh TemplateEngine instance
      */
     public static TemplateEngine create(CodeResolver codeResolver, Path classDirectory, ContentType contentType, ClassLoader parentClassLoader) {
-        return new TemplateEngine(codeResolver, classDirectory, contentType, TemplateMode.OnDemand, parentClassLoader);
+        return create(codeResolver, classDirectory, contentType, parentClassLoader, Constants.PACKAGE_NAME_ON_DEMAND);
+    }
+
+    /**
+     * Creates a new template engine.
+     * All templates are compiled to Java class files on demand.
+     * A JDK is required.
+     * Every template has its own class loader.
+     * This is recommended when running templates on your developer machine.
+     *
+     * @param codeResolver to lookup jte templates
+     * @param classDirectory where template class files are compiled to
+     * @param contentType the content type of all templates this engine manages
+     * @param parentClassLoader the parent classloader to use, or null to use the application class loader as parent
+     * @param packageName the package name, where template classes are generated to
+     * @return a fresh TemplateEngine instance
+     */
+    public static TemplateEngine create(CodeResolver codeResolver, Path classDirectory, ContentType contentType, ClassLoader parentClassLoader, String packageName) {
+        return new TemplateEngine(codeResolver, classDirectory, contentType, TemplateMode.OnDemand, parentClassLoader, packageName);
     }
 
     /**
@@ -127,15 +145,34 @@ public final class TemplateEngine {
      * @return a fresh TemplateEngine instance
      */
     public static TemplateEngine createPrecompiled(Path classDirectory, ContentType contentType, ClassLoader parentClassLoader) {
-        return new TemplateEngine(null, classDirectory, contentType, TemplateMode.Precompiled, parentClassLoader);
+        return createPrecompiled(classDirectory, contentType, parentClassLoader, Constants.PACKAGE_NAME_PRECOMPILED);
     }
 
-    private TemplateEngine(CodeResolver codeResolver, Path classDirectory, ContentType contentType, TemplateMode templateMode, ClassLoader parentClassLoader) {
+    /**
+     * Creates a new template engine.
+     * All templates must have been precompiled to Java class files already.
+     * The template engine will load them from the specified classDirectory.
+     * No JDK is required.
+     * All templates share one class loader with each other.
+     * This is recommended when running templates in production.
+     * How to precompile templates: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates
+     *
+     * @param classDirectory where template class files are located
+     * @param contentType the content type of all templates this engine manages
+     * @param parentClassLoader the parent classloader to use, or null to use the application class loader as parent (only has an effect if classDirectory is not null)
+     * @param packageName the package name, where template classes are generated to
+     * @return a fresh TemplateEngine instance
+     */
+    public static TemplateEngine createPrecompiled(Path classDirectory, ContentType contentType, ClassLoader parentClassLoader, String packageName) {
+        return new TemplateEngine(null, classDirectory, contentType, TemplateMode.Precompiled, parentClassLoader, packageName);
+    }
+
+    private TemplateEngine(CodeResolver codeResolver, Path classDirectory, ContentType contentType, TemplateMode templateMode, ClassLoader parentClassLoader, String packageName) {
         if (contentType == null) {
             throw new NullPointerException("Content type must be specified.");
         }
 
-        this.config = new TemplateConfig(contentType);
+        this.config = new TemplateConfig(contentType, packageName);
 
         this.templateLoader = createTemplateLoader(config, codeResolver, classDirectory, templateMode, parentClassLoader);
         this.templateMode = templateMode;
@@ -151,7 +188,7 @@ public final class TemplateEngine {
 
     private static TemplateLoader createTemplateLoader(TemplateConfig config, CodeResolver codeResolver, Path classDirectory, TemplateMode templateMode, ClassLoader parentClassLoader) {
         if (templateMode == TemplateMode.Precompiled) {
-            return new RuntimeTemplateLoader(classDirectory, parentClassLoader);
+            return new RuntimeTemplateLoader(classDirectory, parentClassLoader, config.packageName);
         } else {
             try {
                 Class<?> compilerClass = Class.forName("gg.jte.compiler.TemplateCompiler");
@@ -366,7 +403,7 @@ public final class TemplateEngine {
      * @throws TemplateException in case there was an error during class loading, in this case you should keep the current engine running!
      */
     public TemplateEngine reloadPrecompiled(Path classDirectory) throws TemplateException {
-        TemplateEngine engine = createPrecompiled(classDirectory, contentType, parentClassLoader);
+        TemplateEngine engine = createPrecompiled(classDirectory, contentType, parentClassLoader, config.packageName);
         engine.setHtmlInterceptor(htmlInterceptor);
 
         Set<String> templates = new HashSet<>(templateCache.keySet());

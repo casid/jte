@@ -7,8 +7,8 @@ import java.util.List;
 public class RuntimeTemplateLoader extends TemplateLoader {
     private final ClassLoader singleClassLoader;
 
-    public RuntimeTemplateLoader(Path classDirectory, ClassLoader parentClassLoader) {
-        super(classDirectory);
+    public RuntimeTemplateLoader(Path classDirectory, ClassLoader parentClassLoader, String packageName) {
+        super(classDirectory, packageName);
         this.singleClassLoader = createClassLoader(parentClassLoader);
     }
 

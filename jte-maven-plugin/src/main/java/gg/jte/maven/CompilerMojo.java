@@ -4,6 +4,7 @@ import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.resolve.DirectoryCodeResolver;
+import gg.jte.runtime.Constants;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -62,6 +63,9 @@ public class CompilerMojo extends AbstractMojo {
     @Parameter(readonly = true)
     public String[] compileArgs;
 
+    @Parameter(readonly = true)
+    public String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
+
 
     @Override
     public void execute() {
@@ -73,7 +77,7 @@ public class CompilerMojo extends AbstractMojo {
 
         getLog().info("Precompiling jte templates found in " + source);
 
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target, ContentType.valueOf(contentType));
+        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target, ContentType.valueOf(contentType), null, packageName);
         templateEngine.setTrimControlStructures(trimControlStructures);
         templateEngine.setHtmlTags(htmlTags);
         templateEngine.setHtmlAttributes(htmlAttributes);

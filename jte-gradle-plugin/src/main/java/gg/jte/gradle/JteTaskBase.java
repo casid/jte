@@ -1,6 +1,7 @@
 package gg.jte.gradle;
 
 import gg.jte.ContentType;
+import gg.jte.runtime.Constants;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
@@ -19,6 +20,7 @@ public abstract class JteTaskBase extends DefaultTask {
     protected String[] htmlAttributes;
     protected Boolean htmlCommentsPreserved;
     protected Boolean binaryStaticContent;
+    protected String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
 
     @InputDirectory
     public Path getSourceDirectory() {
@@ -96,5 +98,15 @@ public abstract class JteTaskBase extends DefaultTask {
     @Optional
     public Boolean getBinaryStaticContent() {
         return binaryStaticContent;
+    }
+
+    @Input
+    @Optional
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 }

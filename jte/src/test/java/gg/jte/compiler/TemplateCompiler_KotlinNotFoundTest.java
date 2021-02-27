@@ -4,6 +4,7 @@ import gg.jte.ContentType;
 import gg.jte.DummyCodeResolver;
 import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
+import gg.jte.runtime.Constants;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 public class TemplateCompiler_KotlinNotFoundTest {
     @Test
     void kotlinNotOnClassPath() {
-        TemplateCompiler templateCompiler = new TemplateCompiler(new TemplateConfig(ContentType.Plain), new DummyCodeResolver(), Paths.get(""), null);
+        TemplateCompiler templateCompiler = new TemplateCompiler(new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED), new DummyCodeResolver(), Paths.get(""), null);
 
         Throwable throwable = catchThrowable(() -> templateCompiler.createCompiler("kt"));
 

@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PreCompileTemplatesTest {
     @Test
     void precompileAll() {
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Paths.get("src/test/resources/benchmark")), Paths.get("jte-classes"), ContentType.Plain);
+        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Paths.get("src/test/resources/benchmark")), Paths.get("jte-classes"), ContentType.Plain, null, "gg.jte.generated");
         templateEngine.cleanAll();
         List<String> javaFiles = templateEngine.precompileAll();
 
@@ -43,7 +43,7 @@ public class PreCompileTemplatesTest {
             ClassLoader externalClassLoader = new URLClassLoader(new URL[] {contextClassLoader.getResource("external/external.jar")});
             Thread.currentThread().setContextClassLoader(externalClassLoader);
 
-            TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Paths.get("src/test/resources/external")), Paths.get("jte-classes"), ContentType.Plain);
+            TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(Paths.get("src/test/resources/external")), Paths.get("jte-classes"), ContentType.Plain, null, "gg.jte.generated");
             templateEngine.cleanAll();
             templateEngine.precompileAll(getCompilePath("src/test/resources/external/external.jar"));
 

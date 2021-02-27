@@ -3,6 +3,7 @@
 jte is a simple, yet powerful templating engine for Java. All jte templates are compiled to Java class files, meaning jte adds essentially zero overhead to your application. All template files use the .jte file extension.
 
 ## Table of Contents
+
 - [Rendering a template](#rendering-a-template)
 - [Displaying data](#displaying-data)
 - [Control structures](#control-structures)
@@ -44,7 +45,9 @@ templateEngine.render("example.jte", model, output);
 
 Where `output` specifies where the template is rendered to and `model` is the data passed to this template, which can be an instance of any class. Ideally, root templates have exactly one data parameter passed to them. If multiple parameters are required, there is a `render` method overload that takes a `Map<String, Object>`.
 
-> Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required. Currently the following implementations are available:
+> Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required.
+  Currently the following implementations are available:
+
 > - `StringOutput` - writes to a string
 > - `FileOutput` - writes to the given file
 > - `PrintWriterOutput` - writes to a `PrintWriter`, for instance the writer provided by `HttpServletRequest`.
@@ -56,7 +59,6 @@ Hello world!
 ```
 
 Rendering it with `templateEngine.render("example.jte", null, output);` will return `Hello world!`.
-
 
 ## Displaying data
 
@@ -169,7 +171,8 @@ Subdirectories in the `tag` directory act like packages in java. For instance, i
 
 ### Named parameters
 
-If you don't want to depend on the parameter order, you can explicitly name parameters when calling the template (this is what the <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> suggests by default).
+If you don't want to depend on the parameter order, you can explicitly name parameters when calling the template
+(this is what the [IntelliJ plugin](https://plugins.jetbrains.com/plugin/14521-jte) suggests by default).
 
 ```xml
 @tag.entry.drawEntry(entry = model.entry1, verbose = true)
@@ -281,7 +284,7 @@ The shorthand to create content blocks within jte templates is an `@`followed by
 
 Local variables can be declared like this:
 
-```
+```jte
 !{var innerObject = someObject.get().very().deeply().located().internal().object();}
 
 ${innerObject.a()}
@@ -295,6 +298,7 @@ Local variables translate 1:1 to Java code.
 For rendering HTML documents, `ContentType.Html` is highly recommended for [security](#html-escaping) but also for convenience.
 
 ### Smart Attributes
+
 Expressions in HTML attributes are evaluated, so that optimal output is generated. This means attributes with a single output that evaluates to an empty string, null, or false, are not rendered. For instance:
 
 ```html
@@ -336,16 +340,19 @@ All HTML, CSS and JavaScript comments are not rendered. You can use the natural 
 ## HTML Escaping
 
 Output escaping depends on the `ContentType` the engine is created with:
+
 - With `ContentType.Plain` there is no output escaping.
 - With `ContentType.Html`, the [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java) is used for context sensitive output escaping.
 
 In `Html` mode, user content `${}` is automatically escaped, depending what part of the template it is placed into:
+
 - HTML tag bodies
 - HMTL attributes
 - JavaScript attributes, e.g. `onclick`
 - `<script>` blocks
 
 ### HTML tag bodies
+
 User output in HTML tag bodies is escaped with `org.owasp.encoder.Encode#forHtmlContent` (`org.owasp.encoder.Encode#forHtml` before jte 1.5.0).
 
 ```htm
@@ -357,6 +364,7 @@ With `userName` being `<script>alert('xss');</script>`,
 the output would be `<div>&lt;script&gt;alert('xss');&lt;/script&gt;</div>`.
 
 ### HTML attributes
+
 User output in HTML attributes is escaped with `org.owasp.encoder.Encode#forHtmlAttribute`. It ensures that all quotes are escaped, so that an attacker cannot escape the attribute.
 
 ```htm
@@ -368,6 +376,7 @@ With `userName` being `"><script>alert('xss')</script>`,
 the output would be `<div data-title="Hello &#34;>&lt;script>alert(&#39;xss&#39;)&lt;/script>"></div>`. The quote `"` is escaped with `&#34;` and the attacker cannot escape the attribute.
 
 ### JavaScript attributes
+
 User output in HTML attributes is escaped with `org.owasp.encoder.Encode#forJavaScriptAttribute`. Those are all HTML attributes starting with `on`.
 
 ```htm
@@ -375,7 +384,6 @@ User output in HTML attributes is escaped with `org.owasp.encoder.Encode#forJava
 ```
 
 With `userName` being `'); alert('xss`,
-
 the output would be `<span onclick="showName('\x27); alert(\x27xss')">Click me</span>`.
 
 In case you run a [strict content security policy](https://csp.withgoogle.com/docs/strict-csp.html) without `unsafe-inline`, you could configure jte to run with `gg.jte.html.policy.PreventInlineEventHandlers`. This would cause errors at compile time, if inline event handlers are used. See [this issue](https://github.com/casid/jte/issues/20) for additional context.
@@ -389,8 +397,6 @@ public class MyHtmlPolicy extends OwaspHtmlPolicy {
 ```
 
 Then, you set it with `templateEngine.setHtmlPolicy(new MyHtmlPolicy());`.
-
-### 
 
 For more examples, you may want to check out the [TemplateEngine_HtmlOutputEscapingTest](jte/src/test/java/gg/jte/TemplateEngine_HtmlOutputEscapingTest.java).
 
@@ -418,7 +424,7 @@ TemplateOutput output = new MySecureHtmlOutput(new StringOutput());
 
 ### For a regular website
 
-When using the `DirectoryCodeResolver`, hot reloading is supported out of the box. Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If there is any modification detected, the template is recompiled and the old one discarded to GC. 
+When using the `DirectoryCodeResolver`, hot reloading is supported out of the box. Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If there is any modification detected, the template is recompiled and the old one discarded to GC.
 
 > It makes sense to do this on your local development environment only. When running in production, for maximum performance and security [precompiled templates](#precompiling-templates) are recommended instead.
 
@@ -427,8 +433,8 @@ If you clone this repository, you can launch the [SimpleWebServer](jte/src/test/
 ### For a statically rendered website
 
 In case you're using jte to pre-render static websites as HTML files, you can also listen to template file changes during development and re-render affected static files:
- 
-`DirectoryCodeResolver::startTemplateFilesListener` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, a listener is called with a list of changed templates.
+
+`DirectoryCodeResolver::startTemplateFilesListener()` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, a listener is called with a list of changed templates.
 
 ```java
 if (isDeveloperEnvironment()) {
@@ -439,6 +445,14 @@ if (isDeveloperEnvironment()) {
     });
 }
 ```
+
+### Customizing generated class directory
+
+By default generated sources and classes are outputted into the subdirectory `jte-classes` under the current directory.
+It is possible to customize this directory when creating template engine. But in order to have the hot reload feature
+working, a custom class directory must not be on the classpath. If it is on the classpath, generated classes
+will be visible to the default class loader and once a generated class is loaded, it will not be possible to reload it
+after recompiling a template, thus making the hot reload effectively non-functional.
 
 ## Precompiling Templates
 
@@ -466,7 +480,7 @@ TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory
 
 #### Maven
 
-There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
+There is a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven.
 
 > It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte maven plugin always matches your jte dependency.
 
@@ -493,11 +507,9 @@ There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven pl
 
 #### Gradle
 
-Since 1.6.0 there is a <a href="https://plugins.gradle.org/plugin/gg.jte.gradle">Gradle plugin</a> you can use to precompile all templates during the Gradle build. Please note that paths specified in Java need to match those specified in Gradle. 
+Since 1.6.0 there is a [Gradle plugin](https://plugins.gradle.org/plugin/gg.jte.gradle) you can use to precompile all templates during the Gradle build. Please note that paths specified in Java need to match those specified in Gradle.
 
 > Make sure that the jte gradle plugin version always matches the jte dependency version.
-
-
 
 <details open>
 <summary>Groovy</summary>
@@ -532,6 +544,7 @@ tasks.test {
 ```
 
 </details>
+
 <details>
 <summary>Kotlin</summary>
 
@@ -571,6 +584,7 @@ tasks.test {
 When using this method the precompiled templates are bundled within your application jar file. The plugin generates `*.java` files for all jte templates during Maven's `GENERATE_SOURCES` phase. Compilation of the templates is left to the Maven Compiler plugin.
 
 While this provides you with a nice self-containing jar, it has some limitations:
+
 - Once the sources are generated, IntelliJ will put them on the classpath and hot reloading will not work unless the generated sources are deleted.
 - Some plugin settings are not supported, like configuring a custom HtmlPolicy class (this is because project classes are not yet compiled at the `GENERATE_SOURCES` phase).
 
@@ -580,7 +594,7 @@ TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Htm
 
 #### Maven
 
-There is a <a href="https://github.com/casid/jte-maven-compiler-plugin">Maven plugin</a> you can use to generate all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven. 
+There is a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) you can use to generate all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven.
 
 > It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte maven plugin always matches your jte dependency.
 
@@ -639,6 +653,7 @@ tasks.compileJava {
 ```
 
 </details>
+
 <details>
 <summary>Kotlin</summary>
 
@@ -704,6 +719,7 @@ try (OutputStream os = response.getOutputStream()) {
 ```
 
 There are a few pretty cool things going on here:
+
 - We know about the binary content-length directly after rendering, at no additional cost
 - All static parts are streamed directly to the output stream, without any copying / encoding overhead
 - Dynamic parts are usually small - and written to very efficiently to internal chunks during rendering

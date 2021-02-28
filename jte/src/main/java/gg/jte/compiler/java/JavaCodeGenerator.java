@@ -375,7 +375,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onTag(int depth, TemplateType type, String name, List<String> params) {
-        ClassInfo tagInfo = compiler.generateTagOrLayout(type, name, ".jte", classDefinitions, templateDependencies, getCurrentDebugInfo());
+        ClassInfo tagInfo = compiler.generateTagOrLayout(type, name, "jte", classDefinitions, templateDependencies, getCurrentDebugInfo());
 
         writeIndentation(depth);
 

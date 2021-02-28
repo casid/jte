@@ -203,7 +203,7 @@ public class TemplateCompiler extends TemplateLoader {
         try {
             return generateTagOrLayout(type, name, classDefinitions, templateDependencies, debugInfo);
         } catch (TemplateNotFoundException e) {
-            String alternativeName = resolveTagOrLayoutName(type, simpleName, ".jte".equals(extension) ? ".kte" : ".jte");
+            String alternativeName = resolveTagOrLayoutName(type, simpleName, "jte".equals(extension) ? "kte" : "jte");
 
             if (codeResolver.exists(alternativeName)) {
                 return generateTagOrLayout(type, alternativeName, classDefinitions, templateDependencies, debugInfo);
@@ -215,7 +215,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     private String resolveTagOrLayoutName(TemplateType type, String simpleName, String extension) {
         String directory = type == TemplateType.Layout ? Constants.LAYOUT_DIRECTORY : Constants.TAG_DIRECTORY;
-        return directory + simpleName.replace('.', '/') + extension;
+        return directory + simpleName.replace('.', '/') + "." + extension;
     }
 
     public ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {

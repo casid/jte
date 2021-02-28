@@ -20,11 +20,13 @@ public class TemplateEngine_HasTemplate_DirectoryCodeResolverTest {
 
     @Test
     void noTemplateExists() {
+        assertThat(codeResolver.exists("foo.jte")).isFalse();
         assertThat(templateEngine.hasTemplate("foo.jte")).isFalse();
     }
 
     @Test
     void templateExists() {
+        assertThat(codeResolver.exists("welcome.jte")).isTrue();
         assertThat(templateEngine.hasTemplate("welcome.jte")).isTrue();
     }
 }

@@ -201,8 +201,7 @@ public class TemplateCompiler extends TemplateLoader {
         } catch (TemplateNotFoundException e) {
             String alternativeName = resolveTagOrLayoutName(type, simpleName, ".jte".equals(extension) ? ".kte" : ".jte");
 
-            // TODO add exists() to code resolver to avoid reading the entire template here
-            if (codeResolver.resolve(alternativeName) != null) {
+            if (codeResolver.exists(alternativeName)) {
                 return generateTagOrLayout(type, alternativeName, classDefinitions, templateDependencies, debugInfo);
             } else {
                 throw e;

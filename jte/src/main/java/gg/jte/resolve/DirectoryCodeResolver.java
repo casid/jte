@@ -38,6 +38,12 @@ public class DirectoryCodeResolver implements CodeResolver {
     }
 
     @Override
+    public boolean exists(String name) {
+        Path file = root.resolve(name);
+        return Files.exists(file);
+    }
+
+    @Override
     public boolean hasChanged(String name) {
         Long lastResolveTime = modificationTimes.get(name);
         if (lastResolveTime == null) {

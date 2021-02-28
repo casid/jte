@@ -52,4 +52,12 @@ public class ResourceCodeResolverTest {
 
         assertThat(throwable).isInstanceOf(UnsupportedOperationException.class).hasMessage("This code resolver does not support finding all template names!");
     }
+
+    @Test
+    void exists() {
+        resourceCodeResolver = new ResourceCodeResolver("benchmark");
+
+        assertThat(resourceCodeResolver.exists("welcome.jte")).isTrue();
+        assertThat(resourceCodeResolver.exists("doesNotExist.jte")).isFalse();
+    }
 }

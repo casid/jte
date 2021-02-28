@@ -11,4 +11,8 @@ public interface CodeResolver {
         throw new UnsupportedOperationException("This code resolver does not support finding all template names!");
     }
 
+    default boolean exists(String name) {
+        return resolve(name) != null;
+    }
+
 }

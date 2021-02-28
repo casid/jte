@@ -33,6 +33,11 @@ public class ResourceCodeResolver implements CodeResolver {
     }
 
     @Override
+    public boolean exists(String name) {
+        return getClassLoader().getResource(root + name) != null;
+    }
+
+    @Override
     public boolean hasChanged(String name) {
         return false;
     }

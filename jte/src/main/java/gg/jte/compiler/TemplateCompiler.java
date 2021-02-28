@@ -6,13 +6,9 @@ import gg.jte.compiler.java.JavaCodeGenerator;
 import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -95,7 +91,7 @@ public class TemplateCompiler extends TemplateLoader {
             if (compilePath != null) {
                 javaCompilePath.addAll(compilePath);
             } else {
-                addClasspathFromClassLoader(javaCompilePath);
+                ClassUtils.resolveClasspathFromClassLoader(javaCompilePath::add);
             }
             javaCompilePath.add(classDirectory.toAbsolutePath().toString());
 
@@ -103,24 +99,6 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
-    }
-
-    private void addClasspathFromClassLoader(List<String> result) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-        if (classLoader instanceof URLClassLoader) {
-            for (URL url : ((URLClassLoader) classLoader).getURLs()) {
-                if ("file".equals(url.getProtocol())) {
-                    try {
-                        result.add(new File(url.toURI()).toString());
-                    } catch (URISyntaxException e) {
-                        throw new TemplateException("Failed to append classpath for " + url, e);
-                    }
-                }
-            }
-        } else {
-            throw new TemplateException("Unknown classloader " + classLoader);
-        }
     }
 
     ClassCompiler createCompiler(String extension) {

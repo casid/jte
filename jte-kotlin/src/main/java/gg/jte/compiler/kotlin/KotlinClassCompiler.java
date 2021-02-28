@@ -3,8 +3,8 @@ package gg.jte.compiler.kotlin;
 import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.compiler.ClassCompiler;
+import gg.jte.compiler.ClassUtils;
 import gg.jte.runtime.ClassInfo;
-import gg.jte.runtime.Constants;
 import org.jetbrains.kotlin.cli.common.ExitCode;
 import org.jetbrains.kotlin.cli.common.arguments.K2JVMCompilerArguments;
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity;
@@ -14,9 +14,6 @@ import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler;
 import org.jetbrains.kotlin.config.Services;
 
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,31 +57,15 @@ public class KotlinClassCompiler implements ClassCompiler {
     }
 
     private String resolveClasspathFromClassLoader() {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
         StringBuilder classpath = new StringBuilder();
         String separator = System.getProperty("path.separator");
-        String prop = System.getProperty("java.class.path");
 
-        if (prop != null && !"".equals(prop)) {
-            classpath.append(prop);
-        }
-
-        if (classLoader instanceof URLClassLoader) {
-            for (URL url : ((URLClassLoader) classLoader).getURLs()) {
-                if (classpath.length() > 0) {
-                    classpath.append(separator);
-                }
-
-                if ("file".equals(url.getProtocol())) {
-                    try {
-                        classpath.append(new File(url.toURI()));
-                    } catch (URISyntaxException e) {
-                        throw new TemplateException("Failed to append classpath for " + url, e);
-                    }
-                }
+        ClassUtils.resolveClasspathFromClassLoader(path -> {
+            if (classpath.length() > 0) {
+                classpath.append(separator);
             }
-        }
+            classpath.append(path);
+        });
 
         return classpath.toString();
     }

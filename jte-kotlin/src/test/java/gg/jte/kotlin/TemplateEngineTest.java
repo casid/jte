@@ -978,12 +978,32 @@ public class TemplateEngineTest {
 
     @Test
     void mixedTemplates() {
-        dummyCodeResolver.givenCode("tag/foo.jte", "Hello foo");
-        dummyCodeResolver.givenCode("tag/bar.kte", "Hello bar");
+        StringOutput jteOutput = new StringOutput();
+        StringOutput kteOutput = new StringOutput();
+        dummyCodeResolver.givenCode("tag/foo.jte", "Hello jte");
+        dummyCodeResolver.givenCode("tag/bar.kte", "Hello kte");
 
-        Throwable throwable = catchThrowable(() -> templateEngine.precompileAll());
+        templateEngine.renderTag("tag/foo.jte", Collections.emptyMap(), jteOutput);
+        templateEngine.renderTag("tag/bar.kte", Collections.emptyMap(), kteOutput);
 
-        assertThat(throwable).isInstanceOf(UnsupportedOperationException.class).hasMessage("Currently all templates are required to be of the same type. Got [java, kt]");
+        assertThat(jteOutput.toString()).isEqualTo("Hello jte");
+        assertThat(kteOutput.toString()).isEqualTo("Hello kte");
+    }
+
+    @Test
+    void mixedTemplates_callKteFromJte() {
+        dummyCodeResolver.givenCode(templateName = "main.jte", "Hello @tag.name()");
+        dummyCodeResolver.givenCode("tag/name.kte", "Kotlin!");
+
+        thenOutputIs("Hello Kotlin!");
+    }
+
+    @Test
+    void mixedTemplates_callJteFromKte() {
+        dummyCodeResolver.givenCode(templateName = "main.kte", "Hello @tag.name()");
+        dummyCodeResolver.givenCode("tag/name.jte", "Java!");
+
+        thenOutputIs("Hello Java!");
     }
 
     private void givenTag(String name, String code) {

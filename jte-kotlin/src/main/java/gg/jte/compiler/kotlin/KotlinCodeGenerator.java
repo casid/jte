@@ -382,15 +382,13 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     @Override
     public void onTag(int depth, TemplateType type, String name, List<String> params) {
-        String directory = type == TemplateType.Layout ? Constants.LAYOUT_DIRECTORY : Constants.TAG_DIRECTORY;
-        String tagName = directory + name.replace('.', '/') + ".kte";
-        ClassInfo tagInfo = compiler.generateTagOrLayout(type, tagName, classDefinitions, templateDependencies, getCurrentDebugInfo());
+        ClassInfo tagInfo = compiler.generateTagOrLayout(type, name, ".kte", classDefinitions, templateDependencies, getCurrentDebugInfo());
 
         writeIndentation(depth);
 
         kotlinCode.append(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
 
-        appendParams(depth, tagName, params);
+        appendParams(depth, tagInfo.name, params);
         kotlinCode.append(");\n");
     }
 

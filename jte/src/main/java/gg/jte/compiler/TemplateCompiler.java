@@ -6,9 +6,13 @@ import gg.jte.compiler.java.JavaCodeGenerator;
 import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -78,14 +82,45 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         // TODO investigate if it is possible to have both kte and jte in one project. https://discuss.kotlinlang.org/t/compiling-mixed-java-and-kotlin-files-on-the-command-line/1553/4
-        if (extensions.size() > 1) {
-            throw new UnsupportedOperationException("Currently all templates are required to be of the same type. Got " + extensions);
+        if (extensions.size() == 1) {
+            ClassCompiler compiler = createCompiler(extensions.iterator().next());
+            compiler.compile(files, compilePath, config, classDirectory, templateByClassName);
+        } else if (extensions.size() > 1) {
+            ClassCompiler kotlinCompiler = createCompiler("kt");
+            kotlinCompiler.compile(files, compilePath, config, classDirectory, templateByClassName);
+
+            String[] javaFiles = Arrays.stream(files).filter(f -> f.endsWith(".java")).toArray(String[]::new);
+            ClassCompiler javaCompiler = createCompiler("java");
+            List<String> javaCompilePath = new ArrayList<>();
+            if (compilePath != null) {
+                javaCompilePath.addAll(compilePath);
+            } else {
+                addClasspathFromClassLoader(javaCompilePath);
+            }
+            javaCompilePath.add(classDirectory.toAbsolutePath().toString());
+
+            javaCompiler.compile(javaFiles, javaCompilePath, config, classDirectory, templateByClassName);
         }
 
-        ClassCompiler compiler = createCompiler(extensions.iterator().next());
-        compiler.compile(files, compilePath, config, classDirectory, templateByClassName);
-
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
+    }
+
+    private void addClasspathFromClassLoader(List<String> result) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+        if (classLoader instanceof URLClassLoader) {
+            for (URL url : ((URLClassLoader) classLoader).getURLs()) {
+                if ("file".equals(url.getProtocol())) {
+                    try {
+                        result.add(new File(url.toURI()).toString());
+                    } catch (URISyntaxException e) {
+                        throw new TemplateException("Failed to append classpath for " + url, e);
+                    }
+                }
+            }
+        } else {
+            throw new TemplateException("Unknown classloader " + classLoader);
+        }
     }
 
     ClassCompiler createCompiler(String extension) {
@@ -179,6 +214,27 @@ public class TemplateCompiler extends TemplateLoader {
         this.templateDependencies.put(name, templateDependencies);
 
         templateByClassName.put(templateInfo.name, templateInfo);
+    }
+
+    public ClassInfo generateTagOrLayout(TemplateType type, String simpleName, String extension, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
+        String name = resolveTagOrLayoutName(type, simpleName, extension);
+        try {
+            return generateTagOrLayout(type, name, classDefinitions, templateDependencies, debugInfo);
+        } catch (TemplateNotFoundException e) {
+            String alternativeName = resolveTagOrLayoutName(type, simpleName, ".jte".equals(extension) ? ".kte" : ".jte");
+
+            // TODO add exists() to code resolver to avoid reading the entire template here
+            if (codeResolver.resolve(alternativeName) != null) {
+                return generateTagOrLayout(type, alternativeName, classDefinitions, templateDependencies, debugInfo);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    private String resolveTagOrLayoutName(TemplateType type, String simpleName, String extension) {
+        String directory = type == TemplateType.Layout ? Constants.LAYOUT_DIRECTORY : Constants.TAG_DIRECTORY;
+        return directory + simpleName.replace('.', '/') + extension;
     }
 
     public ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {

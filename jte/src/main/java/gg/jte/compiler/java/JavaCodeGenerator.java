@@ -375,15 +375,13 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onTag(int depth, TemplateType type, String name, List<String> params) {
-        String directory = type == TemplateType.Layout ? Constants.LAYOUT_DIRECTORY : Constants.TAG_DIRECTORY;
-        String tagName = directory + name.replace('.', '/') + ".jte";
-        ClassInfo tagInfo = compiler.generateTagOrLayout(type, tagName, classDefinitions, templateDependencies, getCurrentDebugInfo());
+        ClassInfo tagInfo = compiler.generateTagOrLayout(type, name, ".jte", classDefinitions, templateDependencies, getCurrentDebugInfo());
 
         writeIndentation(depth);
 
         javaCode.append(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
 
-        appendParams(depth, tagName, params);
+        appendParams(depth, tagInfo.name, params);
         javaCode.append(");\n");
     }
 

@@ -77,11 +77,15 @@ public class TemplateCompiler extends TemplateLoader {
             extensions.add(classDefinition.getExtension());
         }
 
-        // TODO investigate if it is possible to have both kte and jte in one project. https://discuss.kotlinlang.org/t/compiling-mixed-java-and-kotlin-files-on-the-command-line/1553/4
         if (extensions.size() == 1) {
             ClassCompiler compiler = createCompiler(extensions.iterator().next());
             compiler.compile(files, compilePath, config, classDirectory, templateByClassName);
         } else if (extensions.size() > 1) {
+            // As there is currently only support for java and kotlin as expression language, this is the java / kotlin case.
+            // We first need to compile all kotlin classes while passing generate .java files to the kotlin compiler.
+            // Then, we invoke the Java compiler with the compiled kotlin classes on the classpath.
+            // https://discuss.kotlinlang.org/t/compiling-mixed-java-and-kotlin-files-on-the-command-line/1553/4
+
             ClassCompiler kotlinCompiler = createCompiler("kt");
             kotlinCompiler.compile(files, compilePath, config, classDirectory, templateByClassName);
 

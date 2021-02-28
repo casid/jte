@@ -1006,6 +1006,22 @@ public class TemplateEngineTest {
         thenOutputIs("Hello Java!");
     }
 
+    @Test
+    void mixedTemplates_callKteFromJte_withParams() {
+        dummyCodeResolver.givenCode(templateName = "main.jte", "Hello, @tag.name(b = \"foo\", a = 42)");
+        dummyCodeResolver.givenCode("tag/name.kte", "@param a:Int\n@param b:String\nKotlin says ${a}, ${b}!");
+
+        thenOutputIs("Hello, Kotlin says 42, foo!");
+    }
+
+    @Test
+    void mixedTemplates_callJteFromKte_withParams() {
+        dummyCodeResolver.givenCode(templateName = "main.kte", "Hello, @tag.name(b = \"foo\", a = 42)");
+        dummyCodeResolver.givenCode("tag/name.jte", "@param int a\n@param String b\nJava says ${a}, ${b}!");
+
+        thenOutputIs("Hello, Java says 42, foo!");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + ".kte", code);
     }

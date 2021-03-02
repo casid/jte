@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector;
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler;
 import org.jetbrains.kotlin.config.Services;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +22,7 @@ import java.util.Map;
 @SuppressWarnings("unused") // Used by gg.jte.compiler.TemplateCompiler
 public class KotlinClassCompiler implements ClassCompiler {
     @Override
-    public void compile(String[] files, List<String> compilePath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
+    public void compile(String[] files, List<String> classPath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         K2JVMCompilerArguments compilerArguments = new K2JVMCompilerArguments();
         //compilerArguments.setJvmTarget("");
         compilerArguments.setJavaParameters(true);
@@ -32,7 +31,7 @@ public class KotlinClassCompiler implements ClassCompiler {
 
         compilerArguments.setFreeArgs(Arrays.asList(files));
 
-        compilerArguments.setClasspath(resolveClasspath(compilePath));
+        compilerArguments.setClasspath(ClassUtils.join(classPath));
 
         K2JVMCompiler compiler = new K2JVMCompiler();
 
@@ -46,28 +45,6 @@ public class KotlinClassCompiler implements ClassCompiler {
         if (messageCollector.hasErrors()) {
             throw new TemplateException(messageCollector.getErrorMessage());
         }
-    }
-
-    private String resolveClasspath(List<String> compilePath) {
-        if (compilePath != null) {
-            return String.join(File.pathSeparator, compilePath);
-        } else {
-            return resolveClasspathFromClassLoader();
-        }
-    }
-
-    private String resolveClasspathFromClassLoader() {
-        StringBuilder classpath = new StringBuilder();
-        String separator = System.getProperty("path.separator");
-
-        ClassUtils.resolveClasspathFromClassLoader(path -> {
-            if (classpath.length() > 0) {
-                classpath.append(separator);
-            }
-            classpath.append(path);
-        });
-
-        return classpath.toString();
     }
 
     private static class SimpleKotlinCompilerMessageCollector implements MessageCollector {

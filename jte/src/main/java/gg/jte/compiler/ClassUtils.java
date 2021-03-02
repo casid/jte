@@ -7,17 +7,25 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class ClassUtils {
-    public static void resolveClasspathFromClassLoader(Consumer<String> pathConsumer) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-        String separator = System.getProperty("path.separator");
-        String prop = System.getProperty("java.class.path");
+    public static String join(List<String> classPath) {
+        return String.join(File.pathSeparator, classPath);
+    }
 
-        if (!StringUtils.isBlank(prop)) {
-            String[] paths = prop.split(separator);
+    public static void resolveClasspathFromClassLoader(ClassLoader classLoader, Consumer<String> pathConsumer) {
+        if (classLoader == null) {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        }
+
+        String separator = File.pathSeparator;
+        String classPath = System.getProperty("java.class.path");
+
+        if (!StringUtils.isBlank(classPath)) {
+            String[] paths = classPath.split(separator);
             for (String path : paths) {
                 pathConsumer.accept(path);
             }

@@ -53,6 +53,7 @@ public class TemplateCompiler extends TemplateLoader {
         return createClassLoader(parentClassLoader);
     }
 
+    @Override
     public void cleanAll() {
         IoUtils.deleteDirectoryContent(classDirectory.resolve(config.packageName.replace('.', '/')));
     }
@@ -63,6 +64,7 @@ public class TemplateCompiler extends TemplateLoader {
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
+    @Override
     public List<String> precompileAll() {
         return precompile(codeResolver.resolveAllTemplateNames());
     }

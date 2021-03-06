@@ -577,6 +577,8 @@ tasks.test {
 }
 ```
 
+</details>
+
 In case you would like to build a self-contained JAR, you can add this to your build.gradle:
 
 ```groovy
@@ -592,9 +594,7 @@ And init the template engine like this for production builds:
 TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Html);
 ```
 
-This way the templates are loaded from the application class loader.
-
-</details>
+This way the templates are loaded from the application class loader. See [this issue](https://github.com/casid/jte/issues/62) for additional information.
 
 ### Using the application class loader (since 1.2.0)
 

@@ -577,6 +577,23 @@ tasks.test {
 }
 ```
 
+In case you would like to build a self-contained JAR, you can add this to your build.gradle:
+
+```groovy
+from fileTree("jte-classes") {
+    include "**/*.class"
+    include "**/*.bin" // Only required if you use binary templates
+}
+```
+
+And init the template engine like this for production builds:
+
+```java
+TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Html);
+```
+
+This way the templates are loaded from the application class loader.
+
 </details>
 
 ### Using the application class loader (since 1.2.0)

@@ -21,6 +21,7 @@ public abstract class JteTaskBase extends DefaultTask {
     protected Boolean htmlCommentsPreserved;
     protected Boolean binaryStaticContent;
     protected String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
+    protected Path targetResourceDirectory;
 
     @InputDirectory
     public Path getSourceDirectory() {
@@ -108,5 +109,17 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
+    }
+
+    @OutputDirectory
+    @Optional
+    public Path getTargetResourceDirectory()
+    {
+        return targetResourceDirectory;
+    }
+
+    public void setTargetResourceDirectory(Path targetResourceDirectory)
+    {
+        this.targetResourceDirectory = targetResourceDirectory;
     }
 }

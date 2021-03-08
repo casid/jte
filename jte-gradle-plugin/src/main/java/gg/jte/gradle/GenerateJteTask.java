@@ -10,8 +10,10 @@ import java.util.concurrent.TimeUnit;
 
 public class GenerateJteTask extends JteTaskBase {
 
+
     public GenerateJteTask() {
         targetDirectory = Paths.get(getProject().getBuildDir().getAbsolutePath(), "generated-sources", "jte");
+        targetResourceDirectory = Paths.get(getProject().getBuildDir().getAbsolutePath(), "generated-resources", "jte");
     }
 
     @TaskAction
@@ -27,6 +29,7 @@ public class GenerateJteTask extends JteTaskBase {
         templateEngine.setHtmlAttributes(htmlAttributes);
         templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(binaryStaticContent));
+        templateEngine.setTargetResourceDirectory(targetResourceDirectory);
 
         int amount;
         try {
@@ -42,5 +45,6 @@ public class GenerateJteTask extends JteTaskBase {
         long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
         logger.info("Successfully generated " + amount + " jte file" + (amount == 1 ? "" : "s") + " in " + duration + "s to " + targetDirectory);
     }
+
 
 }

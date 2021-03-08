@@ -488,4 +488,8 @@ public final class TemplateEngine {
     public void setBinaryStaticContent(boolean binaryStaticContent) {
         config.binaryStaticContent = binaryStaticContent;
     }
+
+    public void setTargetResourceDirectory(Path targetResourceDirectory) {
+        config.resourceDirectory = targetResourceDirectory;
+    }
 }

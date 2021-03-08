@@ -4,6 +4,8 @@ import gg.jte.html.HtmlPolicy;
 import gg.jte.html.OwaspHtmlPolicy;
 import gg.jte.runtime.Constants;
 
+import java.nio.file.Path;
+
 public class TemplateConfig {
     public static final TemplateConfig PLAIN = new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED);
 
@@ -16,6 +18,7 @@ public class TemplateConfig {
     public String[] htmlAttributes;
     public boolean htmlCommentsPreserved;
     public boolean binaryStaticContent;
+    public Path resourceDirectory;
 
     public TemplateConfig(ContentType contentType, String packageName) {
         this.contentType = contentType;

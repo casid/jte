@@ -58,7 +58,39 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public List<String> generateAll() {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames());
+        generateNativeResources(classDefinitions);
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
+    }
+
+    private void generateNativeResources(LinkedHashSet<ClassDefinition> classDefinitions)
+    {
+        if (config.resourceDirectory == null)
+        {
+            return;
+        }
+        Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/generated/" + packageName);
+        try (FileOutput properties = new FileOutput(nativeImageResourceRoot.resolve("native-image.properties")))
+        {
+            properties.writeContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json\n");
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        try (FileOutput reflection = new FileOutput(nativeImageResourceRoot.resolve("reflection-config.json")))
+        {
+            // avoid adding a json dependency to the project by just writing
+            reflection.writeContent(
+                    classDefinitions.stream()
+                    .map(cd -> "{\n" +
+                            "  \"name\":\"" + cd.getName() + "\",\n" +
+                            "  \"allDeclaredMethods\":true\n" +
+                            "}")
+                    .collect(Collectors.joining(
+                            ",\n", "[\n", "]\n"
+                    ))
+            );
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public List<String> precompileAll(List<String> compilePath) {
@@ -134,6 +166,7 @@ public class TemplateCompiler extends TemplateLoader {
             }
         }
 
+        Path resourceDirectory = config.resourceDirectory == null ? classDirectory : config.resourceDirectory;
         for (ClassDefinition classDefinition : classDefinitions) {
             try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getSourceFileName()))) {
                 fileOutput.writeContent(classDefinition.getCode());
@@ -143,7 +176,7 @@ public class TemplateCompiler extends TemplateLoader {
 
             List<byte[]> textParts = classDefinition.getBinaryTextParts();
             if (!textParts.isEmpty()) {
-                try (OutputStream os = Files.newOutputStream(classDirectory.resolve(classDefinition.getBinaryTextPartsFileName()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
+                try (OutputStream os = Files.newOutputStream(resourceDirectory.resolve(classDefinition.getBinaryTextPartsFileName()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
                     for (byte[] textPart : textParts) {
                         os.write(textPart);
                     }

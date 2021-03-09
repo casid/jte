@@ -1108,6 +1108,46 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void localization_emptyString_noParams() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "<span>${localizer.localize(\"empty\")}</span>");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<span></span>");
+    }
+
+    @Test
+    void localization_emptyString_withParams() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "<span>${localizer.localize(\"empty\", 1)}</span>");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<span></span>");
+    }
+
+    @Test
+    void localization_emptyString_resultsInNullContent() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "<span>@if(localizer.localize(\"empty\") == null)nothing is here@endif</span>");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<span>nothing is here</span>");
+    }
+
+    @Test
+    void localization_emptyString_resultsInNullContent_withParams() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "<span>@if(localizer.localize(\"empty\", 1) == null)nothing is here@endif</span>");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<span>nothing is here</span>");
+    }
+
+    @Test
     void localization_noParams() {
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span alt=\"${localizer.localize(\"no-params\")}\">${localizer.localize(\"no-params\")}</span> $unsafe{localizer.localize(\"no-params\")}");
@@ -1400,7 +1440,8 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "all-primitives", "boolean: {0}, byte: {1}, short: {2}, int: {3}, long: {4}, float: {5}, double: {6}, char: {7}",
                 "enum", "Content type is: {0}",
                 "quotes", "This is a key with \"quotes\"",
-                "quotes-params", "This is a key with \"quotes\" and params <i>\"{0}\"</i>, <b>\"{1}\"</b>, \"{2}\"..."
+                "quotes-params", "This is a key with \"quotes\" and params <i>\"{0}\"</i>, <b>\"{1}\"</b>, \"{2}\"...",
+                "empty", ""
         );
 
         @Override

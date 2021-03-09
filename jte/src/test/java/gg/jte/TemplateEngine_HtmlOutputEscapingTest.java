@@ -1,21 +1,21 @@
 package gg.jte;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import gg.jte.html.HtmlTemplateOutput;
+import gg.jte.html.OwaspHtmlPolicy;
+import gg.jte.html.policy.PreventInlineEventHandlers;
+import gg.jte.html.policy.PreventSingleQuotedAttributes;
+import gg.jte.output.StringOutput;
+import gg.jte.runtime.TemplateUtils;
+import gg.jte.support.LocalizationSupport;
+import org.junit.jupiter.api.Test;
 
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import gg.jte.html.HtmlTemplateOutput;
-import gg.jte.html.OwaspHtmlPolicy;
-import gg.jte.html.policy.PreventInlineEventHandlers;
-import gg.jte.html.policy.PreventSingleQuotedAttributes;
-import gg.jte.runtime.TemplateUtils;
-import gg.jte.support.LocalizationSupport;
-import org.junit.jupiter.api.Test;
-import gg.jte.output.StringOutput;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 
 public class TemplateEngine_HtmlOutputEscapingTest {

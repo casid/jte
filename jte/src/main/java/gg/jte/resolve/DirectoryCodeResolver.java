@@ -1,8 +1,7 @@
 package gg.jte.resolve;
 
-import com.sun.nio.file.SensitivityWatchEventModifier;
-import gg.jte.TemplateEngine;
 import gg.jte.CodeResolver;
+import gg.jte.TemplateEngine;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -90,7 +89,7 @@ public class DirectoryCodeResolver implements CodeResolver {
 
             Files.walk(root).filter(Files::isDirectory).forEach(p -> {
                 try {
-                    p.register(watchService, new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY}, SensitivityWatchEventModifier.HIGH);
+                    p.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
                 } catch (IOException e) {
                     throw new UncheckedIOException("Failed to register watch service for hot reload!", e);
                 }

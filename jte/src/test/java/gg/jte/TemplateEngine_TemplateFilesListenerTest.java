@@ -1,12 +1,12 @@
 package gg.jte;
 
+import gg.jte.compiler.IoUtils;
+import gg.jte.output.FileOutput;
+import gg.jte.output.StringOutput;
 import gg.jte.resolve.DirectoryCodeResolver;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import gg.jte.compiler.IoUtils;
-import gg.jte.output.FileOutput;
-import gg.jte.output.StringOutput;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

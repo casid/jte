@@ -5,9 +5,9 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
+import gg.jte.output.StringOutput;
 import gg.jte.output.StringOutputPool;
 import gg.jte.resolve.DirectoryCodeResolver;
-import gg.jte.output.StringOutput;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;

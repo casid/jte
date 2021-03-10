@@ -33,4 +33,8 @@ public final class IoUtils {
             throw new UncheckedIOException(e);
         }
     }
+
+    public static boolean isTemplateFile(String name) {
+        return name.endsWith(".jte") || name.endsWith(".kte");
+    }
 }

@@ -432,13 +432,22 @@ If you clone this repository, you can launch the [SimpleWebServer](jte/src/test/
 
 ### For a statically rendered website
 
-In case you're using jte to pre-render static websites as HTML files, you can also listen to template file changes during development and re-render affected static files:
+In case you're using jte to pre-render static websites as HTML files, you can also listen to template file changes during development and re-render affected static files. Add the jte-watcher module to your project:
 
-`DirectoryCodeResolver::startTemplateFilesListener()` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, a listener is called with a list of changed templates.
+```xml
+<dependency>
+   <groupId>gg.jte</groupId>
+   <artifactId>jte-watcher</artifactId>
+   <version>${jte.version}</version>
+</dependency>
+```
+
+`DirectoryWatcher::start()` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, a listener is called with a list of changed templates.
 
 ```java
 if (isDeveloperEnvironment()) {
-    codeResolver.startTemplateFilesListener(templateEngine, templates -> {
+    DirectoryWatcher watcher = new DirectoryWatcher(templateEngine, codeResolver);
+    watcher.start(templates -> {
         for (String template : templates) {
             // Re-render the static HTML file
         }

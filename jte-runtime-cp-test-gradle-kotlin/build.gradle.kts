@@ -28,7 +28,7 @@ tasks.generateJte {
 
 sourceSets {
     main {
-        java.srcDirs(tasks.generateJte.get().targetDirectory)
+        java.srcDir(tasks.generateJte.get().targetDirectory)
     }
 }
 

@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Run the builds and tests, but only using the local OS and Java versions.
-# This is not a substitute for the full Git workflow tests, but makes
+# This is not a substitute for the full Git workflow tests, but makes it easier
+# to do testing before commit.
 
 if [[ -z "$PROJECT_PATH" ]]; then
     PROJECT_PATH=$(git rev-parse --show-toplevel)

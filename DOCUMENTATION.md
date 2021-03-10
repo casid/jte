@@ -645,7 +645,7 @@ tasks.generateJte {
     contentType = ContentType.Html
 }
 
-sourceSets.main.java.srcDirs += tasks.generateJte.targetDirectory
+sourceSets.main.java.srcDir(tasks.generateJte.targetDirectory)
 
 tasks.compileJava {
     dependsOn(tasks.generateJte)
@@ -677,7 +677,7 @@ tasks.generateJte {
 
 sourceSets {
     main {
-        java.srcDirs(tasks.generateJte.get().targetDirectory)
+        java.srcDir(tasks.generateJte.get().targetDirectory)
     }
 }
 

@@ -22,13 +22,15 @@ public final class IoUtils {
 
     public static void deleteDirectoryContent(Path directory) {
         Objects.requireNonNull(directory);
+        if (!Files.exists(directory)) {
+            return;
+        }
         try (Stream<Path> pathStream = Files.walk(directory)) {
             //noinspection ResultOfMethodCallIgnored
             pathStream.filter(d -> d != directory)
                     .sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);
-        } catch (NoSuchFileException ignored) {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

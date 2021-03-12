@@ -1,4 +1,3 @@
-import gg.jte.ContentType
 import java.nio.file.Paths
 
 plugins {
@@ -26,7 +25,7 @@ tasks.precompileJte {
     sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
     targetDirectory = Paths.get(project.projectDir.absolutePath, "jte-classes")
     compilePath = sourceSets.main.runtimeClasspath
-    contentType = ContentType.Html
+    contentType = gg.jte.ContentType.Html
 }
 
 tasks.precompileJte {

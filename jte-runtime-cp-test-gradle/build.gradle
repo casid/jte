@@ -1,3 +1,4 @@
+import gg.jte.ContentType
 import java.nio.file.Paths
 
 plugins {
@@ -9,6 +10,8 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
+
+group = 'gg.jte.testgroup'
 
 test {
     useJUnitPlatform()
@@ -23,10 +26,11 @@ dependencies {
 
 tasks.generateJte {
     sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
-    contentType = gg.jte.ContentType.Html
+    contentType = ContentType.Html
 }
 
 sourceSets.main.java.srcDir(tasks.generateJte.targetDirectory)
+sourceSets.main.resources.srcDir(tasks.generateJte.targetResourceDirectory)
 
 tasks.compileJava {
     dependsOn(tasks.generateJte)

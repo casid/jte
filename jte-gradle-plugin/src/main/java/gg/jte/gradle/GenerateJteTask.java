@@ -30,6 +30,7 @@ public class GenerateJteTask extends JteTaskBase {
         templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(binaryStaticContent));
         templateEngine.setTargetResourceDirectory(targetResourceDirectory);
+        templateEngine.setProjectNamespace(getProject().getGroup() + "/" + getProject().getName());
 
         int amount;
         try {

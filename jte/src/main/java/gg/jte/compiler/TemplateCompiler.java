@@ -68,7 +68,8 @@ public class TemplateCompiler extends TemplateLoader {
         {
             return;
         }
-        Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/generated/" + packageName);
+        String namespace = config.projectNamespace != null ? config.projectNamespace : "generated/" + packageName;
+        Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/" + namespace);
         try (FileOutput properties = new FileOutput(nativeImageResourceRoot.resolve("native-image.properties")))
         {
             properties.writeContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json\n");

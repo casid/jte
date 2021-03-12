@@ -18,7 +18,10 @@ public class TemplateConfig {
     public String[] htmlAttributes;
     public boolean htmlCommentsPreserved;
     public boolean binaryStaticContent;
+
     public Path resourceDirectory;
+
+    public String projectNamespace;
 
     public TemplateConfig(ContentType contentType, String packageName) {
         this.contentType = contentType;

@@ -1,6 +1,5 @@
 package gg.jte.compiler;
 
-import gg.jte.compiler.TemplateSingleControlStructureVisitor;
 import org.junit.jupiter.api.Test;
 
 // This indeed is horrible.

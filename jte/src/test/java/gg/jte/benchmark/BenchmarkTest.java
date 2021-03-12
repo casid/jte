@@ -1,8 +1,8 @@
 package gg.jte.benchmark;
 
+import gg.jte.output.StringOutput;
 import gg.jte.output.Utf8ByteOutput;
 import org.junit.jupiter.api.Test;
-import gg.jte.output.StringOutput;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -1,10 +1,13 @@
 package gg.jte.compiler;
 
-import gg.jte.*;
+import gg.jte.CodeResolver;
+import gg.jte.TemplateConfig;
+import gg.jte.TemplateException;
+import gg.jte.TemplateNotFoundException;
 import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
-import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
+import gg.jte.runtime.*;
 
 import java.io.IOException;
 import java.io.OutputStream;

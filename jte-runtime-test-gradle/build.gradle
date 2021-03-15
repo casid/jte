@@ -1,9 +1,8 @@
-import gg.jte.ContentType
 import java.nio.file.Paths
 
 plugins {
     id 'java'
-    id 'gg.jte.gradle' version '1.8.1-SNAPSHOT'
+    id 'gg.jte.gradle' version '1.10.0-SNAPSHOT'
 }
 
 repositories {
@@ -16,7 +15,7 @@ test {
 }
 
 dependencies {
-    implementation('gg.jte:jte-runtime:1.8.1-SNAPSHOT')
+    implementation('gg.jte:jte-runtime:1.10.0-SNAPSHOT')
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testImplementation('org.assertj:assertj-core:3.15.0')
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
@@ -26,7 +25,7 @@ tasks.precompileJte {
     sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
     targetDirectory = Paths.get(project.projectDir.absolutePath, "jte-classes")
     compilePath = sourceSets.main.runtimeClasspath
-    contentType = ContentType.Html
+    contentType = gg.jte.ContentType.Html
 }
 
 tasks.precompileJte {

@@ -14,7 +14,7 @@ public interface LocalizationSupport {
     @SuppressWarnings("unused") // Called by template code
     default Content localize(String key) {
         String value = lookup(key);
-        if (value == null) {
+        if (value == null || value.length() == 0) {
             return null;
         }
 
@@ -24,7 +24,7 @@ public interface LocalizationSupport {
     @SuppressWarnings("unused") // Called by template code
     default Content localize(String key, Object ... params) {
         String value = lookup(key);
-        if (value == null) {
+        if (value == null || value.length() == 0) {
             return null;
         }
 

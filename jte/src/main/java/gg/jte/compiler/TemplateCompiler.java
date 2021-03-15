@@ -1,10 +1,13 @@
 package gg.jte.compiler;
 
-import gg.jte.*;
+import gg.jte.CodeResolver;
+import gg.jte.TemplateConfig;
+import gg.jte.TemplateException;
+import gg.jte.TemplateNotFoundException;
 import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
-import gg.jte.runtime.*;
 import gg.jte.output.FileOutput;
+import gg.jte.runtime.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,6 +31,8 @@ public class TemplateCompiler extends TemplateLoader {
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
 
+    private List<String> classPath;
+
     public TemplateCompiler(TemplateConfig config, CodeResolver codeResolver, Path classDirectory, ClassLoader parentClassLoader) {
         super(classDirectory, config.packageName);
         this.config = config;
@@ -37,7 +42,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public Template load(String name) {
-        precompile(Collections.singletonList(name), null);
+        precompile(Collections.singletonList(name));
         return super.load(name);
     }
 
@@ -51,6 +56,7 @@ public class TemplateCompiler extends TemplateLoader {
         return createClassLoader(parentClassLoader);
     }
 
+    @Override
     public void cleanAll() {
         IoUtils.deleteDirectoryContent(classDirectory.resolve(config.packageName.replace('.', '/')));
     }
@@ -61,12 +67,15 @@ public class TemplateCompiler extends TemplateLoader {
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
-    public List<String> precompileAll(List<String> compilePath) {
-        return precompile(codeResolver.resolveAllTemplateNames(), compilePath);
+    @Override
+    public List<String> precompileAll() {
+        return precompile(codeResolver.resolveAllTemplateNames());
     }
 
-    public List<String> precompile(List<String> names, List<String> compilePath) {
+    public List<String> precompile(List<String> names) {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(names);
+
+        List<String> classPath = getClassPath();
 
         Set<String> extensions = new HashSet<>();
 
@@ -79,7 +88,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         if (extensions.size() == 1) {
             ClassCompiler compiler = createCompiler(extensions.iterator().next());
-            compiler.compile(files, compilePath, config, classDirectory, templateByClassName);
+            compiler.compile(files, classPath, config, classDirectory, templateByClassName);
         } else if (extensions.size() > 1) {
             // As there is currently only support for java and kotlin as expression language, this is the java / kotlin case.
             // We first need to compile all kotlin classes while passing generate .java files to the kotlin compiler.
@@ -87,22 +96,35 @@ public class TemplateCompiler extends TemplateLoader {
             // https://discuss.kotlinlang.org/t/compiling-mixed-java-and-kotlin-files-on-the-command-line/1553/4
 
             ClassCompiler kotlinCompiler = createCompiler("kt");
-            kotlinCompiler.compile(files, compilePath, config, classDirectory, templateByClassName);
+            kotlinCompiler.compile(files, classPath, config, classDirectory, templateByClassName);
 
             String[] javaFiles = Arrays.stream(files).filter(f -> f.endsWith(".java")).toArray(String[]::new);
             ClassCompiler javaCompiler = createCompiler("java");
-            List<String> javaCompilePath = new ArrayList<>();
-            if (compilePath != null) {
-                javaCompilePath.addAll(compilePath);
-            } else {
-                ClassUtils.resolveClasspathFromClassLoader(javaCompilePath::add);
-            }
-            javaCompilePath.add(classDirectory.toAbsolutePath().toString());
+            List<String> javaCompilerClassPath = new ArrayList<>(classPath);
+            javaCompilerClassPath.add(classDirectory.toAbsolutePath().toString());
 
-            javaCompiler.compile(javaFiles, javaCompilePath, config, classDirectory, templateByClassName);
+            javaCompiler.compile(javaFiles, javaCompilerClassPath, config, classDirectory, templateByClassName);
         }
 
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
+    }
+
+    private List<String> getClassPath() {
+        if (classPath == null) {
+            classPath = calculateClassPath();
+        }
+
+        return classPath;
+    }
+
+    private List<String> calculateClassPath() {
+        if (config.classPath != null) {
+            return config.classPath;
+        } else {
+            List<String> classPath = new ArrayList<>();
+            ClassUtils.resolveClasspathFromClassLoader(parentClassLoader, classPath::add);
+            return classPath;
+        }
     }
 
     ClassCompiler createCompiler(String extension) {

@@ -1,9 +1,9 @@
 package gg.jte;
 
 import gg.jte.benchmark.WelcomePage;
+import gg.jte.output.StringOutput;
 import gg.jte.resolve.DirectoryCodeResolver;
 import org.junit.jupiter.api.Test;
-import gg.jte.output.StringOutput;
 
 import java.io.File;
 import java.net.URL;

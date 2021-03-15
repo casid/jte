@@ -8,7 +8,7 @@
     <parent>
         <groupId>gg.jte</groupId>
         <artifactId>jte-parent</artifactId>
-        <version>1.8.1-SNAPSHOT</version>
+        <version>1.10.0-SNAPSHOT</version>
     </parent>
 
     <name>jte</name>

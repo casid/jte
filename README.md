@@ -129,13 +129,13 @@ jte is available on <a href="http://mvnrepository.com/artifact/gg.jte/jte">Maven
 <dependency>
     <groupId>gg.jte</groupId>
     <artifactId>jte</artifactId>
-    <version>1.7.0</version>
+    <version>1.9.0</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-implementation group: 'gg.jte', name: 'jte', version: '1.7.0'
+implementation group: 'gg.jte', name: 'jte', version: '1.9.0'
 ```
 
 No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and start hacking :-)
@@ -152,3 +152,4 @@ No further dependencies required! Check out the [syntax documentation](DOCUMENTA
 - <a href="https://mazebert.com">Mazebert TD (game website)</a>
 - <a href="https://github.com/casid/jte-javalin-tutorial">Javalin website example with login and multiple languages</a>
 - <a href="https://www.mitchdennett.com/">Mitch Dennett's Blog</a>
+- <a href="https://flowcrypt.com/docs/business/enterprise-admin-panel.html">FlowCrypt Admin Panel</a>

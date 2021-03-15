@@ -106,7 +106,7 @@ public abstract class TemplateLoader {
 
     public abstract List<String> generateAll();
 
-    public abstract List<String> precompileAll(List<String> compilePath);
+    public abstract List<String> precompileAll();
 
     public abstract boolean hasChanged(String name);
 }

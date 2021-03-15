@@ -67,15 +67,32 @@ compileNativeMainJava {
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
+// GraalVM currently only has versions 8 or 11
+String graalJavaVersion() {
+    switch (targetCompatibility.majorVersion as int) {
+        case { it <= 8 }:
+            return '8'
+        case { it <= 11 }:
+            return '11'
+        default:
+            return 'skip'
+    }
+}
+
 graal {
     mainClass 'gg.jte.NativeTestApp'
     outputName 'nativeTestApp'
-    javaVersion(targetCompatibility.isJava11Compatible() ? '11' : '8')
+    javaVersion(graalJavaVersion() == 'skip' ? '11' : graalJavaVersion())
 }
 
-tasks.nativeImage.dependsOn compileNativeMainJava
-tasks.nativeImage.classpath.set configurations.nativeMainRuntimeClasspath
+tasks.nativeImage {
+    onlyIf { graalJavaVersion() != 'skip' }
+    dependsOn compileNativeMainJava
+    classpath.set configurations.nativeMainRuntimeClasspath
+}
+
 task nativeTest(type: Test) {
+    onlyIf { graalJavaVersion() != 'skip' }
     dependsOn nativeImage
     description = "Run test of native build"
     group = "verification"
@@ -86,11 +103,11 @@ task nativeTest(type: Test) {
     useJUnitPlatform()
 }
 
-check.dependsOn nativeTest
-
-task debug() {
+task skippedNativeTest {
+    onlyIf { graalJavaVersion() == 'skip' }
     doLast {
-        println tasks.nativeImage.classpath.get().asPath
-        println configurations.nativeMainRuntimeClasspath.asPath
+        println "Skipped native-image test, incompatible Java version"
     }
 }
+
+check.dependsOn(nativeTest, skippedNativeTest)

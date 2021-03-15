@@ -107,6 +107,7 @@ Temporary Items
 /jte-hotreload-test/jte-classes/
 
 ### VS Code / VS Code Java extension (uses Eclipse code) ###
+.vscode/
 .project
 .settings/
 .classpath

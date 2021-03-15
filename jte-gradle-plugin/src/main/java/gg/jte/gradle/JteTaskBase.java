@@ -113,13 +113,11 @@ public abstract class JteTaskBase extends DefaultTask {
 
     @OutputDirectory
     @Optional
-    public Path getTargetResourceDirectory()
-    {
+    public Path getTargetResourceDirectory() {
         return targetResourceDirectory;
     }
 
-    public void setTargetResourceDirectory(Path targetResourceDirectory)
-    {
+    public void setTargetResourceDirectory(Path targetResourceDirectory) {
         this.targetResourceDirectory = targetResourceDirectory;
     }
 }

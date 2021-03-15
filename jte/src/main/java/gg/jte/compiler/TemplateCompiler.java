@@ -69,27 +69,22 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     @Override
-    public List<String> precompileAll()
-    {
+    public List<String> precompileAll() {
         return precompile(codeResolver.resolveAllTemplateNames());
     }
     
-    private void generateNativeResources(LinkedHashSet<ClassDefinition> classDefinitions)
-    {
-        if (config.resourceDirectory == null)
-        {
+    private void generateNativeResources(LinkedHashSet<ClassDefinition> classDefinitions) {
+        if (config.resourceDirectory == null) {
             return;
         }
         String namespace = config.projectNamespace != null ? config.projectNamespace : "generated/" + packageName;
         Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/" + namespace);
-        try (FileOutput properties = new FileOutput(nativeImageResourceRoot.resolve("native-image.properties")))
-        {
+        try (FileOutput properties = new FileOutput(nativeImageResourceRoot.resolve("native-image.properties"))) {
             properties.writeContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json\n");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        try (FileOutput reflection = new FileOutput(nativeImageResourceRoot.resolve("reflection-config.json")))
-        {
+        try (FileOutput reflection = new FileOutput(nativeImageResourceRoot.resolve("reflection-config.json"))) {
             // avoid adding a json dependency to the project by just writing
             reflection.writeContent(
                     classDefinitions.stream()

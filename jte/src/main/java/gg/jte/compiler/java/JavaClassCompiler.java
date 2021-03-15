@@ -3,6 +3,7 @@ package gg.jte.compiler.java;
 import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.compiler.ClassCompiler;
+import gg.jte.compiler.ClassUtils;
 import gg.jte.runtime.ClassInfo;
 
 import javax.tools.JavaCompiler;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 public class JavaClassCompiler implements ClassCompiler {
     @Override
-    public void compile(String[] files, List<String> compilePath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
+    public void compile(String[] files, List<String> classPath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         List<String> args = new ArrayList<>(files.length);
 
         if (config.compileArgs != null) {
@@ -24,9 +25,9 @@ public class JavaClassCompiler implements ClassCompiler {
         }
         args.add("-parameters");
 
-        if (compilePath != null && !compilePath.isEmpty()) {
+        if (!classPath.isEmpty()) {
             args.add("-classpath");
-            args.add(String.join(File.pathSeparator, compilePath));
+            args.add(ClassUtils.join(classPath));
         }
 
         args.addAll(Arrays.asList(files));

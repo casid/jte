@@ -6,6 +6,8 @@ import gg.jte.runtime.Constants;
 
 import java.nio.file.Path;
 
+import java.util.List;
+
 public class TemplateConfig {
     public static final TemplateConfig PLAIN = new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED);
 
@@ -18,6 +20,7 @@ public class TemplateConfig {
     public String[] htmlAttributes;
     public boolean htmlCommentsPreserved;
     public boolean binaryStaticContent;
+    public List<String> classPath;
 
     public Path resourceDirectory;
 

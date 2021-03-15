@@ -1,9 +1,9 @@
 package gg.jte;
 
+import gg.jte.output.StringOutput;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import gg.jte.output.StringOutput;
 
 import java.util.*;
 
@@ -499,7 +499,7 @@ public class TemplateEngineTest {
     void tagWithVarArgs1() {
         givenTag("varargs",
                 "@param String ... values\n" +
-                "@for(String value : values)${value} @endfor");
+                        "@for(String value : values)${value} @endfor");
         givenTemplate("@tag.varargs(\"Hello\")");
         thenOutputIs("Hello ");
     }
@@ -508,7 +508,7 @@ public class TemplateEngineTest {
     void tagWithVarArgs2() {
         givenTag("varargs",
                 "@param String ... values\n" +
-                "@for(String value : values)${value} @endfor");
+                        "@for(String value : values)${value} @endfor");
         givenTemplate("@tag.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
     }
@@ -517,8 +517,8 @@ public class TemplateEngineTest {
     void tagWithVarArgs3() {
         givenTag("localize",
                 "@param String key\n" +
-                "@param String ... values\n" +
-                "${key} with @for(String value : values)${value} @endfor");
+                        "@param String ... values\n" +
+                        "${key} with @for(String value : values)${value} @endfor");
         givenTemplate("@tag.localize(key = \"test.key\", \"Hello\", \"World\")");
         thenOutputIs("test.key with Hello World ");
     }
@@ -632,42 +632,42 @@ public class TemplateEngineTest {
 
         thenOutputIs(
                 "<body>\n" +
-                "<b>Welcome to my site - you are on page 42</b>\n" +
-                "\n" +
-                "<div class=\"content\">\n" +
-                "    \n" +
-                "        Hello, enjoy this great content\n" +
-                "    \n" +
-                "</div>\n" +
-                "\n" +
-                "<div class=\"footer\">\n" +
-                "    \n" +
-                "        Come again!\n" +
-                "    \n" +
-                "</div>\n" +
-                "</body>");
+                        "<b>Welcome to my site - you are on page 42</b>\n" +
+                        "\n" +
+                        "<div class=\"content\">\n" +
+                        "    \n" +
+                        "        Hello, enjoy this great content\n" +
+                        "    \n" +
+                        "</div>\n" +
+                        "\n" +
+                        "<div class=\"footer\">\n" +
+                        "    \n" +
+                        "        Come again!\n" +
+                        "    \n" +
+                        "</div>\n" +
+                        "</body>");
     }
 
     @Test
     void nestedLayouts() {
         givenLayout("main",
                 "@param gg.jte.Content header = null\n" +
-                "@param gg.jte.Content content\n" +
-                "@param gg.jte.Content footer = null\n" +
-                "@if(header != null)<header>${header}</header>@endif" +
-                "<content>${content}</content>" +
-                "@if(footer != null)<footer>${footer}</footer>@endif");
+                        "@param gg.jte.Content content\n" +
+                        "@param gg.jte.Content footer = null\n" +
+                        "@if(header != null)<header>${header}</header>@endif" +
+                        "<content>${content}</content>" +
+                        "@if(footer != null)<footer>${footer}</footer>@endif");
         givenLayout("mainExtended",
                 "@param gg.jte.Content header = null\n" +
-                "@param gg.jte.Content contentPrefix = null\n" +
-                "@param gg.jte.Content content\n" +
-                "@param gg.jte.Content contentSuffix = null\n" +
-                "@param gg.jte.Content footer = null\n" +
-                "@layout.main(header = header, content = @`" +
-                "@if(contentPrefix != null)${contentPrefix}@endif" +
-                "<b>${content}</b>" +
-                "@if(contentSuffix != null)${contentSuffix}@endif" +
-                "`, footer = footer)");
+                        "@param gg.jte.Content contentPrefix = null\n" +
+                        "@param gg.jte.Content content\n" +
+                        "@param gg.jte.Content contentSuffix = null\n" +
+                        "@param gg.jte.Content footer = null\n" +
+                        "@layout.main(header = header, content = @`" +
+                        "@if(contentPrefix != null)${contentPrefix}@endif" +
+                        "<b>${content}</b>" +
+                        "@if(contentSuffix != null)${contentSuffix}@endif" +
+                        "`, footer = footer)");
         givenTemplate("@layout.mainExtended(" +
                 "header = @`" +
                 "this is the header" +
@@ -690,9 +690,9 @@ public class TemplateEngineTest {
     void layoutWithNamedParams() {
         givenLayout("main",
                 "@param int status = 5\n" +
-                "@param int duration = -1\n" +
-                "@param gg.jte.Content content\n" +
-                "Hello, ${content} your status is ${status}, the duration is ${duration}");
+                        "@param int duration = -1\n" +
+                        "@param gg.jte.Content content\n" +
+                        "Hello, ${content} your status is ${status}, the duration is ${duration}");
 
         givenTemplate("@layout.main(content = @`" +
                 "Sir`)");
@@ -804,10 +804,10 @@ public class TemplateEngineTest {
     void exceptionLineNumber1() {
         givenRawTemplate(
                 "@import gg.jte.TemplateEngineTest.Model\n" +
-                "\n" +
-                "@param gg.jte.TemplateEngineTest.Model model\n" +
-                "\n" +
-                "${model.getThatThrows()}\n"
+                        "\n" +
+                        "@param gg.jte.TemplateEngineTest.Model model\n" +
+                        "\n" +
+                        "${model.getThatThrows()}\n"
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
@@ -897,14 +897,14 @@ public class TemplateEngineTest {
     @Test
     void compileError0() {
         thenRenderingFailsWithException()
-            .hasMessage("test/template.jte not found");
+                .hasMessage("test/template.jte not found");
     }
 
     @Test
     void compileError1() {
         givenTemplate("@tag.model(model)");
         thenRenderingFailsWithException()
-            .hasMessage("tag/model.jte not found, referenced at test/template.jte:2");
+                .hasMessage("tag/model.jte not found, referenced at test/template.jte:2");
     }
 
     @Test
@@ -1062,6 +1062,11 @@ public class TemplateEngineTest {
     }
 
     @SuppressWarnings("unused")
+    public enum ModelType {
+        One, Two, Three
+    }
+
+    @SuppressWarnings("unused")
     public static class Model {
         public String hello;
         public int x;
@@ -1101,10 +1106,5 @@ public class TemplateEngineTest {
         public String getThatThrows() {
             throw new NullPointerException("Oops");
         }
-    }
-
-    @SuppressWarnings("unused")
-    public enum ModelType {
-        One, Two, Three
     }
 }

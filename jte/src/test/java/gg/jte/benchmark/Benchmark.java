@@ -2,8 +2,8 @@ package gg.jte.benchmark;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
-import gg.jte.resolve.ResourceCodeResolver;
 import gg.jte.output.StringOutput;
+import gg.jte.resolve.ResourceCodeResolver;
 
 import java.util.concurrent.TimeUnit;
 

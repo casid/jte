@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface ClassCompiler {
-    void compile(String[] files, List<String> compilePath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName);
+    void compile(String[] files, List<String> classPath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName);
 }

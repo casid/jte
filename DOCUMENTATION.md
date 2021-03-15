@@ -432,13 +432,22 @@ If you clone this repository, you can launch the [SimpleWebServer](jte/src/test/
 
 ### For a statically rendered website
 
-In case you're using jte to pre-render static websites as HTML files, you can also listen to template file changes during development and re-render affected static files:
+In case you're using jte to pre-render static websites as HTML files, you can also listen to template file changes during development and re-render affected static files. Add the jte-watcher module to your project:
 
-`DirectoryCodeResolver::startTemplateFilesListener()` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, a listener is called with a list of changed templates.
+```xml
+<dependency>
+   <groupId>gg.jte</groupId>
+   <artifactId>jte-watcher</artifactId>
+   <version>${jte.version}</version>
+</dependency>
+```
+
+`DirectoryWatcher::start()` starts a daemon thread listening to file changes within the jte template directory. Once file changes are detected, a listener is called with a list of changed templates.
 
 ```java
 if (isDeveloperEnvironment()) {
-    codeResolver.startTemplateFilesListener(templateEngine, templates -> {
+    DirectoryWatcher watcher = new DirectoryWatcher(templateEngine, codeResolver);
+    watcher.start(templates -> {
         for (String template : templates) {
             // Re-render the static HTML file
         }
@@ -579,6 +588,23 @@ tasks.test {
 
 </details>
 
+In case you would like to build a self-contained JAR, you can add this to your build.gradle:
+
+```groovy
+from fileTree("jte-classes") {
+    include "**/*.class"
+    include "**/*.bin" // Only required if you use binary templates
+}
+```
+
+And init the template engine like this for production builds:
+
+```java
+TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Html);
+```
+
+This way the templates are loaded from the application class loader. See [this issue](https://github.com/casid/jte/issues/62) for additional information.
+
 ### Using the application class loader (since 1.2.0)
 
 When using this method the precompiled templates are bundled within your application jar file. The plugin generates `*.java` files for all jte templates during Maven's `GENERATE_SOURCES` phase. Compilation of the templates is left to the Maven Compiler plugin.
@@ -645,7 +671,7 @@ tasks.generateJte {
     contentType = ContentType.Html
 }
 
-sourceSets.main.java.srcDirs += tasks.generateJte.targetDirectory
+sourceSets.main.java.srcDir(tasks.generateJte.targetDirectory)
 
 tasks.compileJava {
     dependsOn(tasks.generateJte)
@@ -677,7 +703,7 @@ tasks.generateJte {
 
 sourceSets {
     main {
-        java.srcDirs(tasks.generateJte.get().targetDirectory)
+        java.srcDir(tasks.generateJte.get().targetDirectory)
     }
 }
 

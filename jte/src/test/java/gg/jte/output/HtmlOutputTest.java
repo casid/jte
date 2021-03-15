@@ -1,6 +1,5 @@
 package gg.jte.output;
 
-import gg.jte.TemplateOutput;
 import gg.jte.html.HtmlTemplateOutput;
 import gg.jte.html.OwaspHtmlTemplateOutput;
 

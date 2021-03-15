@@ -1,7 +1,5 @@
 package gg.jte.output;
 
-import gg.jte.TemplateOutput;
-
 import java.io.StringWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;

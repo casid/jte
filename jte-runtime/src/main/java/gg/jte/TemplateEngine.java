@@ -345,16 +345,17 @@ public final class TemplateEngine {
      * @return list of .java template files that were compiled
      */
     public List<String> precompileAll() {
-        return precompileAll(null);
+        return templateLoader.precompileAll();
     }
 
     /**
      * Compiles all templates located in the sources directory, to the compiled template classes directory.
-     * @param compilePath additional compile path arguments for the Java compiler.
+     * @param classPath additional class path arguments for the Java compiler. See also {@link TemplateEngine#setClassPath(List)}
      * @return list of .java template files that were compiled
      */
-    public List<String> precompileAll(List<String> compilePath) {
-        return templateLoader.precompileAll(compilePath);
+    public List<String> precompileAll(List<String> classPath) {
+        setClassPath(classPath);
+        return templateLoader.precompileAll();
     }
 
     private Template resolveTemplate(String name) {
@@ -487,6 +488,14 @@ public final class TemplateEngine {
      */
     public void setBinaryStaticContent(boolean binaryStaticContent) {
         config.binaryStaticContent = binaryStaticContent;
+    }
+
+    /**
+     * The class path used for compiling templates.
+     * @param classPath list of elements on the class path
+     */
+    public void setClassPath(List<String> classPath) {
+        config.classPath = classPath;
     }
 
     /**

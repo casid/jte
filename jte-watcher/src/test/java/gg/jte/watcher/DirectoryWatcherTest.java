@@ -1,12 +1,14 @@
-package gg.jte;
+package gg.jte.watcher;
 
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.compiler.IoUtils;
+import gg.jte.output.FileOutput;
+import gg.jte.output.StringOutput;
 import gg.jte.resolve.DirectoryCodeResolver;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import gg.jte.compiler.IoUtils;
-import gg.jte.output.FileOutput;
-import gg.jte.output.StringOutput;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -18,15 +20,15 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TemplateEngine_TemplateFilesListenerTest {
+class DirectoryWatcherTest {
+    static final String TEMPLATE = "test.jte";
 
-    public static final String TEMPLATE = "test.jte";
+    final Set<String> templatesInvalidated = new LinkedHashSet<>();
 
-    private final Set<String> templatesInvalidated = new LinkedHashSet<>();
-
-    private Path tempDirectory;
-    private DirectoryCodeResolver codeResolver;
-    private TemplateEngine templateEngine;
+    Path tempDirectory;
+    DirectoryCodeResolver codeResolver;
+    TemplateEngine templateEngine;
+    DirectoryWatcher watcher;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -34,13 +36,15 @@ class TemplateEngine_TemplateFilesListenerTest {
         codeResolver = new DirectoryCodeResolver(tempDirectory);
         templateEngine = TemplateEngine.create(codeResolver, ContentType.Plain);
 
-        codeResolver.startTemplateFilesListener(templateEngine, this::onTemplatesInvalidated);
+        watcher = new DirectoryWatcher(templateEngine, codeResolver);
+
+        watcher.start(this::onTemplatesInvalidated);
         Thread.sleep(100); // Give the listener thread some time to start
     }
 
     @AfterEach
     void tearDown() {
-        codeResolver.stopTemplateFilesListener();
+        watcher.stop();
         IoUtils.deleteDirectoryContent(tempDirectory);
     }
 

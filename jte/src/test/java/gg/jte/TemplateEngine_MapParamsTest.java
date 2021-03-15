@@ -1,7 +1,7 @@
 package gg.jte;
 
-import org.junit.jupiter.api.Test;
 import gg.jte.output.StringOutput;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;

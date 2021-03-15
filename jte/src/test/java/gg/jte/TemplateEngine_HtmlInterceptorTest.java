@@ -1,9 +1,9 @@
 package gg.jte;
 
 import gg.jte.html.HtmlInterceptor;
+import gg.jte.output.StringOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import gg.jte.output.StringOutput;
 
 import java.util.ArrayList;
 import java.util.Arrays;

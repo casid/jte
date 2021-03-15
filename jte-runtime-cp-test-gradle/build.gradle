@@ -3,7 +3,7 @@ import java.nio.file.Paths
 
 plugins {
     id 'java'
-    id 'gg.jte.gradle' version '1.8.1-SNAPSHOT'
+    id 'gg.jte.gradle' version '1.10.0-SNAPSHOT'
     id "com.palantir.graal" version "0.7.2" /* for native image
         There are a few native image plugins around. I used this one because it manages downloading and caching GraalVM
         if necessary. */
@@ -30,7 +30,7 @@ test {
 }
 
 dependencies {
-    implementation('gg.jte:jte-runtime:1.8.1-SNAPSHOT')
+    implementation('gg.jte:jte-runtime:1.10.0-SNAPSHOT')
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testImplementation('org.assertj:assertj-core:3.15.0')
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
@@ -52,7 +52,7 @@ jar {
 
 tasks.generateJte {
     sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
-    contentType = ContentType.Html
+    contentType = gg.jte.ContentType.Html
 }
 
 sourceSets.main.java.srcDir(tasks.generateJte.targetDirectory)

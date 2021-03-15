@@ -4,6 +4,9 @@ import java.nio.file.Paths
 plugins {
     id 'java'
     id 'gg.jte.gradle' version '1.8.1-SNAPSHOT'
+    id "com.palantir.graal" version "0.7.2" /* for native image
+        There are a few native image plugins around. I used this one because it manages downloading and caching GraalVM
+        if necessary. */
 }
 
 repositories {
@@ -12,6 +15,15 @@ repositories {
 }
 
 group = 'gg.jte.testgroup'
+
+sourceSets {
+    nativeMain {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+    nativeTest {
+    }
+}
 
 test {
     useJUnitPlatform()
@@ -22,6 +34,20 @@ dependencies {
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testImplementation('org.assertj:assertj-core:3.15.0')
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
+    nativeMainImplementation 'info.picocli:picocli:4.6.1'
+    nativeMainAnnotationProcessor 'info.picocli:picocli-codegen:4.6.1'
+
+}
+
+configurations {
+    nativeMainImplementation.extendsFrom implementation
+    nativeTestImplementation.extendsFrom testImplementation
+    nativeTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+jar {
+    from sourceSets.nativeMain.output.classesDirs
+    from sourceSets.nativeMain.output.resourcesDir
 }
 
 tasks.generateJte {
@@ -34,4 +60,37 @@ sourceSets.main.resources.srcDir(tasks.generateJte.targetResourceDirectory)
 
 tasks.compileJava {
     dependsOn(tasks.generateJte)
+}
+
+compileNativeMainJava {
+    // see https://picocli.info/#_processor_option_project
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+graal {
+    mainClass 'gg.jte.NativeTestApp'
+    outputName 'nativeTestApp'
+    javaVersion(targetCompatibility.isJava11Compatible() ? '11' : '8')
+}
+
+tasks.nativeImage.dependsOn compileNativeMainJava
+tasks.nativeImage.classpath.set configurations.nativeMainRuntimeClasspath
+task nativeTest(type: Test) {
+    dependsOn nativeImage
+    description = "Run test of native build"
+    group = "verification"
+    systemProperty("nativeApp", tasks.nativeImage.outputFile.get().toString())
+    testClassesDirs = sourceSets.nativeTest.output.classesDirs
+    classpath = sourceSets.nativeTest.runtimeClasspath
+    shouldRunAfter test
+    useJUnitPlatform()
+}
+
+check.dependsOn nativeTest
+
+task debug() {
+    doLast {
+        println tasks.nativeImage.classpath.get().asPath
+        println configurations.nativeMainRuntimeClasspath.asPath
+    }
 }

@@ -492,6 +492,7 @@ public final class TemplateEngine {
     /**
      * Directory in which to generate non-java files (resources). Typically set by plugin rather than end user.
      * Optional - if null, resources will not be generated
+     * @param targetResourceDirectory directory to generate resources in
      */
     public void setTargetResourceDirectory(Path targetResourceDirectory) {
         config.resourceDirectory = targetResourceDirectory;
@@ -500,6 +501,7 @@ public final class TemplateEngine {
     /**
      * "group/artifact" of the project using jte. Typically set by plugin rather than end user.
      * If null, the compiler will make one up.
+     * @param projectNamespace "groupId/artifactId"
      */
     public void setProjectNamespace(String projectNamespace) {
         config.projectNamespace = projectNamespace;

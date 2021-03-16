@@ -41,9 +41,7 @@ public class NativeTest {
     void exceptionLineNumber1() throws IOException {
         thenRenderingFailsWithError("exceptionLineNumber1.jte");
         thenOutputContains("Caused by: java.lang.NullPointerException");
-//        thenOutputContains("Failed to render exceptionLineNumber1.jte, error at exceptionLineNumber1.jte:5");
-        // looks like DebugInfo for line numbers isn't working in native (I didn't dig very deep though)
-        thenOutputContains("Failed to render exceptionLineNumber1.jte");
+        thenOutputContains("Failed to render exceptionLineNumber1.jte, error at exceptionLineNumber1.jte:5");
     }
 
     @Test

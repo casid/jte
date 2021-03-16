@@ -12,6 +12,6 @@ fi
 MAVEN_OPTS='-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn' ./mvnw install --file pom.xml --batch-mode)
 
 (cd $PROJECT_PATH/jte-gradle-plugin && ./gradlew publishToMavenLocal)
-(cd $PROJECT_PATH/jte-runtime-test-gradle && ./gradlew test)
-(cd $PROJECT_PATH/jte-runtime-cp-test-gradle && ./gradlew test)
-(cd $PROJECT_PATH/jte-runtime-cp-test-gradle-kotlin && ./gradlew test)
+(cd $PROJECT_PATH/jte-runtime-test-gradle && ./gradlew check)
+(cd $PROJECT_PATH/jte-runtime-cp-test-gradle && ./gradlew check)
+(cd $PROJECT_PATH/jte-runtime-cp-test-gradle-kotlin && ./gradlew check)

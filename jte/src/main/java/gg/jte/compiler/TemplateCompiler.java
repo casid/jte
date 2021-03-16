@@ -77,8 +77,8 @@ public class TemplateCompiler extends TemplateLoader {
         if (config.resourceDirectory == null) {
             return;
         }
-        String namespace = config.projectNamespace != null ? config.projectNamespace : "generated/" + packageName;
-        Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/" + namespace);
+        String namespace = config.projectNamespace != null ? config.projectNamespace : packageName;
+        Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/jte-generated/" + namespace);
         try (FileOutput properties = new FileOutput(nativeImageResourceRoot.resolve("native-image.properties"))) {
             properties.writeContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json\n");
         } catch (IOException e) {
@@ -90,7 +90,8 @@ public class TemplateCompiler extends TemplateLoader {
                     classDefinitions.stream()
                     .map(cd -> "{\n" +
                             "  \"name\":\"" + cd.getName() + "\",\n" +
-                            "  \"allDeclaredMethods\":true\n" +
+                            "  \"allDeclaredMethods\":true,\n" +
+                            "  \"allDeclaredFields\":true\n" +
                             "}")
                     .collect(Collectors.joining(
                             ",\n", "[\n", "]\n"

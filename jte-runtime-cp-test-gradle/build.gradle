@@ -1,5 +1,6 @@
 import gg.jte.ContentType
 import java.nio.file.Paths
+import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     id 'java'
@@ -69,7 +70,12 @@ compileNativeMainJava {
 
 // GraalVM currently only has versions 8 or 11
 String graalJavaVersion() {
-    switch (targetCompatibility.majorVersion as int) {
+    def javaMajorVersion = targetCompatibility.majorVersion as int
+    if (javaMajorVersion <= 8 && Os.isFamily(Os.FAMILY_WINDOWS)) {
+        // GraalVM for Java 8 on Windows requires a difficult to install SDK version
+        return 'skip'
+    }
+    switch (javaMajorVersion) {
         case { it <= 8 }:
             return '8'
         case { it <= 11 }:

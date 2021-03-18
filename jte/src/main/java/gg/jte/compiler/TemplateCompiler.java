@@ -64,12 +64,47 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public List<String> generateAll() {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames());
+        generateNativeResources(classDefinitions);
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
     @Override
     public List<String> precompileAll() {
         return precompile(codeResolver.resolveAllTemplateNames());
+    }
+    
+    /**
+     * Generate configuration files that can be read by Graal native-image.
+     * See https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/
+     * @param classDefinitions details of generated classes
+     */
+    private void generateNativeResources(LinkedHashSet<ClassDefinition> classDefinitions) {
+        if (config.resourceDirectory == null || !config.generateNativeImageResources) {
+            return;
+        }
+        String namespace = config.projectNamespace != null ? config.projectNamespace : packageName;
+        Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/jte-generated/" + namespace);
+        try (FileOutput properties = new FileOutput(nativeImageResourceRoot.resolve("native-image.properties"))) {
+            properties.writeContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json\n");
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        try (FileOutput reflection = new FileOutput(nativeImageResourceRoot.resolve("reflection-config.json"))) {
+            // avoid adding a json dependency to the project by just writing
+            reflection.writeContent(
+                    classDefinitions.stream()
+                    .map(cd -> "{\n" +
+                            "  \"name\":\"" + cd.getName() + "\",\n" +
+                            "  \"allDeclaredMethods\":true,\n" +
+                            "  \"allDeclaredFields\":true\n" +
+                            "}")
+                    .collect(Collectors.joining(
+                            ",\n", "[\n", "]\n"
+                    ))
+            );
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public List<String> precompile(List<String> names) {
@@ -156,6 +191,7 @@ public class TemplateCompiler extends TemplateLoader {
             }
         }
 
+        Path resourceDirectory = config.resourceDirectory == null ? classDirectory : config.resourceDirectory;
         for (ClassDefinition classDefinition : classDefinitions) {
             try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getSourceFileName()))) {
                 fileOutput.writeContent(classDefinition.getCode());
@@ -165,7 +201,7 @@ public class TemplateCompiler extends TemplateLoader {
 
             List<byte[]> textParts = classDefinition.getBinaryTextParts();
             if (!textParts.isEmpty()) {
-                try (OutputStream os = Files.newOutputStream(classDirectory.resolve(classDefinition.getBinaryTextPartsFileName()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
+                try (OutputStream os = Files.newOutputStream(resourceDirectory.resolve(classDefinition.getBinaryTextPartsFileName()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
                     for (byte[] textPart : textParts) {
                         os.write(textPart);
                     }

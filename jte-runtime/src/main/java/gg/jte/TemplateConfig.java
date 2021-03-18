@@ -4,6 +4,8 @@ import gg.jte.html.HtmlPolicy;
 import gg.jte.html.OwaspHtmlPolicy;
 import gg.jte.runtime.Constants;
 
+import java.nio.file.Path;
+
 import java.util.List;
 
 public class TemplateConfig {
@@ -19,6 +21,11 @@ public class TemplateConfig {
     public boolean htmlCommentsPreserved;
     public boolean binaryStaticContent;
     public List<String> classPath;
+
+    public Path resourceDirectory;
+
+    public String projectNamespace;
+    public boolean generateNativeImageResources;
 
     public TemplateConfig(ContentType contentType, String packageName) {
         this.contentType = contentType;

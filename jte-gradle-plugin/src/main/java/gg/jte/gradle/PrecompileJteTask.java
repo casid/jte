@@ -68,6 +68,7 @@ public class PrecompileJteTask extends JteTaskBase {
         templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(binaryStaticContent));
         templateEngine.setCompileArgs(compileArgs);
+        templateEngine.setTargetResourceDirectory(targetResourceDirectory);
 
         int amount;
         try {

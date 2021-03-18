@@ -29,11 +29,11 @@ jobs:
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Test Gradle Plugin Precompile
-        run: cd jte-runtime-test-gradle && ./gradlew test
+        run: cd jte-runtime-test-gradle && ./gradlew check
       - name: Test Gradle Plugin Generate
-        run: cd jte-runtime-cp-test-gradle && ./gradlew test
+        run: cd jte-runtime-cp-test-gradle && ./gradlew check
       - name: Test Gradle Plugin Generate Pure Kotlin
-        run: cd jte-runtime-cp-test-gradle-kotlin && ./gradlew test
+        run: cd jte-runtime-cp-test-gradle-kotlin && ./gradlew check
 
 
   coverage:

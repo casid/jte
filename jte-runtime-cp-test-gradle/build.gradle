@@ -54,6 +54,7 @@ jar {
 tasks.generateJte {
     sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
     contentType = gg.jte.ContentType.Html
+    generateNativeImageResources = true
 }
 
 sourceSets.main.java.srcDir(tasks.generateJte.targetDirectory)

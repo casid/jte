@@ -73,8 +73,13 @@ public class TemplateCompiler extends TemplateLoader {
         return precompile(codeResolver.resolveAllTemplateNames());
     }
     
+    /**
+     * Generate configuration files that can be read by Graal native-image.
+     * See https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/
+     * @param classDefinitions details of generated classes
+     */
     private void generateNativeResources(LinkedHashSet<ClassDefinition> classDefinitions) {
-        if (config.resourceDirectory == null) {
+        if (config.resourceDirectory == null || !config.generateNativeImageResources) {
             return;
         }
         String namespace = config.projectNamespace != null ? config.projectNamespace : packageName;

@@ -25,6 +25,7 @@ public class TemplateConfig {
     public Path resourceDirectory;
 
     public String projectNamespace;
+    public boolean generateNativeImageResources;
 
     public TemplateConfig(ContentType contentType, String packageName) {
         this.contentType = contentType;

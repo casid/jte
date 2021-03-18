@@ -714,6 +714,11 @@ tasks.compileJava {
 
 </details>
 
+#### GraalVM native-image support
+An application jar with generated classes can be built into a native binary using [GraalVM native-image](https://www.graalvm.org/reference-manual/native-image/). To support this, jte can generate the necessary configuration files to tell native-image about classes loaded by reflection.
+
+To use this feature, set `generateNativeImageResources = true` in your Gradle `generateJte` task. (Docs for Maven TBD)
+
 ## Binary rendering for max throughput
 
 Most template parts are static content and only few parts of a template are dynamic. It is wasteful to convert those static parts over and over on every request, if your web-framework sends binary UTF-8 content to the user. Since jte 1.7.0 it is possible to encode those static parts at compile time:

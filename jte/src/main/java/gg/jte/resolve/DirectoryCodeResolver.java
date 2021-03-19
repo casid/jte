@@ -1,7 +1,6 @@
 package gg.jte.resolve;
 
 import gg.jte.CodeResolver;
-import gg.jte.TemplateEngine;
 import gg.jte.compiler.IoUtils;
 
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

@@ -64,7 +64,6 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public List<String> generateAll() {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames());
-        generateNativeResources(classDefinitions);
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
@@ -79,9 +78,18 @@ public class TemplateCompiler extends TemplateLoader {
      * @param classDefinitions details of generated classes
      */
     private void generateNativeResources(LinkedHashSet<ClassDefinition> classDefinitions) {
-        if (config.resourceDirectory == null || !config.generateNativeImageResources) {
+        if (!config.generateNativeImageResources) {
             return;
         }
+
+        if (config.resourceDirectory == null) {
+            return;
+        }
+
+        if (classDefinitions.isEmpty()) {
+            return;
+        }
+
         String namespace = config.projectNamespace != null ? config.projectNamespace : packageName;
         Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/jte-generated/" + namespace);
         try (FileOutput properties = new FileOutput(nativeImageResourceRoot.resolve("native-image.properties"))) {
@@ -89,19 +97,24 @@ public class TemplateCompiler extends TemplateLoader {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+
         try (FileOutput reflection = new FileOutput(nativeImageResourceRoot.resolve("reflection-config.json"))) {
             // avoid adding a json dependency to the project by just writing
-            reflection.writeContent(
-                    classDefinitions.stream()
-                    .map(cd -> "{\n" +
-                            "  \"name\":\"" + cd.getName() + "\",\n" +
-                            "  \"allDeclaredMethods\":true,\n" +
-                            "  \"allDeclaredFields\":true\n" +
-                            "}")
-                    .collect(Collectors.joining(
-                            ",\n", "[\n", "]\n"
-                    ))
-            );
+            boolean first = true;
+
+            reflection.writeContent("[\n");
+            for (ClassDefinition classDefinition : classDefinitions) {
+                if (!first) {
+                    reflection.writeContent(",\n");
+                }
+
+                reflection.writeContent("{\n  \"name\":\"");
+                reflection.writeContent(classDefinition.getName());
+                reflection.writeContent("\",\n  \"allDeclaredMethods\":true,\n  \"allDeclaredFields\":true\n}");
+
+                first = false;
+            }
+            reflection.writeContent("\n]\n");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -210,6 +223,9 @@ public class TemplateCompiler extends TemplateLoader {
                 }
             }
         }
+
+        generateNativeResources(classDefinitions);
+
         return classDefinitions;
     }
 

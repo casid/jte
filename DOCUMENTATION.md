@@ -263,7 +263,7 @@ Here is an example layout with a content block:
 </body>
 ```
 
-The shorthand to create content blocks within jte templates is an `@`followed by two backticks. Let's call the layout we just created and pass a a page content and footer:
+The shorthand to create content blocks within jte templates is an `@` followed by two backticks. Let's call the layout we just created and pass a a page content and footer:
 
 ```htm
 @import org.example.WelcomePage
@@ -753,6 +753,6 @@ There are a few pretty cool things going on here:
 
 - We know about the binary content-length directly after rendering, at no additional cost
 - All static parts are streamed directly to the output stream, without any copying / encoding overhead
-- Dynamic parts are usually small - and written to very efficiently to internal chunks during rendering
+- Dynamic parts are usually small - and written very efficiently to internal chunks during rendering
 
 With binary content you will be able to render millions of pages per second (in case there's no DB or other external service interaction, heh) - with very little CPU, memory and GC usage.

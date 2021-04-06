@@ -133,11 +133,11 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
         kotlinCode.append("\t}\n");
 
-        kotlinCode.append("\t@JvmStatic fun renderMap(");
+        kotlinCode.append("\t@Suppress(\"UNCHECKED_CAST\")\n\t@JvmStatic fun renderMap(");
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
 
-        kotlinCode.append(", params:Map<String, Any>) {\n");
+        kotlinCode.append(", params:Map<String, Any?>) {\n");
         for (ParamInfo parameter : parameters) {
             if (parameter.varargs) {
                 continue;
@@ -145,13 +145,13 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
             kotlinCode.append("\t\tval ").append(parameter.name).append(" = ");
             if (parameter.defaultValue != null) {
-                kotlinCode.append("params.getOrElse(\"").append(parameter.name).append("\") {");
+                kotlinCode.append("params[\"").append(parameter.name).append("\"] as ").append(parameter.type).append("? ?: ");
                 writeCodeWithContentSupport(0, parameter.defaultValue);
-                kotlinCode.append("}");
+                kotlinCode.append('\n');
             } else {
                 kotlinCode.append("params.get(\"").append(parameter.name).append("\")");
+                kotlinCode.append(" as ").append(parameter.type).append('\n');
             }
-            kotlinCode.append(" as ").append(parameter.type).append("\n");
         }
         kotlinCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
 

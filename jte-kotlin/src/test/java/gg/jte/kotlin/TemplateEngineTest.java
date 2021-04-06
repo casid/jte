@@ -4,7 +4,6 @@ import gg.jte.*;
 import gg.jte.output.StringOutput;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -454,8 +453,6 @@ public class TemplateEngineTest {
         thenOutputIs("1, 2");
     }
 
-    // TODO this reproduces the report in https://github.com/casid/jte/issues/75
-    @Disabled
     @Test
     void tagWithDefaultParam_generic() {
         givenTag("named", "@param files: Map<String, ByteArray> = emptyMap()\n" +
@@ -463,6 +460,24 @@ public class TemplateEngineTest {
         givenTemplate("@tag.named()");
 
         thenOutputIs("0");
+    }
+
+    @Test
+    void tagWithDefaultParam_generic_nullDefault() {
+        givenTag("named", "@param files: Map<String, ByteArray>? = null\n" +
+                "${files?.size}");
+        givenTemplate("@tag.named()");
+
+        thenOutputIs("");
+    }
+
+    @Test
+    void tagWithDefaultParam_generic_nullDefault_withValue() {
+        givenTag("named", "@param files: Map<String, ByteArray>? = null\n" +
+                "${files?.size}");
+        givenTemplate("@tag.named(mapOf(\"foo\" to ByteArray(1)))");
+
+        thenOutputIs("1");
     }
 
     @Test

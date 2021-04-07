@@ -133,7 +133,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
         kotlinCode.append("\t}\n");
 
-        kotlinCode.append("\t@Suppress(\"UNCHECKED_CAST\")\n\t@JvmStatic fun renderMap(");
+        kotlinCode.append("\t@JvmStatic fun renderMap(");
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
 

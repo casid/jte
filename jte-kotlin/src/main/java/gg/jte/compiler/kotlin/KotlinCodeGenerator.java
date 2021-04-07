@@ -143,15 +143,12 @@ public class KotlinCodeGenerator implements CodeGenerator {
                 continue;
             }
 
-            kotlinCode.append("\t\tval ").append(parameter.name).append(" = ");
+            kotlinCode.append("\t\tval ").append(parameter.name).append(" = params[\"").append(parameter.name).append("\"] as ").append(parameter.type);
             if (parameter.defaultValue != null) {
-                kotlinCode.append("params[\"").append(parameter.name).append("\"] as ").append(parameter.type).append("? ?: ");
+                kotlinCode.append("? ?: ");
                 writeCodeWithContentSupport(0, parameter.defaultValue);
-                kotlinCode.append('\n');
-            } else {
-                kotlinCode.append("params.get(\"").append(parameter.name).append("\")");
-                kotlinCode.append(" as ").append(parameter.type).append('\n');
             }
+            kotlinCode.append('\n');
         }
         kotlinCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
 

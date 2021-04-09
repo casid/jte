@@ -69,6 +69,9 @@ public class CompilerMojo extends AbstractMojo {
 
     @Override
     public void execute() {
+        // Prevent Kotlin compiler to leak file handles, see https://github.com/casid/jte/issues/77
+        // Use String literal as KOTLIN_COMPILER_ENVIRONMENT_KEEPALIVE_PROPERTY constant isn't available
+        System.setProperty("kotlin.environment.keepalive", "false");
 
         long start = System.nanoTime();
 

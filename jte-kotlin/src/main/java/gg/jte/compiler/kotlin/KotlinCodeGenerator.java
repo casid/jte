@@ -137,21 +137,18 @@ public class KotlinCodeGenerator implements CodeGenerator {
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
 
-        kotlinCode.append(", params:Map<String, Any>) {\n");
+        kotlinCode.append(", params:Map<String, Any?>) {\n");
         for (ParamInfo parameter : parameters) {
             if (parameter.varargs) {
                 continue;
             }
 
-            kotlinCode.append("\t\tval ").append(parameter.name).append(" = ");
+            kotlinCode.append("\t\tval ").append(parameter.name).append(" = params[\"").append(parameter.name).append("\"] as ").append(parameter.type);
             if (parameter.defaultValue != null) {
-                kotlinCode.append("params.getOrElse(\"").append(parameter.name).append("\") {");
+                kotlinCode.append("? ?: ");
                 writeCodeWithContentSupport(0, parameter.defaultValue);
-                kotlinCode.append("}");
-            } else {
-                kotlinCode.append("params.get(\"").append(parameter.name).append("\")");
             }
-            kotlinCode.append(" as ").append(parameter.type).append("\n");
+            kotlinCode.append('\n');
         }
         kotlinCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
 

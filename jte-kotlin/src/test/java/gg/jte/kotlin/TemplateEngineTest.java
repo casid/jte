@@ -454,6 +454,33 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithDefaultParam_generic() {
+        givenTag("named", "@param files: Map<String, ByteArray> = emptyMap()\n" +
+                "${files.size}");
+        givenTemplate("@tag.named()");
+
+        thenOutputIs("0");
+    }
+
+    @Test
+    void tagWithDefaultParam_generic_nullDefault() {
+        givenTag("named", "@param files: Map<String, ByteArray>? = null\n" +
+                "${files?.size}");
+        givenTemplate("@tag.named()");
+
+        thenOutputIs("");
+    }
+
+    @Test
+    void tagWithDefaultParam_generic_nullDefault_withValue() {
+        givenTag("named", "@param files: Map<String, ByteArray>? = null\n" +
+                "${files?.size}");
+        givenTemplate("@tag.named(mapOf(\"foo\" to ByteArray(1)))");
+
+        thenOutputIs("1");
+    }
+
+    @Test
     void tagWithDefaultParam_firstSet() {
         givenTag("named", "@param one:Int = 1\n" +
                 "@param two:Int = 2\n" +

@@ -53,6 +53,10 @@ public class PrecompileJteTask extends JteTaskBase {
 
     @TaskAction
     public void execute() {
+        // Prevent Kotlin compiler to leak file handles, see https://github.com/casid/jte/issues/77
+        // Use String literal as KOTLIN_COMPILER_ENVIRONMENT_KEEPALIVE_PROPERTY constant isn't available
+        System.setProperty("kotlin.environment.keepalive", "false");
+
         Logger logger = getLogger();
         long start = System.nanoTime();
 
@@ -68,6 +72,7 @@ public class PrecompileJteTask extends JteTaskBase {
         templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(binaryStaticContent));
         templateEngine.setCompileArgs(compileArgs);
+        templateEngine.setTargetResourceDirectory(targetResourceDirectory);
 
         int amount;
         try {

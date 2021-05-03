@@ -497,4 +497,32 @@ public final class TemplateEngine {
     public void setClassPath(List<String> classPath) {
         config.classPath = classPath;
     }
+
+    /**
+     * Directory in which to generate non-java files (resources). Typically set by plugin rather than end user.
+     * Optional - if null, resources will not be generated
+     * @param targetResourceDirectory directory to generate resources in
+     */
+    public void setTargetResourceDirectory(Path targetResourceDirectory) {
+        config.resourceDirectory = targetResourceDirectory;
+    }
+
+    /**
+     * "group/artifact" of the project using jte. Typically set by plugin rather than end user.
+     * If null, the compiler will make one up.
+     * @param projectNamespace "groupId/artifactId"
+     */
+    public void setProjectNamespace(String projectNamespace) {
+        config.projectNamespace = projectNamespace;
+    }
+
+    /**
+     * Whether to try and generate configuration files to support Graal native-image.
+     * If true, setTargetResourceDirectory should also be used to indicate where to
+     * put the resources.
+     * @param value true to generate native image configuration resources
+     */
+    public void setGenerateNativeImageResources(boolean value) {
+        config.generateNativeImageResources = value;
+    }
 }

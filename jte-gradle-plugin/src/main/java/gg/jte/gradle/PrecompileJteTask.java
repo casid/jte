@@ -7,10 +7,12 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.*;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +23,12 @@ public class PrecompileJteTask extends JteTaskBase {
     private FileCollection compilePath;
     private String htmlPolicyClass;
     private String[] compileArgs;
+
+    @Inject
+    public PrecompileJteTask(JteExtension extension)
+    {
+        super(extension);
+    }
 
     @Nested
     public FileCollection getCompilePath() {
@@ -60,19 +68,26 @@ public class PrecompileJteTask extends JteTaskBase {
         Logger logger = getLogger();
         long start = System.nanoTime();
 
+        Path sourceDirectory = getSourceDirectory();
         logger.info("Precompiling jte templates found in " + sourceDirectory);
 
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(sourceDirectory), targetDirectory, contentType, null, packageName);
-        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(trimControlStructures));
-        templateEngine.setHtmlTags(htmlTags);
-        templateEngine.setHtmlAttributes(htmlAttributes);
+        Path targetDirectory = getTargetDirectory();
+        TemplateEngine templateEngine = TemplateEngine.create(
+                new DirectoryCodeResolver(sourceDirectory),
+                targetDirectory,
+                getContentType(),
+                null,
+                getPackageName());
+        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(getTrimControlStructures()));
+        templateEngine.setHtmlTags(getHtmlTags());
+        templateEngine.setHtmlAttributes(getHtmlAttributes());
         if (htmlPolicyClass != null) {
             templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass));
         }
-        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
-        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(binaryStaticContent));
+        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(getHtmlCommentsPreserved()));
+        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
         templateEngine.setCompileArgs(compileArgs);
-        templateEngine.setTargetResourceDirectory(targetResourceDirectory);
+        templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());
 
         int amount;
         try {

@@ -1,123 +1,120 @@
 package gg.jte.gradle;
 
 import gg.jte.ContentType;
-import gg.jte.runtime.Constants;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public abstract class JteTaskBase extends DefaultTask {
 
-    protected Path sourceDirectory;
-    protected Path targetDirectory;
-    protected ContentType contentType;
-    protected Boolean trimControlStructures;
-    protected String[] htmlTags;
-    protected String[] htmlAttributes;
-    protected Boolean htmlCommentsPreserved;
-    protected Boolean binaryStaticContent;
-    protected String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
-    protected Path targetResourceDirectory;
+    public JteTaskBase(JteExtension extension)
+    {
+        this.extension = extension;
+    }
+
+    protected final JteExtension extension;
 
     @InputDirectory
     public Path getSourceDirectory() {
-        return sourceDirectory;
+        return extension.getSourceDirectory().get();
     }
 
     public void setSourceDirectory(Path value) {
-        sourceDirectory = value;
+        extension.getSourceDirectory().set(value);
     }
 
     @OutputDirectory
     @Optional
     public Path getTargetDirectory() {
-        return targetDirectory;
+        return extension.getTargetDirectory().getOrNull();
     }
 
     public void setTargetDirectory(Path value) {
-        targetDirectory = value;
+        extension.getTargetDirectory().set(value);
     }
 
     @Input
     public ContentType getContentType() {
-        return contentType;
+        return extension.getContentType().get();
     }
 
     public void setContentType(ContentType value) {
-        contentType = value;
+        extension.getContentType().set(value);
     }
 
     @Input
     @Optional
     public Boolean getTrimControlStructures() {
-        return trimControlStructures;
+        return extension.getTrimControlStructures().getOrNull();
     }
 
     public void setTrimControlStructures(Boolean value) {
-        trimControlStructures = value;
+        extension.getTrimControlStructures().set(value);
     }
 
     @Input
     @Optional
     public String[] getHtmlTags() {
-        return htmlTags;
+        return extension.getHtmlTags().getOrNull();
     }
 
     public void setHtmlTags(String[] value) {
-        htmlTags = value;
+        extension.getHtmlTags().set(value);
     }
 
     @Input
     @Optional
     public String[] getHtmlAttributes() {
-        return htmlAttributes;
+        return extension.getHtmlAttributes().getOrNull();
     }
 
     public void setHtmlAttributes(String[] value) {
-        htmlAttributes = value;
+        extension.getHtmlAttributes().set(value);
     }
 
     @Input
     @Optional
     public Boolean getHtmlCommentsPreserved() {
-        return htmlCommentsPreserved;
+        return extension.getHtmlCommentsPreserved().getOrNull();
     }
 
     public void setHtmlCommentsPreserved(Boolean value) {
-        htmlCommentsPreserved = value;
+        extension.getHtmlCommentsPreserved().set(value);
     }
 
     public void setBinaryStaticContent(Boolean binaryStaticContent) {
-        this.binaryStaticContent = binaryStaticContent;
+        extension.getBinaryStaticContent().set(binaryStaticContent);
     }
 
     @Input
     @Optional
     public Boolean getBinaryStaticContent() {
-        return binaryStaticContent;
+        return extension.getBinaryStaticContent().getOrNull();
     }
 
     @Input
     @Optional
     public String getPackageName() {
-        return packageName;
+        return extension.getPackageName().getOrNull();
     }
 
     public void setPackageName(String packageName) {
-        this.packageName = packageName;
+        extension.getPackageName().set(packageName);
     }
 
     @OutputDirectory
     @Optional
     public Path getTargetResourceDirectory() {
-        return targetResourceDirectory;
+        return extension.getTargetResourceDirectory().getOrNull();
     }
 
     public void setTargetResourceDirectory(Path targetResourceDirectory) {
-        this.targetResourceDirectory = targetResourceDirectory;
+        extension.getTargetResourceDirectory().set(targetResourceDirectory);
     }
 }

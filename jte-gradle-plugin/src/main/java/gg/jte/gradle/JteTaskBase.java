@@ -13,12 +13,21 @@ import java.nio.file.Path;
 
 public abstract class JteTaskBase extends DefaultTask {
 
-    public JteTaskBase(JteExtension extension)
+    public JteTaskBase(JteExtension extension, JteStage stage)
     {
         this.extension = extension;
+        this.stage = stage;
+
+        onlyIf(t -> extension.getStage().getOrNull() == stage);
     }
 
+    private final JteStage stage;
     protected final JteExtension extension;
+
+    // for backwards compatibility, set the stage if a setter on the task is called directly
+    protected void setterCalled() {
+        extension.getStage().set(stage);
+    }
 
     @InputDirectory
     public Path getSourceDirectory() {
@@ -27,6 +36,7 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setSourceDirectory(Path value) {
         extension.getSourceDirectory().set(value);
+        setterCalled();
     }
 
     @OutputDirectory
@@ -37,6 +47,7 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setTargetDirectory(Path value) {
         extension.getTargetDirectory().set(value);
+        setterCalled();
     }
 
     @Input
@@ -46,6 +57,7 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setContentType(ContentType value) {
         extension.getContentType().set(value);
+        setterCalled();
     }
 
     @Input
@@ -56,6 +68,7 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setTrimControlStructures(Boolean value) {
         extension.getTrimControlStructures().set(value);
+        setterCalled();
     }
 
     @Input
@@ -66,6 +79,7 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setHtmlTags(String[] value) {
         extension.getHtmlTags().set(value);
+        setterCalled();
     }
 
     @Input
@@ -76,6 +90,7 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setHtmlAttributes(String[] value) {
         extension.getHtmlAttributes().set(value);
+        setterCalled();
     }
 
     @Input
@@ -86,10 +101,12 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setHtmlCommentsPreserved(Boolean value) {
         extension.getHtmlCommentsPreserved().set(value);
+        setterCalled();
     }
 
     public void setBinaryStaticContent(Boolean binaryStaticContent) {
         extension.getBinaryStaticContent().set(binaryStaticContent);
+        setterCalled();
     }
 
     @Input
@@ -106,6 +123,7 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setPackageName(String packageName) {
         extension.getPackageName().set(packageName);
+        setterCalled();
     }
 
     @OutputDirectory
@@ -116,5 +134,6 @@ public abstract class JteTaskBase extends DefaultTask {
 
     public void setTargetResourceDirectory(Path targetResourceDirectory) {
         extension.getTargetResourceDirectory().set(targetResourceDirectory);
+        setterCalled();
     }
 }

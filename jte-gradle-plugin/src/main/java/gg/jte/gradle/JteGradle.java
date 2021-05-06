@@ -37,10 +37,13 @@ public class JteGradle implements Plugin<Project> {
 
         project.getTasks().named("clean").configure(t -> t.dependsOn("cleanPrecompileJte", "cleanGenerateJte")); // clean tasks are generated based on task outputs
 
-//        generateJteTask.configure(t -> {
-//            main.getJava().srcDir(t.getTargetDirectory());
-//            main.getResources().srcDir(t.getTargetResourceDirectory());
-//        });
+        generateJteTask.configure(t -> {
+            if (extension.getStage().isPresent() && extension.getStage().get() == JteStage.GENERATE)
+            {
+                main.getJava().srcDir(t.getTargetDirectory());
+                main.getResources().srcDir(t.getTargetResourceDirectory());
+            }
+        });
     }
 
     private SourceSet _getMainSourceSet(Project project)

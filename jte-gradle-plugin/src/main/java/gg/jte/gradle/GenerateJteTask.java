@@ -15,6 +15,21 @@ import java.util.concurrent.TimeUnit;
 
 public class GenerateJteTask extends JteTaskBase {
 
+    @Inject
+    public GenerateJteTask(JteExtension extension) {
+        super(extension, JteStage.GENERATE);
+    }
+
+    @Override
+    public Path getTargetDirectory()
+    {
+        if (!extension.getStage().isPresent())
+        {
+            extension.getStage().set(JteStage.GENERATE);
+        }
+        return super.getTargetDirectory();
+    }
+
     @Input
     public boolean getGenerateNativeImageResources() {
         return extension.getGenerateNativeImageResources().getOrElse(false);
@@ -22,24 +37,7 @@ public class GenerateJteTask extends JteTaskBase {
 
     public void setGenerateNativeImageResources(boolean value) {
         extension.getGenerateNativeImageResources().set(value);
-    }
-
-    @Override
-    public Path getTargetDirectory()
-    {
-        // backward compatibility with old build style
-        if (!extension.getStage().isPresent())
-        {
-            //noinspection UnstableApiUsage
-            extension.getStage().convention(JteStage.GENERATE);
-        }
-        return super.getTargetDirectory();
-    }
-
-    @Inject
-    public GenerateJteTask(JteExtension extension) {
-        super(extension);
-        onlyIf(t -> extension.getStage().get() == JteStage.GENERATE);
+        setterCalled();
     }
 
     @TaskAction

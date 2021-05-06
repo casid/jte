@@ -20,13 +20,10 @@ import java.util.stream.Collectors;
 
 public class PrecompileJteTask extends JteTaskBase {
 
-    private String[] compileArgs;
-
     @Inject
     public PrecompileJteTask(JteExtension extension)
     {
-        super(extension);
-        onlyIf(t -> extension.getStage().get() == JteStage.PRECOMPILE);
+        super(extension, JteStage.PRECOMPILE);
     }
 
     @Nested
@@ -36,6 +33,7 @@ public class PrecompileJteTask extends JteTaskBase {
 
     public void setCompilePath(FileCollection compilePath) {
         extension.getCompilePath().from(compilePath);
+        setterCalled();
     }
 
     @Input
@@ -46,16 +44,18 @@ public class PrecompileJteTask extends JteTaskBase {
 
     public void setHtmlPolicyClass(String htmlPolicyClass) {
         extension.getHtmlPolicyClass().set(htmlPolicyClass);
+        setterCalled();
     }
 
     @Input
     @Optional
     public String[] getCompileArgs() {
-        return compileArgs;
+        return extension.getCompileArgs().getOrNull();
     }
 
     public void setCompileArgs(String[] compileArgs) {
-        this.compileArgs = compileArgs;
+        extension.getCompileArgs().set(compileArgs);
+        setterCalled();
     }
 
     @TaskAction
@@ -67,7 +67,7 @@ public class PrecompileJteTask extends JteTaskBase {
         Logger logger = getLogger();
         long start = System.nanoTime();
 
-        Path sourceDirectory = getSourceDirectory();
+         Path sourceDirectory = getSourceDirectory();
         logger.info("Precompiling jte templates found in " + sourceDirectory);
 
         Path targetDirectory = getTargetDirectory();
@@ -85,7 +85,7 @@ public class PrecompileJteTask extends JteTaskBase {
         }
         templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(getHtmlCommentsPreserved()));
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
-        templateEngine.setCompileArgs(compileArgs);
+        templateEngine.setCompileArgs(getCompileArgs());
         templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());
 
         int amount;

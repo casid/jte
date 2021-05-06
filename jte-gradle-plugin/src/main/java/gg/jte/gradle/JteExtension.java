@@ -5,6 +5,7 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.provider.Property;
 
 import java.nio.file.Path;
+import java.util.List;
 
 
 /**
@@ -30,6 +31,7 @@ public interface JteExtension
     ConfigurableFileCollection getCompilePath();
     Property<String> getHtmlPolicyClass();
     Property<Boolean> getGenerateNativeImageResources();
+    Property<String[]> getCompileArgs();
 
     default void precompile() {
         getStage().set(JteStage.PRECOMPILE);
@@ -38,4 +40,5 @@ public interface JteExtension
     default void generate() {
         getStage().set(JteStage.GENERATE);
     }
+
 }

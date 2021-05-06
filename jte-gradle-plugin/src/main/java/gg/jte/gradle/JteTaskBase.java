@@ -32,7 +32,7 @@ public abstract class JteTaskBase extends DefaultTask {
     @OutputDirectory
     @Optional
     public Path getTargetDirectory() {
-        return extension.getTargetDirectory().getOrNull();
+        return extension.getTargetDirectory().get();
     }
 
     public void setTargetDirectory(Path value) {

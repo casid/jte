@@ -15,15 +15,13 @@ import java.util.concurrent.TimeUnit;
 
 public class GenerateJteTask extends JteTaskBase {
 
-    private boolean generateNativeImageResources = false;
-
     @Input
     public boolean getGenerateNativeImageResources() {
-        return generateNativeImageResources;
+        return extension.getGenerateNativeImageResources().getOrElse(false);
     }
 
     public void setGenerateNativeImageResources(boolean value) {
-        generateNativeImageResources = value;
+        extension.getGenerateNativeImageResources().set(value);
     }
 
     @Override
@@ -41,6 +39,7 @@ public class GenerateJteTask extends JteTaskBase {
     @Inject
     public GenerateJteTask(JteExtension extension) {
         super(extension);
+        onlyIf(t -> extension.getStage().get() == JteStage.GENERATE);
     }
 
     @TaskAction
@@ -64,7 +63,7 @@ public class GenerateJteTask extends JteTaskBase {
         templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(getHtmlCommentsPreserved()));
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
         templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());
-        templateEngine.setGenerateNativeImageResources(generateNativeImageResources);
+        templateEngine.setGenerateNativeImageResources(getGenerateNativeImageResources());
         templateEngine.setProjectNamespace(getProject().getGroup() + "/" + getProject().getName());
 
         int amount;

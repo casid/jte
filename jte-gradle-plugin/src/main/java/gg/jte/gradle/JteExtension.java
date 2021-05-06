@@ -1,6 +1,7 @@
 package gg.jte.gradle;
 
 import gg.jte.ContentType;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.provider.Property;
 
 import java.nio.file.Path;
@@ -26,4 +27,15 @@ public interface JteExtension
     Property<Boolean> getBinaryStaticContent();
     Property<String> getPackageName();
     Property<Path> getTargetResourceDirectory();
+    ConfigurableFileCollection getCompilePath();
+    Property<String> getHtmlPolicyClass();
+    Property<Boolean> getGenerateNativeImageResources();
+
+    default void precompile() {
+        getStage().set(JteStage.PRECOMPILE);
+    }
+
+    default void generate() {
+        getStage().set(JteStage.GENERATE);
+    }
 }

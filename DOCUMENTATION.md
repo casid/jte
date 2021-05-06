@@ -524,9 +524,6 @@ Since 1.6.0 there is a [Gradle plugin](https://plugins.gradle.org/plugin/gg.jte.
 <summary>Groovy</summary>
 
 ```groovy
-import gg.jte.ContentType
-import java.nio.file.Paths
-
 plugins {
     id 'java'
     id 'gg.jte.gradle' version '${jte.version}'
@@ -536,19 +533,8 @@ dependencies {
     implementation('gg.jte:jte:${jte.version}')
 }
 
-tasks.precompileJte {
-    sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
-    targetDirectory = Paths.get(project.projectDir.absolutePath, "jte-classes")
-    compilePath = sourceSets.main.runtimeClasspath
-    contentType = ContentType.Html
-}
-
-tasks.precompileJte {
-    dependsOn(tasks.compileJava)
-}
-
-tasks.test {
-    dependsOn(tasks.precompileJte)
+jte {
+  precompile()
 }
 ```
 
@@ -558,9 +544,6 @@ tasks.test {
 <summary>Kotlin</summary>
 
 ```kotlin
-import gg.jte.ContentType
-import java.nio.file.Path
-
 plugins {
     java
     id("gg.jte.gradle") version("${jte.version}")
@@ -570,19 +553,8 @@ dependencies {
     implementation("gg.jte:jte:${jte.version}")
 }
 
-tasks.precompileJte {
-    sourceDirectory = Path.of(project.projectDir.absolutePath, "src", "main", "jte")
-    targetDirectory = Path.of(project.projectDir.absolutePath, "jte-classes")
-    compilePath = project.the<SourceSetContainer>()["main"].runtimeClasspath
-    contentType = ContentType.Html
-}
-
-tasks.precompileJte {
-    dependsOn(tasks.compileJava)
-}
-
-tasks.test {
-    dependsOn(tasks.precompileJte)
+jte {
+    precompile()
 }
 ```
 
@@ -654,9 +626,6 @@ Since 1.6.0 there is a <a href="https://plugins.gradle.org/plugin/gg.jte.gradle"
 <summary>Groovy</summary>
 
 ```groovy
-import gg.jte.ContentType
-import java.nio.file.Paths
-
 plugins {
     id 'java'
     id 'gg.jte.gradle' version '${jte.version}'
@@ -666,15 +635,8 @@ dependencies {
     implementation('gg.jte:jte:${jte.version}')
 }
 
-tasks.generateJte {
-    sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
-    contentType = ContentType.Html
-}
-
-sourceSets.main.java.srcDir(tasks.generateJte.targetDirectory)
-
-tasks.compileJava {
-    dependsOn(tasks.generateJte)
+jte {
+  generate()
 }
 ```
 
@@ -684,9 +646,6 @@ tasks.compileJava {
 <summary>Kotlin</summary>
 
 ```kotlin
-import gg.jte.ContentType
-import java.nio.file.Path
-
 plugins {
     java
     id("gg.jte.gradle") version("${jte.version}")
@@ -696,19 +655,8 @@ dependencies {
     implementation("gg.jte:jte:${jte.version}")
 }
 
-tasks.generateJte {
-    sourceDirectory = Path.of(project.projectDir.absolutePath, "src", "main", "jte")
-    contentType = ContentType.Html
-}
-
-sourceSets {
-    main {
-        java.srcDir(tasks.generateJte.get().targetDirectory)
-    }
-}
-
-tasks.compileJava {
-    dependsOn(tasks.generateJte)
+jte {
+    generate()
 }
 ```
 
@@ -717,7 +665,7 @@ tasks.compileJava {
 #### GraalVM native-image support
 An application jar with generated classes can be built into a native binary using [GraalVM native-image](https://www.graalvm.org/reference-manual/native-image/). To support this, jte can generate the necessary configuration files to tell native-image about classes loaded by reflection.
 
-To use this feature, set `generateNativeImageResources = true` in your Gradle `generateJte` task. (Docs for Maven TBD)
+To use this feature, set `generateNativeImageResources = true` in your Gradle `jte` block. (Docs for Maven TBD)
 
 ## Binary rendering for max throughput
 

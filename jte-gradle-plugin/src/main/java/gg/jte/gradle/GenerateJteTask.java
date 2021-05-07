@@ -3,29 +3,41 @@ package gg.jte.gradle;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.TaskAction;
 
+import javax.inject.Inject;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 public class GenerateJteTask extends JteTaskBase {
 
-    private boolean generateNativeImageResources = false;
+    @Inject
+    public GenerateJteTask(JteExtension extension) {
+        super(extension, JteStage.GENERATE);
+    }
+
+    @Override
+    public Path getTargetDirectory()
+    {
+        if (!extension.getStage().isPresent())
+        {
+            extension.getStage().set(JteStage.GENERATE);
+        }
+        return super.getTargetDirectory();
+    }
 
     @Input
     public boolean getGenerateNativeImageResources() {
-        return generateNativeImageResources;
+        return extension.getGenerateNativeImageResources().getOrElse(false);
     }
 
     public void setGenerateNativeImageResources(boolean value) {
-        generateNativeImageResources = value;
-    }
-
-    public GenerateJteTask() {
-        targetDirectory = Paths.get(getProject().getBuildDir().getAbsolutePath(), "generated-sources", "jte");
-        targetResourceDirectory = Paths.get(getProject().getBuildDir().getAbsolutePath(), "generated-resources", "jte");
+        extension.getGenerateNativeImageResources().set(value);
+        setterCalled();
     }
 
     @TaskAction
@@ -33,16 +45,23 @@ public class GenerateJteTask extends JteTaskBase {
         Logger logger = getLogger();
         long start = System.nanoTime();
 
+        Path sourceDirectory = getSourceDirectory();
+        Path targetDirectory = getTargetDirectory();
         logger.info("Generating jte templates found in " + sourceDirectory);
 
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(sourceDirectory), targetDirectory, contentType, null, packageName);
-        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(trimControlStructures));
-        templateEngine.setHtmlTags(htmlTags);
-        templateEngine.setHtmlAttributes(htmlAttributes);
-        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
-        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(binaryStaticContent));
-        templateEngine.setTargetResourceDirectory(targetResourceDirectory);
-        templateEngine.setGenerateNativeImageResources(generateNativeImageResources);
+        TemplateEngine templateEngine = TemplateEngine.create(
+                new DirectoryCodeResolver(sourceDirectory),
+                targetDirectory,
+                getContentType(),
+                null,
+                getPackageName());
+        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(getTrimControlStructures()));
+        templateEngine.setHtmlTags(getHtmlTags());
+        templateEngine.setHtmlAttributes(getHtmlAttributes());
+        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(getHtmlCommentsPreserved()));
+        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
+        templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());
+        templateEngine.setGenerateNativeImageResources(getGenerateNativeImageResources());
         templateEngine.setProjectNamespace(getProject().getGroup() + "/" + getProject().getName());
 
         int amount;

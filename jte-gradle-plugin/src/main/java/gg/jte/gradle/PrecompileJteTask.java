@@ -7,10 +7,12 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.*;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,37 +20,42 @@ import java.util.stream.Collectors;
 
 public class PrecompileJteTask extends JteTaskBase {
 
-    private FileCollection compilePath;
-    private String htmlPolicyClass;
-    private String[] compileArgs;
+    @Inject
+    public PrecompileJteTask(JteExtension extension)
+    {
+        super(extension, JteStage.PRECOMPILE);
+    }
 
     @Nested
     public FileCollection getCompilePath() {
-        return compilePath;
+        return extension.getCompilePath();
     }
 
     public void setCompilePath(FileCollection compilePath) {
-        this.compilePath = compilePath;
+        extension.getCompilePath().from(compilePath);
+        setterCalled();
     }
 
     @Input
     @Optional
     public String getHtmlPolicyClass() {
-        return htmlPolicyClass;
+        return extension.getHtmlPolicyClass().getOrNull();
     }
 
     public void setHtmlPolicyClass(String htmlPolicyClass) {
-        this.htmlPolicyClass = htmlPolicyClass;
+        extension.getHtmlPolicyClass().set(htmlPolicyClass);
+        setterCalled();
     }
 
     @Input
     @Optional
     public String[] getCompileArgs() {
-        return compileArgs;
+        return extension.getCompileArgs().getOrNull();
     }
 
     public void setCompileArgs(String[] compileArgs) {
-        this.compileArgs = compileArgs;
+        extension.getCompileArgs().set(compileArgs);
+        setterCalled();
     }
 
     @TaskAction
@@ -60,24 +67,31 @@ public class PrecompileJteTask extends JteTaskBase {
         Logger logger = getLogger();
         long start = System.nanoTime();
 
+         Path sourceDirectory = getSourceDirectory();
         logger.info("Precompiling jte templates found in " + sourceDirectory);
 
-        TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(sourceDirectory), targetDirectory, contentType, null, packageName);
-        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(trimControlStructures));
-        templateEngine.setHtmlTags(htmlTags);
-        templateEngine.setHtmlAttributes(htmlAttributes);
-        if (htmlPolicyClass != null) {
-            templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass));
+        Path targetDirectory = getTargetDirectory();
+        TemplateEngine templateEngine = TemplateEngine.create(
+                new DirectoryCodeResolver(sourceDirectory),
+                targetDirectory,
+                getContentType(),
+                null,
+                getPackageName());
+        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(getTrimControlStructures()));
+        templateEngine.setHtmlTags(getHtmlTags());
+        templateEngine.setHtmlAttributes(getHtmlAttributes());
+        if (extension.getHtmlPolicyClass().isPresent()) {
+            templateEngine.setHtmlPolicy(createHtmlPolicy(getHtmlPolicyClass()));
         }
-        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(htmlCommentsPreserved));
-        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(binaryStaticContent));
-        templateEngine.setCompileArgs(compileArgs);
-        templateEngine.setTargetResourceDirectory(targetResourceDirectory);
+        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(getHtmlCommentsPreserved()));
+        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
+        templateEngine.setCompileArgs(getCompileArgs());
+        templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());
 
         int amount;
         try {
             templateEngine.cleanAll();
-            List<String> compilePathFiles = compilePath.getFiles().stream().map(File::getAbsolutePath).collect(Collectors.toList());
+            List<String> compilePathFiles = getCompilePath().getFiles().stream().map(File::getAbsolutePath).collect(Collectors.toList());
             amount = templateEngine.precompileAll(compilePathFiles).size();
         } catch (Exception e) {
             logger.error("Failed to precompile templates.", e);
@@ -101,7 +115,7 @@ public class PrecompileJteTask extends JteTaskBase {
     }
 
     private URLClassLoader createProjectClassLoader() throws IOException {
-        List<File> files = new ArrayList<>(compilePath.getFiles());
+        List<File> files = new ArrayList<>(getCompilePath().getFiles());
 
         URL[] runtimeUrls = new URL[files.size()];
         for (int i = 0; i < files.size(); i++) {

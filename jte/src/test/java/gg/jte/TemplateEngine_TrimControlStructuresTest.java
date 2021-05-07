@@ -33,6 +33,27 @@ public class TemplateEngine_TrimControlStructuresTest {
     }
 
     @Test
+    void whitespacesAtTemplateBegin_variable() {
+        givenTemplate(
+                "@import java.time.Instant\n" +
+                "@import java.time.temporal.ChronoUnit\n" +
+                "@param String name\n" +
+                "!{\n" +
+                "    String ts = \"ts\";\n" +
+                "    String message = \"Hello \" + name;\n" +
+                "}\n" +
+                "<!DOCTYPE cXML SYSTEM \"http://example.com/example.dtd\">\n" +
+                "<Issue xml:lang=\"en-US\" timestamp=\"${ts}\" someID=\"${name}@internal.example.com\">\n" +
+                "  <Response><Status code=\"foo\" text=\"bar\">${message}</Status></Response>\n" +
+                "</Issue>");
+
+        thenOutputIs("<!DOCTYPE cXML SYSTEM \"http://example.com/example.dtd\">\n" +
+                "<Issue xml:lang=\"en-US\" timestamp=\"ts\" someID=\"@internal.example.com\">\n" +
+                "  <Response><Status code=\"foo\" text=\"bar\">Hello null</Status></Response>\n" +
+                "</Issue>");
+    }
+
+    @Test
     void attributes() {
         givenTemplate("@if(true)\n" +
                 "    <a href=\"${\"url\"}\" class=\"nav-item@if(true) is-active@endif\">foo</a>\n" +

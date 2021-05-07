@@ -437,11 +437,7 @@ public final class TemplateParser {
 
     private void extractTrimmed(int startIndex, int endIndex) {
         int indentationsToSkip = getIndentationsToSkip();
-        if (indentationsToSkip > 0) {
-            visitor.onTextPart(depth, trimIndentations(startIndex, endIndex, indentationsToSkip));
-        } else {
-            extract(templateCode, startIndex, endIndex, visitor::onTextPart);
-        }
+        visitor.onTextPart(depth, trimIndentations(startIndex, endIndex, indentationsToSkip));
     }
 
     private String trimIndentations(int startIndex, int endIndex, int indentationsToSkip) {

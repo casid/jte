@@ -25,6 +25,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
 - [Precompiling Templates](#precompiling-templates)
   - [Using a directory on your server](#using-a-directory-on-your-server-recommended)
   - [Using the application class loader](#using-the-application-class-loader-since-120)
+  - [GraalVM native-image support](#graalvm-native-image-support-since-1100)
 - [Binary rendering for max throughput](#binary-rendering-for-max-throughput)
 
 ## Rendering a template
@@ -666,6 +667,8 @@ jte {
 An application jar with generated classes can be built into a native binary using [GraalVM native-image](https://www.graalvm.org/reference-manual/native-image/). To support this, jte can generate the necessary configuration files to tell native-image about classes loaded by reflection.
 
 To use this feature, set `generateNativeImageResources = true` in your Gradle `jte` block. (Docs for Maven TBD)
+
+There's an example [gradle test project](https://github.com/casid/jte/blob/master/jte-runtime-cp-test-gradle-convention/build.gradle) using native-image compilation.
 
 ## Binary rendering for max throughput
 

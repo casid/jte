@@ -26,7 +26,7 @@ public class PrecompileJteTask extends JteTaskBase {
         super(extension, JteStage.PRECOMPILE);
     }
 
-    @Nested
+    @InputFiles
     public FileCollection getCompilePath() {
         return extension.getCompilePath();
     }

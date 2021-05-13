@@ -1,4 +1,5 @@
-This converter converts JSP templates to jte templates. If you plan to migrate a huge JSP project, this converter takes care of most of the boring, error-prone parts.
+<img align="left" alt="jte" src="../jte.svg" width="128">This converter converts JSP templates to jte templates. If you plan to migrate a huge JSP project to jte, this converter will take care of most of the boring, error-prone parts.
+<br clear="left">
 
 ## Features
 - No duplicate code during conversion, with a jte bridging tag you convert your application in small steps

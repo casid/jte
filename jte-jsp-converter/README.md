@@ -167,6 +167,18 @@ public class JteTag extends BodyTagSupport implements DynamicAttributes {
 }
 ```
 
+Register the bridging tag in your taglib like this:
+
+```xml
+<tag>
+   <name>jte</name>
+   <tag-class>my.JteTag</tag-class>
+   <body-content>scriptless</body-content>
+   <attribute><name>jte</name><required>true</required><rtexprvalue>true</rtexprvalue></attribute>
+   <dynamic-attributes>true</dynamic-attributes>
+</tag>
+```
+
 The above tag writes to the underlying `JspWriter`, so that the jte template contributes to the output of the JSP page it is embedded into. Thus we need a `TemplateOutput` implementation to support this:
 
 ```java
@@ -197,4 +209,4 @@ public class JspWriterOutput implements TemplateOutput {
 }
 ```
 
-That's it! You should be able to convert your first JSP tag!
+That's it! You should be able to convert your first JSP tag to jte!

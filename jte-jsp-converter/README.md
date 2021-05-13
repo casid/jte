@@ -8,7 +8,17 @@
 
 ## Getting started
 
-Add a new class in `src/test/java` to the project that you plan to migrate to jte:
+First you need to add jte-jsp-converter as test dependency to your project:
+
+```xml
+<dependency>
+    <groupId>gg.jte</groupId>
+    <artifactId>jte</artifactId>
+    <version>${jte.version}</version>
+</dependency>
+```
+
+Then, add a new class in `src/test/java` to the project that you plan to migrate to jte:
 
 ```java
 public class JspConverter extends JspToJteConverter {

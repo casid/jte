@@ -144,6 +144,7 @@ No further dependencies required! Check out the [syntax documentation](DOCUMENTA
 
 - [Javalin](https://javalin.io/tutorials/jte)
 - [Eclipse Vert.x](https://github.com/vert-x3/vertx-web/tree/master/vertx-template-engines/vertx-web-templ-jte)
+- [Spring Boot](https://github.com/casid/jte-spring-boot-demo)
 - [Severell](https://github.com/severell/severell-jte-plugin)
 
 ## Websites rendered with jte

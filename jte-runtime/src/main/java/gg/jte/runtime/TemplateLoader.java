@@ -48,6 +48,24 @@ public abstract class TemplateLoader {
         return null;
     }
 
+    public void rewriteStackTrace(Throwable e, ClassLoader classLoader, StackTraceElement[] stackTrace) {
+        if (stackTrace.length == 0) {
+            return;
+        }
+
+        for (int i = 0; i < stackTrace.length; ++i) {
+            StackTraceElement stackTraceElement = stackTrace[i];
+            if (stackTraceElement.getClassName().startsWith(packageName)) {
+                ClassInfo classInfo = getClassInfo(classLoader, getClassName(stackTraceElement));
+                if (classInfo != null) {
+                    stackTrace[i] = new StackTraceElement(stackTraceElement.getClassName(), stackTraceElement.getMethodName(), classInfo.name, resolveLineNumber(classInfo, stackTraceElement.getLineNumber()));
+                }
+            }
+        }
+
+        e.setStackTrace(stackTrace);
+    }
+
     private String getClassName(StackTraceElement stackTraceElement) {
         String className = stackTraceElement.getClassName();
         if (className.endsWith("$Companion")) {

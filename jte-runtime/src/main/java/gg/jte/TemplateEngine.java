@@ -281,11 +281,17 @@ public final class TemplateEngine {
             return (TemplateException)e;
         }
 
-        DebugInfo debugInfo = templateLoader.resolveDebugInfo(template.getClassLoader(), e.getStackTrace());
+        ClassLoader classLoader = template.getClassLoader();
+        StackTraceElement[] stackTrace = e.getStackTrace();
+
+        DebugInfo debugInfo = templateLoader.resolveDebugInfo(classLoader, stackTrace);
         String message = "Failed to render " + name;
         if (debugInfo != null) {
             message += ", error at " + debugInfo.name + ":" + debugInfo.line;
+
+            templateLoader.rewriteStackTrace(e, classLoader, stackTrace);
         }
+
         return new TemplateException(message, e);
     }
 

@@ -825,7 +825,8 @@ public class TemplateEngineTest {
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
-                .hasMessage("Failed to render test/template.jte, error at test/template.jte:7");
+                .hasMessage("Failed to render test/template.jte, error at test/template.jte:7")
+                .hasStackTraceContaining("at gg.jte.generated.ondemand.test.JtetemplateGenerated.render(test/template.jte:7)");
     }
 
     @Test
@@ -870,7 +871,9 @@ public class TemplateEngineTest {
 
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
-                .hasMessage("Failed to render test/template.jte, error at tag/model.jte:4");
+                .hasMessage("Failed to render test/template.jte, error at tag/model.jte:4")
+                .hasStackTraceContaining("at gg.jte.generated.ondemand.tag.JtemodelGenerated.render(tag/model.jte:4)")
+                .hasStackTraceContaining("at gg.jte.generated.ondemand.test.JtetemplateGenerated.render(test/template.jte:2)");
     }
 
     @Test

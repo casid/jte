@@ -10,7 +10,7 @@
 - Intuitive, easy [syntax](DOCUMENTATION.md)
 - Write plain Java or Kotlin for expressions
 - Context-sensitive [HTML escaping](https://github.com/casid/jte/blob/master/DOCUMENTATION.md#html-escaping) at compile time
-- <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offering completion and refactoring support
+- <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> with completion and refactoring support
 - Hot reloading of templates during development
 - Blazing fast execution ([~100k renders/s](#performance) on a MacBook Pro 2015, [~2M renders/s](#high-concurrency) on AMD Ryzen 5950x)
 

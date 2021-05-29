@@ -29,17 +29,17 @@ jobs:
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Test Gradle Plugin Precompile (old style)
-        run: cd jte-runtime-test-gradle && ./gradlew check
+        run: cd test/jte-runtime-test-gradle && ./gradlew check
       - name: Test Gradle Plugin Generate (old style)
-        run: cd jte-runtime-cp-test-gradle && ./gradlew check
+        run: cd test/jte-runtime-cp-test-gradle && ./gradlew check
       - name: Test Gradle Plugin Generate Pure Kotlin (old style)
-        run: cd jte-runtime-cp-test-gradle-kotlin && ./gradlew check
+        run: cd test/jte-runtime-cp-test-gradle-kotlin && ./gradlew check
       - name: Test Gradle Plugin Precompile with conventions
-        run: cd jte-runtime-test-gradle-convention && ./gradlew check
+        run: cd test/jte-runtime-test-gradle-convention && ./gradlew check
       - name: Test Gradle Plugin Generate with conventions
-        run: cd jte-runtime-cp-test-gradle-convention && ./gradlew check
+        run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew check
       - name: Test Gradle Plugin Generate Pure Kotlin with conventions
-        run: cd jte-runtime-cp-test-gradle-kotlin-convention && ./gradlew check
+        run: cd test/jte-runtime-cp-test-gradle-kotlin-convention && ./gradlew check
 
 
   coverage:

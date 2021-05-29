@@ -49,11 +49,11 @@
         <module>jte-kotlin</module>
         <module>jte-watcher</module>
         <module>jte-maven-plugin</module>
-        <module>jte-runtime-test</module>
-        <module>jte-runtime-test-kotlin</module>
-        <module>jte-runtime-cp-test</module>
-        <module>jte-hotreload-test</module>
-        <module>jte-test-report</module>
+        <module>test/jte-runtime-test</module>
+        <module>test/jte-runtime-test-kotlin</module>
+        <module>test/jte-runtime-cp-test</module>
+        <module>test/jte-hotreload-test</module>
+        <module>test/jte-test-report</module>
         <module>jte-deploy-nexus</module>
     </modules>
 

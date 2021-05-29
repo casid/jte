@@ -47,10 +47,10 @@ fi
  
 if [[ "$GRADLE" == "true" ]]; then
 (cd "$PROJECT_PATH"/jte-gradle-plugin && ./gradlew $CLEAN build publishToMavenLocal)
-(cd "$PROJECT_PATH"/jte-runtime-test-gradle && ./gradlew $CLEAN check)
-(cd "$PROJECT_PATH"/jte-runtime-cp-test-gradle && ./gradlew $CLEAN check)
-(cd "$PROJECT_PATH"/jte-runtime-cp-test-gradle-kotlin && ./gradlew $CLEAN check)
-(cd "$PROJECT_PATH"/jte-runtime-test-gradle-convention && ./gradlew $CLEAN check)
-(cd "$PROJECT_PATH"/jte-runtime-cp-test-gradle-convention && ./gradlew $CLEAN check)
-(cd "$PROJECT_PATH"/jte-runtime-cp-test-gradle-kotlin-convention && ./gradlew $CLEAN check)
+(cd "$PROJECT_PATH"/test/jte-runtime-test-gradle && ./gradlew $CLEAN check)
+(cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle && ./gradlew $CLEAN check)
+(cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle-kotlin && ./gradlew $CLEAN check)
+(cd "$PROJECT_PATH"/test/jte-runtime-test-gradle-convention && ./gradlew $CLEAN check)
+(cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle-convention && ./gradlew $CLEAN check)
+(cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle-kotlin-convention && ./gradlew $CLEAN check)
 fi

@@ -101,10 +101,10 @@ Temporary Items
 /jte/jte-classes/
 /jte-kotlin/jte-classes/
 /jte-watcher/jte-classes/
-/jte-runtime-test/jte-classes/
-/jte-runtime-test-kotlin/jte-classes/
-/jte-runtime-test-gradle/jte-classes/
-/jte-hotreload-test/jte-classes/
+/test/jte-runtime-test/jte-classes/
+/test/jte-runtime-test-kotlin/jte-classes/
+/test/jte-runtime-test-gradle/jte-classes/
+/test/jte-hotreload-test/jte-classes/
 
 ### VS Code / VS Code Java extension (uses Eclipse code) ###
 .vscode/

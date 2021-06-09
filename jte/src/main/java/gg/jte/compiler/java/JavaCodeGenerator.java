@@ -409,7 +409,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onHtmlAttributeOutput(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
-        String javaExpression = extractJavaExpression(htmlAttribute.value);
+        String javaExpression = CodeGenerator.extractTemplateExpression(htmlAttribute.value);
         if (htmlAttribute.bool) {
             onConditionStart(depth, javaExpression);
             onTextPart(depth, " " + htmlAttribute.name);
@@ -423,27 +423,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private void writeAttributeMap(TemplateParser.HtmlTag htmlTag) {
-        javaCode.append("gg.jte.runtime.TemplateUtils.toMap(");
-        boolean firstWritten = false;
-        for (TemplateParser.HtmlAttribute attribute : htmlTag.attributes) {
-            if (attribute.value == null) {
-                continue;
-            }
-
-            if (firstWritten) {
-                javaCode.append(",");
-            } else {
-                firstWritten = true;
-            }
-            javaCode.append("\"").append(attribute.name).append("\",");
-            String javaExpression = extractJavaExpression(attribute.value);
-            if (javaExpression != null) {
-                javaCode.append(javaExpression);
-            } else {
-                javaCode.append("\"").append(attribute.value).append("\"");
-            }
-        }
-        javaCode.append(")");
+        CodeGenerator.writeAttributeMap(javaCode, htmlTag);
     }
 
     private void writeJavaCodeWithContentSupport(int depth, String code) {
@@ -452,20 +432,6 @@ public class JavaCodeGenerator implements CodeGenerator {
         } else {
             javaCode.append(code);
         }
-    }
-
-    private String extractJavaExpression(String value) {
-        int startIndex = value.indexOf("${");
-        if (startIndex == -1) {
-            return null;
-        }
-
-        int endIndex = value.lastIndexOf('}');
-        if (endIndex == -1) {
-            return null;
-        }
-
-        return value.substring(startIndex + 2, endIndex);
     }
 
     private DebugInfo getCurrentDebugInfo() {

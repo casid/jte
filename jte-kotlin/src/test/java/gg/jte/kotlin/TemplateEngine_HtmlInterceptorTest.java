@@ -134,6 +134,23 @@ public class TemplateEngine_HtmlInterceptorTest {
     }
 
     @Test
+    void input_disabled() {
+        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
+                "<form action=\"${url}\">\n" +
+                "<input name=\"param1\" disabled>\n" +
+                "<input name=\"param2\">\n" +
+                "</form>");
+
+        templateEngine.render("page.kte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
+                "<input name=\"param1\" disabled value=\"?\">\n" +
+                "<input name=\"param2\" value=\"?\">\n" +
+                "<input name=\"__fp\" value=\"a:hello.htm, p:param2\">\n" + // No param1 here
+                "</form>");
+    }
+
+    @Test
     void select() {
         dummyCodeResolver.givenCode("page.kte", "@param controller:gg.jte.kotlin.TemplateEngine_HtmlInterceptorTest.Controller\n" +
                 "<form action=\"${controller.url}\">\n" +
@@ -310,7 +327,9 @@ public class TemplateEngine_HtmlInterceptorTest {
                 action = (String)attributes.get("action");
                 output.writeContent(" data-form=\"x\"");
             } else if ("input".equals(name)) {
-                fieldNames.add((String)attributes.get("name"));
+                if (!Boolean.TRUE.equals(attributes.get("disabled"))) {
+                    fieldNames.add((String) attributes.get("name"));
+                }
                 if (attributes.containsKey("name") && !attributes.containsKey("value")) {
                     output.writeContent(" value=\"?\"");
                 }

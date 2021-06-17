@@ -2,7 +2,7 @@ import java.nio.file.Paths
 
 plugins {
     id 'java'
-    id 'gg.jte.gradle' version '1.11.0-SNAPSHOT'
+    id 'gg.jte.gradle' version '1.11.0'
 }
 
 repositories {
@@ -15,7 +15,7 @@ test {
 }
 
 dependencies {
-    implementation('gg.jte:jte-runtime:1.11.0-SNAPSHOT')
+    implementation('gg.jte:jte-runtime:1.11.0')
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testImplementation('org.assertj:assertj-core:3.15.0')
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'

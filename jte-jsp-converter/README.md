@@ -13,8 +13,9 @@ First you need to add jte-jsp-converter as test dependency to your project:
 ```xml
 <dependency>
     <groupId>gg.jte</groupId>
-    <artifactId>jte</artifactId>
+    <artifactId>jte-jsp-converter</artifactId>
     <version>${jte.version}</version>
+    <scope>test</test>
 </dependency>
 ```
 

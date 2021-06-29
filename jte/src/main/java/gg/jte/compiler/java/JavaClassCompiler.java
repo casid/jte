@@ -18,7 +18,7 @@ import java.util.Map;
 public class JavaClassCompiler implements ClassCompiler {
     @Override
     public void compile(String[] files, List<String> classPath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
-        List<String> args = new ArrayList<>(files.length);
+        List<String> args = new ArrayList<>(files.length + classPath.size() + 8);
 
         if (config.compileArgs != null) {
             args.addAll(Arrays.asList(config.compileArgs));

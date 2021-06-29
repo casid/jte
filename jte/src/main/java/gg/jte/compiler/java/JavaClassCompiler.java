@@ -23,6 +23,8 @@ public class JavaClassCompiler implements ClassCompiler {
         if (config.compileArgs != null) {
             args.addAll(Arrays.asList(config.compileArgs));
         }
+        args.add("-encoding");
+        args.add("UTF-8");
         args.add("-parameters");
 
         if (!classPath.isEmpty()) {

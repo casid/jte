@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import test.Model;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
@@ -20,12 +21,15 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 public class TemplateEngineTest {
 
     private static TemplateEngine templateEngine;
+    private static Path targetDirectory;
+
     StringOutput output = new StringOutput();
     Model model = new Model();
 
     @BeforeAll
     static void beforeAll() {
-        templateEngine = TemplateEngine.createPrecompiled(Paths.get("jte-classes"), ContentType.Html);
+        targetDirectory = Paths.get("jte-classes");
+        templateEngine = TemplateEngine.createPrecompiled(targetDirectory, ContentType.Html);
     }
 
     @BeforeEach
@@ -43,6 +47,13 @@ public class TemplateEngineTest {
     @Test
     void templateNotFound() {
         thenRenderingFailsWithException("unknown.kte").hasMessage("Failed to load unknown.kte");
+    }
+
+    @Test
+    void sourceFilesAreDeleted() {
+        Path precompiledResult = targetDirectory.resolve("gg").resolve("jte").resolve("generated").resolve("precompiled");
+        assertThat(precompiledResult).isDirectoryContaining (p -> p.toString().endsWith(".class"));
+        assertThat(precompiledResult).isDirectoryNotContaining (p -> p.toString().endsWith(".kt"));
     }
 
     @Test

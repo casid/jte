@@ -66,6 +66,9 @@ public class CompilerMojo extends AbstractMojo {
     @Parameter(readonly = true)
     public String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
 
+    @Parameter(readonly = true)
+    public boolean keepGeneratedSourceFiles;
+
 
     @Override
     public void execute() {
@@ -94,7 +97,11 @@ public class CompilerMojo extends AbstractMojo {
         int amount;
         try {
             templateEngine.cleanAll();
-            amount = templateEngine.precompileAll(compilePath).size();
+            List<String> generatedSourceFiles = templateEngine.precompileAll(compilePath);
+            if (!keepGeneratedSourceFiles) {
+                deleteGeneratedSourceFiles(target, generatedSourceFiles);
+            }
+            amount = generatedSourceFiles.size();
         } catch (Exception e) {
             getLog().error("Failed to precompile templates.");
             getLog().error(e);
@@ -105,6 +112,15 @@ public class CompilerMojo extends AbstractMojo {
         long end = System.nanoTime();
         long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
         getLog().info("Successfully precompiled " + amount + " jte file" + (amount == 1 ? "" : "s") + " in " + duration + "s to " + target);
+    }
+
+    private void deleteGeneratedSourceFiles(Path target, List<String> generatedSources) {
+        for (String generatedSource : generatedSources) {
+            Path generatedSourceFile = target.resolve(generatedSource);
+            if (!generatedSourceFile.toFile().delete()) {
+                getLog().warn("Failed to delete generated source file " + generatedSourceFile);
+            }
+        }
     }
 
     private HtmlPolicy createHtmlPolicy(String htmlPolicyClass) {

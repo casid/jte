@@ -65,8 +65,6 @@ System.out.println(output);
 
 `example.jte` works, but imagine you have more than one page. You would have to duplicate a lot of shared template code. Let's extract the shared code into a tag. Tags are template snippets that can be called by other templates.
 
-> All tags must be created in a directory called `tag` in your template root directory.
-
 Let's move stuff from our example page to `tag/page.jte`:
 
 ```htm
@@ -100,7 +98,7 @@ The `@param Content content` is a content block that can be provided by callers 
 `)
 ```
 
-The shorthand to create content blocks within jte templates is an `@`followed by two backticks. For advanced stuff, you can even create Java methods that return custom `Content` implementation and call it from your template code!
+The shorthand to create content blocks within jte templates is an `@` followed by two backticks. For advanced stuff, you can even create Java methods that return custom `Content` implementation and call it from your template code!
 
 Check out the [syntax documentation](DOCUMENTATION.md), for a more comprehensive introduction.
 

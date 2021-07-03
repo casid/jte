@@ -125,16 +125,23 @@ public class CompilerMojo extends AbstractMojo {
     private String[] calculateCompileArgs() {
         List<String> allCompileArgs = new ArrayList<>();
 
-        String javaSource = project.getProperties().getProperty("maven.compiler.source");
-        if (!StringUtils.isBlank(javaSource)) {
-            allCompileArgs.add("-source");
-            allCompileArgs.add(javaSource);
-        }
+        // See https://docs.oracle.com/en/java/javase/14/docs/specs/man/javac.html#option-release
+        String javaRelease = project.getProperties().getProperty("maven.compiler.release");
+        if (!StringUtils.isBlank(javaRelease)) {
+            allCompileArgs.add("--release");
+            allCompileArgs.add(javaRelease);
+        } else {
+            String javaSource = project.getProperties().getProperty("maven.compiler.source");
+            if (!StringUtils.isBlank(javaSource)) {
+                allCompileArgs.add("-source");
+                allCompileArgs.add(javaSource);
+            }
 
-        String javaTarget = project.getProperties().getProperty("maven.compiler.target");
-        if (!StringUtils.isBlank(javaTarget)) {
-            allCompileArgs.add("-target");
-            allCompileArgs.add(javaTarget);
+            String javaTarget = project.getProperties().getProperty("maven.compiler.target");
+            if (!StringUtils.isBlank(javaTarget)) {
+                allCompileArgs.add("-target");
+                allCompileArgs.add(javaTarget);
+            }
         }
 
         if (compileArgs != null) {

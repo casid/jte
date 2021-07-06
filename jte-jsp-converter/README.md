@@ -161,6 +161,25 @@ public class JteTag extends BodyTagSupport implements DynamicAttributes {
       jte = null;
       params.clear();
    }
+   
+   private static class JteStringContent implements Content {
+
+       private final String string;
+
+       public JteStringContent( String string ) {
+          this.string = string;
+       }
+
+       @Override
+       public boolean isEmptyContent() {
+          return string == null || string.length() == 0;
+       }
+
+       @Override
+       public void writeTo( TemplateOutput output ) {
+          output.writeUserContent(string);
+       }
+    }
 
    private static class JteBodyContent implements Content {
 

@@ -4,6 +4,7 @@ import gg.jte.convert.IoUtils;
 import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.cc.CamelCaseConverter;
 import gg.jte.convert.jsp.converter.*;
+import gg.jte.runtime.StringUtils;
 import org.apache.jasper.compiler.JtpConverter;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class JspToJteConverter {
             throw new IllegalArgumentException("Missing JSP file, it should be the first argument on the command line.");
         }
 
-        Path jspFile = Path.of(commandLineArgs[0]);
+        Path jspFile = Paths.get(commandLineArgs[0]);
         jspFile = converter.jspRoot.toAbsolutePath().relativize(jspFile);
 
         String jteFile = converter.suggestJteFile(jspFile.toString().replace('\\', '/'));
@@ -168,7 +169,7 @@ public class JspToJteConverter {
         String jteDirectory = suggestJteDirectory(jspFileWithoutExtension, jspFileExtension);
 
         StringBuilder jteFile = new StringBuilder();
-        if (!jteDirectory.isBlank()) {
+        if (!StringUtils.isBlank(jteDirectory)) {
             jteFile.append(jteDirectory);
             jteFile.append('/');
         }

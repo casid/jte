@@ -12,6 +12,7 @@ import java.util.Map;
 public class JteContext {
     /**
      * Taken from org.apache.el.parser.AstEmpty implementation
+     * @param obj the object to check for JSP like emptiness
      */
     public static boolean isEmpty(Object obj) {
         if (obj == null) {
@@ -28,14 +29,18 @@ public class JteContext {
     }
 
     /**
-     * Dummy localization method
+     * Dummy localization method. Usually {@link gg.jte.support.LocalizationSupport} in a thread local will help you implement this method.
+     * @param key the localization key
+     * @return a localized content
      */
     public static Content localize(String key) {
         return null;
     }
 
     /**
-     * Dummy localization method
+     * Dummy localization method. Usually {@link gg.jte.support.LocalizationSupport} in a thread local will help you implement this method.
+     * @param key the localization key
+     * @param params parameters for
      */
     public static Content localize(String key, Object ... params) {
         return null;

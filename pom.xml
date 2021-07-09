@@ -49,6 +49,7 @@
         <module>jte-kotlin</module>
         <module>jte-watcher</module>
         <module>jte-maven-plugin</module>
+        <module>jte-jsp-converter</module>
         <module>test/jte-runtime-test</module>
         <module>test/jte-runtime-test-kotlin</module>
         <module>test/jte-runtime-cp-test</module>

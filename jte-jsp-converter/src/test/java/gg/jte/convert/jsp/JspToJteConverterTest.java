@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -206,7 +207,7 @@ class JspToJteConverterTest {
         jspRoot = tempDir.resolve("jsp");
         jteRoot = tempDir.resolve("jte");
 
-        IoUtils.copyDirectory(Path.of("testdata", usecase, "before"), tempDir);
+        IoUtils.copyDirectory(Paths.get("testdata", usecase, "before"), tempDir);
 
         this.usecase = usecase;
     }
@@ -224,7 +225,7 @@ class JspToJteConverterTest {
     }
 
     private void thenConversionIsAsExpected() {
-        Path expected = Path.of("testdata", usecase, "after");
+        Path expected = Paths.get("testdata", usecase, "after");
         Path actual = tempDir;
 
         try (Stream<Path> stream = Files.walk(expected)) {

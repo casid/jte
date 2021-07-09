@@ -2,7 +2,7 @@ package gg.jte.convert.jsp;
 
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +55,7 @@ class JspToJteConverter_FromIntelliJTest {
     }
 
     private void whenJspFileIsConverted(String file) {
-        MyConverter.convertFromIntelliJPlugin(new String[]{Path.of("").toAbsolutePath().resolve(file).toString()}, converter, null);
+        MyConverter.convertFromIntelliJPlugin(new String[]{Paths.get("").toAbsolutePath().resolve(file).toString()}, converter, null);
     }
 
     static class MyConverter extends JspToJteConverter {
@@ -63,7 +63,7 @@ class JspToJteConverter_FromIntelliJTest {
         String jteTag;
 
         public MyConverter() {
-            super(Path.of("jsp"), Path.of("jte"), "my:jte");
+            super(Paths.get("jsp"), Paths.get("jte"), "my:jte");
         }
 
         @Override

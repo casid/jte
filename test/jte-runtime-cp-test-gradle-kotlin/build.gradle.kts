@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.Paths
 
 plugins {
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm") version "1.5.20"
     id("gg.jte.gradle") version("1.11.2-SNAPSHOT")
 }
 

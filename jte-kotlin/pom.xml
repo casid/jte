@@ -16,7 +16,7 @@
     <properties>
         <maven.deploy.skip>false</maven.deploy.skip>
         <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
-        <kotlin.version>1.4.30</kotlin.version>
+        <kotlin.version>1.5.20</kotlin.version>
     </properties>
 
     <dependencies>

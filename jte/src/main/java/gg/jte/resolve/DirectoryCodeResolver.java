@@ -59,7 +59,7 @@ public class DirectoryCodeResolver implements CodeResolver {
 
     @Override
     public List<String> resolveAllTemplateNames() {
-        try (Stream<Path> stream = Files.walk(root)) {
+        try (Stream<Path> stream = Files.walk(root, FileVisitOption.FOLLOW_LINKS)) {
             return stream
                     .filter(p -> !Files.isDirectory(p))
                     .map(p -> root.relativize(p).toString().replace('\\', '/'))

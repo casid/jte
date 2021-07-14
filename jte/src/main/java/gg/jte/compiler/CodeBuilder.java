@@ -133,4 +133,8 @@ public final class CodeBuilder {
     public int getLineInfo(int index) {
         return lineInfo[index];
     }
+
+    public void setCurrentTemplateLine(int templateLine) {
+        currentTemplateLine = templateLine;
+    }
 }

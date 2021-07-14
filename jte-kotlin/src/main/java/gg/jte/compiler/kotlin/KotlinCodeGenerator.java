@@ -56,7 +56,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     @Override
     public void onParam(String parameter) {
-        ParamInfo paramInfo = KotlinParamInfo.parse(parameter, this);
+        ParamInfo paramInfo = KotlinParamInfo.parse(parameter, this, kotlinCode.getCurrentTemplateLine());
 
         writePackageIfRequired();
         if (!hasWrittenClass) {
@@ -143,6 +143,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
                 continue;
             }
 
+            kotlinCode.setCurrentTemplateLine(parameter.templateLine);
             kotlinCode.append("\t\tval ").append(parameter.name).append(" = params[\"").append(parameter.name).append("\"] as ").append(parameter.type);
             if (parameter.defaultValue != null) {
                 kotlinCode.append("? ?: ");

@@ -4,7 +4,7 @@ import gg.jte.compiler.ParamInfo;
 import gg.jte.compiler.TemplateParserVisitor;
 
 public class KotlinParamInfo {
-    public static ParamInfo parse(String parameterString, TemplateParserVisitor visitor) {
+    public static ParamInfo parse(String parameterString, TemplateParserVisitor visitor, int templateLine) {
         String type;
         String name;
         String defaultValue;
@@ -77,6 +77,6 @@ public class KotlinParamInfo {
             defaultValue = parameterString.substring(defaultValueStartIndex);
         }
 
-        return new ParamInfo(type, name, defaultValue, varargs);
+        return new ParamInfo(type, name, defaultValue, varargs, templateLine);
     }
 }

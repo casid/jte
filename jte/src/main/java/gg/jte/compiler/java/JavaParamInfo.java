@@ -4,7 +4,7 @@ import gg.jte.compiler.ParamInfo;
 import gg.jte.compiler.TemplateParserVisitor;
 
 public class JavaParamInfo {
-    public static ParamInfo parse(String parameterString, TemplateParserVisitor visitor) {
+    public static ParamInfo parse(String parameterString, TemplateParserVisitor visitor, int templateLine) {
         String type;
         String name;
         String defaultValue;
@@ -78,6 +78,6 @@ public class JavaParamInfo {
 
         varargs = varArgsIndex != -1;
 
-        return new ParamInfo(type, name, defaultValue, varargs);
+        return new ParamInfo(type, name, defaultValue, varargs, templateLine);
     }
 }

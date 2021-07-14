@@ -1,6 +1,7 @@
 package gg.jte;
 
 import gg.jte.output.StringOutput;
+import gg.jte.runtime.TemplateUtils;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -874,6 +875,22 @@ public class TemplateEngineTest {
                 .hasMessage("Failed to render test/template.jte, error at tag/model.jte:4")
                 .hasStackTraceContaining("at gg.jte.generated.ondemand.tag.JtemodelGenerated.render(tag/model.jte:4)")
                 .hasStackTraceContaining("at gg.jte.generated.ondemand.test.JtetemplateGenerated.render(test/template.jte:2)");
+    }
+
+    @Test
+    void exceptionLineNumber6() {
+        givenTag("model", "@param gg.jte.TemplateEngineTest.Model model\n" +
+                "@param int i = 0\n" +
+                "i is: ${i}\n" +
+                "${model.getThatThrows()}");
+
+        StringOutput output = new StringOutput();
+        Throwable throwable = catchThrowable(() -> templateEngine.renderTag("tag/model.jte", TemplateUtils.toMap("model", model, "i", 1L), output));
+
+        assertThat(throwable)
+                .hasCauseInstanceOf(ClassCastException.class)
+                .hasMessage("Failed to render tag/model.jte, error at tag/model.jte:2")
+                .hasStackTraceContaining("at gg.jte.generated.ondemand.tag.JtemodelGenerated.renderMap(tag/model.jte:2)");
     }
 
     @Test

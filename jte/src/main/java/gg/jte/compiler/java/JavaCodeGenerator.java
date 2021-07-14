@@ -55,7 +55,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onParam(String parameter) {
-        ParamInfo paramInfo = JavaParamInfo.parse(parameter, this);
+        ParamInfo paramInfo = JavaParamInfo.parse(parameter, this, javaCode.getCurrentTemplateLine());
 
         writePackageIfRequired();
         if (!hasWrittenClass) {
@@ -137,6 +137,7 @@ public class JavaCodeGenerator implements CodeGenerator {
                 continue;
             }
 
+            javaCode.setCurrentTemplateLine(parameter.templateLine);
             javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = (").append(parameter.type);
             if (parameter.defaultValue != null) {
                 javaCode.append(")params.getOrDefault(\"").append(parameter.name).append("\", ");

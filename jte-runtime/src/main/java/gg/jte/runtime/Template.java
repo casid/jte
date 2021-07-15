@@ -3,6 +3,7 @@ package gg.jte.runtime;
 import gg.jte.TemplateException;
 import gg.jte.TemplateOutput;
 import gg.jte.html.HtmlInterceptor;
+import gg.jte.html.HtmlTemplateOutput;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,9 +39,13 @@ public final class Template {
         } catch (InvocationTargetException e) {
             throw e.getCause();
         } catch (IllegalArgumentException e) {
-            String expectedType = render.getParameterTypes()[2].getName();
-            String actualType = param != null ? param.getClass().getName() : null;
-            throw new TemplateException("Failed to render " + name + ", type mismatch for parameter: Expected " + expectedType + ", got " + actualType, e);
+            if (render.getParameterTypes()[0] == HtmlTemplateOutput.class && !(output instanceof HtmlTemplateOutput)) {
+                throw new TemplateException("The template " + name + " was compiled with ContentType.Html, but the template engine was initialized with ContentType.Plain. Please initialize the template engine with ContentType.Html.", e);
+            } else {
+                String expectedType = render.getParameterTypes()[2].getName();
+                String actualType = param != null ? param.getClass().getName() : null;
+                throw new TemplateException("Failed to render " + name + ", type mismatch for parameter: Expected " + expectedType + ", got " + actualType, e);
+            }
         }
     }
 

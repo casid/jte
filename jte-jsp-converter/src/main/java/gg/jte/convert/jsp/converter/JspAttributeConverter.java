@@ -5,6 +5,8 @@ import org.apache.jasper.compiler.JtpAttribute;
 import org.apache.jasper.compiler.JtpConverter;
 
 public class JspAttributeConverter {
+
+    @SuppressWarnings("StatementWithEmptyBody")
     public void convert(JtpConverter converter, JtpAttribute attribute, ConverterOutput output) {
         String type = attribute.getType();
 
@@ -26,6 +28,8 @@ public class JspAttributeConverter {
             type = "double";
         } else if (type.startsWith("java.lang.")) {
             type = type.substring("java.lang.".length());
+        } else if (type.contains("<") && type.contains(">")) {
+            // Keep type, if user wants imports its up to the user to do that manually
         } else if(type.endsWith("[]")) {
             converter.addImport(type.substring(0, type.length() - 2));
             type = getSimpleType(type);

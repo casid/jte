@@ -26,6 +26,9 @@ public class JspAttributeConverter {
             type = "double";
         } else if (type.startsWith("java.lang.")) {
             type = type.substring("java.lang.".length());
+        } else if(type.endsWith("[]")) {
+            converter.addImport(type.substring(0, type.length() - 2));
+            type = getSimpleType(type);
         } else {
             converter.addImport(type);
             type = getSimpleType(type);

@@ -60,6 +60,7 @@ public class JspToJteConverter {
 
     public void replaceUsages(Path jspTag, Path jteTag) {
         String oldJspTagPrefix = extractTagPrefix(jspTag);
+        String oldJspTagClosing = "</" + oldJspTagPrefix.substring(1) + ">";
         String newJteFile = jteRoot.relativize(jteTag).toString().replace('\\', '/');
 
         IoUtils.deleteFile(jspTag);
@@ -71,7 +72,7 @@ public class JspToJteConverter {
                   .filter(p -> {
                       String fileName = p.toString();
                       return fileName.endsWith(".jsp") || fileName.endsWith(".jsp.inc") || fileName.endsWith(".tag");
-                  }).forEach(jspFile -> replaceUsages(jspFile, oldJspTagPrefix, newJteFile));
+                  }).forEach(jspFile -> replaceUsages(jspFile, oldJspTagPrefix, oldJspTagClosing, newJteFile));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -118,7 +119,7 @@ public class JspToJteConverter {
         replaceUsages(jspTag, jteTag);
     }
 
-    private void replaceUsages(Path jspFile, String oldJspTagPrefix, String newJteFile) {
+    private void replaceUsages(Path jspFile, String oldJspTagPrefix, String oldJspTagClosing, String newJteFile) {
         boolean modified = false;
 
         StringBuilder jspContent = new StringBuilder(IoUtils.readFile(jspFile));
@@ -135,6 +136,18 @@ public class JspToJteConverter {
                 } else {
                     ++lastIndex;
                 }
+            } else {
+                break;
+            }
+        } while (true);
+
+        lastIndex = 0;
+
+        do {
+            lastIndex = jspContent.indexOf(oldJspTagClosing, lastIndex);
+            if (lastIndex >= 0 && lastIndex < jspContent.length()) {
+                jspContent.replace(lastIndex, lastIndex + oldJspTagClosing.length(), "</" + jteTag + ">");
+                modified = true;
             } else {
                 break;
             }

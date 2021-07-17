@@ -253,7 +253,7 @@ public class JtpConverter extends Node.Visitor implements Converter {
     public void visit(Node.DoBodyAction n) {
         addImport("gg.jte.Content");
         addParam("Content bodyContent");
-        output.append("${bodyContent}").newLine();
+        output.append("${bodyContent}");
     }
 
     @Override

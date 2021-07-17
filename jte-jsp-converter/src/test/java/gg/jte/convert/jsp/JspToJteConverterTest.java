@@ -217,6 +217,13 @@ class JspToJteConverterTest {
         thenConversionIsAsExpected();
     }
 
+    @Test
+    void simpleTagWithBodyUsages() {
+        givenUsecase("simpleTagWithBodyUsages");
+        whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
     void givenUsecase(String usecase) {
         jspRoot = tempDir.resolve("jsp");
         jteRoot = tempDir.resolve("jte");

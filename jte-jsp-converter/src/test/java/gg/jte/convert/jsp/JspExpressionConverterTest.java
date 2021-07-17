@@ -129,6 +129,11 @@ class JspExpressionConverterTest {
     }
 
     @Test
+    void concatenation() {
+        assertConversion("${x += y}", "x + y");
+    }
+
+    @Test
     void calculation() {
         assertConversion("${x * 10 / 23.0}", "(x * 10) / 23.0");
     }

@@ -57,6 +57,7 @@ public class JspExpressionConverter {
             visitorMap.put(AstMult.class, new AstMultVisitor());
             visitorMap.put(AstDiv.class, new AstDivVisitor());
             visitorMap.put(AstMod.class, new AstModVisitor());
+            visitorMap.put(AstConcatenation.class, new AstConcatenationVisitor());
             visitorMap.put(AstNegative.class, new AstNegativeVisitor());
             visitorMap.put(AstGreaterThan.class, new AstGreaterThanVisitor());
             visitorMap.put(AstLessThan.class, new AstLessThanVisitor());
@@ -285,6 +286,13 @@ public class JspExpressionConverter {
         @Override
         protected String getOperator() {
             return "%";
+        }
+    }
+
+    private class AstConcatenationVisitor extends AstBinaryOperatorVisitor {
+        @Override
+        protected String getOperator() {
+            return "+";
         }
     }
 

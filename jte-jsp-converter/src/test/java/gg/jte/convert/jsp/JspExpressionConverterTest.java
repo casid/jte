@@ -173,6 +173,11 @@ class JspExpressionConverterTest {
         assertConversion("${lazy ? 'js-lazy js-rflag-lazy' : ''}${' '}${cssClass}", "@`${lazy ? \"js-lazy js-rflag-lazy\" : \"\"}${\" \"}${cssClass}`");
     }
 
+    @Test
+    void list() {
+        assertConversion("${[CustomEnumType.VAL_A, CustomEnumType.VAL_B, CustomEnumType.VAL_C]}", "java.util.Arrays.asList(CustomEnumType.VAL_A, CustomEnumType.VAL_B, CustomEnumType.VAL_C)");
+    }
+
     private void assertConversion(String el, String java) {
         assertThat(new JspExpressionConverter(el).getJavaCode()).isEqualTo(java);
     }

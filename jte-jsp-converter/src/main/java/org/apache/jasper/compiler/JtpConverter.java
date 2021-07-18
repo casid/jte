@@ -224,6 +224,10 @@ public class JtpConverter extends Node.Visitor implements Converter {
         }
 
         output.append("<%--").append(n.getText()).append("--%>");
+
+        if (output.isTrimWhitespace()) {
+            output.setAllowNextWhitespace();
+        }
     }
 
     @Override

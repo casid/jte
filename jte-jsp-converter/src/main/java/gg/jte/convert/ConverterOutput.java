@@ -16,6 +16,7 @@ public class ConverterOutput {
     private int skipIndent;
     private boolean trimWhitespace = false;
     private boolean insideScript = false;
+    private boolean allowNextWhitespace = false;
 
     public ConverterOutput append(String s) {
         if (s != null) {
@@ -32,6 +33,11 @@ public class ConverterOutput {
     }
 
     public boolean isTrimWhitespace() {
+        if (allowNextWhitespace) {
+            allowNextWhitespace = false;
+            return false;
+        }
+
         return trimWhitespace;
     }
 
@@ -71,7 +77,6 @@ public class ConverterOutput {
     }
 
     public ConverterOutput indent(int amount) {
-        //noinspection StringRepeatCanBeUsed
         for(int i = 0; i < amount * indentationCount; ++i) {
             buffer.append(indentationChar);
         }
@@ -148,6 +153,10 @@ public class ConverterOutput {
         } else {
             insideScript = this.insideScriptStack.peek();
         }
+    }
+
+    public void setAllowNextWhitespace() {
+        allowNextWhitespace = true;
     }
 
     @Override

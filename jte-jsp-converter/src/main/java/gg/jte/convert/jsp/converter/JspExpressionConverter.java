@@ -225,7 +225,9 @@ public class JspExpressionConverter {
         @Override
         public void visit(Node node) {
             AstString astString = (AstString)node;
-            result.append('"').append(astString.getString()).append('"');
+            result.append('"');
+            StringUtils.appendEscaped(result, astString.getString());
+            result.append('"');
         }
     }
 

@@ -47,4 +47,27 @@ public final class StringUtils {
 
         return true;
     }
+
+    public static void appendEscaped(StringBuilder result, String string) {
+        for (int i = 0; i < string.length(); ++i) {
+            char c = string.charAt(i);
+            if (c == '\"') {
+                result.append("\\\"");
+            } else if (c == '\n') {
+                result.append("\\n");
+            } else if (c == '\t') {
+                result.append("\\t");
+            } else if (c == '\r') {
+                result.append("\\r");
+            } else if (c == '\f') {
+                result.append("\\f");
+            } else if (c == '\b') {
+                result.append("\\b");
+            } else if (c == '\\') {
+                result.append("\\\\");
+            } else {
+                result.append(c);
+            }
+        }
+    }
 }

@@ -1,5 +1,7 @@
 package gg.jte.compiler;
 
+import gg.jte.runtime.StringUtils;
+
 import java.util.Arrays;
 
 @SuppressWarnings("UnusedReturnValue")
@@ -43,26 +45,7 @@ public final class CodeBuilder {
 
     @SuppressWarnings("UnusedReturnValue")
     public CodeBuilder appendEscaped(String text) {
-        for (int i = 0; i < text.length(); ++i) {
-            char c = text.charAt(i);
-            if (c == '\"') {
-                code.append("\\\"");
-            } else if (c == '\n') {
-                code.append("\\n");
-            } else if (c == '\t') {
-                code.append("\\t");
-            } else if (c == '\r') {
-                code.append("\\r");
-            } else if (c == '\f') {
-                code.append("\\f");
-            } else if (c == '\b') {
-                code.append("\\b");
-            } else if (c == '\\') {
-                code.append("\\\\");
-            } else {
-                code.append(c);
-            }
-        }
+        StringUtils.appendEscaped(code, text);
         return this;
     }
 

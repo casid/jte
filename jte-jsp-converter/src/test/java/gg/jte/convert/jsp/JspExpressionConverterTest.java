@@ -178,6 +178,12 @@ class JspExpressionConverterTest {
         assertConversion("${[CustomEnumType.VAL_A, CustomEnumType.VAL_B, CustomEnumType.VAL_C]}", "java.util.Arrays.asList(CustomEnumType.VAL_A, CustomEnumType.VAL_B, CustomEnumType.VAL_C)");
     }
 
+    @Test
+    void stringsStayProperlyEscaped() {
+        String expression = "fn:escapeXml(String.format(\"%s at \\\"%s\\\"\"), person.fullName, company.name)";
+        assertConversion("${" + expression + "}", expression);
+    }
+
     private void assertConversion(String el, String java) {
         assertThat(new JspExpressionConverter(el).getJavaCode()).isEqualTo(java);
     }

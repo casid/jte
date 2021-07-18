@@ -71,21 +71,4 @@ public final class StringUtils {
         }
     }
 
-    public static String repeat(char ch, int count) {
-        return repeat(Character.toString(ch), count);
-    }
-
-    public static String repeat(String str, int count) {
-        if (count < 0) {
-            throw new IllegalArgumentException("count must be 0 or positive integer, given: " + count);
-        }
-        if (count == 0 || str.isEmpty()) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder(str.length() * count);
-        for (int i = 0; i < count; ++i) {
-            sb.append(str);
-        }
-        return sb.toString();
-    }
 }

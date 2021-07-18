@@ -1,13 +1,14 @@
 package gg.jte.convert.jsp.converter;
 
-import gg.jte.convert.CustomTagConverter;
 import gg.jte.convert.ConverterOutput;
+import gg.jte.convert.CustomTagConverter;
 import gg.jte.convert.jsp.BodyConverter;
-import gg.jte.runtime.StringUtils;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.JtpConverter;
 import org.apache.jasper.compiler.JtpCustomTag;
 import org.xml.sax.Attributes;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gg.jte.convert.jsp.converter.JspExpressionConverter.convertAttributeValue;
 
@@ -20,51 +21,50 @@ public class JspJteConverter implements CustomTagConverter {
 
         String pathWithoutExtension = jteTagPath.substring(0, jteTagPath.length() - 4);
         String tagCall = pathWithoutExtension.replace('/', '.');
-        String tagStartIndent = null;
+        final String tagStartIndent; // Used in lambda, must be final
         if (converter.isPutParametersOnSeparateLines()) {
             int tagStartPos = output.getCurrentLineCharCount();
-            tagStartIndent = StringUtils.repeat(output.getIndentationChar(), tagStartPos);
+            StringBuilder sb = new StringBuilder(tagStartPos);
+            for (int i = 0; i < tagStartPos; ++i) {
+                sb.append(output.getIndentationChar());
+            }
+            tagStartIndent = sb.toString();
+        } else {
+            tagStartIndent = null;
         }
         output.append("@").append(tagCall).append("(");
 
-        boolean first = true;
+        final AtomicBoolean first = new AtomicBoolean(true); // Used in lambda, must be final
+        Runnable handleParameterStart = () -> {
+            if (converter.isPutParametersOnSeparateLines()) {
+                if (!first.get()) {
+                    output.append(",");
+                }
+                output.newLine(tagStartIndent);
+                output.indent(1);
+            } else if (!first.get()) {
+                output.append(", ");
+            }
+            first.set(false);
+        };
+
         for (int i = 0; i < attributes.getLength(); i++) {
             String localName = attributes.getLocalName(i);
             if ("jte".equals(localName)) {
                 continue;
             }
-
-            if (converter.isPutParametersOnSeparateLines()) {
-                if (!first) {
-                    output.append(",");
-                }
-                output.newLine(tagStartIndent);
-                output.indent(1);
-            } else if (!first) {
-                output.append(", ");
-            }
-
-            first = false;
-
+            handleParameterStart.run();
             output.append(localName).append(" = ").append(convertAttributeValue(attributes.getValue(i)));
         }
 
         if (tag.hasBody()) {
-            if (!first) {
-                if (converter.isPutParametersOnSeparateLines()) {
-                    output.append(",");
-                    output.newLine();
-                } else {
-                    output.append(", ");
-                }
-            }
+            handleParameterStart.run();
             output.append("bodyContent = @`");
             bodyConverter.convert();
             output.append("`");
-            first = false;
         }
 
-        if (!first && converter.isPutParametersOnSeparateLines()) {
+        if (!first.get() && converter.isPutParametersOnSeparateLines()) {
             output.newLine(tagStartIndent);
         }
         output.append(")");

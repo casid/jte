@@ -32,6 +32,7 @@ public class JtpConverter extends Node.Visitor implements Converter {
 
     private String prefix;
     private String lineSeparator = "\n";
+    private boolean putParametersOnSeparateLines;
 
     public JtpConverter(String relativeFilePath, byte[] input, URL resourceBase, boolean tagFile, ConverterOutput output) {
         this.relativeFilePath = relativeFilePath;
@@ -69,6 +70,15 @@ public class JtpConverter extends Node.Visitor implements Converter {
     @Override
     public void setIndentationChar(char indentationChar) {
         output.setIndentationChar(indentationChar);
+    }
+
+    @Override
+    public void setPutParametersOnSeparateLines(boolean putParametersOnSeparateLines) {
+        this.putParametersOnSeparateLines = putParametersOnSeparateLines;
+    }
+
+    public boolean isPutParametersOnSeparateLines() {
+        return putParametersOnSeparateLines;
     }
 
     @Override

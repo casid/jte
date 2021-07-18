@@ -137,6 +137,13 @@ class JspToJteConverterTest {
     }
 
     @Test
+    void jspWithAlreadyConvertedTagParametersOnSeparateLines() {
+        givenUsecase("jspWithAlreadyConvertedTagParametersOnSeparateLines");
+        whenJspTagIsConverted("usage.jsp", "usage.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
     void simpleTagWithSetProperty() {
         givenUsecase("simpleTagWithSetProperty");
         whenJspTagIsConverted("simple.tag", "tag/simple.jte");
@@ -247,6 +254,7 @@ class JspToJteConverterTest {
     void whenJspTagIsConverted(String jspTag, String jteTag) {
         JspToJteConverter converter = new MyConverter();
         converter.convertTag(jspTag, jteTag, c -> {
+            c.setPutParametersOnSeparateLines(true);
             c.setPrefix("@import static example.JteContext.*\n");
             setups.forEach(s -> s.accept(c));
         });

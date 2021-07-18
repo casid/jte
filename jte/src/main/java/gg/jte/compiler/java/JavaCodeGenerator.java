@@ -486,7 +486,8 @@ public class JavaCodeGenerator implements CodeGenerator {
                 return i;
             }
         }
-        throw new IllegalStateException("No parameter with name " + paramCallInfo.name + " is defined in " + name);
+
+        throw new TemplateException("Failed to compile template, error at " + classInfo.name + ":" + javaCode.getCurrentTemplateLine() + ". No parameter with name " + paramCallInfo.name + " is defined in " + name);
     }
 
     private void writeIndentation(int depth) {

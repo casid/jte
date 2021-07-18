@@ -971,6 +971,17 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void compileError6() {
+        givenTag("test", "@param gg.jte.TemplateEngineTest.Model model\n" +
+                "test");
+        givenTemplate("@tag.test(\n" +
+                "model = model,\n" +
+                "param2 = \"foo\")");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile template, error at test/template.jte:3. No parameter with name param2 is defined in tag/test.jte");
+    }
+
+    @Test
     void calledWithWrongParam1() {
         givenRawTemplate("@param String hello\n${hello}");
         thenRenderingFailsWithException().hasMessage("Failed to render test/template.jte, type mismatch for parameter: Expected java.lang.String, got gg.jte.TemplateEngineTest$Model");

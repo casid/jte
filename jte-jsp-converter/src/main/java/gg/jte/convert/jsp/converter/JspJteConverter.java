@@ -21,30 +21,21 @@ public class JspJteConverter implements CustomTagConverter {
 
         String pathWithoutExtension = jteTagPath.substring(0, jteTagPath.length() - 4);
         String tagCall = pathWithoutExtension.replace('/', '.');
-        final String tagStartIndent; // Used in lambda, must be final
-        if (converter.isPutParametersOnSeparateLines()) {
-            int tagStartPos = output.getCurrentLineCharCount();
-            StringBuilder sb = new StringBuilder(tagStartPos);
-            for (int i = 0; i < tagStartPos; ++i) {
-                sb.append(output.getIndentationChar());
-            }
-            tagStartIndent = sb.toString();
-        } else {
-            tagStartIndent = null;
+        int tagStartPos = output.getCurrentLineCharCount();
+        StringBuilder sb = new StringBuilder(tagStartPos);
+        for (int i = 0; i < tagStartPos; ++i) {
+            sb.append(output.getIndentationChar());
         }
+        final String tagStartIndent = sb.toString(); // Used in lambda, must be final
         output.append("@").append(tagCall).append("(");
 
         final AtomicBoolean first = new AtomicBoolean(true); // Used in lambda, must be final
         Runnable handleParameterStart = () -> {
-            if (converter.isPutParametersOnSeparateLines()) {
-                if (!first.get()) {
-                    output.append(",");
-                }
-                output.newLine(tagStartIndent);
-                output.indent(1);
-            } else if (!first.get()) {
-                output.append(", ");
+            if (!first.get()) {
+                output.append(",");
             }
+            output.newLine(tagStartIndent);
+            output.indent(1);
             first.set(false);
         };
 
@@ -64,7 +55,7 @@ public class JspJteConverter implements CustomTagConverter {
             output.append("`");
         }
 
-        if (!first.get() && converter.isPutParametersOnSeparateLines()) {
+        if (!first.get()) {
             output.newLine(tagStartIndent);
         }
         output.append(")");

@@ -17,8 +17,6 @@ public interface Converter {
 
     void setIndentationChar(char indentationChar);
 
-    void setPutParametersOnSeparateLines(boolean putParametersOnSeparateLines);
-
     String convert();
 
     void setPrefix(String prefix);

@@ -215,6 +215,15 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void conditionInstanceOfPatternMatching() {
+        if (TestUtils.isInstanceOfPatternMatchingJavaVersion()) {
+            givenTemplate("@if (model.object instanceof String s)${s.length()}@endif");
+            model.object = "foobar";
+            thenOutputIs("6");
+        }
+    }
+
+    @Test
     void loop() {
         model.array = new int[]{1, 2, 3};
         givenTemplate("@for (int i : model.array)" +
@@ -1103,6 +1112,7 @@ public class TemplateEngineTest {
         public int x;
         public int[] array;
         public ModelType type;
+        public Object object;
 
         // For null iteration tests
         public boolean[] booleanArray;

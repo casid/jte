@@ -16,6 +16,10 @@ public class TestUtils {
         return JAVA_VERSION < 11;
     }
 
+    public static boolean isInstanceOfPatternMatchingJavaVersion() {
+        return JAVA_VERSION >= 14;
+    }
+
     public static void sleepIfLegacyJavaVersion(long millis) {
         if (isLegacyJavaVersion()) {
             try {

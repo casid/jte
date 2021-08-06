@@ -101,6 +101,14 @@ You may construct if statements using the `@if`, `@elseif`, `@else` and `@endif`
 @endif
 ```
 
+Since Java 14+ you can also use InstanceOf Pattern matching:
+
+```xml
+@if (model instanceof SubModel subModel)
+    ${subModel.getSpecial()}
+@endif
+```
+
 ### Loops
 
 In addition to if statements, jte provides the `@for` and `@endfor` keywords to loop over iterable data. Again, `for` translates directly to its Java counterpart:

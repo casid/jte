@@ -101,7 +101,7 @@ You may construct if statements using the `@if`, `@elseif`, `@else` and `@endif`
 @endif
 ```
 
-Since Java 14+ you can also use InstanceOf Pattern matching:
+Since Java 14+ you can also use Pattern Matching for instanceof (https://openjdk.java.net/jeps/394):
 
 ```xml
 @if (model instanceof SubModel subModel)

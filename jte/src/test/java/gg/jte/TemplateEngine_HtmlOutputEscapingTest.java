@@ -355,15 +355,6 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
-    void booleanAttributes_condition() {
-        codeResolver.givenCode("template.jte", "@param boolean disabled\n<button class=\"submit cta\" @if(disabled)disabled=\"disabled\"@endif data-item=\"${id}\">Do it</button>");
-
-        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", true, output));
-
-        assertThat(throwable).hasMessage("Failed to compile template.jte, error at line 2: Illegal HTML attribute name @if(disabled)disabled! Expressions in HTML attribute names are not allowed.");
-    }
-
-    @Test
     void booleanAttributes_withoutCondition() {
         codeResolver.givenCode("template.jte", "@param boolean disabled\n<button class=\"submit cta\" disabled=\"${disabled}\" data-item=\"id\">Do it</button>");
 
@@ -1085,6 +1076,60 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "ignored", output));
 
         assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 4: @layout calls in <script> blocks are not allowed.");
+    }
+
+    @Test
+    void ifInAttributes() {
+        codeResolver.givenCode("template.jte", "@param boolean disabled\n<button class=\"submit cta\" @if(disabled)disabled=\"disabled\"@endif data-item=\"${id}\">Do it</button>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", true, output));
+
+        assertThat(throwable).hasMessage("Failed to compile template.jte, error at line 2: Illegal HTML attribute name @if(disabled)disabled! @if expressions in HTML attribute names are not allowed. In case you're trying to optimize the generated output, smart attributes will do just that: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#smart-attributes");
+    }
+
+    @Test
+    void forInAttributes() {
+        codeResolver.givenCode("template.jte", "<div @for(int i = 0; i < 1; ++i)x@endfor>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", true, output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 1: Illegal HTML attribute name @for(int! @for loops in HTML attribute names are not allowed.");
+    }
+
+    @Test
+    void layoutInAttributes() {
+        codeResolver.givenCode("template.jte", "<div @layout.foo()>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", localizer, output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 1: Illegal HTML attribute name @layout.foo()! @layout calls in HTML attribute names are not allowed.");
+    }
+
+    @Test
+    void tagInAttributes() {
+        codeResolver.givenCode("template.jte", "<div @tag.foo()>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", localizer, output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 1: Illegal HTML attribute name @tag.foo()! @tag calls in HTML attribute names are not allowed.");
+    }
+
+    @Test
+    void contentBlockInAttributes() {
+        codeResolver.givenCode("template.jte", "<div @`foo`>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", localizer, output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 1: Illegal HTML attribute name @`foo`! Content blocks in HTML attribute names are not allowed.");
+    }
+
+    @Test
+    void alpineJsAttributes() {
+        codeResolver.givenCode("template.jte", "<div @click.away=\"open = false\" x-data=\"{ open: false }\">");
+
+        templateEngine.render("template.jte", localizer, output);
+
+        assertThat(output.toString()).isEqualTo("<div @click.away=\"open = false\" x-data=\"{ open: false }\">");
     }
 
     @Test

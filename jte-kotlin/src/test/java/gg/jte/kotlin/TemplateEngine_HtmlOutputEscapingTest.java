@@ -380,7 +380,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.kte", true, output));
 
-        assertThat(throwable).hasMessage("Failed to compile template.kte, error at line 2: Illegal HTML attribute name @if(disabled)disabled! Expressions in HTML attribute names are not allowed.");
+        assertThat(throwable).hasMessageContaining("Failed to compile template.kte, error at line 2: Illegal HTML attribute name @if(disabled)disabled! @if expressions in HTML attribute names are not allowed.");
     }
 
     @Test

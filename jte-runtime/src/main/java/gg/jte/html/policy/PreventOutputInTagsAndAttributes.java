@@ -19,8 +19,25 @@ public class PreventOutputInTagsAndAttributes implements HtmlPolicy {
         if ( htmlAttribute.getName().contains("${") ) {
             throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! Expressions in HTML attribute names are not allowed.");
         }
-        if (htmlAttribute.getName().contains("@")) {
-            throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! Expressions in HTML attribute names are not allowed.");
+
+        if (htmlAttribute.getName().contains("@if")) {
+            throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! @if expressions in HTML attribute names are not allowed. In case you're trying to optimize the generated output, smart attributes will do just that: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#smart-attributes");
+        }
+
+        if (htmlAttribute.getName().contains("@for")) {
+            throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! @for loops in HTML attribute names are not allowed.");
+        }
+
+        if (htmlAttribute.getName().contains("@layout")) {
+            throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! @layout calls in HTML attribute names are not allowed.");
+        }
+
+        if (htmlAttribute.getName().contains("@tag")) {
+            throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! @tag calls in HTML attribute names are not allowed.");
+        }
+
+        if (htmlAttribute.getName().contains("@`")) {
+            throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! Content blocks in HTML attribute names are not allowed.");
         }
     }
 }

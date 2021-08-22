@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.5.20"
-    id("gg.jte.gradle") version("1.11.3-SNAPSHOT")
+    id("gg.jte.gradle") version("1.11.3")
 }
 
 repositories {
@@ -13,7 +13,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.junit.jupiter:junit-jupiter:5.4.2")
-    implementation("gg.jte:jte-runtime:1.11.3-SNAPSHOT")
+    implementation("gg.jte:jte-runtime:1.11.3")
 }
 
 jte {

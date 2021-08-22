@@ -7,6 +7,7 @@ import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1078,6 +1079,55 @@ public class TemplateEngineTest {
         dummyCodeResolver.givenCode("tag/name.jte", "@param int a\n@param String b\nJava says ${a}, ${b}!");
 
         thenOutputIs("Hello, Java says 42, foo!");
+    }
+
+    @Test
+    void nestedKotlinStringTemplates() {
+        givenRawTemplate("@import java.time.format.DateTimeFormatter\n" +
+                "@import java.time.LocalDateTime\n" +
+                "@param now: LocalDateTime\n" +
+                "@param datePattern: String\n" +
+                "println(\"Today is ${now.format(DateTimeFormatter.ofPattern(\"${datePattern} HH:mm\"))}\")");
+
+        LocalDateTime now = LocalDateTime.of(2021, 8, 21, 7, 50);
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, TemplateUtils.toMap("now", now, "datePattern", "YYYY-MM-dd"), output);
+
+        assertThat(output.toString()).isEqualTo("println(\"Today is 2021-08-21 07:50\")");
+    }
+
+    @Test
+    void nestedKotlinStringTemplates_unsafe() {
+        givenRawTemplate("@import java.time.format.DateTimeFormatter\n" +
+                "@import java.time.LocalDateTime\n" +
+                "@param now: LocalDateTime\n" +
+                "@param datePattern: String\n" +
+                "println(\"Today is $unsafe{now.format(DateTimeFormatter.ofPattern(\"${datePattern} HH:mm\"))}\")");
+
+        LocalDateTime now = LocalDateTime.of(2021, 8, 21, 7, 50);
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, TemplateUtils.toMap("now", now, "datePattern", "YYYY-MM-dd"), output);
+
+        assertThat(output.toString()).isEqualTo("println(\"Today is 2021-08-21 07:50\")");
+    }
+
+    @Test
+    void nestedKotlinStringTemplates_variable() {
+        givenRawTemplate("@import java.time.format.DateTimeFormatter\n" +
+                "@import java.time.LocalDateTime\n" +
+                "@param now: LocalDateTime\n" +
+                "@param datePattern: String\n" +
+                "!{val variable = now.format(DateTimeFormatter.ofPattern(\"${datePattern} HH:mm\"))}" +
+                "println(\"Today is ${variable}\")");
+
+        LocalDateTime now = LocalDateTime.of(2021, 8, 21, 7, 50);
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, TemplateUtils.toMap("now", now, "datePattern", "YYYY-MM-dd"), output);
+
+        assertThat(output.toString()).isEqualTo("println(\"Today is 2021-08-21 07:50\")");
     }
 
     private void givenTag(String name, String code) {

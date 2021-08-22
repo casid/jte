@@ -188,9 +188,9 @@ public final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onCodeStatement);
                     lastIndex = i + 1;
                 }
-            } else if (currentChar == '\"' && currentMode.isJava()) {
+            } else if (currentChar == '"' && currentMode.isTrackStrings()) {
                 push(Mode.JavaCodeString);
-            } else if (currentChar == '\"' && currentMode == Mode.JavaCodeString && previousChar0 != '\\') {
+            } else if (currentChar == '"' && currentMode == Mode.JavaCodeString && previousChar0 != '\\') {
                 pop();
             } else if (currentChar == '}' && currentMode == Mode.Code) {
                 pop();
@@ -210,9 +210,9 @@ public final class TemplateParser {
             } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
                 lastIndex = i + 1;
                 push(Mode.JavaCode);
-            } else if (currentChar == '(' && currentMode.isJava()) {
+            } else if (currentChar == '(' && currentMode.isTrackBraces()) {
                 push(Mode.JavaCode);
-            } else if (currentChar == ')' && currentMode.isJava()) {
+            } else if (currentChar == ')' && currentMode.isTrackBraces()) {
                 if (currentMode == Mode.JavaCodeParam) {
                     TagMode previousMode = getPreviousMode(TagMode.class);
                     extract(templateCode, lastIndex, i, (d, c) -> {
@@ -928,48 +928,56 @@ public final class TemplateParser {
         Mode Import = new StatelessMode("Import");
         Mode Param = new StatelessMode("Param");
         Mode Text = new StatelessMode("Text");
-        Mode Code = new StatelessMode("Code");
-        Mode UnsafeCode = new StatelessMode("UnsafeCode");
-        Mode CodeStatement = new StatelessMode("CodeStatement");
+        Mode Code = new StatelessMode("Code", true, false, false);
+        Mode UnsafeCode = new StatelessMode("UnsafeCode", true, false, false);
+        Mode CodeStatement = new StatelessMode("CodeStatement", true, false, false);
         Mode Condition = new StatelessMode("Condition");
-        Mode JavaCode = new StatelessMode("JavaCode", true, false);
-        Mode JavaCodeParam = new StatelessMode("JavaCodeParam", true, false);
+        Mode JavaCode = new StatelessMode("JavaCode", true, true, false);
+        Mode JavaCodeParam = new StatelessMode("JavaCodeParam", true, true, false);
         Mode JavaCodeString = new StatelessMode("JavaCodeString");
         Mode ConditionElse = new StatelessMode("ConditionElse");
         Mode ConditionEnd = new StatelessMode("ConditionEnd");
         Mode ForLoop = new StatelessMode("ForLoop");
-        Mode ForLoopCode = new StatelessMode("ForLoopCode");
+        Mode ForLoopCode = new StatelessMode("ForLoopCode", true, false, false);
         Mode ForLoopEnd = new StatelessMode("ForLoopEnd");
         Mode TagName = new StatelessMode("TagName");
         Mode Comment = new StatelessMode("Comment");
-        Mode HtmlComment = new StatelessMode("HtmlComment", false, true);
-        Mode CssComment = new StatelessMode("CssComment", false, true);
-        Mode JsComment = new StatelessMode("JsComment", false, true);
-        Mode JsBlockComment = new StatelessMode("JsBlockComment", false, true);
-        Mode Content = new StatelessMode("Content", false, true);
+        Mode HtmlComment = new StatelessMode("HtmlComment", false, false, true);
+        Mode CssComment = new StatelessMode("CssComment", false, false, true);
+        Mode JsComment = new StatelessMode("JsComment", false, false, true);
+        Mode JsBlockComment = new StatelessMode("JsBlockComment", false, false, true);
+        Mode Content = new StatelessMode("Content", false, false, true);
 
-        boolean isJava();
+        boolean isTrackStrings();
+        boolean isTrackBraces();
         boolean isComment();
     }
 
     private static class StatelessMode implements Mode {
         private final String debugName;
-        private final boolean java;
+        private final boolean trackStrings;
+        private final boolean trackBraces;
         private final boolean comment;
 
         private StatelessMode(String debugName) {
-            this(debugName, false, false);
+            this(debugName, false, false, false);
         }
 
-        private StatelessMode(String debugName, boolean java, boolean comment) {
+        private StatelessMode(String debugName, boolean trackStrings, boolean trackBraces, boolean comment) {
             this.debugName = debugName;
-            this.java = java;
+            this.trackStrings = trackStrings;
+            this.trackBraces = trackBraces;
             this.comment = comment;
         }
 
         @Override
-        public boolean isJava() {
-            return java;
+        public boolean isTrackStrings() {
+            return trackStrings;
+        }
+
+        @Override
+        public boolean isTrackBraces() {
+            return trackBraces;
         }
 
         @Override
@@ -993,7 +1001,12 @@ public final class TemplateParser {
         }
 
         @Override
-        public boolean isJava() {
+        public boolean isTrackStrings() {
+            return false;
+        }
+
+        @Override
+        public boolean isTrackBraces() {
             return false;
         }
 

@@ -903,6 +903,39 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void curlyBracesAreTracked() {
+        givenRawTemplate("!{java.util.Optional<String> name = java.util.Optional.ofNullable(null)}" +
+                "${name.map((n) -> { return \"name: \" + n; }).orElse(\"empty\")}");
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, null, output);
+
+        assertThat(output.toString()).isEqualTo("empty");
+    }
+
+    @Test
+    void curlyBracesAreTracked_unsafe() {
+        givenRawTemplate("!{java.util.Optional<String> name = java.util.Optional.ofNullable(null)}" +
+                "$unsafe{name.map((n) -> { return \"name: \" + n; }).orElse(\"empty\")}");
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, null, output);
+
+        assertThat(output.toString()).isEqualTo("empty");
+    }
+
+    @Test
+    void curlyBracesAreTracked_statement() {
+        givenRawTemplate("!{String name = java.util.Optional.ofNullable(null).map((n) -> { return \"name: \" + n; }).orElse(\"empty\")}" +
+                "${name}");
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, null, output);
+
+        assertThat(output.toString()).isEqualTo("empty");
+    }
+
+    @Test
     void emptyTemplate() {
         givenRawTemplate("");
         thenOutputIs("");

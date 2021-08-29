@@ -210,9 +210,9 @@ public final class TemplateParser {
             } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
                 lastIndex = i + 1;
                 push(Mode.JavaCode);
-            } else if (currentChar == '(' && currentMode.isTrackBraces()) {
+            } else if (currentMode.isTrackBraces() && (currentChar == '(' || currentChar == '{')) {
                 push(Mode.JavaCode);
-            } else if (currentChar == ')' && currentMode.isTrackBraces()) {
+            } else if (currentMode.isTrackBraces() && (currentChar == ')' || currentChar == '}')) {
                 if (currentMode == Mode.JavaCodeParam) {
                     TagMode previousMode = getPreviousMode(TagMode.class);
                     extract(templateCode, lastIndex, i, (d, c) -> {
@@ -928,9 +928,9 @@ public final class TemplateParser {
         Mode Import = new StatelessMode("Import");
         Mode Param = new StatelessMode("Param");
         Mode Text = new StatelessMode("Text");
-        Mode Code = new StatelessMode("Code", true, false, false);
-        Mode UnsafeCode = new StatelessMode("UnsafeCode", true, false, false);
-        Mode CodeStatement = new StatelessMode("CodeStatement", true, false, false);
+        Mode Code = new StatelessMode("Code", true, true, false);
+        Mode UnsafeCode = new StatelessMode("UnsafeCode", true, true, false);
+        Mode CodeStatement = new StatelessMode("CodeStatement", true, true, false);
         Mode Condition = new StatelessMode("Condition");
         Mode JavaCode = new StatelessMode("JavaCode", true, true, false);
         Mode JavaCodeParam = new StatelessMode("JavaCodeParam", true, true, false);

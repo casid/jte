@@ -11,12 +11,12 @@ repositories {
 }
 
 dependencies {
-    implementation('gg.jte:jte:1.11.4-SNAPSHOT')
-    implementation('gg.jte:jte-kotlin:1.11.4-SNAPSHOT')
+    implementation('gg.jte:jte:1.11.4')
+    implementation('gg.jte:jte-kotlin:1.11.4')
 }
 
 group = 'gg.jte'
-version = '1.11.4-SNAPSHOT'
+version = '1.11.4'
 
 compileJava   {
     sourceCompatibility = '1.8'

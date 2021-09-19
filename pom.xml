@@ -9,7 +9,7 @@
 
     <name>jte-parent</name>
     <description>A template engine using plain Java code.</description>
-    <url>http://jte.gg</url>
+    <url>https://jte.gg</url>
     <developers>
         <developer>
             <id>casid</id>
@@ -25,7 +25,7 @@
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>

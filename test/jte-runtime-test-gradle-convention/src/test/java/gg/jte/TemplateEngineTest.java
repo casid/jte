@@ -76,8 +76,8 @@ public class TemplateEngineTest {
                 }
 
                 @Override
-                public boolean hasChanged(String name) {
-                    return false;
+                public long getLastModified(String name) {
+                    return 0;
                 }
             }, ContentType.Plain)
         );

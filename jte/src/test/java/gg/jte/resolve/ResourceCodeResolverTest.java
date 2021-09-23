@@ -36,12 +36,12 @@ public class ResourceCodeResolverTest {
     }
 
     @Test
-    void changesNotSupported() {
+    void lastModifiedNotSupported() {
         resourceCodeResolver = new ResourceCodeResolver("benchmark");
 
-        boolean hasChanged = resourceCodeResolver.hasChanged("welcome.jte");
+        long lastModified = resourceCodeResolver.getLastModified("welcome.jte");
 
-        assertThat(hasChanged).isFalse();
+        assertThat(lastModified).isEqualTo(0L);
     }
 
     @Test

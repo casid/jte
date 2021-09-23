@@ -16,8 +16,8 @@ public class DummyCodeResolver implements CodeResolver {
     }
 
     @Override
-    public boolean hasChanged(String name) {
-        return false;
+    public long getLastModified(String name) {
+        return 0;
     }
 
     public void givenCode(String name, String code) {

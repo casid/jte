@@ -37,6 +37,8 @@ public class TemplateEngineTest {
         thenOutputIs("Hello World");
 
         templateEngine = TemplateEngine.create(new CodeResolver() {
+            long lastModified = 0;
+
             @Override
             public String resolve(String name) {
                 return "@param test.Model model\n" +
@@ -44,8 +46,8 @@ public class TemplateEngineTest {
             }
 
             @Override
-            public boolean hasChanged(String name) {
-                return true;
+            public long getLastModified(String name) {
+                return lastModified++;
             }
         }, ContentType.Html);
 
@@ -53,6 +55,7 @@ public class TemplateEngineTest {
         thenOutputIs("Hello changed World");
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void whenTemplateIsRendered(String templateName) {
         templateEngine.render(templateName, model, output);
     }

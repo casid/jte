@@ -38,8 +38,8 @@ public class ResourceCodeResolver implements CodeResolver {
     }
 
     @Override
-    public boolean hasChanged(String name) {
-        return false;
+    public long getLastModified(String name) {
+        return 0;
     }
 
     private ClassLoader getClassLoader() {

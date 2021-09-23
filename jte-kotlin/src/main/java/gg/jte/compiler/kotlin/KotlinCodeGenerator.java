@@ -25,14 +25,14 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private final ClassInfo classInfo;
     private final CodeBuilder kotlinCode = new CodeBuilder();
     private final LinkedHashSet<ClassDefinition> classDefinitions;
-    private final LinkedHashSet<String> templateDependencies;
+    private final LinkedHashSet<TemplateDependency> templateDependencies;
     private final List<ParamInfo> parameters = new ArrayList<>();
     private final List<byte[]> binaryTextParts = new ArrayList<>();
 
     private boolean hasWrittenPackage;
     private boolean hasWrittenClass;
 
-    public KotlinCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+    public KotlinCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
         this.compiler = compiler;
         this.config = config;
         this.paramOrder = paramOrder;

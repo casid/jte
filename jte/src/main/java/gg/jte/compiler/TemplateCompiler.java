@@ -27,7 +27,7 @@ public class TemplateCompiler extends TemplateLoader {
     private final CodeResolver codeResolver;
     private final ClassLoader parentClassLoader;
 
-    private final ConcurrentHashMap<String, LinkedHashSet<String>> templateDependencies = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, LinkedHashSet<TemplateDependency>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
 
@@ -232,7 +232,7 @@ public class TemplateCompiler extends TemplateLoader {
     private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
         String code = resolveCode(name, null);
 
-        LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
+        LinkedHashSet<TemplateDependency> templateDependencies = initTemplateDependencies(name);
 
         ClassInfo templateInfo = new ClassInfo(name, config.packageName);
 
@@ -252,8 +252,14 @@ public class TemplateCompiler extends TemplateLoader {
         }
     }
 
+    private LinkedHashSet<TemplateDependency> initTemplateDependencies(String name) {
+        LinkedHashSet<TemplateDependency> templateDependencies = new LinkedHashSet<>();
+        templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
+        return templateDependencies;
+    }
+
     private void generateTemplateFromTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
-        LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
+        LinkedHashSet<TemplateDependency> templateDependencies = initTemplateDependencies(name);
 
         ClassInfo templateInfo = generateTagOrLayout(TemplateType.Tag, name, classDefinitions, templateDependencies, null);
 
@@ -263,7 +269,7 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     private void generateTemplateFromLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
-        LinkedHashSet<String> templateDependencies = new LinkedHashSet<>();
+        LinkedHashSet<TemplateDependency> templateDependencies = initTemplateDependencies(name);
 
         ClassInfo templateInfo = generateTagOrLayout(TemplateType.Layout, name, classDefinitions, templateDependencies, null);
 
@@ -272,7 +278,7 @@ public class TemplateCompiler extends TemplateLoader {
         templateByClassName.put(templateInfo.name, templateInfo);
     }
 
-    public ClassInfo generateTagOrLayout(TemplateType type, String simpleName, String extension, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
+    public ClassInfo generateTagOrLayout(TemplateType type, String simpleName, String extension, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo) {
         String name = resolveTagOrLayoutName(type, simpleName, extension);
         try {
             return generateTagOrLayout(type, name, classDefinitions, templateDependencies, debugInfo);
@@ -292,8 +298,8 @@ public class TemplateCompiler extends TemplateLoader {
         return directory + simpleName.replace('.', '/') + "." + extension;
     }
 
-    public ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies, DebugInfo debugInfo) {
-        templateDependencies.add(name);
+    public ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo) {
+        templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
         ClassInfo classInfo = new ClassInfo(name, config.packageName);
 
         ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName, classInfo);
@@ -318,7 +324,7 @@ public class TemplateCompiler extends TemplateLoader {
         return classInfo;
     }
 
-    private CodeGenerator createCodeGenerator(ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<String> templateDependencies) {
+    private CodeGenerator createCodeGenerator(ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
         if ("kte".equals(classInfo.extension)) {
             try {
                 Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinCodeGenerator");
@@ -345,17 +351,13 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public boolean hasChanged(String name) {
-        if (codeResolver.hasChanged(name)) {
-            return true;
-        }
-
-        LinkedHashSet<String> dependencies = templateDependencies.get(name);
+        LinkedHashSet<TemplateDependency> dependencies = this.templateDependencies.get(name);
         if (dependencies == null) {
             return false;
         }
 
-        for (String dependency : dependencies) {
-            if (codeResolver.hasChanged(dependency)) {
+        for (TemplateDependency dependency : dependencies) {
+            if (codeResolver.getLastModified(dependency.getName()) > dependency.getLastCompiledTimestamp()) {
                 return true;
             }
         }
@@ -365,9 +367,11 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public List<String> getTemplatesUsing(String name) {
+        TemplateDependency dependency = new TemplateDependency(name, 0);
+
         List<String> result = new ArrayList<>();
-        for (Map.Entry<String, LinkedHashSet<String>> dependencies : templateDependencies.entrySet()) {
-            if (dependencies.getValue().contains(name)) {
+        for (Map.Entry<String, LinkedHashSet<TemplateDependency>> dependencies : templateDependencies.entrySet()) {
+            if (dependencies.getValue().contains(dependency)) {
                 result.add(dependencies.getKey());
             }
         }

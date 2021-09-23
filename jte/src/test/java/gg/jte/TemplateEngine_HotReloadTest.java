@@ -56,9 +56,28 @@ class TemplateEngine_HotReloadTest {
         thenTemplateOutputIs("Hello hot reload!!!");
     }
 
+    @Test
+    void tagUsedByTemplates() {
+        whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
+        whenFileIsWritten("test1.jte", "@param String name\ntest1: @tag.name(name)");
+        whenFileIsWritten("test2.jte", "@param String name\ntest2: @tag.name(name)");
+        thenTemplateOutputIs("test1.jte", "test1: Hello hot reload!");
+        thenTemplateOutputIs("test2.jte", "test2: Hello hot reload!");
+
+        TestUtils.sleepIfLegacyJavaVersion(1000); // File.getLastModified() only has seconds precision on most Java 8 versions
+
+        whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!!!");
+        thenTemplateOutputIs("test1.jte", "test1: Hello hot reload!!!");
+        thenTemplateOutputIs("test2.jte", "test2: Hello hot reload!!!");
+    }
+
     private void thenTemplateOutputIs(String expected) {
+        thenTemplateOutputIs(TEMPLATE, expected);
+    }
+
+    private void thenTemplateOutputIs(String name, String expected) {
         StringOutput output = new StringOutput();
-        templateEngine.render(TEMPLATE, "hot reload", output);
+        templateEngine.render(name, "hot reload", output);
         assertThat(output.toString()).isEqualTo(expected);
     }
 

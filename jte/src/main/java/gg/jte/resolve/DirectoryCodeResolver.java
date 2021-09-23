@@ -8,14 +8,11 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DirectoryCodeResolver implements CodeResolver {
     private final Path root;
-    private final ConcurrentMap<String, Long> modificationTimes = new ConcurrentHashMap<>();
 
     public DirectoryCodeResolver(Path root) {
         this.root = root;
@@ -26,7 +23,6 @@ public class DirectoryCodeResolver implements CodeResolver {
         try {
             Path file = root.resolve(name);
             byte[] bytes = Files.readAllBytes(file);
-            modificationTimes.put(name, getLastModified(file));
             return new String(bytes, StandardCharsets.UTF_8);
         } catch (NoSuchFileException e) {
             return null;
@@ -42,15 +38,8 @@ public class DirectoryCodeResolver implements CodeResolver {
     }
 
     @Override
-    public boolean hasChanged(String name) {
-        Long lastResolveTime = modificationTimes.get(name);
-        if (lastResolveTime == null) {
-            return true;
-        }
-
-        long lastModified = getLastModified(root.resolve(name));
-
-        return lastModified != lastResolveTime;
+    public long getLastModified(String name) {
+        return getLastModified(root.resolve(name));
     }
 
     private long getLastModified(Path file) {

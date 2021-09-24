@@ -1,45 +1,34 @@
 package gg.jte.compiler;
 
-import java.util.Objects;
-
 public final class TemplateDependency {
-    private final TemplateDependencyShared shared;
-    private long lastLoadedTimestamp;
+    private final String name;
+    private final long lastCompiledTimestamp;
 
-    public TemplateDependency(TemplateDependencyShared shared) {
-        this.shared = shared;
+    public TemplateDependency(String name, long lastCompiledTimestamp) {
+        this.name = name;
+        this.lastCompiledTimestamp = lastCompiledTimestamp;
     }
 
     public String getName() {
-        return shared.getName();
-    }
-
-    public long getLastLoadedTimestamp() {
-        return lastLoadedTimestamp;
-    }
-
-    public void setLastLoadedTimestamp(long lastLoadedTimestamp) {
-        this.lastLoadedTimestamp = lastLoadedTimestamp;
+        return name;
     }
 
     public long getLastCompiledTimestamp() {
-        return shared.getLastCompiledTimestamp();
-    }
-
-    public void setLastCompiledTimestamp(long lastCompiledTimestamp) {
-        shared.setLastCompiledTimestamp(lastCompiledTimestamp);
+        return lastCompiledTimestamp;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         TemplateDependency that = (TemplateDependency) o;
-        return shared.equals(that.shared);
+
+        return name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(shared);
+        return name.hashCode();
     }
 }

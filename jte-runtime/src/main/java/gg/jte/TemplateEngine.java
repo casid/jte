@@ -368,7 +368,7 @@ public final class TemplateEngine {
         if (templateMode == TemplateMode.OnDemand && templateLoader.hasChanged(name)) {
             synchronized (templateCache) {
                 if (templateLoader.hasChanged(name)) {
-                    Template template = templateLoader.loadChanges(name);
+                    Template template = templateLoader.load(name);
                     templateCache.put(name, template);
                     return template;
                 }

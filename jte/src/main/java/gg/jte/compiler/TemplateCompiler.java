@@ -27,7 +27,6 @@ public class TemplateCompiler extends TemplateLoader {
     private final CodeResolver codeResolver;
     private final ClassLoader parentClassLoader;
 
-    private final ConcurrentHashMap<String, TemplateDependencyShared> templateDependenciesShared = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, LinkedHashSet<TemplateDependency>> templateDependencies = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
@@ -44,33 +43,7 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public Template load(String name) {
         precompile(Collections.singletonList(name));
-        markDependenciesAsLoaded(name);
         return super.load(name);
-    }
-
-    @Override
-    public Template loadChanges(String name) {
-        List<String> dependenciesToRecompile = getDependenciesToRecompile(name);
-        precompile(dependenciesToRecompile);
-        mergeCompiledDependencies(name, dependenciesToRecompile);
-        markDependenciesAsLoaded(name);
-        return super.load(name);
-    }
-
-    private void mergeCompiledDependencies(String name, List<String> compiledDependencies) {
-        LinkedHashSet<TemplateDependency> rootDependencies = this.templateDependencies.get(name);
-
-        for (String compiledDependency : compiledDependencies) {
-            LinkedHashSet<TemplateDependency> templateDependencies = this.templateDependencies.get(compiledDependency);
-            rootDependencies.addAll(templateDependencies);
-        }
-    }
-
-    private void markDependenciesAsLoaded(String name) {
-        LinkedHashSet<TemplateDependency> templateDependencies = this.templateDependencies.get(name);
-        for (TemplateDependency templateDependency : templateDependencies) {
-            templateDependency.setLastLoadedTimestamp(codeResolver.getLastModified(templateDependency.getName()));
-        }
     }
 
     @Override
@@ -181,18 +154,7 @@ public class TemplateCompiler extends TemplateLoader {
             javaCompiler.compile(javaFiles, javaCompilerClassPath, config, classDirectory, templateByClassName);
         }
 
-        markDependenciesAsCompiled(names);
-
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
-    }
-
-    private void markDependenciesAsCompiled(List<String> names) {
-        for (String name : names) {
-            LinkedHashSet<TemplateDependency> templateDependencies = this.templateDependencies.get(name);
-            for (TemplateDependency templateDependency : templateDependencies) {
-                templateDependency.setLastCompiledTimestamp(codeResolver.getLastModified(templateDependency.getName()));
-            }
-        }
     }
 
     private List<String> getClassPath() {
@@ -290,14 +252,9 @@ public class TemplateCompiler extends TemplateLoader {
         }
     }
 
-    private TemplateDependency initTemplateDependency(String name) {
-        TemplateDependencyShared shared = templateDependenciesShared.computeIfAbsent(name, TemplateDependencyShared::new);
-        return new TemplateDependency(shared);
-    }
-
     private LinkedHashSet<TemplateDependency> initTemplateDependencies(String name) {
         LinkedHashSet<TemplateDependency> templateDependencies = new LinkedHashSet<>();
-        templateDependencies.add(initTemplateDependency(name));
+        templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
         return templateDependencies;
     }
 
@@ -342,7 +299,7 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     public ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo) {
-        templateDependencies.add(initTemplateDependency(name));
+        templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
         ClassInfo classInfo = new ClassInfo(name, config.packageName);
 
         ClassDefinition classDefinition = new ClassDefinition(classInfo.fullName, classInfo);
@@ -400,7 +357,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         for (TemplateDependency dependency : dependencies) {
-            if (codeResolver.getLastModified(dependency.getName()) > dependency.getLastLoadedTimestamp()) {
+            if (codeResolver.getLastModified(dependency.getName()) > dependency.getLastCompiledTimestamp()) {
                 return true;
             }
         }
@@ -410,26 +367,12 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public List<String> getTemplatesUsing(String name) {
-        TemplateDependency dependency = initTemplateDependency(name);
+        TemplateDependency dependency = new TemplateDependency(name, 0);
 
         List<String> result = new ArrayList<>();
         for (Map.Entry<String, LinkedHashSet<TemplateDependency>> dependencies : templateDependencies.entrySet()) {
             if (dependencies.getValue().contains(dependency)) {
                 result.add(dependencies.getKey());
-            }
-        }
-
-        return result;
-    }
-
-    private List<String> getDependenciesToRecompile(String name) {
-        LinkedHashSet<TemplateDependency> dependencies = this.templateDependencies.get(name);
-
-        List<String> result = new ArrayList<>();
-
-        for (TemplateDependency dependency : dependencies) {
-            if (codeResolver.getLastModified(dependency.getName()) > dependency.getLastCompiledTimestamp()) {
-                result.add(dependency.getName());
             }
         }
 

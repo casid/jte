@@ -1,4 +1,4 @@
-<img align="left" alt="jte" src="jte.svg" width="128">jte is a secure and lightweight template engine for Java. All jte templates are compiled to Java class files, meaning jte adds essentially zero overhead to your application. jte is designed to introduce as few new keywords as possible and builds upon existing Java features, so that it is very easy to reason about what a template does. The <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offers full completion and refactoring support for Java parts as well as for jte keywords. Supports Java 8 or higher.
+<img align="left" alt="jte" src="jte.svg" width="128">jte is a secure and lightweight template engine for Java and Kotlin. All jte templates are compiled to Java class files, meaning jte adds essentially zero overhead to your application. jte is designed to introduce as few new keywords as possible and builds upon existing Java features, so that it is very easy to reason about what a template does. The <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> offers full completion and refactoring support for Java parts as well as for jte keywords. Supports Java 8 or higher.
 <br clear="left">
 
 [![Build Status](https://github.com/casid/jte/workflows/Test%20all%20JDKs%20on%20all%20OSes/badge.svg)](https://github.com/casid/jte/actions)
@@ -127,7 +127,7 @@ jte is available on <a href="http://mvnrepository.com/artifact/gg.jte/jte">Maven
 <dependency>
     <groupId>gg.jte</groupId>
     <artifactId>jte</artifactId>
-    <version>1.11.4</version>
+    <version>1.12.0</version>
 </dependency>
 ```
 

@@ -364,6 +364,14 @@ public final class TemplateEngine {
         return templateLoader.precompileAll();
     }
 
+    /**
+     * Clears all cached templates.
+     * Future invocations of render methods will result in reloaded template classes.
+     */
+    public void clearCache() {
+        templateCache.clear();
+    }
+
     private Template resolveTemplate(String name) {
         if (templateMode == TemplateMode.OnDemand && templateLoader.hasChanged(name)) {
             synchronized (templateCache) {

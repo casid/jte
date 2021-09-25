@@ -9,7 +9,7 @@
     <parent>
         <groupId>gg.jte</groupId>
         <artifactId>jte-parent</artifactId>
-        <version>1.11.5-SNAPSHOT</version>
+        <version>1.12.0</version>
     </parent>
 
     <name>jte-maven-plugin</name>

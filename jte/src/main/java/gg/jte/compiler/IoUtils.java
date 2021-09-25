@@ -1,14 +1,23 @@
 package gg.jte.compiler;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public final class IoUtils {
+
+    public static String toString(Path file) {
+        try {
+            byte[] bytes = Files.readAllBytes(file);
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public static String toString(InputStream inputStream) throws IOException {
         ByteArrayOutputStream result = new ByteArrayOutputStream();

@@ -65,4 +65,8 @@ public class RuntimeTemplateLoader extends TemplateLoader {
         return false;
     }
 
+    @Override
+    public Template hotReload(String name) {
+        return load(name);
+    }
 }

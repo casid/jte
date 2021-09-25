@@ -47,6 +47,18 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     @Override
+    public Template hotReload(String name) {
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(Collections.singletonList(name), true);
+        classDefinitions.removeIf(c -> !c.isChanged());
+
+        if (!classDefinitions.isEmpty()) {
+            precompileClasses(classDefinitions);
+        }
+
+        return super.load(name);
+    }
+
+    @Override
     protected ClassInfo getClassInfo(ClassLoader classLoader, String className) {
         return templateByClassName.get(className);
     }
@@ -63,7 +75,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public List<String> generateAll() {
-        LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames());
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames(), false);
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
@@ -121,8 +133,11 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     public List<String> precompile(List<String> names) {
-        LinkedHashSet<ClassDefinition> classDefinitions = generate(names);
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(names, false);
+        return precompileClasses(classDefinitions);
+    }
 
+    private List<String> precompileClasses(LinkedHashSet<ClassDefinition> classDefinitions) {
         List<String> classPath = getClassPath();
 
         Set<String> extensions = new HashSet<>();
@@ -134,9 +149,12 @@ public class TemplateCompiler extends TemplateLoader {
             extensions.add(classDefinition.getExtension());
         }
 
+        List<String> javaCompilerClassPath = new ArrayList<>(classPath);
+        javaCompilerClassPath.add(classDirectory.toAbsolutePath().toString());
+
         if (extensions.size() == 1) {
             ClassCompiler compiler = createCompiler(extensions.iterator().next());
-            compiler.compile(files, classPath, config, classDirectory, templateByClassName);
+            compiler.compile(files, javaCompilerClassPath, config, classDirectory, templateByClassName);
         } else if (extensions.size() > 1) {
             // As there is currently only support for java and kotlin as expression language, this is the java / kotlin case.
             // We first need to compile all kotlin classes while passing generate .java files to the kotlin compiler.
@@ -147,10 +165,8 @@ public class TemplateCompiler extends TemplateLoader {
             kotlinCompiler.compile(files, classPath, config, classDirectory, templateByClassName);
 
             String[] javaFiles = Arrays.stream(files).filter(f -> f.endsWith(".java")).toArray(String[]::new);
-            ClassCompiler javaCompiler = createCompiler("java");
-            List<String> javaCompilerClassPath = new ArrayList<>(classPath);
-            javaCompilerClassPath.add(classDirectory.toAbsolutePath().toString());
 
+            ClassCompiler javaCompiler = createCompiler("java");
             javaCompiler.compile(javaFiles, javaCompilerClassPath, config, classDirectory, templateByClassName);
         }
 
@@ -188,7 +204,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
     }
 
-    private LinkedHashSet<ClassDefinition> generate(List<String> names) {
+    private LinkedHashSet<ClassDefinition> generate(List<String> names, boolean trackChanges) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
             switch (getTemplateType(name)) {
@@ -206,7 +222,13 @@ public class TemplateCompiler extends TemplateLoader {
 
         Path resourceDirectory = config.resourceDirectory == null ? classDirectory : config.resourceDirectory;
         for (ClassDefinition classDefinition : classDefinitions) {
-            try (FileOutput fileOutput = new FileOutput(classDirectory.resolve(classDefinition.getSourceFileName()))) {
+            Path sourceFile = classDirectory.resolve(classDefinition.getSourceFileName());
+            if (trackChanges) {
+                String sourceFileContent = IoUtils.toString(sourceFile);
+                classDefinition.setChanged(!classDefinition.getCode().equals(sourceFileContent));
+            }
+
+            try (FileOutput fileOutput = new FileOutput(sourceFile)) {
                 fileOutput.writeContent(classDefinition.getCode());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -357,7 +379,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         for (TemplateDependency dependency : dependencies) {
-            if (codeResolver.getLastModified(dependency.getName()) > dependency.getLastCompiledTimestamp()) {
+            if (codeResolver.getLastModified(dependency.getName()) > dependency.getLastModifiedTimestamp()) {
                 return true;
             }
         }

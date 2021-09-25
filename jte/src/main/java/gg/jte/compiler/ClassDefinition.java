@@ -9,6 +9,7 @@ public final class ClassDefinition {
     private final String extension;
     private String code;
     private List<byte[]> binaryTextParts;
+    private boolean changed = true;
 
     public ClassDefinition(String name, ClassInfo classInfo) {
         this.name = name;
@@ -62,5 +63,13 @@ public final class ClassDefinition {
 
     public String getExtension() {
         return extension;
+    }
+
+    public boolean isChanged() {
+        return changed;
+    }
+
+    public void setChanged(boolean changed) {
+        this.changed = changed;
     }
 }

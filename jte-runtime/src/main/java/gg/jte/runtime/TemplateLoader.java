@@ -31,6 +31,8 @@ public abstract class TemplateLoader {
         }
     }
 
+    public abstract Template hotReload(String name);
+
     public DebugInfo resolveDebugInfo(ClassLoader classLoader, StackTraceElement[] stackTrace) {
         if (stackTrace.length == 0) {
             return null;

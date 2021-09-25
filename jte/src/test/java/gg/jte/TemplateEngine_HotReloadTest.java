@@ -154,6 +154,19 @@ class TemplateEngine_HotReloadTest {
         thenTemplateOutputIs("Hello hot reload?!");
     }
 
+    @Test
+    void binaryContent_oneCharacterReplaced() {
+        templateEngine.setBinaryStaticContent(true);
+        whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
+        whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
+        thenTemplateOutputIs("Hello hot reload!");
+
+        waitUntilFileChangesPossible();
+
+        whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}?");
+        thenTemplateOutputIs("Hello hot reload?");
+    }
+
     private void thenTemplateOutputIs(String expected) {
         thenTemplateOutputIs(TEMPLATE, expected);
     }

@@ -2,19 +2,19 @@ package gg.jte.compiler;
 
 public final class TemplateDependency {
     private final String name;
-    private final long lastCompiledTimestamp;
+    private final long lastModifiedTimestamp;
 
-    public TemplateDependency(String name, long lastCompiledTimestamp) {
+    public TemplateDependency(String name, long lastModifiedTimestamp) {
         this.name = name;
-        this.lastCompiledTimestamp = lastCompiledTimestamp;
+        this.lastModifiedTimestamp = lastModifiedTimestamp;
     }
 
     public String getName() {
         return name;
     }
 
-    public long getLastCompiledTimestamp() {
-        return lastCompiledTimestamp;
+    public long getLastModifiedTimestamp() {
+        return lastModifiedTimestamp;
     }
 
     @Override

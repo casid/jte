@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Resolves template code within a given root directory.
+ */
 public class DirectoryCodeResolver implements CodeResolver {
     private final Path root;
 

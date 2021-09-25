@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 
+/**
+ * Resolves template code within a given resources root.
+ */
 public class ResourceCodeResolver implements CodeResolver {
     private final String root;
     private final ClassLoader classLoader;

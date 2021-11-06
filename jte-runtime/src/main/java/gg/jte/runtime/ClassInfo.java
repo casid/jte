@@ -30,7 +30,7 @@ public final class ClassInfo {
         if (startIndex == 0) {
             packageName = parentPackage;
         } else {
-            packageName = parentPackage + "." + name.substring(0, startIndex - 1).replace('/', '.');
+            packageName = parentPackage + "." + name.substring(0, startIndex - 1).replace("-", "").replace('/', '.');
         }
         fullName = packageName + "." + className;
     }

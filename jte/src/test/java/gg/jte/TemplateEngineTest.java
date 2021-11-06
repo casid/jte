@@ -784,10 +784,28 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void snakeCaseCanBeCompiled() {
-        templateName = "snake-case.jte";
+    void kebabCaseCanBeCompiled() {
+        templateName = "kebab-case.jte";
         givenTemplate("Hello");
         thenOutputIs("Hello");
+    }
+
+    @Test
+    void kebabCaseCanBeCompiled_package() {
+        templateName = "kebab-case/kebab-case.jte";
+        givenTemplate("Hello");
+        thenOutputIs("Hello");
+    }
+
+    @Test
+    void kebabCaseCanBeCompiled_tagCall() {
+        givenTag("kebab-case/kebab-case", "@param gg.jte.TemplateEngineTest.Model model\n" +
+                "@param int i = 0\n" +
+                "i is: ${i}");
+
+        givenTemplate("@tag.kebab-case/kebab-case(model = model, i = 42)");
+
+        thenOutputIs("i is: 42");
     }
 
     @Test

@@ -623,25 +623,6 @@ There is a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) yo
         </execution>
     </executions>
 </plugin>
-
-<!-- Add the generated sources, so that they get compiled -->
-<plugin>
-    <groupId>org.codehaus.mojo</groupId>
-    <artifactId>build-helper-maven-plugin</artifactId>
-    <executions>
-        <execution>
-            <phase>generate-sources</phase>
-            <goals>
-                <goal>add-source</goal>
-            </goals>
-            <configuration>
-                <sources>
-                    <source>${project.build.directory}/generated-sources/jte</source>
-                </sources>
-            </configuration>
-        </execution>
-    </executions>
-</plugin>
 ```
 
 #### Gradle

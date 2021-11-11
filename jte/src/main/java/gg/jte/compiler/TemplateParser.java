@@ -209,9 +209,9 @@ public final class TemplateParser {
                 push(Mode.Condition);
             } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
                 lastIndex = i + 1;
-                push(Mode.JavaCode);
+                push(new JavaCodeMode(currentChar));
             } else if (currentMode.isTrackBraces() && (currentChar == '(' || currentChar == '{')) {
-                push(Mode.JavaCode);
+                push(new JavaCodeMode(currentChar));
             } else if (currentMode.isTrackBraces() && (currentChar == ')' || currentChar == '}')) {
                 if (currentMode == Mode.JavaCodeParam) {
                     TagMode previousMode = getPreviousMode(TagMode.class);
@@ -220,11 +220,19 @@ public final class TemplateParser {
                             previousMode.params.add(c);
                         }
                     });
+                } else if (currentMode instanceof JavaCodeMode) {
+                    JavaCodeMode javaCodeMode = (JavaCodeMode)currentMode;
+                    char closingBrace = javaCodeMode.getClosingBrace();
+                    if (currentChar != closingBrace) {
+                        visitor.onError("Unexpected closing brace " + currentChar + ", expected " + closingBrace);
+                    }
                 }
 
                 pop();
 
-                if (currentMode == Mode.Condition) {
+                if (currentMode == Mode.Text) {
+                    visitor.onError("Unexpected closing brace " + currentChar);
+                } else if (currentMode == Mode.Condition) {
                     extract(templateCode, lastIndex, i, visitor::onConditionStart);
                     lastIndex = i + 1;
                     push(Mode.Text);
@@ -394,6 +402,10 @@ public final class TemplateParser {
     }
 
     private void extractTextPart(int endIndex, Mode mode) {
+        if (currentMode != Mode.Text) {
+            visitor.onError("Unexpected end of template expression");
+        }
+
         if (trimControlStructures) {
             extractTextPartAndTrimControlStructures(endIndex, mode);
         } else {
@@ -932,7 +944,6 @@ public final class TemplateParser {
         Mode UnsafeCode = new StatelessMode("UnsafeCode", true, true, false);
         Mode CodeStatement = new StatelessMode("CodeStatement", true, true, false);
         Mode Condition = new StatelessMode("Condition");
-        Mode JavaCode = new StatelessMode("JavaCode", true, true, false);
         Mode JavaCodeParam = new StatelessMode("JavaCodeParam", true, true, false);
         Mode JavaCodeString = new StatelessMode("JavaCodeString");
         Mode ConditionElse = new StatelessMode("ConditionElse");
@@ -1013,6 +1024,34 @@ public final class TemplateParser {
         @Override
         public boolean isComment() {
             return false;
+        }
+    }
+
+    private static class JavaCodeMode implements Mode {
+
+        private final char closingBrace;
+
+        public JavaCodeMode(char openingBrace) {
+            this.closingBrace = openingBrace == '(' ? ')' : '}';
+        }
+
+        @Override
+        public boolean isTrackStrings() {
+            return true;
+        }
+
+        @Override
+        public boolean isTrackBraces() {
+            return true;
+        }
+
+        @Override
+        public boolean isComment() {
+            return false;
+        }
+
+        public char getClosingBrace() {
+            return closingBrace;
         }
     }
 

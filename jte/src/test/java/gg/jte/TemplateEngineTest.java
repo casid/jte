@@ -954,6 +954,52 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void brace_unclosed() {
+        givenTemplate("${model.isCaseA(}");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Unexpected closing brace }, expected )");
+    }
+
+    @Test
+    void brace_closedOnceMore() {
+        givenTemplate("${model.isCaseA())}");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Unexpected closing brace )");
+    }
+
+    @Test
+    void brace_allUnclosed() {
+        givenTemplate("${model.isCaseA(");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Unexpected end of template expression");
+    }
+
+    @Test
+    void brace_unclosed_string() {
+        givenTemplate("!{model.setHello(\n" +
+                "\")}{(test)}{(\"\n" +
+                ";}");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 4: Unexpected closing brace }, expected )");
+    }
+
+    @Test
+    void brace_closedOnceMore_string() {
+        givenTemplate("${model.setHello(\n" +
+                "\")}{(test)}{(\"\n" +
+                "))}");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 4: Unexpected closing brace )");
+    }
+
+    @Test
+    void brace_allUnclosed_string() {
+        givenTemplate("!{model.setHello(\"foo{{{{{)\"");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Unexpected end of template expression");
+    }
+
+    @Test
     void emptyTemplate() {
         givenRawTemplate("");
         thenOutputIs("");
@@ -1193,6 +1239,10 @@ public class TemplateEngineTest {
 
         public boolean isCaseB() {
             return false;
+        }
+
+        public void setHello(String hello) {
+            this.hello = hello;
         }
 
         public String getThatThrows() {

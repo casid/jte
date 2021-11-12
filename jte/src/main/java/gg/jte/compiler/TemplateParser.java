@@ -207,7 +207,7 @@ public final class TemplateParser {
                 extractTextPart(i - 2, Mode.Condition);
                 lastIndex = i + 1;
                 push(Mode.Condition);
-            } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
+            } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse || currentMode == Mode.ForLoop)) {
                 lastIndex = i + 1;
                 push(new JavaCodeMode(currentChar, getCurrentTemplateLine()));
             } else if (currentMode.isTrackBraces() && (currentChar == '(' || currentChar == '{')) {
@@ -238,6 +238,10 @@ public final class TemplateParser {
                     push(Mode.Text);
                 } else if (currentMode == Mode.ConditionElse) {
                     extract(templateCode, lastIndex, i, visitor::onConditionElse);
+                    lastIndex = i + 1;
+                    push(Mode.Text);
+                } else if (currentMode == Mode.ForLoop) {
+                    extract(templateCode, lastIndex, i, visitor::onForLoopStart);
                     lastIndex = i + 1;
                     push(Mode.Text);
                 } else if (currentMode instanceof TagMode) {
@@ -296,18 +300,6 @@ public final class TemplateParser {
                 extractTextPart(i - 3, Mode.ForLoop);
                 lastIndex = i + 1;
                 push(Mode.ForLoop);
-            } else if (currentChar == '(' && currentMode == Mode.ForLoop) {
-                lastIndex = i + 1;
-                push(Mode.ForLoopCode);
-            } else if (currentChar == '(' && currentMode == Mode.ForLoopCode) {
-                push(Mode.ForLoopCode);
-            } else if (currentChar == ')' && currentMode == Mode.ForLoopCode) {
-                pop();
-                if (currentMode == Mode.ForLoop) {
-                    extract(templateCode, lastIndex, i, visitor::onForLoopStart);
-                    lastIndex = i + 1;
-                    push(Mode.Text);
-                }
             } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && isKeywordAllowed()) {
                 extractTextPart(i - 6, Mode.ForLoopEnd);
                 lastIndex = i + 1;
@@ -985,7 +977,6 @@ public final class TemplateParser {
         Mode ConditionElse = new StatelessMode("ConditionElse");
         Mode ConditionEnd = new StatelessMode("ConditionEnd");
         Mode ForLoop = new StatelessMode("ForLoop");
-        Mode ForLoopCode = new StatelessMode("ForLoopCode", true, false, false);
         Mode ForLoopEnd = new StatelessMode("ForLoopEnd");
         Mode TagName = new StatelessMode("TagName");
         Mode Comment = new StatelessMode("Comment");

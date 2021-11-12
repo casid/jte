@@ -1009,10 +1009,19 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void brace_if_unclosed_else() {
+    void brace_if_unclosed_elseif() {
         givenTemplate("@if(model.isCaseA()\n" +
                 "foo\n" +
                 "@elseif(model.isCaseB())\n");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Missing closing brace )");
+    }
+
+    @Test
+    void brace_if_unclosed_else() {
+        givenTemplate("@if(model.isCaseA()\n" +
+                "foo\n" +
+                "@else\n");
         thenRenderingFailsWithException()
                 .hasMessage("Failed to compile test/template.jte, error at line 2: Missing closing brace )");
     }

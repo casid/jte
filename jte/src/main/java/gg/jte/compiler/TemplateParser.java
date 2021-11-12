@@ -274,7 +274,7 @@ public final class TemplateParser {
 
                 visitor.onConditionElse(depth);
                 push(Mode.Text);
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f' && isKeywordAllowed()) {
+            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
                 extractTextPart(i - 6, Mode.ConditionElse);
                 lastIndex = i + 1;
 
@@ -286,7 +286,7 @@ public final class TemplateParser {
 
                 push(Mode.ConditionElse);
 
-            } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && isKeywordAllowed()) {
+            } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
                 extractTextPart(i - 5, Mode.ConditionEnd);
                 lastIndex = i + 1;
 
@@ -300,7 +300,7 @@ public final class TemplateParser {
                 extractTextPart(i - 3, Mode.ForLoop);
                 lastIndex = i + 1;
                 push(Mode.ForLoop);
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && isKeywordAllowed()) {
+            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
                 extractTextPart(i - 6, Mode.ForLoopEnd);
                 lastIndex = i + 1;
 
@@ -369,15 +369,6 @@ public final class TemplateParser {
         } else if (currentMode == Mode.ForLoop) {
             visitor.onError("Missing @endfor");
         }
-    }
-
-    private boolean isKeywordAllowed() {
-        if (currentMode instanceof JavaCodeMode) {
-            JavaCodeMode mode = (JavaCodeMode)currentMode;
-            visitor.onError("Missing closing brace " + mode.getClosingBrace(), mode.getTemplateLine());
-        }
-
-        return currentMode == Mode.Text;
     }
 
     private int getCurrentTemplateLine() {

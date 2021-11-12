@@ -209,9 +209,9 @@ public final class TemplateParser {
                 push(Mode.Condition);
             } else if (currentChar == '(' && (currentMode == Mode.Condition || currentMode == Mode.ConditionElse)) {
                 lastIndex = i + 1;
-                push(new JavaCodeMode(currentChar));
+                push(new JavaCodeMode(currentChar, getCurrentTemplateLine()));
             } else if (currentMode.isTrackBraces() && (currentChar == '(' || currentChar == '{')) {
-                push(new JavaCodeMode(currentChar));
+                push(new JavaCodeMode(currentChar, getCurrentTemplateLine()));
             } else if (currentMode.isTrackBraces() && (currentChar == ')' || currentChar == '}')) {
                 if (currentMode == Mode.JavaCodeParam) {
                     TagMode previousMode = getPreviousMode(TagMode.class);
@@ -270,7 +270,7 @@ public final class TemplateParser {
 
                 visitor.onConditionElse(depth);
                 push(Mode.Text);
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f' && isKeywordAllowed()) {
                 extractTextPart(i - 6, Mode.ConditionElse);
                 lastIndex = i + 1;
 
@@ -282,7 +282,7 @@ public final class TemplateParser {
 
                 push(Mode.ConditionElse);
 
-            } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+            } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && isKeywordAllowed()) {
                 extractTextPart(i - 5, Mode.ConditionEnd);
                 lastIndex = i + 1;
 
@@ -308,7 +308,7 @@ public final class TemplateParser {
                     lastIndex = i + 1;
                     push(Mode.Text);
                 }
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
+            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && isKeywordAllowed()) {
                 extractTextPart(i - 6, Mode.ForLoopEnd);
                 lastIndex = i + 1;
 
@@ -350,6 +350,10 @@ public final class TemplateParser {
             }
         }
 
+        if (stack.size() > 1) {
+            handleUnclosedKeywords();
+        }
+
         if (lastIndex < endIndex) {
             extractTextPart(endIndex, null);
         }
@@ -358,6 +362,38 @@ public final class TemplateParser {
             completeParamsIfRequired();
             visitor.onComplete();
         }
+    }
+
+    private void handleUnclosedKeywords() {
+        while (currentMode == Mode.Text) {
+            pop();
+        }
+
+        if (currentMode instanceof JavaCodeMode) {
+            JavaCodeMode mode = (JavaCodeMode)currentMode;
+            visitor.onError("Missing closing brace " + mode.getClosingBrace(), mode.getTemplateLine());
+        } else if (currentMode == Mode.Condition || currentMode == Mode.ConditionElse) {
+            visitor.onError("Missing @endif");
+        } else if (currentMode == Mode.ForLoop) {
+            visitor.onError("Missing @endfor");
+        }
+    }
+
+    private boolean isKeywordAllowed() {
+        if (currentMode instanceof JavaCodeMode) {
+            JavaCodeMode mode = (JavaCodeMode)currentMode;
+            visitor.onError("Missing closing brace " + mode.getClosingBrace(), mode.getTemplateLine());
+        }
+
+        return currentMode == Mode.Text;
+    }
+
+    private int getCurrentTemplateLine() {
+        if (visitor instanceof CodeGenerator) {
+            return ((CodeGenerator)visitor).getCurrentTemplateLine();
+        }
+
+        return 0;
     }
 
     private boolean isCommentAllowed() {
@@ -1030,9 +1066,11 @@ public final class TemplateParser {
     private static class JavaCodeMode implements Mode {
 
         private final char closingBrace;
+        private final int templateLine;
 
-        public JavaCodeMode(char openingBrace) {
+        public JavaCodeMode(char openingBrace, int templateLine) {
             this.closingBrace = openingBrace == '(' ? ')' : '}';
+            this.templateLine = templateLine;
         }
 
         @Override
@@ -1052,6 +1090,10 @@ public final class TemplateParser {
 
         public char getClosingBrace() {
             return closingBrace;
+        }
+
+        public int getTemplateLine() {
+            return templateLine;
         }
     }
 

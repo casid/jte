@@ -971,7 +971,7 @@ public class TemplateEngineTest {
     void brace_allUnclosed() {
         givenTemplate("${model.isCaseA(");
         thenRenderingFailsWithException()
-                .hasMessage("Failed to compile test/template.jte, error at line 2: Unexpected end of template expression");
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Missing closing brace )");
     }
 
     @Test
@@ -996,7 +996,59 @@ public class TemplateEngineTest {
     void brace_allUnclosed_string() {
         givenTemplate("!{model.setHello(\"foo{{{{{)\"");
         thenRenderingFailsWithException()
-                .hasMessage("Failed to compile test/template.jte, error at line 2: Unexpected end of template expression");
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Missing closing brace )");
+    }
+
+    @Test
+    void brace_if_unclosed() {
+        givenTemplate("@if(model.isCaseA()\n" +
+                "foo\n" +
+                "@endif");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Missing closing brace )");
+    }
+
+    @Test
+    void brace_if_unclosed_else() {
+        givenTemplate("@if(model.isCaseA()\n" +
+                "foo\n" +
+                "@elseif(model.isCaseB())\n");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Missing closing brace )");
+    }
+
+    @Test
+    void brace_for_unclosed() {
+        givenTemplate("@for(int i = 0; i < model.getAnotherWorld().length; ++i\n" +
+                "foo\n" +
+                "@endfor");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 2: Missing closing brace )");
+    }
+
+    @Test
+    void if_missing_endif() {
+        givenTemplate("@if(model.isCaseA())\n" +
+                "foo\n");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 4: Missing @endif");
+    }
+
+    @Test
+    void elseif_missing_endif() {
+        givenTemplate("@if(model.isCaseA())\n" +
+                "foo\n" +
+                "@elseif(model.isCaseB())\n");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 5: Missing @endif");
+    }
+
+    @Test
+    void for_missing_endfor() {
+        givenTemplate("@for(int i = 0; i < 10; ++i)\n" +
+                "foo\n");
+        thenRenderingFailsWithException()
+                .hasMessage("Failed to compile test/template.jte, error at line 4: Missing @endfor");
     }
 
     @Test

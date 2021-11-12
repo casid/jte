@@ -7,6 +7,8 @@ public interface CodeGenerator extends TemplateParserVisitor {
 
     List<byte[]> getBinaryTextParts();
 
+    int getCurrentTemplateLine();
+
     static void writeAttributeMap(CodeBuilder code, TemplateParser.HtmlTag htmlTag) {
         code.append("gg.jte.runtime.TemplateUtils.toMap(");
         boolean firstWritten = false;

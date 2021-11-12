@@ -43,6 +43,8 @@ public interface TemplateParserVisitor {
 
     void onError(String message);
 
+    void onError(String message, int templateLine);
+
     void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag);
 
     void onInterceptHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute);

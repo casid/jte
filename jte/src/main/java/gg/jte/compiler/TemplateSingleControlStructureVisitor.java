@@ -106,6 +106,11 @@ class TemplateSingleControlStructureVisitor implements TemplateParserVisitor {
     }
 
     @Override
+    public void onError(String message, int templateLine) {
+        // not relevant
+    }
+
+    @Override
     public void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
         // not relevant
     }

@@ -55,7 +55,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onParam(String parameter) {
-        ParamInfo paramInfo = JavaParamInfo.parse(parameter, this, javaCode.getCurrentTemplateLine());
+        ParamInfo paramInfo = JavaParamInfo.parse(parameter, this, getCurrentTemplateLine());
 
         writePackageIfRequired();
         if (!hasWrittenClass) {
@@ -222,6 +222,12 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     @Override
+    public void onError(String message, int templateLine) {
+        DebugInfo debugInfo = getDebugInfo(templateLine);
+        throw new TemplateException("Failed to compile " + debugInfo.name + ", error at line " + debugInfo.line + ": " + message);
+    }
+
+    @Override
     public void onTextPart(int depth, String textPart) {
         if (textPart.isEmpty()) {
             return;
@@ -236,7 +242,6 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     private void writeTextBinary(int depth, String textPart) {
         writeIndentation(depth);
-
 
         javaCode.append("jteOutput.writeBinaryContent(");
         javaCode.append(TEXT_PART_BINARY).append(binaryTextParts.size());
@@ -436,7 +441,16 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private DebugInfo getCurrentDebugInfo() {
-        return new DebugInfo(classInfo.name, javaCode.getCurrentTemplateLine() + 1);
+        return getDebugInfo(getCurrentTemplateLine());
+    }
+
+    private DebugInfo getDebugInfo(int templateLine) {
+        return new DebugInfo(classInfo.name, templateLine + 1);
+    }
+
+    @Override
+    public int getCurrentTemplateLine() {
+        return javaCode.getCurrentTemplateLine();
     }
 
     private void appendParams(int depth, String name, List<String> params) {
@@ -487,7 +501,7 @@ public class JavaCodeGenerator implements CodeGenerator {
             }
         }
 
-        throw new TemplateException("Failed to compile template, error at " + classInfo.name + ":" + javaCode.getCurrentTemplateLine() + ". No parameter with name " + paramCallInfo.name + " is defined in " + name);
+        throw new TemplateException("Failed to compile template, error at " + classInfo.name + ":" + getCurrentTemplateLine() + ". No parameter with name " + paramCallInfo.name + " is defined in " + name);
     }
 
     private void writeIndentation(int depth) {

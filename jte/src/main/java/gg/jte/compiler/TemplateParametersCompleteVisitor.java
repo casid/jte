@@ -102,6 +102,11 @@ class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
     }
 
     @Override
+    public void onError(String message, int templateLine) {
+
+    }
+
+    @Override
     public void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
 
     }

@@ -22,7 +22,7 @@
         <dependency>
             <groupId>gg.jte</groupId>
             <artifactId>jte</artifactId>
-            <version>1.12.1-SNAPSHOT</version>
+            <version>1.12.1</version>
         </dependency>
 
         <dependency>

@@ -6,7 +6,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.UnknownTaskException;
 import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskProvider;
 
@@ -42,8 +42,8 @@ public class JteGradle implements Plugin<Project> {
     }
 
     private SourceSet getMainSourceSet(Project project) {
-        JavaPluginConvention javaPluginConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-        return javaPluginConvention.getSourceSets().findByName("main");
+        JavaPluginExtension javaPluginExtension = project.getExtensions().getByType(JavaPluginExtension.class);
+        return javaPluginExtension.getSourceSets().findByName("main");
     }
 
     private void defaults(Project project, JteExtension extension, SourceSet main) {

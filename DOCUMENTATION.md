@@ -571,12 +571,32 @@ jte {
 
 In case you would like to build a self-contained JAR, you can add this to your build.gradle:
 
+<details open>
+<summary>Groovy</summary>
+
 ```groovy
-from fileTree("jte-classes") {
-    include "**/*.class"
-    include "**/*.bin" // Only required if you use binary templates
+jar {
+    dependsOn precompileJte
+    from fileTree("jte-classes") {
+        include "**/*.class"
+    }
 }
 ```
+
+</details>
+<details>
+<summary>Kotlin</summary>
+
+```kotlin
+tasks.jar {
+  dependsOn(tasks.precompileJte)
+  from(fileTree("jte-classes") {
+    include("**/*.class")
+  })
+}
+```
+
+</details>
 
 And init the template engine like this for production builds:
 

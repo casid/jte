@@ -579,6 +579,7 @@ jar {
     dependsOn precompileJte
     from fileTree("jte-classes") {
         include "**/*.class"
+        include "**/*.bin" // Only required if you use binary templates
     }
 }
 ```
@@ -589,10 +590,11 @@ jar {
 
 ```kotlin
 tasks.jar {
-  dependsOn(tasks.precompileJte)
-  from(fileTree("jte-classes") {
-    include("**/*.class")
-  })
+    dependsOn(tasks.precompileJte)
+    from(fileTree("jte-classes") {
+        include("**/*.class")
+        include("**/*.bin") // Only required if you use binary templates
+    })
 }
 ```
 
@@ -665,7 +667,7 @@ dependencies {
 }
 
 jte {
-  generate()
+    generate()
 }
 ```
 

@@ -23,3 +23,10 @@ dependencies {
 jte {
     precompile()
 }
+
+jar {
+    dependsOn precompileJte
+    from fileTree("jte-classes") {
+        include "**/*.class"
+    }
+}

@@ -49,7 +49,7 @@ public class DirectoryWatcher {
             return io.methvin.watcher.DirectoryWatcher.builder()
                     .path(root)
                     .listener(event -> {
-                        if (event.eventType() != DirectoryChangeEvent.EventType.MODIFY) {
+                        if (!isRelevantEventType(event)) {
                             return;
                         }
 
@@ -74,5 +74,9 @@ public class DirectoryWatcher {
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to initialize watcher for directory " + root, e);
         }
+    }
+
+    private boolean isRelevantEventType(DirectoryChangeEvent event) {
+        return event.eventType() == DirectoryChangeEvent.EventType.MODIFY || event.eventType() == DirectoryChangeEvent.EventType.CREATE;
     }
 }

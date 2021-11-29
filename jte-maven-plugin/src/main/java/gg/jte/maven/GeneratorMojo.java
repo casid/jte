@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_SOURCES;
 
-@Mojo(name = "generate", defaultPhase = GENERATE_SOURCES)
+@Mojo(name = "generate", defaultPhase = GENERATE_SOURCES, threadSafe = true)
 public class GeneratorMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}")

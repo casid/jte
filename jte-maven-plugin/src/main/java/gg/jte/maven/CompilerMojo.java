@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import static org.apache.maven.plugins.annotations.LifecyclePhase.PROCESS_CLASSES;
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE;
 
-@Mojo(name = "precompile", defaultPhase = PROCESS_CLASSES, requiresDependencyResolution = COMPILE)
+@Mojo(name = "precompile", defaultPhase = PROCESS_CLASSES, requiresDependencyResolution = COMPILE, threadSafe = true)
 public class CompilerMojo extends AbstractMojo {
 
     /**

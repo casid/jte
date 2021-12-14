@@ -2,4 +2,4 @@
 
 @param model:Model
 
-${model.getThatThrows()}
+${model.thatThrows}

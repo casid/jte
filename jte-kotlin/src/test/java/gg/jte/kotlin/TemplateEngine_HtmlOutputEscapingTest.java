@@ -1049,7 +1049,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.kte", "ignored", output));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.kte, error at line 4: @tag calls in <script> blocks are not allowed.");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.kte, error at line 4: Template calls in <script> blocks are not allowed.");
     }
 
     @Test
@@ -1059,7 +1059,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.kte", "ignored", output));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.kte, error at line 4: @layout calls in <script> blocks are not allowed.");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.kte, error at line 4: Template calls in <script> blocks are not allowed.");
     }
 
     @Test

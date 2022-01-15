@@ -385,8 +385,8 @@ public class KotlinCodeGenerator implements CodeGenerator {
     }
 
     @Override
-    public void onTag(int depth, TemplateType type, String name, List<String> params) {
-        ClassInfo tagInfo = compiler.generateTagOrLayout(type, name, "kte", classDefinitions, templateDependencies, getCurrentDebugInfo());
+    public void onTemplateCall(int depth, String name, List<String> params) {
+        ClassInfo tagInfo = compiler.generateTemplateCall(name, "kte", classDefinitions, templateDependencies, getCurrentDebugInfo());
 
         writeIndentation(depth);
 

@@ -20,7 +20,7 @@ class TemplateParametersCompleteVisitorTest {
         visitor.onConditionEnd(0);
         visitor.onForLoopStart(0, null);
         visitor.onForLoopEnd(0);
-        visitor.onTag(0, null, null, null);
+        visitor.onTemplateCall(0, null, null);
         visitor.onLineFinished();
         visitor.onComplete();
         visitor.onError(null);

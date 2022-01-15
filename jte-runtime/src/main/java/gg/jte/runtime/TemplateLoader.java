@@ -21,11 +21,9 @@ public abstract class TemplateLoader {
     public Template load(String name) {
         ClassInfo templateInfo = new ClassInfo(name, packageName);
 
-        TemplateType templateType = getTemplateType(name);
-
         try {
             Class<?> clazz = getClassLoader().loadClass(templateInfo.fullName);
-            return new Template(name, templateType, clazz);
+            return new Template(name, clazz);
         } catch (Exception e) {
             throw new TemplateNotFoundException("Failed to load " + name, e);
         }
@@ -91,18 +89,6 @@ public abstract class TemplateLoader {
         }
 
         return codeLineToTemplateLine[lineIndex] + 1;
-    }
-
-    protected TemplateType getTemplateType(String name) {
-        if (name.startsWith(Constants.TAG_DIRECTORY)) {
-            return TemplateType.Tag;
-        }
-
-        if (name.startsWith(Constants.LAYOUT_DIRECTORY)) {
-            return TemplateType.Layout;
-        }
-
-        return TemplateType.Template;
     }
 
     protected abstract ClassLoader getClassLoader();

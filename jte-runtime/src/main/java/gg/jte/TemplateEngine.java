@@ -305,11 +305,7 @@ public final class TemplateEngine {
     }
 
     public List<String> getTemplatesUsing(String name) {
-        if (name.startsWith(Constants.TAG_DIRECTORY) || name.startsWith(Constants.LAYOUT_DIRECTORY)) {
-            return templateLoader.getTemplatesUsing(name);
-        } else {
-            return Collections.singletonList(name);
-        }
+        return templateLoader.getTemplatesUsing(name);
     }
 
     /**

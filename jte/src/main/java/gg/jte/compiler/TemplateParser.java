@@ -246,11 +246,17 @@ public final class TemplateParser {
                     push(Mode.Text);
                 } else if (currentMode instanceof TagMode) {
                     TagMode tagMode = (TagMode) currentMode;
-                    if (contentType == ContentType.Html && currentHtmlTag != null && currentHtmlTag.innerTagsIgnored) {
-                        visitor.onError("@" + tagMode.type.toString().toLowerCase() + " calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
+                    if (contentType == ContentType.Html && currentHtmlTag != null) {
+                        if (currentHtmlTag.innerTagsIgnored) {
+                            visitor.onError("Template calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
+                        }
+
+                        if (!currentHtmlTag.attributesProcessed && !currentHtmlTag.isInAttribute()) {
+                            throw new HtmlPolicyException("Illegal HTML attribute name " + "@" + tagMode.name + "()! Template calls in HTML attribute names are not allowed.");
+                        }
                     }
 
-                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTag(d, tagMode.type, tagMode.name.toString(), tagMode.params));
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTemplateCall(d, tagMode.name.toString(), tagMode.params));
                     lastIndex = i + 1;
                     pop();
                 }
@@ -310,16 +316,9 @@ public final class TemplateParser {
                     visitor.onForLoopEnd(depth);
                     pop();
                 }
-            } else if (previousChar3 == '@' && previousChar2 == 't' && previousChar1 == 'a' && previousChar0 == 'g' && currentChar == '.' && currentMode == Mode.Text) {
-                TagMode mode = new TagMode(TemplateType.Tag);
-                extractTextPart(i - 4, mode);
-                lastIndex = i + 1;
-
-                push(mode);
-                push(Mode.TagName);
-            } else if (previousChar6 == '@' && previousChar5 == 'l' && previousChar4 == 'a' && previousChar3 == 'y' && previousChar2 == 'o' && previousChar1 == 'u' && previousChar0 == 't' && currentChar == '.' && currentMode == Mode.Text) {
-                TagMode mode = new TagMode(TemplateType.Layout);
-                extractTextPart(i - 7, mode);
+            } else if (currentChar == '@' && currentMode == Mode.Text && isTemplateCall()) {
+                TagMode mode = new TagMode();
+                extractTextPart(i, mode);
                 lastIndex = i + 1;
 
                 push(mode);
@@ -354,6 +353,87 @@ public final class TemplateParser {
             completeParamsIfRequired();
             visitor.onComplete();
         }
+    }
+
+    private boolean isTemplateCall() {
+        int nextIndex = i + 1;
+
+        if (nextIndex >= templateCode.length()) {
+            return false; // TODO unit test
+        }
+
+        if (Character.isWhitespace(templateCode.charAt(nextIndex))) {
+            return false; // TODO unit test
+        }
+
+        // TODO allow special template names. E.g. @forward() should not be interpreted as @for
+        // TODO allow to escape @
+
+        if (templateCode.charAt(nextIndex) == '`') {
+            return false;
+        }
+
+        if (regionMatches(nextIndex, "param")) {
+            return false;
+        }
+
+        if (regionMatches(nextIndex, "import")) {
+            return false;
+        }
+
+        if (regionMatches(nextIndex, "if")) {
+            return false;
+        }
+
+        if (regionMatches(nextIndex, "else")) {
+            return false;
+        }
+
+        if (regionMatches(nextIndex, "endif")) {
+            return false;
+        }
+
+        if (regionMatches(nextIndex, "for")) {
+            return false;
+        }
+
+        if (regionMatches(nextIndex, "endfor")) {
+            return false;
+        }
+
+        for (int j = nextIndex; j < templateCode.length(); ++j) {
+            char character = templateCode.charAt(j);
+
+            if (Character.isWhitespace(character) && nextCharacterAfterWhitespace(j) != '(') {
+                break;
+            }
+
+            if (character == '@') {
+                break; // TODO test
+            }
+
+            if (character == '(') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean regionMatches(int index, String s) {
+        return templateCode.regionMatches(index, s, 0, s.length());
+    }
+
+    private char nextCharacterAfterWhitespace(int index) {
+        for (int j = index + 1; j < templateCode.length(); ++j) {
+            char character = templateCode.charAt(j);
+
+            if (!Character.isWhitespace(character)) {
+                return character;
+            }
+        }
+
+        return 0;
     }
 
     private void handleUnclosedKeywords() {
@@ -1021,13 +1101,8 @@ public final class TemplateParser {
     }
 
     private static class TagMode implements Mode {
-        final TemplateType type;
         final StringBuilder name = new StringBuilder();
         final List<String> params = new ArrayList<>();
-
-        private TagMode(TemplateType type) {
-            this.type = type;
-        }
 
         @Override
         public boolean isTrackStrings() {

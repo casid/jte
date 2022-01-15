@@ -544,6 +544,15 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void templateCall() {
+        dummyCodeResolver.givenCode("module/components/card.jte", "@param java.lang.String firstParam\n" +
+                "@param int secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+        givenTemplate("@module.components.card(model.hello, model.x), That was an arbitrary template call!");
+        thenOutputIs("One: Hello, two: 42, That was an arbitrary template call!");
+    }
+
+    @Test
     void comment() {
         givenTemplate("<%--This is a comment" +
                 " ${model.hello} everything in here is omitted--%>" +

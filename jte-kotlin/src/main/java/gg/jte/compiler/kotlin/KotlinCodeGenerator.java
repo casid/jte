@@ -7,7 +7,7 @@ import gg.jte.compiler.*;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import gg.jte.runtime.DebugInfo;
-import gg.jte.runtime.TemplateType;
+import gg.jte.compiler.TemplateType;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

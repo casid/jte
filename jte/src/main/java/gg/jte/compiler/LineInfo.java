@@ -1,7 +1,6 @@
 package gg.jte.compiler;
 
 import gg.jte.TemplateConfig;
-import gg.jte.runtime.TemplateType;
 
 import java.util.Arrays;
 import java.util.List;

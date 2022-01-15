@@ -5,7 +5,6 @@ import gg.jte.TemplateConfig;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.html.HtmlPolicyException;
 import gg.jte.runtime.StringUtils;
-import gg.jte.runtime.TemplateType;
 
 import java.util.*;
 

@@ -120,7 +120,10 @@ public final class TemplateParser {
             previousChar0 = currentChar;
             currentChar = templateCode.charAt(i);
 
-            if (!currentMode.isComment() && previousChar5 == '@' && previousChar4 == 'i' && previousChar3 == 'm' && previousChar2 == 'p' && previousChar1 == 'o' && previousChar0 == 'r' && currentChar == 't' && isParamOrImportAllowed()) {
+            if (currentMode == Mode.Text && previousChar0 == '@' && currentChar == '@') {
+                extractTextPart(i, null);
+                lastIndex = i + 1;
+            } else if (!currentMode.isComment() && previousChar5 == '@' && previousChar4 == 'i' && previousChar3 == 'm' && previousChar2 == 'p' && previousChar1 == 'o' && previousChar0 == 'r' && currentChar == 't' && isParamOrImportAllowed()) {
                 push(Mode.Import);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Import && currentChar == '\n') {
@@ -361,14 +364,18 @@ public final class TemplateParser {
             return false;
         }
 
-        if (Character.isWhitespace(templateCode.charAt(nextIndex))) {
+        char nextChar = templateCode.charAt(nextIndex);
+        if (Character.isWhitespace(nextChar)) {
+            return false;
+        }
+
+        if (nextChar == '@') {
             return false;
         }
 
         // TODO allow special template names. E.g. @forward() should not be interpreted as @for
-        // TODO allow to escape @
 
-        if (templateCode.charAt(nextIndex) == '`') {
+        if (nextChar == '`') {
             return false;
         }
 

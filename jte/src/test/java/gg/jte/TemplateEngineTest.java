@@ -565,6 +565,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void escapeAt() {
+        givenTemplate("mail@@example.com(write me)"); // Escaped with double @
+        thenOutputIs("mail@example.com(write me)");
+    }
+
+    @Test
     void comment() {
         givenTemplate("<%--This is a comment" +
                 " ${model.hello} everything in here is omitted--%>" +

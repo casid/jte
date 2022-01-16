@@ -592,9 +592,75 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void escapeAt() {
+    void escapeAt_templateCall() {
         givenTemplate("mail@@example.com(write me)"); // Escaped with double @
         thenOutputIs("mail@example.com(write me)");
+    }
+
+    @Test
+    void escapeAt_3x() {
+        givenTemplate("@@@");
+        thenOutputIs("@@");
+    }
+
+    @Test
+    void escapeAt_4x() {
+        givenTemplate("@@@@");
+        thenOutputIs("@@");
+    }
+
+    @Test
+    void escapeAt_param() {
+        givenTemplate("@@param String foo");
+        thenOutputIs("@param String foo");
+    }
+
+    @Test
+    void escapeAt_import() {
+        givenTemplate("@@import foo.Bar");
+        thenOutputIs("@import foo.Bar");
+    }
+
+    @Test
+    void escapeAt_for() {
+        givenTemplate("@@for");
+        thenOutputIs("@for");
+    }
+
+    @Test
+    void escapeAt_endfor() {
+        givenTemplate("@@endfor");
+        thenOutputIs("@endfor");
+    }
+
+    @Test
+    void escapeAt_if() {
+        givenTemplate("@@if");
+        thenOutputIs("@if");
+    }
+
+    @Test
+    void escapeAt_else() {
+        givenTemplate("@@else");
+        thenOutputIs("@else");
+    }
+
+    @Test
+    void escapeAt_elseif() {
+        givenTemplate("@@elseif");
+        thenOutputIs("@elseif");
+    }
+
+    @Test
+    void escapeAt_endif() {
+        givenTemplate("@@endif");
+        thenOutputIs("@endif");
+    }
+
+    @Test
+    void escapeAt_content() {
+        givenTemplate("@@``");
+        thenOutputIs("@``");
     }
 
     @Test

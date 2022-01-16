@@ -110,18 +110,14 @@ public final class TemplateParser {
         depth = startingDepth;
 
         for (i = startIndex; i < endIndex; ++i) {
-            previousChar7 = previousChar6;
-            previousChar6 = previousChar5;
-            previousChar5 = previousChar4;
-            previousChar4 = previousChar3;
-            previousChar3 = previousChar2;
-            previousChar2 = previousChar1;
-            previousChar1 = previousChar0;
-            previousChar0 = currentChar;
-            currentChar = templateCode.charAt(i);
+            moveToNextChar();
 
-            if (currentMode == Mode.Text && previousChar0 == '@' && currentChar == '@') {
-                extractTextPart(i, null);
+            if (currentMode == Mode.Text && currentChar == '@' && nextChar() == '@') {
+                extractTextPart(i + 1, null);
+
+                i += 1;
+                moveToNextChar();
+
                 lastIndex = i + 1;
             } else if (!currentMode.isComment() && previousChar5 == '@' && previousChar4 == 'i' && previousChar3 == 'm' && previousChar2 == 'p' && previousChar1 == 'o' && previousChar0 == 'r' && currentChar == 't' && isParamOrImportAllowed()) {
                 push(Mode.Import);
@@ -205,7 +201,7 @@ public final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onUnsafeCodePart);
                     lastIndex = i + 1;
                 }
-            } else if (previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+            } else if (previousChar2 != '@' && previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
                 extractTextPart(i - 2, Mode.Condition);
                 lastIndex = i + 1;
                 push(Mode.Condition);
@@ -274,7 +270,7 @@ public final class TemplateParser {
                     }
                 });
                 lastIndex = i + 1;
-            } else if (previousChar3 == '@' && previousChar2 == 'e' && previousChar1 == 'l' && previousChar0 == 's' && currentChar == 'e' && templateCode.charAt(i + 1) != 'i' && currentMode == Mode.Text) {
+            } else if (previousChar4 != '@' && previousChar3 == '@' && previousChar2 == 'e' && previousChar1 == 'l' && previousChar0 == 's' && currentChar == 'e' && nextChar() != 'i' && currentMode == Mode.Text) {
                 extractTextPart(i - 4, Mode.ConditionElse);
                 lastIndex = i + 1;
 
@@ -282,7 +278,7 @@ public final class TemplateParser {
 
                 visitor.onConditionElse(depth);
                 push(Mode.Text);
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+            } else if (previousChar6 != '@' && previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
                 extractTextPart(i - 6, Mode.ConditionElse);
                 lastIndex = i + 1;
 
@@ -294,7 +290,7 @@ public final class TemplateParser {
 
                 push(Mode.ConditionElse);
 
-            } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+            } else if (previousChar5 != '@' && previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
                 extractTextPart(i - 5, Mode.ConditionEnd);
                 lastIndex = i + 1;
 
@@ -304,11 +300,11 @@ public final class TemplateParser {
                     visitor.onConditionEnd(depth);
                     pop();
                 }
-            } else if (previousChar2 == '@' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
+            } else if (previousChar3 != '@' && previousChar2 == '@' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
                 extractTextPart(i - 3, Mode.ForLoop);
                 lastIndex = i + 1;
                 push(Mode.ForLoop);
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
+            } else if (previousChar6 != '@' && previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
                 extractTextPart(i - 6, Mode.ForLoopEnd);
                 lastIndex = i + 1;
 
@@ -355,6 +351,26 @@ public final class TemplateParser {
             completeParamsIfRequired();
             visitor.onComplete();
         }
+    }
+
+    private void moveToNextChar() {
+        previousChar7 = previousChar6;
+        previousChar6 = previousChar5;
+        previousChar5 = previousChar4;
+        previousChar4 = previousChar3;
+        previousChar3 = previousChar2;
+        previousChar2 = previousChar1;
+        previousChar1 = previousChar0;
+        previousChar0 = currentChar;
+        currentChar = templateCode.charAt(i);
+    }
+
+    private char nextChar() {
+        if (i + 1 >= templateCode.length()) {
+            return 0;
+        }
+
+        return templateCode.charAt(i + 1);
     }
 
     private boolean isTemplateCall() {

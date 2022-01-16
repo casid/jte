@@ -369,10 +369,6 @@ public final class TemplateParser {
             return false;
         }
 
-        if (nextChar == '@') {
-            return false;
-        }
-
         // TODO allow special template names. E.g. @forward() should not be interpreted as @for
 
         if (nextChar == '`') {
@@ -415,7 +411,7 @@ public final class TemplateParser {
             }
 
             if (character == '@') {
-                break; // TODO test
+                break;
             }
 
             if (character == '(') {

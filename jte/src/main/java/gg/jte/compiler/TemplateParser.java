@@ -358,11 +358,11 @@ public final class TemplateParser {
         int nextIndex = i + 1;
 
         if (nextIndex >= templateCode.length()) {
-            return false; // TODO unit test
+            return false;
         }
 
         if (Character.isWhitespace(templateCode.charAt(nextIndex))) {
-            return false; // TODO unit test
+            return false;
         }
 
         // TODO allow special template names. E.g. @forward() should not be interpreted as @for

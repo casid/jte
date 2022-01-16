@@ -553,6 +553,18 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void templateCall_singleAt() {
+        givenTemplate("@");
+        thenOutputIs("@");
+    }
+
+    @Test
+    void templateCall_singleAt_ws() {
+        givenTemplate("@\nfoo");
+        thenOutputIs("@\nfoo");
+    }
+
+    @Test
     void comment() {
         givenTemplate("<%--This is a comment" +
                 " ${model.hello} everything in here is omitted--%>" +

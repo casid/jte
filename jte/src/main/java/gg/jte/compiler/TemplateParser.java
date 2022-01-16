@@ -369,21 +369,19 @@ public final class TemplateParser {
             return false;
         }
 
-        // TODO allow special template names. E.g. @forward() should not be interpreted as @for
-
         if (nextChar == '`') {
             return false;
         }
 
-        if (regionMatches(nextIndex, "param")) {
+        if (keywordWithWhitespaceMatches(nextIndex, "param")) {
             return false;
         }
 
-        if (regionMatches(nextIndex, "import")) {
+        if (keywordWithWhitespaceMatches(nextIndex, "import")) {
             return false;
         }
 
-        if (regionMatches(nextIndex, "if")) {
+        if (keywordWithBracesMatches(nextIndex, "if")) {
             return false;
         }
 
@@ -395,7 +393,7 @@ public final class TemplateParser {
             return false;
         }
 
-        if (regionMatches(nextIndex, "for")) {
+        if (keywordWithBracesMatches(nextIndex, "for")) {
             return false;
         }
 
@@ -420,6 +418,28 @@ public final class TemplateParser {
         }
 
         return false;
+    }
+
+    private boolean keywordWithBracesMatches(int index, String s) {
+        if (!regionMatches(index, s)) {
+            return false;
+        }
+
+        return nextCharacterAfterWhitespace(index + s.length() - 1) == '(';
+    }
+
+    private boolean keywordWithWhitespaceMatches(int index, String s) {
+        if (!regionMatches(index, s)) {
+            return false;
+        }
+
+        int nextIndex = index + s.length();
+        if (nextIndex >= templateCode.length()) {
+            return false;
+        }
+
+        char nextChar = templateCode.charAt(nextIndex);
+        return Character.isWhitespace(nextChar);
     }
 
     private boolean regionMatches(int index, String s) {

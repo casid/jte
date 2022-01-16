@@ -553,6 +553,33 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void templateCall_noConflictWithKeywords_for() {
+        dummyCodeResolver.givenCode("format.jte", "@param java.lang.String firstParam\n" +
+                "@param int secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+        givenTemplate("@format(model.hello, model.x), That was an arbitrary template call!");
+        thenOutputIs("One: Hello, two: 42, That was an arbitrary template call!");
+    }
+
+    @Test
+    void templateCall_noConflictWithKeywords_param() {
+        dummyCodeResolver.givenCode("parameter.jte", "@param java.lang.String firstParam\n" +
+                "@param int secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+        givenTemplate("@parameter(model.hello, model.x), That was an arbitrary template call!");
+        thenOutputIs("One: Hello, two: 42, That was an arbitrary template call!");
+    }
+
+    @Test
+    void templateCall_noConflictWithKeywords_import() {
+        dummyCodeResolver.givenCode("importer.jte", "@param java.lang.String firstParam\n" +
+                "@param int secondParam\n" +
+                "One: ${firstParam}, two: ${secondParam}");
+        givenTemplate("@importer(model.hello, model.x), That was an arbitrary template call!");
+        thenOutputIs("One: Hello, two: 42, That was an arbitrary template call!");
+    }
+
+    @Test
     void templateCall_singleAt() {
         givenTemplate("@");
         thenOutputIs("@");

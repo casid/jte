@@ -640,6 +640,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void escapeAt_if_3x() {
+        givenTemplate("@@@if(true)x@endif"); // First @@ are escaped to @, then a regular @if follows
+        thenOutputIs("@x");
+    }
+
+    @Test
     void escapeAt_else() {
         givenTemplate("@@else");
         thenOutputIs("@else");

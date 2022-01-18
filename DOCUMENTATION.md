@@ -27,6 +27,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
   - [Using the application class loader](#using-the-application-class-loader-since-120)
   - [GraalVM native-image support](#graalvm-native-image-support-since-1100)
 - [Binary rendering for max throughput](#binary-rendering-for-max-throughput)
+- [Localization](#localization)
 
 ## Rendering a template
 
@@ -737,3 +738,90 @@ There are a few pretty cool things going on here:
 - Dynamic parts are usually small - and written very efficiently to internal chunks during rendering
 
 With binary content you will be able to render millions of pages per second (in case there's no DB or other external service interaction, heh) - with very little CPU, memory and GC usage.
+
+## Localization
+
+jte has no built in keywords for localization. Instead, it provides a flexible interface so that you can easily use the same localization mechanism you're used to in your project! This has several advantages:
+
+- no need to learn yet another way to localize things
+- no need to reverse engineer another opinionated localization implementation
+- your users receive the same localization through jte as they do from the rest of your application
+
+
+Let's implement `gg.jte.support.LocalizationSupport`. There's only on method to implement:
+
+```java
+public static class JteLocalizer implements gg.jte.support.LocalizationSupport {
+    
+    private final OtherFrameworkLocalizer frameworkLocalizer;
+    private final Locale locale;
+    
+    public JteLocalizer(OtherFrameworkLocalizer frameworkLocalizer, Locale locale) {
+        this.frameworkLocalizer = frameworkLocalizer;
+        this.locale = locale;
+    }
+    
+    @Override
+    public String lookup(String key) {
+        // However this works in your localization framework
+        return frameworkLocalizer.get(locale, key);
+    }
+}
+```
+
+Now, you can create a JteLocalizer whenever you render a page and pass it to the page template:
+
+```html
+@param JteLocalizer localizer
+
+<h1>${localizer.localize("my.title")}</h1>
+<p>${localizer.localize("my.greetings", user.getName())}</p>
+```
+
+> Why is the `gg.jte.support.LocalizationSupport` interface even needed? It mainly helps with proper output escaping in HTML mode. Localized texts are considered safe and are not output escaped, but all user provided parameters are! Here are some good examples [in form of unit tests](https://github.com/casid/jte/blob/0daa676174a2ed9f1b303b927f252ce5bc9ef653/jte/src/test/java/gg/jte/TemplateEngine_HtmlOutputEscapingTest.java#L1099).
+
+This works fine, but passing a parameter to every template might feel a little repetitive. In case it does, you could use a `ThreadLocal`, that is filled with the required information before rendering a page and destroyed afterwards.
+
+```java
+public class JteContext {
+    private static final ThreadLocal<JteLocalizer> context = new ThreadLocal<>();
+
+    public static Content localize(String key) {
+        localizer.localize(key);
+    }
+    
+    public static Content localize(String key, Object... params) {
+        localizer.localize(key, params);
+    }
+    
+    static void init(JteLocalizer localizer) {
+        context.set(localizer);
+    }
+    
+    static void dispose() {
+        context.remove();
+    }
+}
+```
+
+```java
+public void renderPage(String template, Locale locale) {
+    try {
+        JteContext.init(new JteLocalizer(this.frameworkLocalizer, locale));
+        templateEngine.render(template);
+    } finally {
+        JteContext.dispose();
+    }
+}
+```
+
+Localization in the template is now possible with a simple static method call:
+
+```html
+@import static my.JteContext.*
+
+<h1>${localize("my.title")}</h1>
+<p>${localize("my.greetings", user.getName())}</p>
+```
+
+It really is a matter of taste, if you prefer a parameter or a static method call. The nice thing of both ways is, that everything is under your control and if you want to know what happens under the hood, that is just a click away in your IDE.

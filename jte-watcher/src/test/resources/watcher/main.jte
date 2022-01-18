@@ -1,1 +1,1 @@
-Hello world, @tag.child(x = 42)
+Hello world, @template.tag.child(x = 42)

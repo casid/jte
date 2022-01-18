@@ -40,15 +40,7 @@ public final class TemplateParser {
     private int lastLineIndex = 0;
     private int lastTrimmedIndex = -1;
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private char previousChar7;
-    private char previousChar6;
-    private char previousChar5;
-    private char previousChar4;
-    private char previousChar3;
-    private char previousChar2;
-    private char previousChar1;
-    private char previousChar0;
+    private char previousChar;
     private char currentChar;
 
     public TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, TemplateConfig config) {
@@ -110,60 +102,45 @@ public final class TemplateParser {
         depth = startingDepth;
 
         for (i = startIndex; i < endIndex; ++i) {
-            previousChar7 = previousChar6;
-            previousChar6 = previousChar5;
-            previousChar5 = previousChar4;
-            previousChar4 = previousChar3;
-            previousChar3 = previousChar2;
-            previousChar2 = previousChar1;
-            previousChar1 = previousChar0;
-            previousChar0 = currentChar;
+            previousChar = currentChar;
             currentChar = templateCode.charAt(i);
 
-            if (currentMode == Mode.Text && currentChar == '@' && nextChar() == '@') {
-                extractTextPart(i, null);
-                lastIndex = i + 1;
-
-                push(Mode.Escape);
-            } else if (currentMode == Mode.Escape) {
-                currentChar = 0; // Prevent look behind for this escaped character in further iterations
-                pop();
-            } else if (!currentMode.isComment() && previousChar5 == '@' && previousChar4 == 'i' && previousChar3 == 'm' && previousChar2 == 'p' && previousChar1 == 'o' && previousChar0 == 'r' && currentChar == 't' && isParamOrImportAllowed()) {
+            if (!currentMode.isComment() && regionMatches("@import") && isParamOrImportAllowed()) {
                 push(Mode.Import);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Import && currentChar == '\n') {
                 extract(templateCode, lastIndex, i, (depth, content) -> visitor.onImport(content.trim()));
                 pop();
                 lastIndex = i + 1;
-            } else if (!currentMode.isComment() && previousChar4 == '@' && previousChar3 == 'p' && previousChar2 == 'a' && previousChar1 == 'r' && previousChar0 == 'a' && currentChar == 'm' && isParamOrImportAllowed()) {
+            } else if (!currentMode.isComment() && regionMatches("@param") && isParamOrImportAllowed()) {
                 push(Mode.Param);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Param && currentChar == '\n') {
                 extract(templateCode, lastIndex, i, (depth, content) -> visitor.onParam(content.trim()));
                 pop();
                 lastIndex = i + 1;
-            } else if (isCommentAllowed() && previousChar2 == '<' && previousChar1 == '%' && previousChar0 == '-' && currentChar == '-') {
+            } else if (isCommentAllowed() && regionMatches("<%--")) {
                 extractComment(Mode.Comment, i - 3);
-            } else if (isCommentAllowed() && previousChar2 == '<' && previousChar1 == '!' && previousChar0 == '-' && currentChar == '-' && isHtmlCommentAllowed()) {
+            } else if (isCommentAllowed() && regionMatches("<!--") && isHtmlCommentAllowed()) {
                 extractComment(Mode.HtmlComment, i - 3);
-            } else if (isCommentAllowed() && previousChar0 == '/' && currentChar == '*' && isCssCommentAllowed()) {
+            } else if (isCommentAllowed() && regionMatches("/*") && isCssCommentAllowed()) {
                 extractComment(Mode.CssComment, i - 1);
-            } else if (isCommentAllowed() && previousChar0 == '/' && currentChar == '/' && isJsCommentAllowed()) {
+            } else if (isCommentAllowed() && regionMatches("//") && isJsCommentAllowed()) {
                 extractComment(Mode.JsComment, i - 1);
-            } else if (isCommentAllowed() && previousChar0 == '/' && currentChar == '*' && isJsCommentAllowed()) {
+            } else if (isCommentAllowed() && regionMatches("/*") && isJsCommentAllowed()) {
                 extractComment(Mode.JsBlockComment, i - 1);
             } else if (currentMode == Mode.Comment) {
-                if (previousChar2 == '-' && previousChar1 == '-' && previousChar0 == '%' && currentChar == '>') {
+                if (regionMatches("--%>")) {
                     pop();
                     lastIndex = i + 1;
                 }
             } else if (currentMode == Mode.HtmlComment) {
-                if (previousChar1 == '-' && previousChar0 == '-' && currentChar == '>') {
+                if (regionMatches("-->")) {
                     pop();
                     lastIndex = i + 1;
                 }
             } else if (currentMode == Mode.CssComment || currentMode == Mode.JsBlockComment) {
-                if (previousChar0 == '*' && currentChar == '/') {
+                if (regionMatches("*/")) {
                     pop();
                     lastIndex = i + 1;
                 }
@@ -171,21 +148,21 @@ public final class TemplateParser {
                 if (currentChar == '\n') {
                     pop();
                     lastIndex = i + 1;
-                } else if (previousChar7 == '<' && previousChar6 == '/' && previousChar5 == 's' && previousChar4 == 'c' && previousChar3 == 'r' && previousChar2 == 'i' && previousChar1 == 'p' && previousChar0 == 't' && currentChar == '>') {
+                } else if (regionMatches("</script>")) {
                     pop();
                     lastIndex = i - 8;
                 }
-            } else if (previousChar0 == '$' && currentChar == '{' && currentMode == Mode.Text) {
+            } else if (currentMode == Mode.Text && regionMatches("${")) {
                 if (!outputPrevented) {
                     extractTextPart(i - 1, Mode.Code);
                     lastIndex = i + 1;
                 }
                 push(Mode.Code);
-            } else if (previousChar6 == '$' && previousChar5 == 'u' && previousChar4 == 'n' && previousChar3 == 's' && previousChar2 == 'a' && previousChar1 == 'f' && previousChar0 == 'e' && currentChar == '{' && currentMode == Mode.Text) {
+            } else if (currentMode == Mode.Text && regionMatches("$unsafe{")) {
                 extractTextPart(i - 7, Mode.UnsafeCode);
                 lastIndex = i + 1;
                 push(Mode.UnsafeCode);
-            } else if (previousChar0 == '!' && currentChar == '{' && currentMode == Mode.Text) {
+            } else if (currentMode == Mode.Text && regionMatches("!{")) {
                 extractTextPart(i - 1, Mode.CodeStatement);
                 lastIndex = i + 1;
                 push(Mode.CodeStatement);
@@ -197,7 +174,7 @@ public final class TemplateParser {
                 }
             } else if (currentChar == '"' && currentMode.isTrackStrings()) {
                 push(Mode.JavaCodeString);
-            } else if (currentChar == '"' && currentMode == Mode.JavaCodeString && previousChar0 != '\\') {
+            } else if (currentChar == '"' && currentMode == Mode.JavaCodeString && previousChar != '\\') {
                 pop();
             } else if (currentChar == '}' && currentMode == Mode.Code) {
                 pop();
@@ -210,7 +187,7 @@ public final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onUnsafeCodePart);
                     lastIndex = i + 1;
                 }
-            } else if (previousChar1 == '@' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+            } else if (currentMode == Mode.Text && regionMatches("@if")) {
                 extractTextPart(i - 2, Mode.Condition);
                 lastIndex = i + 1;
                 push(Mode.Condition);
@@ -221,7 +198,7 @@ public final class TemplateParser {
                 push(new JavaCodeMode(currentChar, getCurrentTemplateLine()));
             } else if (currentMode.isTrackBraces() && (currentChar == ')' || currentChar == '}')) {
                 if (currentMode == Mode.JavaCodeParam) {
-                    TagMode previousMode = getPreviousMode(TagMode.class);
+                    TemplateCallMode previousMode = getPreviousMode(TemplateCallMode.class);
                     extract(templateCode, lastIndex, i, (d, c) -> {
                         if (!StringUtils.isBlank(c)) {
                             previousMode.params.add(c);
@@ -251,35 +228,29 @@ public final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onForLoopStart);
                     lastIndex = i + 1;
                     push(Mode.Text);
-                } else if (currentMode instanceof TagMode) {
-                    TagMode tagMode = (TagMode) currentMode;
-                    if (contentType == ContentType.Html && currentHtmlTag != null) {
-                        if (currentHtmlTag.innerTagsIgnored) {
-                            visitor.onError("Template calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
-                        }
-
-                        if (!currentHtmlTag.attributesProcessed && !currentHtmlTag.isInAttribute()) {
-                            throw new HtmlPolicyException("Illegal HTML attribute name " + "@" + tagMode.name + "()! Template calls in HTML attribute names are not allowed.");
-                        }
+                } else if (currentMode instanceof TemplateCallMode) {
+                    TemplateCallMode templateCallMode = (TemplateCallMode) currentMode;
+                    if (contentType == ContentType.Html && currentHtmlTag != null && currentHtmlTag.innerTagsIgnored) {
+                        visitor.onError("Template calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
                     }
 
-                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTemplateCall(d, tagMode.name.toString(), tagMode.params));
+                    extract(templateCode, lastIndex, i, (d, c) -> visitor.onTemplateCall(d, templateCallMode.name.toString(), templateCallMode.params));
                     lastIndex = i + 1;
                     pop();
                 }
-            } else if (previousChar0 == '@' && currentChar == '`' && isContentExpressionAllowed()) {
+            } else if (regionMatches("@`") && isContentExpressionAllowed()) {
                 push(Mode.Content);
             } else if (currentChar == '`' && currentMode == Mode.Content) {
                 pop();
             } else if (currentChar == ',' && currentMode == Mode.JavaCodeParam) {
-                TagMode previousMode = getPreviousMode(TagMode.class);
+                TemplateCallMode previousMode = getPreviousMode(TemplateCallMode.class);
                 extract(templateCode, lastIndex, i, (d, c) -> {
                     if (!StringUtils.isBlank(c)) {
                         previousMode.params.add(c);
                     }
                 });
                 lastIndex = i + 1;
-            } else if (previousChar3 == '@' && previousChar2 == 'e' && previousChar1 == 'l' && previousChar0 == 's' && currentChar == 'e' && nextChar() != 'i' && currentMode == Mode.Text) {
+            } else if (currentMode == Mode.Text && regionMatches("@else") && nextChar() != 'i') {
                 extractTextPart(i - 4, Mode.ConditionElse);
                 lastIndex = i + 1;
 
@@ -287,7 +258,7 @@ public final class TemplateParser {
 
                 visitor.onConditionElse(depth);
                 push(Mode.Text);
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'l' && previousChar2 == 's' && previousChar1 == 'e' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+            } else if (currentMode == Mode.Text && regionMatches("@elseif")) {
                 extractTextPart(i - 6, Mode.ConditionElse);
                 lastIndex = i + 1;
 
@@ -299,7 +270,7 @@ public final class TemplateParser {
 
                 push(Mode.ConditionElse);
 
-            } else if (previousChar4 == '@' && previousChar3 == 'e' && previousChar2 == 'n' && previousChar1 == 'd' && previousChar0 == 'i' && currentChar == 'f' && currentMode == Mode.Text) {
+            } else if (currentMode == Mode.Text && regionMatches("@endif")) {
                 extractTextPart(i - 5, Mode.ConditionEnd);
                 lastIndex = i + 1;
 
@@ -309,11 +280,11 @@ public final class TemplateParser {
                     visitor.onConditionEnd(depth);
                     pop();
                 }
-            } else if (previousChar2 == '@' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
+            } else if (currentMode == Mode.Text && regionMatches("@for")) {
                 extractTextPart(i - 3, Mode.ForLoop);
                 lastIndex = i + 1;
                 push(Mode.ForLoop);
-            } else if (previousChar5 == '@' && previousChar4 == 'e' && previousChar3 == 'n' && previousChar2 == 'd' && previousChar1 == 'f' && previousChar0 == 'o' && currentChar == 'r' && currentMode == Mode.Text) {
+            } else if (currentMode == Mode.Text && regionMatches("@endfor")) {
                 extractTextPart(i - 6, Mode.ForLoopEnd);
                 lastIndex = i + 1;
 
@@ -323,20 +294,20 @@ public final class TemplateParser {
                     visitor.onForLoopEnd(depth);
                     pop();
                 }
-            } else if (currentChar == '@' && currentMode == Mode.Text && isTemplateCall()) {
-                TagMode mode = new TagMode();
-                extractTextPart(i, mode);
+            } else if (currentMode == Mode.Text && regionMatches("@template.")) {
+                TemplateCallMode mode = new TemplateCallMode();
+                extractTextPart(i - 9, mode);
                 lastIndex = i + 1;
 
                 push(mode);
-                push(Mode.TagName);
-            } else if (currentMode == Mode.TagName) {
+                push(Mode.TemplateCallName);
+            } else if (currentMode == Mode.TemplateCallName) {
                 if (currentChar == '(') {
                     pop();
                     push(Mode.JavaCodeParam);
                     lastIndex = i + 1;
                 } else if (currentChar != ' ') {
-                    getPreviousMode(TagMode.class).name.append(currentChar);
+                    getPreviousMode(TemplateCallMode.class).name.append(currentChar);
                 }
             } else if (currentMode == Mode.Text && contentType == ContentType.Html) {
                 interceptHtmlTags();
@@ -370,105 +341,8 @@ public final class TemplateParser {
         return templateCode.charAt(i + 1);
     }
 
-    private boolean isTemplateCall() {
-        int nextIndex = i + 1;
-
-        if (nextIndex >= templateCode.length()) {
-            return false;
-        }
-
-        char nextChar = templateCode.charAt(nextIndex);
-        if (Character.isWhitespace(nextChar)) {
-            return false;
-        }
-
-        if (nextChar == '`') {
-            return false;
-        }
-
-        if (keywordWithWhitespaceMatches(nextIndex, "param")) {
-            return false;
-        }
-
-        if (keywordWithWhitespaceMatches(nextIndex, "import")) {
-            return false;
-        }
-
-        if (keywordWithBracesMatches(nextIndex, "if")) {
-            return false;
-        }
-
-        if (regionMatches(nextIndex, "else")) {
-            return false;
-        }
-
-        if (regionMatches(nextIndex, "endif")) {
-            return false;
-        }
-
-        if (keywordWithBracesMatches(nextIndex, "for")) {
-            return false;
-        }
-
-        if (regionMatches(nextIndex, "endfor")) {
-            return false;
-        }
-
-        for (int j = nextIndex; j < templateCode.length(); ++j) {
-            char character = templateCode.charAt(j);
-
-            if (Character.isWhitespace(character) && nextCharacterAfterWhitespace(j) != '(') {
-                break;
-            }
-
-            if (character == '@') {
-                break;
-            }
-
-            if (character == '(') {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean keywordWithBracesMatches(int index, String s) {
-        if (!regionMatches(index, s)) {
-            return false;
-        }
-
-        return nextCharacterAfterWhitespace(index + s.length() - 1) == '(';
-    }
-
-    private boolean keywordWithWhitespaceMatches(int index, String s) {
-        if (!regionMatches(index, s)) {
-            return false;
-        }
-
-        int nextIndex = index + s.length();
-        if (nextIndex >= templateCode.length()) {
-            return false;
-        }
-
-        char nextChar = templateCode.charAt(nextIndex);
-        return Character.isWhitespace(nextChar);
-    }
-
-    private boolean regionMatches(int index, String s) {
-        return templateCode.regionMatches(index, s, 0, s.length());
-    }
-
-    private char nextCharacterAfterWhitespace(int index) {
-        for (int j = index + 1; j < templateCode.length(); ++j) {
-            char character = templateCode.charAt(j);
-
-            if (!Character.isWhitespace(character)) {
-                return character;
-            }
-        }
-
-        return 0;
+    private boolean regionMatches(String s) {
+        return templateCode.regionMatches(i - s.length() + 1, s, 0, s.length());
     }
 
     private void handleUnclosedKeywords() {
@@ -800,7 +674,7 @@ public final class TemplateParser {
                         outputPrevented = false;
                     }
                 }
-            } else if (!currentHtmlTag.attributesProcessed && previousChar0 == '/' && currentChar == '>') {
+            } else if (!currentHtmlTag.attributesProcessed && regionMatches("/>")) {
                 if (currentHtmlTag.intercepted) {
                     extractTextPart(i - 1, null);
                     lastIndex = i - 1;
@@ -824,7 +698,7 @@ public final class TemplateParser {
                         popHtmlTag();
                     }
                 }
-            } else if (previousChar0 == '<' && currentChar == '/') {
+            } else if (regionMatches("</")) {
                 if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
                     if (!currentHtmlTag.bodyIgnored) {
                         if (currentHtmlTag.intercepted) {
@@ -869,7 +743,7 @@ public final class TemplateParser {
         if (currentChar == quote && (currentHtmlTag.stringLiteralQuote == 0 || currentHtmlTag.stringLiteralQuote == quote)) {
             if (currentHtmlTag.stringLiteralQuote == 0) {
                 currentHtmlTag.stringLiteralQuote = currentChar;
-            } else if (previousChar0 != '\\') {
+            } else if (previousChar != '\\') {
                 currentHtmlTag.stringLiteralQuote = 0;
             }
         }
@@ -1084,14 +958,13 @@ public final class TemplateParser {
         Mode ConditionEnd = new StatelessMode("ConditionEnd");
         Mode ForLoop = new StatelessMode("ForLoop");
         Mode ForLoopEnd = new StatelessMode("ForLoopEnd");
-        Mode TagName = new StatelessMode("TagName");
+        Mode TemplateCallName = new StatelessMode("TemplateCallName");
         Mode Comment = new StatelessMode("Comment");
         Mode HtmlComment = new StatelessMode("HtmlComment", false, false, true);
         Mode CssComment = new StatelessMode("CssComment", false, false, true);
         Mode JsComment = new StatelessMode("JsComment", false, false, true);
         Mode JsBlockComment = new StatelessMode("JsBlockComment", false, false, true);
         Mode Content = new StatelessMode("Content", false, false, true);
-        Mode Escape = new StatelessMode("Escape");
 
         boolean isTrackStrings();
         boolean isTrackBraces();
@@ -1136,7 +1009,7 @@ public final class TemplateParser {
         }
     }
 
-    private static class TagMode implements Mode {
+    private static class TemplateCallMode implements Mode {
         final StringBuilder name = new StringBuilder();
         final List<String> params = new ArrayList<>();
 

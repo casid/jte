@@ -1,6 +1,6 @@
 @import static example.JteContext.*
 
-@tag.my.simple(
+@template.tag.my.simple(
     name = "Hello " + " Hola",
     greeting = "World"
 )

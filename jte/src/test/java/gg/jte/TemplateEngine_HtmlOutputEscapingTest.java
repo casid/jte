@@ -1021,7 +1021,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void tagCallInScript() {
         codeResolver.givenCode("tag/snippet.jte", "var x = y;");
-        codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@tag.snippet()\n}\n</script>");
+        codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@template.tag.snippet()\n}\n</script>");
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "ignored", output));
 
@@ -1071,7 +1071,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void layoutCallInScript() {
         codeResolver.givenCode("layout/snippet.jte", "var x = y;");
-        codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@layout.snippet()\n}\n</script>");
+        codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@template.layout.snippet()\n}\n</script>");
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", "ignored", output));
 
@@ -1098,20 +1098,20 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void layoutInAttributes() {
-        codeResolver.givenCode("template.jte", "<div @layout.foo()>");
+        codeResolver.givenCode("template.jte", "<div @template.layout.foo()>");
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", localizer, output));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 1: Illegal HTML attribute name @layout.foo()! Template calls in HTML attribute names are not allowed.");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 1: Illegal HTML attribute name @template.layout.foo()! Template calls in HTML attribute names are not allowed.");
     }
 
     @Test
     void tagInAttributes() {
-        codeResolver.givenCode("template.jte", "<div @tag.foo()>");
+        codeResolver.givenCode("template.jte", "<div @template.tag.foo()>");
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", localizer, output));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 1: Illegal HTML attribute name @tag.foo()! Template calls in HTML attribute names are not allowed.");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 1: Illegal HTML attribute name @template.tag.foo()! Template calls in HTML attribute names are not allowed.");
     }
 
     @Test
@@ -1370,7 +1370,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                     "<span>${content}</span>");
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String name\n" +
-                "@tag.card(content = @`<b>${localizer.localize(\"one-param\", name)}</b>`)");
+                "@template.tag.card(content = @`<b>${localizer.localize(\"one-param\", name)}</b>`)");
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1383,7 +1383,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String name\n" +
-                "@tag.card(content = localizer.localize(\"one-param\", name))");
+                "@template.tag.card(content = localizer.localize(\"one-param\", name))");
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1396,7 +1396,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String name\n" +
-                "@tag.card(content = localizer.localize(\"one-param\", @`<b>${name}</b>`))");
+                "@template.tag.card(content = localizer.localize(\"one-param\", @`<b>${name}</b>`))");
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1409,7 +1409,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String name\n" +
-                "@tag.card(content = localizer.localize(\"many-params-html\", @`<span>${name}</span>`, @`<span>${name}</span>`, @`<span>${name}</span>`))");
+                "@template.tag.card(content = localizer.localize(\"many-params-html\", @`<span>${name}</span>`, @`<span>${name}</span>`, @`<span>${name}</span>`))");
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1422,7 +1422,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String name\n" +
-                "@tag.card(content = localizer.localize(\"one-param\", @`<b>" +
+                "@template.tag.card(content = localizer.localize(\"one-param\", @`<b>" +
                     "${localizer.localize(\"one-param-html\", @`<i>${name}</i>`)}" +
                 "</b>`))");
 
@@ -1437,8 +1437,8 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "@param String name\n" +
-                "@tag.card(content = localizer.localize(\"one-param\", @`<b>" +
-                    "@tag.card(content = localizer.localize(\"one-param-html\", @`<i>${name}</i>`))" +
+                "@template.tag.card(content = localizer.localize(\"one-param\", @`<b>" +
+                    "@template.tag.card(content = localizer.localize(\"one-param-html\", @`<i>${name}</i>`))" +
                 "</b>`))");
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
@@ -1455,7 +1455,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "!{gg.jte.Content content = localizer.localize(\"one-param\", @`<b>" +
                 "${localizer.localize(\"one-param-html\", @`<i>${name}</i>`)}" +
                 "</b>`);}" +
-                "@tag.card(content = content)");
+                "@template.tag.card(content = content)");
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1466,7 +1466,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     void localization_tag8() {
         codeResolver.givenCode("tag/card.jte", "@param gg.jte.Content content = @`My default is ${42}`\n" +
                 "<span>${content}</span>");
-        codeResolver.givenCode("template.jte", "@tag.card()");
+        codeResolver.givenCode("template.jte", "@template.tag.card()");
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 

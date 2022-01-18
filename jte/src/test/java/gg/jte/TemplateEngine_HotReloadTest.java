@@ -47,7 +47,7 @@ class TemplateEngine_HotReloadTest {
     @Test
     void tagUsedByTemplate() {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
-        whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
+        whenFileIsWritten(TEMPLATE, "@param String name\n@template.tag.name(name)");
         thenTemplateOutputIs("Hello hot reload!");
 
         waitUntilFileChangesPossible();
@@ -59,8 +59,8 @@ class TemplateEngine_HotReloadTest {
     @Test
     void tagUsedByTemplates() {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
-        whenFileIsWritten("test1.jte", "@param String name\ntest1: @tag.name(name)");
-        whenFileIsWritten("test2.jte", "@param String name\ntest2: @tag.name(name)");
+        whenFileIsWritten("test1.jte", "@param String name\ntest1: @template.tag.name(name)");
+        whenFileIsWritten("test2.jte", "@param String name\ntest2: @template.tag.name(name)");
         thenTemplateOutputIs("test1.jte", "test1: Hello hot reload!");
         thenTemplateOutputIs("test2.jte", "test2: Hello hot reload!");
 
@@ -74,12 +74,12 @@ class TemplateEngine_HotReloadTest {
     @Test
     void newDependencyAdded() {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
-        whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
+        whenFileIsWritten(TEMPLATE, "@param String name\n@template.tag.name(name)");
         thenTemplateOutputIs("Hello hot reload!");
 
         waitUntilFileChangesPossible();
         whenFileIsWritten("tag/nested.jte", "@param String name\nnested ${name}");
-        whenFileIsWritten("tag/name.jte", "@param String name\nHello @tag.nested(name)!!!");
+        whenFileIsWritten("tag/name.jte", "@param String name\nHello @template.tag.nested(name)!!!");
 
         thenTemplateOutputIs("Hello nested hot reload!!!");
 
@@ -92,12 +92,12 @@ class TemplateEngine_HotReloadTest {
     @Test
     void anotherDependencyAdded() {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
-        whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
+        whenFileIsWritten(TEMPLATE, "@param String name\n@template.tag.name(name)");
         thenTemplateOutputIs("Hello hot reload!");
 
         waitUntilFileChangesPossible();
         whenFileIsWritten("tag/nested.jte", "@param String name\nnested ${name}");
-        whenFileIsWritten("tag/name.jte", "@param String name\nHello @tag.nested(name)!!!");
+        whenFileIsWritten("tag/name.jte", "@param String name\nHello @template.tag.nested(name)!!!");
 
         thenTemplateOutputIs("Hello nested hot reload!!!");
 
@@ -108,7 +108,7 @@ class TemplateEngine_HotReloadTest {
 
         waitUntilFileChangesPossible();
         whenFileIsWritten("tag/beforeNested.jte", "@param String name\nbefore ${name}.");
-        whenFileIsWritten("tag/name.jte", "@param String name\nHello @tag.beforeNested(name) @tag.nested(name)!!!");
+        whenFileIsWritten("tag/name.jte", "@param String name\nHello @template.tag.beforeNested(name) @template.tag.nested(name)!!!");
 
         thenTemplateOutputIs("Hello before hot reload. nested, hot reload!!!");
 
@@ -121,12 +121,12 @@ class TemplateEngine_HotReloadTest {
     @Test
     void newDependencyAddedAndDeleted() {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
-        whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
+        whenFileIsWritten(TEMPLATE, "@param String name\n@template.tag.name(name)");
         thenTemplateOutputIs("Hello hot reload!");
 
         waitUntilFileChangesPossible();
         whenFileIsWritten("tag/nested.jte", "@param String name\nnested ${name}");
-        whenFileIsWritten("tag/name.jte", "@param String name\nHello @tag.nested(name)!!!");
+        whenFileIsWritten("tag/name.jte", "@param String name\nHello @template.tag.nested(name)!!!");
 
         thenTemplateOutputIs("Hello nested hot reload!!!");
 
@@ -145,7 +145,7 @@ class TemplateEngine_HotReloadTest {
     @Test
     void paramWithDefaultValueAdded() {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
-        whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
+        whenFileIsWritten(TEMPLATE, "@param String name\n@template.tag.name(name)");
         thenTemplateOutputIs("Hello hot reload!");
 
         waitUntilFileChangesPossible();
@@ -158,7 +158,7 @@ class TemplateEngine_HotReloadTest {
     void binaryContent_oneCharacterReplaced() {
         templateEngine.setBinaryStaticContent(true);
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
-        whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
+        whenFileIsWritten(TEMPLATE, "@param String name\n@template.tag.name(name)");
         thenTemplateOutputIs("Hello hot reload!");
 
         waitUntilFileChangesPossible();
@@ -170,7 +170,7 @@ class TemplateEngine_HotReloadTest {
     @Test
     void clearCache() {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
-        whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
+        whenFileIsWritten(TEMPLATE, "@param String name\n@template.tag.name(name)");
         thenTemplateOutputIs("Hello hot reload!");
 
         templateEngine.clearCache();

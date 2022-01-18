@@ -178,7 +178,7 @@ public class TemplateEngine_HtmlInterceptorTest {
 
         dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
                 "<form action=\"${url}\">\n" +
-                "@tag.formContent()" +
+                "@template.tag.formContent()" +
                 "</form>");
 
         templateEngine.render("page.jte", "hello.htm", output);
@@ -200,7 +200,7 @@ public class TemplateEngine_HtmlInterceptorTest {
                         "</form>");
 
         dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
-                "@layout.formContent(url, content = @`" +
+                "@template.layout.formContent(url, content = @`" +
                 "<input name=\"param1\"></input>\n" +
                 "<input name=\"param2\"></input>\n" +
                 "`)");

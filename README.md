@@ -93,7 +93,7 @@ The `@param Content content` is a content block that can be provided by callers 
 
 @param Page page
 
-@tag.page(page = page, content = @`
+@template.tag.page(page = page, content = @`
     <p>Welcome to my example page!</p>
 `)
 ```

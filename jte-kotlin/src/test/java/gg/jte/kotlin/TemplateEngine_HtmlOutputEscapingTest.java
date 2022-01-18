@@ -1045,7 +1045,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void tagCallInScript() {
         codeResolver.givenCode("tag/snippet.kte", "var x = y;");
-        codeResolver.givenCode("template.kte", "@param ignored:String\n<script>\nfunction() {\n@tag.snippet()\n}\n</script>");
+        codeResolver.givenCode("template.kte", "@param ignored:String\n<script>\nfunction() {\n@template.tag.snippet()\n}\n</script>");
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.kte", "ignored", output));
 
@@ -1055,7 +1055,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void layoutCallInScript() {
         codeResolver.givenCode("layout/snippet.kte", "var x = y;");
-        codeResolver.givenCode("template.kte", "@param String ignored\n<script>\nfunction() {\n@layout.snippet()\n}\n</script>");
+        codeResolver.givenCode("template.kte", "@param String ignored\n<script>\nfunction() {\n@template.layout.snippet()\n}\n</script>");
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.kte", "ignored", output));
 
@@ -1260,7 +1260,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                     "<span>${content}</span>");
         codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
                 "@param name:String\n" +
-                "@tag.card(content = @`<b>${localizer.localize(\"one-param\", name)}</b>`)");
+                "@template.tag.card(content = @`<b>${localizer.localize(\"one-param\", name)}</b>`)");
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1273,7 +1273,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
                 "@param name:String\n" +
-                "@tag.card(content = localizer.localize(\"one-param\", name))");
+                "@template.tag.card(content = localizer.localize(\"one-param\", name))");
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1286,7 +1286,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
                 "@param name:String\n" +
-                "@tag.card(content = localizer.localize(\"one-param\", @`<b>${name}</b>`))");
+                "@template.tag.card(content = localizer.localize(\"one-param\", @`<b>${name}</b>`))");
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1299,7 +1299,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
                 "@param name:String\n" +
-                "@tag.card(content = localizer.localize(\"many-params-html\", @`<span>${name}</span>`, @`<span>${name}</span>`, @`<span>${name}</span>`))");
+                "@template.tag.card(content = localizer.localize(\"many-params-html\", @`<span>${name}</span>`, @`<span>${name}</span>`, @`<span>${name}</span>`))");
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1312,7 +1312,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
                 "@param name:String\n" +
-                "@tag.card(content = localizer.localize(\"one-param\", @`<b>" +
+                "@template.tag.card(content = localizer.localize(\"one-param\", @`<b>" +
                     "${localizer.localize(\"one-param-html\", @`<i>${name}</i>`)}" +
                 "</b>`))");
 
@@ -1327,8 +1327,8 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "<span>${content}</span>");
         codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
                 "@param name:String\n" +
-                "@tag.card(content = localizer.localize(\"one-param\", @`<b>" +
-                    "@tag.card(content = localizer.localize(\"one-param-html\", @`<i>${name}</i>`))" +
+                "@template.tag.card(content = localizer.localize(\"one-param\", @`<b>" +
+                    "@template.tag.card(content = localizer.localize(\"one-param-html\", @`<i>${name}</i>`))" +
                 "</b>`))");
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
@@ -1345,7 +1345,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "!{var content = localizer.localize(\"one-param\", @`<b>" +
                 "${localizer.localize(\"one-param-html\", @`<i>${name}</i>`)}" +
                 "</b>`);}" +
-                "@tag.card(content = content)");
+                "@template.tag.card(content = content)");
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1356,7 +1356,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     void localization_tag8() {
         codeResolver.givenCode("tag/card.kte", "@param content:gg.jte.Content = @`My default is ${42}`\n" +
                 "<span>${content}</span>");
-        codeResolver.givenCode("template.kte", "@tag.card()");
+        codeResolver.givenCode("template.kte", "@template.tag.card()");
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 

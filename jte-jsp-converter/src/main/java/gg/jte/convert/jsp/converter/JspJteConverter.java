@@ -27,7 +27,7 @@ public class JspJteConverter implements CustomTagConverter {
             sb.append(output.getIndentationChar());
         }
         final String tagStartIndent = sb.toString(); // Used in lambda, must be final
-        output.append("@").append(tagCall).append("(");
+        output.append("@template.").append(tagCall).append("(");
 
         final AtomicBoolean first = new AtomicBoolean(true); // Used in lambda, must be final
         Runnable handleParameterStart = () -> {

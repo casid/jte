@@ -285,7 +285,7 @@ public class TemplateCompiler extends TemplateLoader {
         classDefinitions.add(classDefinition);
 
         CodeGenerator codeGenerator = createCodeGenerator(classInfo, classDefinitions, templateDependencies);
-        new TemplateParser(code, TemplateType.Template, codeGenerator, config).parse();
+        new TemplateParser(code, TemplateType.Template, codeGenerator, config, codeResolver).parse();
 
         classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
         templateByClassName.put(classDefinition.getName(), classInfo);

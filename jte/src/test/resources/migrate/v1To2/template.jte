@@ -1,0 +1,2 @@
+@tag.foo()
+@layout.foo()

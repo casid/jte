@@ -63,9 +63,9 @@ System.out.println(output);
 
 > Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required.
 
-If you had more than one page like `example.jte`, you would have to duplicate a lot of shared template code. Let's extract the shared code into a tag. Tags are template snippets that can be called by other templates.
+If you had more than one page like `example.jte`, you would have to duplicate a lot of shared template code. Let's extract the shared code into another template, so that it can be reused.
 
-Let's move stuff from our example page to `tag/page.jte`:
+Let's move stuff from our example page to `layout.jte`:
 
 ```htm
 @import org.example.Page
@@ -86,14 +86,14 @@ Let's move stuff from our example page to `tag/page.jte`:
 </body>
 ```
 
-The `@param Content content` is a content block that can be provided by callers of the template. `${content}` renders this content block. Let's refactor `example.jte` to use the new tag:
+The `@param Content content` is a content block that can be provided by callers of the template. `${content}` renders this content block. Let's refactor `example.jte` to use the new template:
 
 ```htm
 @import org.example.Page
 
 @param Page page
 
-@template.tag.page(page = page, content = @`
+@template.layout(page = page, content = @`
     <p>Welcome to my example page!</p>
 `)
 ```

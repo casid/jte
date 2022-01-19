@@ -787,11 +787,11 @@ public class JteContext {
     private static final ThreadLocal<JteLocalizer> context = new ThreadLocal<>();
 
     public static Content localize(String key) {
-        localizer.localize(key);
+        context.get().localize(key);
     }
     
     public static Content localize(String key, Object... params) {
-        localizer.localize(key, params);
+        context.get().localize(key, params);
     }
     
     static void init(JteLocalizer localizer) {
@@ -825,3 +825,7 @@ Localization in the template is now possible with a simple static method call:
 ```
 
 It really is a matter of taste, if you prefer a parameter or a static method call. The nice thing of both ways is, that everything is under your control and if you want to know what happens under the hood, that is just a click away in your IDE.
+
+Further reading:
+- Javalin example app [with localization support](https://github.com/casid/jte-javalin-tutorial)
+- The localization part of the [Javalin jte tutorial](https://javalin.io/tutorials/jte)

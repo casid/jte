@@ -234,41 +234,6 @@ public final class TemplateEngine {
         }
     }
 
-    /**
-     * Renders a tag with the given name.
-     * This comes at the cost of an extra method invocation and losing the type safety for params that jte usually provides.
-     * However, this is useful while migrating to jte.
-     * For instance, you can port a JSP tag to a jte tag and invoke the new jte tag from all other JSPs,
-     * so that there are no redundant implementations during the migration.
-     * @param name the template name relative to the specified root directory, for instance "tag/myTag.jte".
-     * @param params map of parameters that should be passed to the tag.
-     * @param output any implementation of {@link TemplateOutput}, where the template will be written to.
-     * @throws TemplateException in case the tag failed to render, containing information where the error happened.
-     */
-    public void renderTag(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
-        Template template = resolveTemplate(name);
-        try {
-            template.renderMap(checkOutput(output), htmlInterceptor, params);
-        } catch (Throwable e) {
-            throw handleRenderException(name, template, e);
-        }
-    }
-
-    /**
-     * Renders a layout with the given name.
-     * This comes at the cost of an extra method invocation and losing the type safety for params that jte usually provides.
-     * However, this is useful while migrating to jte.
-     * For instance, you can port a JSP layout to a jte layout and invoke the new jte layout from all other JSPs,
-     * so that there are no redundant implementations during the migration.
-     * @param name the template name relative to the specified root directory, for instance "layout/myLayout.jte".
-     * @param params map of parameters that should be passed to the layout.
-     * @param output any implementation of {@link TemplateOutput}, where the template will be written to.
-     * @throws TemplateException in case the layout failed to render, containing information where the error happened.
-     */
-    public void renderLayout(String name, Map<String, Object> params, TemplateOutput output) throws TemplateException {
-        renderTag(name, params, output);
-    }
-
     private TemplateOutput checkOutput(TemplateOutput templateOutput) {
         if (contentType == ContentType.Html && !(templateOutput instanceof HtmlTemplateOutput)) {
             return new OwaspHtmlTemplateOutput(templateOutput);
@@ -310,7 +275,7 @@ public final class TemplateEngine {
 
     /**
      * Obtain parameter information about a specific template.
-     * @param name the template name relative to the specified root directory, for instance "tag/example.jte".
+     * @param name the template name relative to the specified root directory, for instance "my/example.jte".
      * @return a map containing all template parameters names and their classes
      * @throws TemplateException in case parameter information is not available (jte classes must be compiled with -parameters compiler flag.)
      */

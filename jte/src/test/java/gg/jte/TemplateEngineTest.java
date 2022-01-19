@@ -948,7 +948,7 @@ public class TemplateEngineTest {
                 "${model.getThatThrows()}");
 
         StringOutput output = new StringOutput();
-        Throwable throwable = catchThrowable(() -> templateEngine.renderTag("tag/model.jte", TemplateUtils.toMap("model", model, "i", 1L), output));
+        Throwable throwable = catchThrowable(() -> templateEngine.render("tag/model.jte", TemplateUtils.toMap("model", model, "i", 1L), output));
 
         assertThat(throwable)
                 .hasCauseInstanceOf(ClassCastException.class)

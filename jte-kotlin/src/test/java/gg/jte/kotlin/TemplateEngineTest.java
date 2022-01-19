@@ -881,7 +881,7 @@ public class TemplateEngineTest {
                 "${model.getThatThrows()}");
 
         StringOutput output = new StringOutput();
-        Throwable throwable = catchThrowable(() -> templateEngine.renderTag("tag/model.kte", TemplateUtils.toMap("model", model, "i", 1L), output));
+        Throwable throwable = catchThrowable(() -> templateEngine.render("tag/model.kte", TemplateUtils.toMap("model", model, "i", 1L), output));
 
         assertThat(throwable)
                 .hasCauseInstanceOf(ClassCastException.class)
@@ -1042,8 +1042,8 @@ public class TemplateEngineTest {
         dummyCodeResolver.givenCode("tag/foo.jte", "Hello jte");
         dummyCodeResolver.givenCode("tag/bar.kte", "Hello kte");
 
-        templateEngine.renderTag("tag/foo.jte", Collections.emptyMap(), jteOutput);
-        templateEngine.renderTag("tag/bar.kte", Collections.emptyMap(), kteOutput);
+        templateEngine.render("tag/foo.jte", Collections.emptyMap(), jteOutput);
+        templateEngine.render("tag/bar.kte", Collections.emptyMap(), kteOutput);
 
         assertThat(jteOutput.toString()).isEqualTo("Hello jte");
         assertThat(kteOutput.toString()).isEqualTo("Hello kte");

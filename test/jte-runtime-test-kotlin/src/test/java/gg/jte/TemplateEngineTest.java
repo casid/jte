@@ -65,7 +65,7 @@ public class TemplateEngineTest {
 
     @Test
     void unusedTag() {
-        templateEngine.renderTag("tag/unused.kte", TemplateUtils.toMap("param1", "One", "param2", "Two"), output);
+        templateEngine.render("tag/unused.kte", TemplateUtils.toMap("param1", "One", "param2", "Two"), output);
         thenOutputIs("One is One, two is Two.");
     }
 

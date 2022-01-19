@@ -11,7 +11,6 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
   - [Loops](#loops)
 - [Comments](#comments)
 - [Tags](#tags)
-- [Layouts](#layouts)
 - [Content](#content)
 - [Variables](#variables)
 - [HTML Rendering](#html-rendering)

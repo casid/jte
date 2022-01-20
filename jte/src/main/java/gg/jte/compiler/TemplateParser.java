@@ -317,7 +317,7 @@ public final class TemplateParser {
                     rootDirectory = ((DirectoryCodeResolver)codeResolver).getRoot().toAbsolutePath().toString().replace("\\", "\\\\");
                 }
 
-                visitor.onError("@tag and @layout have been replace with @template since jte v2. Your templates must be migrated. You can do this automatically by running the following Java code in your project:\n\n" +
+                visitor.onError("@tag and @layout have been replace with @template since jte 2.\nYour templates must be migrated. You can do this automatically by running the following Java code in your project:\n\n" +
                         "public class Migration {\n" +
                         "    public static void main(String[] args) {\n" +
                         "        gg.jte.migrate.MigrateV1To2.migrateTemplates(java.nio.file.Paths.get(\"" + rootDirectory + "\"));\n" +

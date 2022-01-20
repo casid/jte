@@ -7,7 +7,7 @@ import gg.jte.compiler.*;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import gg.jte.runtime.DebugInfo;
-import gg.jte.runtime.TemplateType;
+import gg.jte.compiler.TemplateType;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -385,8 +385,8 @@ public class KotlinCodeGenerator implements CodeGenerator {
     }
 
     @Override
-    public void onTag(int depth, TemplateType type, String name, List<String> params) {
-        ClassInfo tagInfo = compiler.generateTagOrLayout(type, name, "kte", classDefinitions, templateDependencies, getCurrentDebugInfo());
+    public void onTemplateCall(int depth, String name, List<String> params) {
+        ClassInfo tagInfo = compiler.generateTemplateCall(name, "kte", classDefinitions, templateDependencies, getCurrentDebugInfo());
 
         writeIndentation(depth);
 

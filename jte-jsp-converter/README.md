@@ -103,7 +103,7 @@ public class JteTag extends BodyTagSupport implements DynamicAttributes {
       try {
          convertParamsIfRequired();
 
-         templateEngine.renderTag(jte, params, new JspWriterOutput(pageContext.getOut()));
+         templateEngine.render(jte, params, new JspWriterOutput(pageContext.getOut()));
 
          return super.doEndTag();
       }

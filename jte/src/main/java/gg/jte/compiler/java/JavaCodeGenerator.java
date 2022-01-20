@@ -7,7 +7,7 @@ import gg.jte.compiler.*;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import gg.jte.runtime.DebugInfo;
-import gg.jte.runtime.TemplateType;
+import gg.jte.compiler.TemplateType;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -380,8 +380,8 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     @Override
-    public void onTag(int depth, TemplateType type, String name, List<String> params) {
-        ClassInfo tagInfo = compiler.generateTagOrLayout(type, name, "jte", classDefinitions, templateDependencies, getCurrentDebugInfo());
+    public void onTemplateCall(int depth, String name, List<String> params) {
+        ClassInfo tagInfo = compiler.generateTemplateCall(name, "jte", classDefinitions, templateDependencies, getCurrentDebugInfo());
 
         writeIndentation(depth);
 

@@ -37,7 +37,7 @@ public class TemplateEngine_MapParamsTest {
         params.put("firstParam", "Hello");
         params.put("secondParam", 42);
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: Hello, two: 42");
     }
@@ -48,7 +48,7 @@ public class TemplateEngine_MapParamsTest {
                 "@param Boolean secondParam = true\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: false, two: true");
     }
@@ -59,7 +59,7 @@ public class TemplateEngine_MapParamsTest {
                 "@param Integer secondParam = 3\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: 1, two: 3");
     }
@@ -70,7 +70,7 @@ public class TemplateEngine_MapParamsTest {
                 "@param Long secondParam = 3L\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: 1, two: 3");
     }
@@ -81,7 +81,7 @@ public class TemplateEngine_MapParamsTest {
                 "@param Float secondParam = 3.0f\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: 1.0, two: 3.0");
     }
@@ -92,7 +92,7 @@ public class TemplateEngine_MapParamsTest {
                 "@param Double secondParam = 3.0\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: 1.0, two: 3.0");
     }
@@ -103,7 +103,7 @@ public class TemplateEngine_MapParamsTest {
                 "@param Double secondParam = 3.0\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: 1, two: 3.0");
     }
@@ -114,7 +114,7 @@ public class TemplateEngine_MapParamsTest {
                 "@param Double secondParam = 3.0\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: -2147483648, two: 3.0");
     }
@@ -125,7 +125,7 @@ public class TemplateEngine_MapParamsTest {
                 "@param int secondParam = 3\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: test, two: 3");
     }
@@ -136,7 +136,7 @@ public class TemplateEngine_MapParamsTest {
                 "@param int secondParam = 3\n" +
                 "One: ${firstParam}, two: ${secondParam}");
 
-        whenTagIsRendered("tag/card.jte");
+        whenTemplateIsRendered("tag/card.jte");
 
         thenOutputIs("One: , two: 3");
     }
@@ -144,7 +144,7 @@ public class TemplateEngine_MapParamsTest {
     @Test
     void layout_noParamsAndDefinitions() {
         givenLayout("page", "Hello !!");
-        whenLayoutIsRendered("layout/page.jte");
+        whenTemplateIsRendered("layout/page.jte");
         thenOutputIs("Hello !!");
     }
 
@@ -154,7 +154,7 @@ public class TemplateEngine_MapParamsTest {
                 "Hello ${content}!!");
         params.put("content", (Content) output -> output.writeContent("<p>world</p>"));
 
-        whenLayoutIsRendered("layout/page.jte");
+        whenTemplateIsRendered("layout/page.jte");
 
         thenOutputIs("Hello <p>world</p>!!");
     }
@@ -169,7 +169,7 @@ public class TemplateEngine_MapParamsTest {
         params.put("content", (Content) output -> output.writeContent("<p>content</p>"));
         params.put("footer", (Content) output -> output.writeContent("<p>footer</p>"));
 
-        whenLayoutIsRendered("layout/page.jte");
+        whenTemplateIsRendered("layout/page.jte");
 
         thenOutputIs("Hello jte <p>content</p>, <p>footer</p>");
     }
@@ -189,19 +189,8 @@ public class TemplateEngine_MapParamsTest {
         dummyCodeResolver.givenCode("layout/" + name + ".jte", code);
     }
 
-    @SuppressWarnings("SameParameterValue")
     private void whenTemplateIsRendered(String name) {
         templateEngine.render(name, params, output);
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private void whenTagIsRendered(String name) {
-        templateEngine.renderTag(name, params, output);
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private void whenLayoutIsRendered(String name) {
-        templateEngine.renderLayout(name, params, output);
     }
 
     private void thenOutputIs(String expected) {

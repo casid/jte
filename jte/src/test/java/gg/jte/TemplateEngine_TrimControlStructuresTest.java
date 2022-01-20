@@ -329,7 +329,7 @@ public class TemplateEngine_TrimControlStructuresTest {
         givenTag("my.jte", "hello..");
         givenTemplate(
                 "@if(true)\n" +
-                "    @tag.my()\n" +
+                "    @template.tag.my()\n" +
                 "@endif\n" +
                 "Next line");
         thenOutputIs("hello..\nNext line");
@@ -347,7 +347,7 @@ public class TemplateEngine_TrimControlStructuresTest {
         );
         givenTemplate(
                 "@if(true)\n" +
-                "    @layout.my(@`Here is some data: ${42} that's nice.`)\n" +
+                "    @template.layout.my(@`Here is some data: ${42} that's nice.`)\n" +
                 "@endif\n" +
                 "Next line");
 

@@ -64,7 +64,7 @@ class DirectoryWatcherTest {
     @Test
     void tagUsedByTemplate() {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
-        whenFileIsWritten(TEMPLATE, "@param String name\n@tag.name(name)");
+        whenFileIsWritten(TEMPLATE, "@param String name\n@template.tag.name(name)");
         thenTemplateOutputIs("Hello hot reload!");
 
         TestUtils.sleepIfLegacyJavaVersion(1000); // File.getLastModified() only has seconds precision on most Java 8 versions

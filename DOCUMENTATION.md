@@ -11,7 +11,6 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
   - [Loops](#loops)
 - [Comments](#comments)
 - [Tags](#tags)
-- [Layouts](#layouts)
 - [Content](#content)
 - [Variables](#variables)
 - [HTML Rendering](#html-rendering)
@@ -148,11 +147,11 @@ jte allows you to define comments in your templates. jte comments are not includ
 <%-- This comment will not be present in the rendered output --%>
 ```
 
-## Tags
+## Template Calls
 
-To share common functionality between templates, you can extract it into tags. All tags must be located within the `tag` directory in the jte root directory.
+To share common functionality between templates, you can extract it into other templates. All templates must be located within the jte root directory.
 
-Here is an example tag, located in `tag/drawEntry.jte`
+Here is an example template, located in `my/drawEntry.jte`
 
 ```xml
 @import my.Entry
@@ -165,18 +164,18 @@ Here is an example tag, located in `tag/drawEntry.jte`
 @endif
 ```
 
-Tags can be called like regular Java methods.
+Templates can be called like regular Java methods.
 
 ```xml
-@tag.drawEntry(model.entry1, true)
-@tag.drawEntry(model.entry2, false)
+@template.my.drawEntry(model.entry1, true)
+@template.my.drawEntry(model.entry2, false)
 ```
 
-Subdirectories in the `tag` directory act like packages in java. For instance, if the drawEntry tag was located in `tag/entry/drawEntry.jte`, you would call it like this:
+Subdirectories in the jte root directory act like packages in java. For instance, if the drawEntry template was located in `my/entry/drawEntry.jte`, you would call it like this:
 
 ```xml
-@tag.entry.drawEntry(model.entry1, true)
-@tag.entry.drawEntry(model.entry2, false)
+@template.my.entry.drawEntry(model.entry1, true)
+@template.my.entry.drawEntry(model.entry2, false)
 ```
 
 ### Named parameters
@@ -185,8 +184,8 @@ If you don't want to depend on the parameter order, you can explicitly name para
 (this is what the [IntelliJ plugin](https://plugins.jetbrains.com/plugin/14521-jte) suggests by default).
 
 ```xml
-@tag.entry.drawEntry(entry = model.entry1, verbose = true)
-@tag.entry.drawEntry(entry = model.entry2, verbose = false)
+@template.my.entry.drawEntry(entry = model.entry1, verbose = true)
+@template.my.entry.drawEntry(entry = model.entry2, verbose = false)
 ```
 
 ### Default parameters
@@ -207,13 +206,13 @@ You can also define default values for all parameters, so that they only need to
 The second call could then be simplified to this:
 
 ```xml
-@tag.entry.drawEntry(entry = model.entry1, verbose = true)
-@tag.entry.drawEntry(entry = model.entry2)
+@template.my.entry.drawEntry(entry = model.entry1, verbose = true)
+@template.my.entry.drawEntry(entry = model.entry2)
 ```
 
 ### Varargs
 
-The last parameter of a tag can be a varargs parameter. For instance, if you created a tag to wrap elements in a list you could create something like `tag/list.jte`:
+The last parameter of a template can be a varargs parameter. For instance, if you created a tag to wrap elements in a list you could create something like `list.jte`:
 
 ```xml
 @param String title
@@ -229,20 +228,12 @@ The last parameter of a tag can be a varargs parameter. For instance, if you cre
 And call it like this:
 
 ```xml
-@tag.list(title = "Things to do", "Cook dinner", "Eat", "Netflix and Chill")
+@template.list(title = "Things to do", "Cook dinner", "Eat", "Netflix and Chill")
 ```
-
-## Layouts
-
-Layouts have the same features as tags. All layouts must be located within the `layout` directory in the jte root directory.
-
-You can use layouts to better distinguish page layouts from regular tags, but you don't have to.
-
-Layouts usually contain of one or several [content blocks](#content).
 
 ## Content
 
-`gg.jte.Content` is a special parameter type to pass template code to tags, much like lambdas in Java. They are particularly useful to share structure between different templates.
+`gg.jte.Content` is a special parameter type to pass template code to other templates, much like lambdas in Java. They are particularly useful to share structure between different templates.
 
 Here is an example layout with a content block:
 
@@ -279,7 +270,7 @@ The shorthand to create content blocks within jte templates is an `@` followed b
 @import org.example.WelcomePage
 @param WelcomePage welcomePage
 
-@layout.page(
+@template.layout.page(
     page = welcomePage,
     content = @`
         <p>Welcome, ${welcomePage.getUserName()}.</p>

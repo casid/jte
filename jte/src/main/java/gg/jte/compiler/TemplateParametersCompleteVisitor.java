@@ -1,7 +1,5 @@
 package gg.jte.compiler;
 
-import gg.jte.runtime.TemplateType;
-
 import java.util.List;
 
 class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
@@ -82,7 +80,7 @@ class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onTag(int depth, TemplateType type, String name, List<String> params) {
+    public void onTemplateCall(int depth, String name, List<String> params) {
 
     }
 

@@ -1,8 +1,6 @@
-package gg.jte.runtime;
+package gg.jte.compiler;
 
 public enum TemplateType {
     Template,
-    Tag,
-    Layout,
     Content,
 }

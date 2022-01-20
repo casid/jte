@@ -1,7 +1,5 @@
 package gg.jte.compiler;
 
-import gg.jte.runtime.TemplateType;
-
 import java.util.List;
 
 public interface TemplateParserVisitor {
@@ -35,7 +33,7 @@ public interface TemplateParserVisitor {
 
     void onForLoopEnd(int depth);
 
-    void onTag(int depth, TemplateType type, String name, List<String> params);
+    void onTemplateCall(int depth, String name, List<String> params);
 
     void onLineFinished();
 

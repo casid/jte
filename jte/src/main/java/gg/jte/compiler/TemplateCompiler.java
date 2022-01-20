@@ -207,17 +207,12 @@ public class TemplateCompiler extends TemplateLoader {
     private LinkedHashSet<ClassDefinition> generate(List<String> names, boolean trackChanges) {
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
-            switch (getTemplateType(name)) {
-                case Template:
-                    generateTemplate(name, classDefinitions);
-                    break;
-                case Tag:
-                    generateTemplateFromTag(name, classDefinitions);
-                    break;
-                case Layout:
-                    generateTemplateFromLayout(name, classDefinitions);
-                    break;
-            }
+            LinkedHashSet<TemplateDependency> dependencies = initTemplateDependencies(name);
+
+            ClassInfo templateInfo = generateTemplateCall(name, classDefinitions, dependencies, null);
+
+            templateDependencies.put(name, dependencies);
+            templateByClassName.put(templateInfo.name, templateInfo);
         }
 
         Path resourceDirectory = config.resourceDirectory == null ? classDirectory : config.resourceDirectory;
@@ -251,76 +246,32 @@ public class TemplateCompiler extends TemplateLoader {
         return classDefinitions;
     }
 
-    private void generateTemplate(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
-        String code = resolveCode(name, null);
-
-        LinkedHashSet<TemplateDependency> templateDependencies = initTemplateDependencies(name);
-
-        ClassInfo templateInfo = new ClassInfo(name, config.packageName);
-
-        CodeGenerator codeGenerator = createCodeGenerator(templateInfo, classDefinitions, templateDependencies);
-        new TemplateParser(code, TemplateType.Template, codeGenerator, config).parse();
-
-        this.templateDependencies.put(name, templateDependencies);
-
-        ClassDefinition templateDefinition = new ClassDefinition(templateInfo.fullName, templateInfo);
-        templateDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
-        classDefinitions.add(templateDefinition);
-
-        templateByClassName.put(templateDefinition.getName(), templateInfo);
-
-        if (DEBUG) {
-            System.out.println(templateDefinition.getCode());
-        }
-    }
-
     private LinkedHashSet<TemplateDependency> initTemplateDependencies(String name) {
         LinkedHashSet<TemplateDependency> templateDependencies = new LinkedHashSet<>();
         templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
         return templateDependencies;
     }
 
-    private void generateTemplateFromTag(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
-        LinkedHashSet<TemplateDependency> templateDependencies = initTemplateDependencies(name);
-
-        ClassInfo templateInfo = generateTagOrLayout(TemplateType.Tag, name, classDefinitions, templateDependencies, null);
-
-        this.templateDependencies.put(name, templateDependencies);
-
-        templateByClassName.put(templateInfo.name, templateInfo);
-    }
-
-    private void generateTemplateFromLayout(String name, LinkedHashSet<ClassDefinition> classDefinitions) {
-        LinkedHashSet<TemplateDependency> templateDependencies = initTemplateDependencies(name);
-
-        ClassInfo templateInfo = generateTagOrLayout(TemplateType.Layout, name, classDefinitions, templateDependencies, null);
-
-        this.templateDependencies.put(name, templateDependencies);
-
-        templateByClassName.put(templateInfo.name, templateInfo);
-    }
-
-    public ClassInfo generateTagOrLayout(TemplateType type, String simpleName, String extension, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo) {
-        String name = resolveTagOrLayoutName(type, simpleName, extension);
+    public ClassInfo generateTemplateCall(String simpleName, String extension, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo) {
+        String name = resolveTemplateName(simpleName, extension);
         try {
-            return generateTagOrLayout(type, name, classDefinitions, templateDependencies, debugInfo);
+            return generateTemplateCall(name, classDefinitions, templateDependencies, debugInfo);
         } catch (TemplateNotFoundException e) {
-            String alternativeName = resolveTagOrLayoutName(type, simpleName, "jte".equals(extension) ? "kte" : "jte");
+            String alternativeName = resolveTemplateName(simpleName, "jte".equals(extension) ? "kte" : "jte");
 
             if (codeResolver.exists(alternativeName)) {
-                return generateTagOrLayout(type, alternativeName, classDefinitions, templateDependencies, debugInfo);
+                return generateTemplateCall(alternativeName, classDefinitions, templateDependencies, debugInfo);
             } else {
                 throw e;
             }
         }
     }
 
-    private String resolveTagOrLayoutName(TemplateType type, String simpleName, String extension) {
-        String directory = type == TemplateType.Layout ? Constants.LAYOUT_DIRECTORY : Constants.TAG_DIRECTORY;
-        return directory + simpleName.replace('.', '/') + "." + extension;
+    private String resolveTemplateName(String simpleName, String extension) {
+        return simpleName.replace('.', '/') + "." + extension;
     }
 
-    public ClassInfo generateTagOrLayout(TemplateType type, String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo) {
+    public ClassInfo generateTemplateCall(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo) {
         templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
         ClassInfo classInfo = new ClassInfo(name, config.packageName);
 
@@ -334,7 +285,7 @@ public class TemplateCompiler extends TemplateLoader {
         classDefinitions.add(classDefinition);
 
         CodeGenerator codeGenerator = createCodeGenerator(classInfo, classDefinitions, templateDependencies);
-        new TemplateParser(code, type, codeGenerator, config).parse();
+        new TemplateParser(code, TemplateType.Template, codeGenerator, config, codeResolver).parse();
 
         classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
         templateByClassName.put(classDefinition.getName(), classInfo);

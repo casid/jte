@@ -14,16 +14,14 @@ import java.util.Map;
 
 public final class Template {
     private final String name;
-    private final TemplateType type;
     private final Class<?> clazz;
     private final int parameterCount;
     private Method render;
     private Method renderMap;
     private Map<String, Class<?>> parameterInfo;
 
-    public Template(String name, TemplateType type, Class<?> clazz) {
+    public Template(String name, Class<?> clazz) {
         this.name = name;
-        this.type = type;
         this.clazz = clazz;
         findRenderMethods(clazz);
         parameterCount = resolveParameterCount();
@@ -71,20 +69,16 @@ public final class Template {
         }
 
         if (render == null) {
-            throw new IllegalStateException("Failed to init " + type + " " + name + ", no method named 'render' found in " + clazz);
+            throw new IllegalStateException("Failed to init template " + name + ", no method named 'render' found in " + clazz);
         }
 
         if (renderMap == null) {
-            throw new IllegalStateException("Failed to init " + type + " " + name + ", no method named 'renderMap' found in " + clazz);
+            throw new IllegalStateException("Failed to init template " + name + ", no method named 'renderMap' found in " + clazz);
         }
     }
 
     private int resolveParameterCount() {
-        if (type == TemplateType.Layout) {
-            return render.getParameterCount() - 3;
-        } else {
-            return render.getParameterCount() - 2;
-        }
+        return render.getParameterCount() - 2;
     }
 
     public Map<String, Class<?>> getParamInfo() {

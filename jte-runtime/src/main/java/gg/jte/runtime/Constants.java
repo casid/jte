@@ -1,8 +1,6 @@
 package gg.jte.runtime;
 
 public interface Constants {
-    String TAG_DIRECTORY = "tag/";
-    String LAYOUT_DIRECTORY = "layout/";
     String CLASS_PREFIX = "Jte";
     String CLASS_SUFFIX = "Generated";
     String PACKAGE_NAME_PRECOMPILED = "gg.jte.generated.precompiled";

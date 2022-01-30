@@ -7,7 +7,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/gg.jte/jte.svg)](http://mvnrepository.com/artifact/gg.jte/jte)
 
 ## Features
-- Intuitive, easy [syntax](DOCUMENTATION.md)
+- Intuitive and easy syntax, you'll rarely need to check the [documentation](DOCUMENTATION.md)
 - Write plain Java or Kotlin for expressions
 - Context-sensitive [HTML escaping](https://github.com/casid/jte/blob/master/DOCUMENTATION.md#html-escaping) at compile time
 - <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> with completion and refactoring support
@@ -144,6 +144,7 @@ No further dependencies required! Check out the [syntax documentation](DOCUMENTA
 - [Eclipse Vert.x](https://github.com/vert-x3/vertx-web/tree/master/vertx-template-engines/vertx-web-templ-jte)
 - [Spring Boot](https://github.com/casid/jte-spring-boot-demo)
 - [Spring Web MVC](https://github.com/izogfif/demo-spring-jte)
+- [Micronaut](https://micronaut-projects.github.io/micronaut-views/latest/guide/#jte)
 - [Quarkus](https://github.com/renannprado/quarkus-jte-extension/)
 - [Severell](https://github.com/severell/severell-jte-plugin)
 

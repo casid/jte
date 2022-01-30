@@ -65,7 +65,7 @@ System.out.println(output);
 
 If you had more than one page like `example.jte`, you would have to duplicate a lot of shared template code. Let's extract the shared code into another template, so that it can be reused.
 
-Let's move stuff from our example page to `layout.jte`:
+Let's move stuff from our example page to `tag/page.jte`:
 
 ```htm
 @import org.example.Page
@@ -93,7 +93,7 @@ The `@param Content content` is a content block that can be provided by callers 
 
 @param Page page
 
-@template.layout(page = page, content = @`
+@tag.page(page = page, content = @`
     <p>Welcome to my example page!</p>
 `)
 ```

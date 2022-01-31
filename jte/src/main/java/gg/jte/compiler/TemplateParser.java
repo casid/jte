@@ -129,6 +129,14 @@ public final class TemplateParser {
                 extract(templateCode, lastIndex, i, (depth, content) -> visitor.onParam(content.trim()));
                 pop();
                 lastIndex = i + 1;
+            } else if (currentMode == Mode.Text && regionMatches("@raw")) {
+                extractTextPart(i - 3, Mode.Raw);
+                lastIndex = i + 1;
+                push(Mode.Raw);
+            } else if (currentMode == Mode.Raw && regionMatches("@endraw")) {
+                pop();
+                extractTextPart(i - 6, Mode.RawEnd);
+                lastIndex = i + 1;
             } else if (isCommentAllowed() && regionMatches("<%--")) {
                 extractComment(Mode.Comment, i - 3);
             } else if (isCommentAllowed() && regionMatches("<!--") && isHtmlCommentAllowed()) {
@@ -470,9 +478,9 @@ public final class TemplateParser {
             previousControlStructureTrimmed = null;
         }
 
-        if (mode == Mode.Condition || mode == Mode.ForLoop) {
+        if (mode == Mode.Condition || mode == Mode.ForLoop || mode == Mode.Raw) {
             pushIndent(endIndex, mode);
-        } else if (mode == Mode.ConditionEnd || mode == Mode.ForLoopEnd) {
+        } else if (mode == Mode.ConditionEnd || mode == Mode.ForLoopEnd || mode == Mode.RawEnd) {
             popIndent();
         }
     }
@@ -987,6 +995,8 @@ public final class TemplateParser {
         Mode JsComment = new StatelessMode("JsComment", false, false, true);
         Mode JsBlockComment = new StatelessMode("JsBlockComment", false, false, true);
         Mode Content = new StatelessMode("Content", false, false, true);
+        Mode Raw = new StatelessMode("Raw");
+        Mode RawEnd = new StatelessMode("RawEnd");
 
         boolean isTrackStrings();
         boolean isTrackBraces();

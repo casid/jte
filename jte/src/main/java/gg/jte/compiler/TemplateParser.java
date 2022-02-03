@@ -133,10 +133,14 @@ public final class TemplateParser {
                 extractTextPart(i - 3, Mode.Raw);
                 lastIndex = i + 1;
                 push(Mode.Raw);
+
+                visitor.onRawStart(depth);
             } else if (currentMode == Mode.Raw && regionMatches("@endraw")) {
                 pop();
                 extractTextPart(i - 6, Mode.RawEnd);
                 lastIndex = i + 1;
+
+                visitor.onRawEnd(depth);
             } else if (isCommentAllowed() && regionMatches("<%--")) {
                 extractComment(Mode.Comment, i - 3);
             } else if (isCommentAllowed() && regionMatches("<!--") && isHtmlCommentAllowed()) {

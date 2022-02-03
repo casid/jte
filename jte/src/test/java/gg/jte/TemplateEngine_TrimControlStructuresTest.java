@@ -327,6 +327,12 @@ public class TemplateEngine_TrimControlStructuresTest {
     }
 
     @Test
+    void raw_oneLine() {
+        givenTemplate("@rawfoo@endraw");
+        thenOutputIs("foo");
+    }
+
+    @Test
     void variable() {
         givenTemplate(
                 "!{int x = 1;}\n" +

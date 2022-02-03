@@ -33,6 +33,10 @@ public interface TemplateParserVisitor {
 
     void onForLoopEnd(int depth);
 
+    default void onRawStart(int depth) {}
+
+    default void onRawEnd(int depth) {}
+
     void onTemplateCall(int depth, String name, List<String> params);
 
     void onLineFinished();

@@ -618,6 +618,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void commentInPlainTemplate_raw() {
+        givenTemplate("@rawHello<%--This is a comment--%> World@endraw");
+        thenOutputIs("Hello<%--This is a comment--%> World");
+    }
+
+    @Test
     void htmlCommentInPlainTemplate() {
         givenTemplate("Hello<!--This is an HTML comment--> World");
         thenOutputIs("Hello<!--This is an HTML comment--> World");

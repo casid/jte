@@ -303,6 +303,36 @@ public class TemplateEngine_TrimControlStructuresTest {
     }
 
     @Test
+    void raw() {
+        givenTemplate("@if(true)\n" +
+                    "  @raw\n" +
+                    "    @template(foo, bar) => ${something}\n" +
+                    "  @endraw\n" +
+                    "@endif");
+        thenOutputIs("@template(foo, bar) => ${something}\n");
+    }
+
+    @Test
+    void raw_divs() {
+        givenTemplate("@if(true)\n" +
+                "  @raw\n" +
+                "    <div>\n" +
+                "      <b>foo</b>\n" +
+                "    </div>\n" +
+                "  @endraw\n" +
+                "@endif");
+        thenOutputIs("<div>\n" +
+                "  <b>foo</b>\n" +
+                "</div>\n");
+    }
+
+    @Test
+    void raw_oneLine() {
+        givenTemplate("@rawfoo@endraw");
+        thenOutputIs("foo");
+    }
+
+    @Test
     void variable() {
         givenTemplate(
                 "!{int x = 1;}\n" +

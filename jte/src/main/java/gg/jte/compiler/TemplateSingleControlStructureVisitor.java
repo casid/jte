@@ -85,6 +85,16 @@ class TemplateSingleControlStructureVisitor implements TemplateParserVisitor {
     }
 
     @Override
+    public void onRawStart(int depth) {
+        incrementAmount();
+    }
+
+    @Override
+    public void onRawEnd(int depth) {
+        incrementAmount();
+    }
+
+    @Override
     public void onTemplateCall(int depth, String name, List<String> params) {
         throw new NotSingleControlStructure();
     }

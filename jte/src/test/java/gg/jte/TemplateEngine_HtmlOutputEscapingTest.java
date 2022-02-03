@@ -545,6 +545,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void htmlComment_raw() {
+        codeResolver.givenCode("template.jte", "@param String url\n@raw<!-- html comment -->@endraw<a href=\"${url}\">Click me!</a>");
+
+        templateEngine.render("template.jte", "https://jte.gg", output);
+
+        assertThat(output.toString()).isEqualTo("<!-- html comment --><a href=\"https://jte.gg\">Click me!</a>");
+    }
+
+    @Test
     void jsComment() {
         codeResolver.givenCode("template.jte", "@param String hello\n<script>// hello\nvar x = 'hello';</script>${hello}");
 

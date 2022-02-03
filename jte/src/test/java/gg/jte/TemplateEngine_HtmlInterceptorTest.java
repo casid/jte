@@ -291,6 +291,41 @@ public class TemplateEngine_HtmlInterceptorTest {
                 "</form>");
     }
 
+    @Test
+    void raw_entireForm() {
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "@raw\n" +
+                "    <form action=\"${url}\">\n" +
+                "        <input name=\"x\"/>\n" +
+                "    </form>" +
+                "@endraw");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo(
+                "<form action=\"${url}\">\n" +
+                "    <input name=\"x\"/>\n" +
+                "</form>");
+    }
+
+    @Test
+    void raw_partOfForm() {
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "<form action=\"${url}\">\n" +
+                "    @raw\n" +
+                "        <input name=\"${x}\"/>\n" +
+                "    @endraw" +
+                "</form>");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo(
+                "<form action=\"hello.htm\" data-form=\"x\">\n" +
+                        "    <input name=\"${x}\"/>\n" +
+                        "<input name=\"__fp\" value=\"a:hello.htm, p:\">\n" +
+                        "</form>");
+    }
+
     @SuppressWarnings("unused")
     public static class Controller {
         private String foodOption;

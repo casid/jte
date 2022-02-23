@@ -27,8 +27,6 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
   - [GraalVM native-image support](#graalvm-native-image-support-since-1100)
 - [Binary rendering for max throughput](#binary-rendering-for-max-throughput)
 - [Localization](#localization)
-- [Migration](#migration)
-  - [jte 1 to jte 2](#jte-1-to-jte-2)
 
 ## Rendering a template
 
@@ -824,28 +822,3 @@ It really is a matter of taste, if you prefer a parameter or a static method cal
 Further reading:
 - Javalin example app [with localization support](https://github.com/casid/jte-javalin-tutorial)
 - The localization part of the [Javalin jte tutorial](https://javalin.io/tutorials/jte)
-
-## Migration
-
-### jte 1 to jte 2
-
-> jte 2 is still work in progress and not yet released.
-
-The specialized `@tag` and `@layout` keywords have been removed in favor of `@template`. This change allows users of the library to structure their code freely.
-
-How to upgrade:
-- Bump jte dependency to the latest 2.x release
-- Compile your templates (either through maven, gradle or by simply opening your website locally)
-- In case you use any of the removed keywords, the compiler will fail and output a Java class that does the migration
-- Create a class with the migration code in your project and run the main method
-- Make sure to upgrade the IntelliJ plugin to 2.x
-
-Migration class, in case you want to migrate right away without the compile step:
-
-```java
-public class Migration {
-    public static void main(String[] args) {
-        gg.jte.migrate.MigrateV1To2.migrateTemplates(java.nio.file.Paths.get("your jte source root directory"));
-    }
-}
-```

@@ -149,9 +149,7 @@ jte allows you to define comments in your templates. jte comments are not includ
 
 ## Template Calls
 
-> This is already the new syntax for jte 2. In the current jte version callable templates need to be located in specific directories ([see here](https://github.com/casid/jte/blob/77d4e49122cac96f77eca9ae299b7ebd32b5d2fe/DOCUMENTATION.md#tags)). No worries, once jte 2 is out, there'll be an automatic migration to the new syntax.
-
-To share common functionality between templates, you can extract it into other templates. All templates must be located within the jte root directory.
+To share common functionality between templates, you can call other templates. All templates must be located within the jte root directory.
 
 Here is an example template, located in `my/drawEntry.jte`
 

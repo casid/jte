@@ -20,6 +20,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
   - [HTML tag bodies](#html-tag-bodies)
   - [HTML attributes](#html-attributes)
   - [JavaScript attributes](#javascript-attributes)
+- [Raw output](#raw-output)
 - [Hot Reloading](#hot-reloading)
 - [Precompiling Templates](#precompiling-templates)
   - [Using a directory on your server](#using-a-directory-on-your-server-recommended)
@@ -419,6 +420,19 @@ Before rendering, you'd simply wrap the actual `TemplateOutput` you are using:
 
 ```java
 TemplateOutput output = new MySecureHtmlOutput(new StringOutput());
+```
+
+## Raw output
+
+Sometimes it is required to output text as is. The `@raw` keyword can be used to open a raw section, that is unprocessed by jte.
+
+```html
+@raw
+<script>
+  const foo = "foo";
+  console.log("This is ${foo}");
+</script>
+@endraw
 ```
 
 ## Hot Reloading

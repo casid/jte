@@ -342,36 +342,36 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void tag() {
-        givenTag("card", "@param java.lang.String firstParam\n" +
+    void template() {
+        givenTemplate("card.jte", "@param java.lang.String firstParam\n" +
                 "@param int secondParam\n" +
                 "One: ${firstParam}, two: ${secondParam}");
-        givenTemplate("@template.tag.card(model.hello, model.x), That was a tag!");
+        givenTemplate("@template.card(model.hello, model.x), That was a tag!");
         thenOutputIs("One: Hello, two: 42, That was a tag!");
     }
 
     @Test
-    void tag_content() {
-        givenTag("card", "@param gg.jte.Content content\n" +
+    void template_content() {
+        givenTemplate("card.jte", "@param gg.jte.Content content\n" +
                 "<span>${content}</span>");
-        givenTemplate("@template.tag.card(@`<b>${model.hello}</b>`), That was a tag!");
+        givenTemplate("@template.card(@`<b>${model.hello}</b>`), That was a tag!");
         thenOutputIs("<span><b>Hello</b></span>, That was a tag!");
     }
 
     @Test
-    void tag_content_comma() {
-        givenTag("card", "@param gg.jte.Content content\n" +
+    void template_content_comma() {
+        givenTemplate("card.jte", "@param gg.jte.Content content\n" +
                 "<span>${content}</span>");
-        givenTemplate("@template.tag.card(@`<b>Hello, ${model.hello}</b>`), That was a tag!");
+        givenTemplate("@template.card(@`<b>Hello, ${model.hello}</b>`), That was a tag!");
         thenOutputIs("<span><b>Hello, Hello</b></span>, That was a tag!");
     }
 
     @Test
-    void tagWithGenericParam() {
-        givenTag("entry", "@param java.util.Map.Entry<String, java.util.List<String>> entry\n" +
+    void templateWithGenericParam() {
+        givenTemplate("entry.jte", "@param java.util.Map.Entry<String, java.util.List<String>> entry\n" +
                 "${entry.getKey()}: ${entry.getValue().toString()}");
         givenRawTemplate("@param java.util.Map<String, java.util.List<String>> map\n" +
-                "@for(java.util.Map.Entry entry : map.entrySet())@template.tag.entry(entry)\n@endfor");
+                "@for(java.util.Map.Entry entry : map.entrySet())@template.entry(entry)\n@endfor");
 
         Map<String, List<String>> model = new TreeMap<>();
         model.put("one", Arrays.asList("1", "2"));
@@ -384,82 +384,82 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void tagWithMethodCallForParam() {
-        givenTag("card", "@param java.lang.String firstParam\n" +
+    void templateWithMethodCallForParam() {
+        givenTemplate("card.jte", "@param java.lang.String firstParam\n" +
                 "@param int secondParam\n" +
                 "One: ${firstParam}, two: ${secondParam}");
-        givenTemplate("@template.tag.card(model.getAnotherWorld(), model.x), That was a tag!");
+        givenTemplate("@template.card(model.getAnotherWorld(), model.x), That was a tag!");
         thenOutputIs("One: Another World, two: 42, That was a tag!");
     }
 
     @Test
-    void tagInTag() {
-        givenTag("divTwo", "@param int amount\n" +
+    void templateInTemplate() {
+        givenTemplate("divTwo.jte", "@param int amount\n" +
                 "Divided by two is ${amount / 2}!");
-        givenTag("card", "@param java.lang.String firstParam\n" +
+        givenTemplate("card.jte", "@param java.lang.String firstParam\n" +
                 "@param int secondParam\n" +
-                "${firstParam}, @template.tag.divTwo(secondParam)");
-        givenTemplate("@template.tag.card (model.hello, model.x) That was a tag in a tag!");
+                "${firstParam}, @template.divTwo(secondParam)");
+        givenTemplate("@template.card (model.hello, model.x) That was a tag in a tag!");
         thenOutputIs("Hello, Divided by two is 21! That was a tag in a tag!");
     }
 
     @Test
-    void sameTagReused() {
-        givenTag("divTwo", "@param int amount\n" +
+    void sameTemplateReused() {
+        givenTemplate("divTwo.jte", "@param int amount\n" +
                 "${amount / 2}!");
-        givenTemplate("@template.tag.divTwo(model.x),@template.tag.divTwo(2 * model.x)");
+        givenTemplate("@template.divTwo(model.x),@template.divTwo(2 * model.x)");
         thenOutputIs("21!,42!");
     }
 
     @Test
-    void tagRecursion() {
-        givenTag("recursion", "@param int amount\n" +
+    void templateRecursion() {
+        givenTemplate("recursion.jte", "@param int amount\n" +
                 "${amount}" +
                 "@if (amount > 0)" +
-                "@template.tag.recursion(amount - 1)" +
+                "@template.recursion(amount - 1)" +
                 "@endif"
         );
-        givenTemplate("@template.tag.recursion(5)");
+        givenTemplate("@template.recursion(5)");
         thenOutputIs("543210");
     }
 
     @Test
-    void tagWithoutParams() {
-        givenTag("basic", "I do nothing!");
-        givenTemplate("@template.tag.basic()");
+    void templateWithoutParams() {
+        givenTemplate("basic.jte", "I do nothing!");
+        givenTemplate("@template.basic()");
         thenOutputIs("I do nothing!");
     }
 
     @Test
-    void tagWithoutParams_paramPassed() {
-        givenTag("basic", "I do nothing!");
-        givenTemplate("@template.tag.basic(42)");
+    void templateWithoutParams_paramPassed() {
+        givenTemplate("basic.jte", "I do nothing!");
+        givenTemplate("@template.basic(42)");
         thenRenderingFailsWithException().hasMessageStartingWith("Failed to compile template, error at test/template.jte:2");
     }
 
     @Test
-    void tagWithPackage() {
-        givenTag("my/basic", "I have a custom package");
-        givenTemplate("@template.tag.my.basic()");
+    void templateWithPackage() {
+        givenTemplate("my/basic.jte", "I have a custom package");
+        givenTemplate("@template.my.basic()");
         thenOutputIs("I have a custom package");
     }
 
     @Test
-    void tagWithNamedParam() {
-        givenTag("named", "@param int one\n" +
+    void templateWithNamedParam() {
+        givenTemplate("named.jte", "@param int one\n" +
                 "@param int two\n" +
                 "${one}, ${two}");
-        givenTemplate("@template.tag.named(two = 2, one = 1)");
+        givenTemplate("@template.named(two = 2, one = 1)");
         thenOutputIs("1, 2");
     }
 
     @Test
-    void tagWithNamedParamString() {
-        givenTag("named", "@param int one\n" +
+    void templateWithNamedParamString() {
+        givenTemplate("named.jte", "@param int one\n" +
                 "@param int two\n" +
                 "@param String three\n" +
                 "${one}, ${two}, ${three}");
-        givenTemplate("@template.tag.named(\n" +
+        givenTemplate("@template.named(\n" +
                 "two = 2,\n" +
                 "three = \"Hello, there ;-)\",\n" +
                 "one = 1)");
@@ -467,85 +467,85 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void tagWithNamedParam_ternary() {
-        givenTag("named", "@param int one\n" +
+    void templateWithNamedParam_ternary() {
+        givenTemplate("named.jte", "@param int one\n" +
                 "@param int two\n" +
                 "${one}, ${two}");
-        givenTemplate("@template.tag.named(two = 1 == 2 ? 1 : 0, one = 1)");
+        givenTemplate("@template.named(two = 1 == 2 ? 1 : 0, one = 1)");
         thenOutputIs("1, 0");
     }
 
     @Test
-    void tagWithDefaultParam() {
-        givenTag("named", "@param int one = 1\n" +
+    void templateWithDefaultParam() {
+        givenTemplate("named.jte", "@param int one = 1\n" +
                 "@param int two = 2\n" +
                 "${one}, ${two}");
-        givenTemplate("@template.tag.named()");
+        givenTemplate("@template.named()");
 
         thenOutputIs("1, 2");
     }
 
     @Test
-    void tagWithDefaultParam_firstSet() {
-        givenTag("named", "@param int one = 1\n" +
+    void templateWithDefaultParam_firstSet() {
+        givenTemplate("named.jte", "@param int one = 1\n" +
                 "@param int two = 2\n" +
                 "${one}, ${two}");
-        givenTemplate("@template.tag.named(one = 6)");
+        givenTemplate("@template.named(one = 6)");
 
         thenOutputIs("6, 2");
     }
 
     @Test
-    void tagWithDefaultParam_secondSet() {
-        givenTag("named", "@param int one = 1\n" +
+    void templateWithDefaultParam_secondSet() {
+        givenTemplate("named.jte", "@param int one = 1\n" +
                 "@param int two = 2\n" +
                 "${one}, ${two}");
-        givenTemplate("@template.tag.named(two= 5)");
+        givenTemplate("@template.named(two= 5)");
 
         thenOutputIs("1, 5");
     }
 
     @Test
-    void tagWithVarArgs1() {
-        givenTag("varargs",
+    void templateWithVarArgs1() {
+        givenTemplate("varargs.jte",
                 "@param String ... values\n" +
                         "@for(String value : values)${value} @endfor");
-        givenTemplate("@template.tag.varargs(\"Hello\")");
+        givenTemplate("@template.varargs(\"Hello\")");
         thenOutputIs("Hello ");
     }
 
     @Test
-    void tagWithVarArgs2() {
-        givenTag("varargs",
+    void templateWithVarArgs2() {
+        givenTemplate("varargs.jte",
                 "@param String ... values\n" +
                         "@for(String value : values)${value} @endfor");
-        givenTemplate("@template.tag.varargs(\"Hello\", \"World\")");
+        givenTemplate("@template.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
     }
 
     @Test
-    void tagWithVarArgs3() {
-        givenTag("localize",
+    void templateWithVarArgs3() {
+        givenTemplate("localize.jte",
                 "@param String key\n" +
                         "@param String ... values\n" +
                         "${key} with @for(String value : values)${value} @endfor");
-        givenTemplate("@template.tag.localize(key = \"test.key\", \"Hello\", \"World\")");
+        givenTemplate("@template.localize(key = \"test.key\", \"Hello\", \"World\")");
         thenOutputIs("test.key with Hello World ");
     }
 
     @Test
-    void tagWithVarArgs4() {
-        givenTag("localize",
+    void templateWithVarArgs4() {
+        givenTemplate("localize.jte",
                 "@param String key\n" +
                         "@param String ... values\n" +
                         "${key} with @for(String value : values)${value} @endfor");
-        givenTemplate("@template.tag.localize(\"test.key\", \"Hello\", \"World\")");
+        givenTemplate("@template.localize(\"test.key\", \"Hello\", \"World\")");
         thenOutputIs("test.key with Hello World ");
     }
 
     @Test
     void templateCall() {
-        dummyCodeResolver.givenCode("module/components/card.jte", "@param java.lang.String firstParam\n" +
+        givenTemplate("module/components/card.jte", "@param java.lang.String firstParam\n" +
                 "@param int secondParam\n" +
                 "One: ${firstParam}, two: ${secondParam}");
         givenTemplate("@template.module.components.card(model.hello, model.x), That was an arbitrary template call!");
@@ -554,7 +554,7 @@ public class TemplateEngineTest {
 
     @Test
     void templateCall_noConflictWithKeywords_for() {
-        dummyCodeResolver.givenCode("format.jte", "@param java.lang.String firstParam\n" +
+        givenTemplate("format.jte", "@param java.lang.String firstParam\n" +
                 "@param int secondParam\n" +
                 "One: ${firstParam}, two: ${secondParam}");
         givenTemplate("@template.format(model.hello, model.x), That was an arbitrary template call!");
@@ -563,7 +563,7 @@ public class TemplateEngineTest {
 
     @Test
     void templateCall_noConflictWithKeywords_param() {
-        dummyCodeResolver.givenCode("parameter.jte", "@param java.lang.String firstParam\n" +
+        givenTemplate("parameter.jte", "@param java.lang.String firstParam\n" +
                 "@param int secondParam\n" +
                 "One: ${firstParam}, two: ${secondParam}");
         givenTemplate("@template.parameter(model.hello, model.x), That was an arbitrary template call!");
@@ -572,7 +572,7 @@ public class TemplateEngineTest {
 
     @Test
     void templateCall_noConflictWithKeywords_import() {
-        dummyCodeResolver.givenCode("importer.jte", "@param java.lang.String firstParam\n" +
+        givenTemplate("importer.jte", "@param java.lang.String firstParam\n" +
                 "@param int secondParam\n" +
                 "One: ${firstParam}, two: ${secondParam}");
         givenTemplate("@template.importer(model.hello, model.x), That was an arbitrary template call!");
@@ -660,7 +660,7 @@ public class TemplateEngineTest {
 
     @Test
     void layout() {
-        givenLayout("main", "@param gg.jte.TemplateEngineTest.Model model\n" +
+        givenTemplate("layout/main.jte", "@param gg.jte.TemplateEngineTest.Model model\n" +
                 "@param gg.jte.Content content\n" +
                 "@param gg.jte.Content footer\n" +
                 "<body>\n" +
@@ -702,14 +702,14 @@ public class TemplateEngineTest {
 
     @Test
     void nestedLayouts() {
-        givenLayout("main",
+        givenTemplate("layout/main.jte",
                 "@param gg.jte.Content header = null\n" +
                         "@param gg.jte.Content content\n" +
                         "@param gg.jte.Content footer = null\n" +
                         "@if(header != null)<header>${header}</header>@endif" +
                         "<content>${content}</content>" +
                         "@if(footer != null)<footer>${footer}</footer>@endif");
-        givenLayout("mainExtended",
+        givenTemplate("layout/mainExtended.jte",
                 "@param gg.jte.Content header = null\n" +
                         "@param gg.jte.Content contentPrefix = null\n" +
                         "@param gg.jte.Content content\n" +
@@ -740,7 +740,7 @@ public class TemplateEngineTest {
 
     @Test
     void layoutWithNamedParams() {
-        givenLayout("main",
+        givenTemplate("layout/main.jte",
                 "@param int status = 5\n" +
                         "@param int duration = -1\n" +
                         "@param gg.jte.Content content\n" +
@@ -754,7 +754,7 @@ public class TemplateEngineTest {
 
     @Test
     void layoutWithNamedParams_noNames() {
-        givenLayout("main",
+        givenTemplate("layout/main.jte",
                 "@param int status = 5\n" +
                         "@param int duration = -1\n" +
                         "@param gg.jte.Content content\n" +
@@ -767,7 +767,7 @@ public class TemplateEngineTest {
 
     @Test
     void layoutWithVarArgs() {
-        givenLayout("varargs",
+        givenTemplate("layout/varargs.jte",
                 "@param String ... values\n" +
                         "@for(String value : values)${value} @endfor");
         givenTemplate("@template.layout.varargs(\"Hello\", \"World\")");
@@ -840,12 +840,12 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void kebabCaseCanBeCompiled_tagCall() {
-        givenTag("kebab-case/kebab-case", "@param gg.jte.TemplateEngineTest.Model model\n" +
+    void kebabCaseCanBeCompiled_templateCall() {
+        givenTemplate("kebab-case/kebab-case.jte", "@param gg.jte.TemplateEngineTest.Model model\n" +
                 "@param int i = 0\n" +
                 "i is: ${i}");
 
-        givenTemplate("@template.tag.kebab-case/kebab-case(model = model, i = 42)");
+        givenTemplate("@template.kebab-case.kebab-case(model = model, i = 42)");
 
         thenOutputIs("i is: 42");
     }
@@ -933,33 +933,33 @@ public class TemplateEngineTest {
 
     @Test
     void exceptionLineNumber5() {
-        givenTag("model", "@param gg.jte.TemplateEngineTest.Model model\n" +
+        givenTemplate("my/model.jte", "@param gg.jte.TemplateEngineTest.Model model\n" +
                 "@param int i = 0\n" +
                 "i is: ${i}\n" +
                 "${model.getThatThrows()}");
-        givenTemplate("@template.tag.model(model)");
+        givenTemplate("@template.my.model(model)");
 
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
-                .hasMessage("Failed to render test/template.jte, error at tag/model.jte:4")
-                .hasStackTraceContaining("at gg.jte.generated.ondemand.tag.JtemodelGenerated.render(tag/model.jte:4)")
+                .hasMessage("Failed to render test/template.jte, error at my/model.jte:4")
+                .hasStackTraceContaining("at gg.jte.generated.ondemand.my.JtemodelGenerated.render(my/model.jte:4)")
                 .hasStackTraceContaining("at gg.jte.generated.ondemand.test.JtetemplateGenerated.render(test/template.jte:2)");
     }
 
     @Test
     void exceptionLineNumber6() {
-        givenTag("model", "@param gg.jte.TemplateEngineTest.Model model\n" +
+        givenTemplate("my/model.jte", "@param gg.jte.TemplateEngineTest.Model model\n" +
                 "@param int i = 0\n" +
                 "i is: ${i}\n" +
                 "${model.getThatThrows()}");
 
         StringOutput output = new StringOutput();
-        Throwable throwable = catchThrowable(() -> templateEngine.render("tag/model.jte", TemplateUtils.toMap("model", model, "i", 1L), output));
+        Throwable throwable = catchThrowable(() -> templateEngine.render("my/model.jte", TemplateUtils.toMap("model", model, "i", 1L), output));
 
         assertThat(throwable)
                 .hasCauseInstanceOf(ClassCastException.class)
-                .hasMessage("Failed to render tag/model.jte, error at tag/model.jte:2")
-                .hasStackTraceContaining("at gg.jte.generated.ondemand.tag.JtemodelGenerated.renderMap(tag/model.jte:2)");
+                .hasMessage("Failed to render my/model.jte, error at my/model.jte:2")
+                .hasStackTraceContaining("at gg.jte.generated.ondemand.my.JtemodelGenerated.renderMap(my/model.jte:2)");
     }
 
     @Test
@@ -1109,17 +1109,9 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void emptyTag() {
-        givenTag("test", "");
-        givenTemplate("@template.tag.test()");
-        thenOutputIs("");
-    }
-
-    @Test
-    void emptyLayout() {
-        givenLayout("test", "");
-        givenTemplate(
-                "@template.layout.test()");
+    void emptyTemplateCall() {
+        givenTemplate("test.jte", "");
+        givenTemplate("@template.test()");
         thenOutputIs("");
     }
 
@@ -1131,9 +1123,9 @@ public class TemplateEngineTest {
 
     @Test
     void compileError1() {
-        givenTemplate("@template.tag.model(model)");
+        givenTemplate("@template.my.model(model)");
         thenRenderingFailsWithException()
-                .hasMessage("tag/model.jte not found, referenced at test/template.jte:2");
+                .hasMessage("my/model.jte not found, referenced at test/template.jte:2");
     }
 
     @Test
@@ -1157,37 +1149,37 @@ public class TemplateEngineTest {
 
     @Test
     void compileError4() {
-        givenTag("test", "@param gg.jte.TemplateEngineTest.Model model\nThis will not compile!\n${model.helloUnknown}\n!!");
-        givenTemplate("@template.tag.test(model)");
+        givenTemplate("test.jte", "@param gg.jte.TemplateEngineTest.Model model\nThis will not compile!\n${model.helloUnknown}\n!!");
+        givenTemplate("@template.test(model)");
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at tag/test.jte:3\n")
+                .hasMessageStartingWith("Failed to compile template, error at test.jte:3\n")
                 .hasMessageContaining("cannot find symbol")
                 .hasMessageContaining("model.helloUnknown");
     }
 
     @Test
     void compileError5() {
-        givenTag("test", "@param gg.jte.TemplateEngineTest.Model model\n" +
+        givenTemplate("test.jte", "@param gg.jte.TemplateEngineTest.Model model\n" +
                 "${\n" +
                 "@`\n" +
                 "This will not compile!\n${model.helloUnknown}\n!!\n" +
                 "`}");
-        givenTemplate("@template.tag.test(model)");
+        givenTemplate("@template.test(model)");
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at tag/test.jte:5\n")
+                .hasMessageStartingWith("Failed to compile template, error at test.jte:5\n")
                 .hasMessageContaining("cannot find symbol")
                 .hasMessageContaining("model.helloUnknown");
     }
 
     @Test
     void compileError6() {
-        givenTag("test", "@param gg.jte.TemplateEngineTest.Model model\n" +
+        givenTemplate("test.jte", "@param gg.jte.TemplateEngineTest.Model model\n" +
                 "test");
-        givenTemplate("@template.tag.test(\n" +
+        givenTemplate("@template.test(\n" +
                 "model = model,\n" +
                 "param2 = \"foo\")");
         thenRenderingFailsWithException()
-                .hasMessage("Failed to compile template, error at test/template.jte:3. No parameter with name param2 is defined in tag/test.jte");
+                .hasMessage("Failed to compile template, error at test/template.jte:3. No parameter with name param2 is defined in test.jte");
     }
 
     @Test
@@ -1267,8 +1259,8 @@ public class TemplateEngineTest {
         thenRenderingFailsWithException().hasMessage("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.");
     }
 
-    private void givenTag(String name, String code) {
-        dummyCodeResolver.givenCode("tag/" + name + ".jte", code);
+    private void givenTemplate(String name, String code) {
+        dummyCodeResolver.givenCode(name, code);
     }
 
     private void givenTemplate(String template) {
@@ -1278,10 +1270,6 @@ public class TemplateEngineTest {
 
     private void givenRawTemplate(String template) {
         dummyCodeResolver.givenCode(templateName, template);
-    }
-
-    private void givenLayout(String name, String code) {
-        dummyCodeResolver.givenCode("layout/" + name + ".jte", code);
     }
 
     private void thenOutputIs(String expected) {

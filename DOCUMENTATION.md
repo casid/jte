@@ -620,7 +620,6 @@ When using this method the precompiled templates are bundled within your applica
 
 While this provides you with a nice self-containing jar, it has some limitations:
 
-- Once the sources are generated, IntelliJ will put them on the classpath and hot reloading will not work unless the generated sources are deleted.
 - Some plugin settings are not supported, like configuring a custom HtmlPolicy class (this is because project classes are not yet compiled at the `GENERATE_SOURCES` phase).
 
 ```java

@@ -4,7 +4,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     id 'java'
-    id 'gg.jte.gradle' version '2.0.1'
+    id 'gg.jte.gradle' version '2.0.2-SNAPSHOT'
     id "com.palantir.graal" version "0.10.0" /* for native image
         There are a few native image plugins around. I used this one because it manages downloading and caching GraalVM
         if necessary. */
@@ -31,7 +31,7 @@ test {
 }
 
 dependencies {
-    implementation('gg.jte:jte-runtime:2.0.1')
+    implementation('gg.jte:jte-runtime:2.0.2-SNAPSHOT')
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testImplementation('org.assertj:assertj-core:3.20.0')
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'

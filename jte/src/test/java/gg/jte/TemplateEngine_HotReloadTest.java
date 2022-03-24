@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 class TemplateEngine_HotReloadTest {
 
@@ -168,6 +169,18 @@ class TemplateEngine_HotReloadTest {
     }
 
     @Test
+    void cacheIsNotUsedAfterCompilationError() {
+        whenFileIsWritten(TEMPLATE, "@param String name\nHello ${name}!");
+        thenTemplateOutputIs("Hello hot reload!");
+
+        waitUntilFileChangesPossible();
+
+        whenFileIsWritten(TEMPLATE, "@param String name\nHello ${name2}");
+        thenCompilationFails();
+        thenCompilationFails(); // Should continue failing and not use an old template from the cache
+    }
+
+    @Test
     void clearCache() {
         whenFileIsWritten("tag/name.jte", "@param String name\nHello ${name}!");
         whenFileIsWritten(TEMPLATE, "@param String name\n@template.tag.name(name)");
@@ -185,6 +198,11 @@ class TemplateEngine_HotReloadTest {
         StringOutput output = new StringOutput();
         templateEngine.render(name, "hot reload", output);
         assertThat(output.toString()).isEqualTo(expected);
+    }
+
+    private void thenCompilationFails() {
+        Throwable throwable = catchThrowable(() -> thenTemplateOutputIs("ignored"));
+        assertThat(throwable).isInstanceOf(TemplateException.class);
     }
 
     private void whenFileIsWritten(String name, String content) {

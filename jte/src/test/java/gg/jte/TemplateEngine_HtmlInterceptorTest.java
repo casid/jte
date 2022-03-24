@@ -130,6 +130,16 @@ public class TemplateEngine_HtmlInterceptorTest {
     }
 
     @Test
+    void input_withRegex() {
+        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
+                "<input required pattern=\"\\w+\">");
+
+        templateEngine.render("page.jte", "hello.htm", output);
+
+        assertThat(output.toString()).isEqualTo("<input required pattern=\"\\w+\">");
+    }
+
+    @Test
     void input_disabled() {
         dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
                 "<form action=\"${url}\">\n" +

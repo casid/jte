@@ -30,7 +30,9 @@ public interface CodeGenerator extends TemplateParserVisitor {
                 if (javaExpression != null) {
                     code.append(javaExpression);
                 } else {
-                    code.append("\"").append(attribute.value).append("\"");
+                    code.append("\"");
+                    code.appendEscaped(attribute.value);
+                    code.append("\"");
                 }
             }
         }

@@ -1363,6 +1363,16 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         assertThat(output.toString()).isEqualTo("<span>My default is 42</span>");
     }
 
+    @Test
+    void localization_contentParams() {
+        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
+                "<span>${localizer.localize(\"link\", @`<a href=\"${\"foo\"}\">`, @`</a>`)}</span>");
+
+        templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer), output);
+
+        assertThat(output.toString()).isEqualTo("<span>Hello? <a href=\"foo\">Click here</a></span>");
+    }
+
     @SuppressWarnings("unused")
     public static class MyLocalizer implements LocalizationSupport {
         Map<String, Object> resources = TemplateUtils.toMap(
@@ -1375,7 +1385,8 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "all-primitives", "boolean: {0}, byte: {1}, short: {2}, int: {3}, long: {4}, float: {5}, double: {6}, char: {7}",
                 "enum", "Content type is: {0}",
                 "quotes", "This is a key with \"quotes\"",
-                "quotes-params", "This is a key with \"quotes\" and params <i>\"{0}\"</i>, <b>\"{1}\"</b>, \"{2}\"..."
+                "quotes-params", "This is a key with \"quotes\" and params <i>\"{0}\"</i>, <b>\"{1}\"</b>, \"{2}\"...",
+                "link", "Hello? {0}Click here{1}"
         );
 
         @Override

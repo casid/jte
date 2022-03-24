@@ -1047,8 +1047,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void customOutput() {
         class CustomHtmlTemplateOutput implements HtmlTemplateOutput {
-            String lastTagName;
-            String lastAttributeName;
+            final StringBuilder history = new StringBuilder();
 
             @Override
             public Writer getWriter() {
@@ -1062,8 +1061,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
             @Override
             public void setContext(String tagName, String attributeName) {
-                lastTagName = tagName;
-                lastAttributeName = attributeName;
+                history.append("{").append(tagName).append(",").append(attributeName).append("}");
             }
         }
 
@@ -1073,8 +1071,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "hello", customHtmlOutput);
 
         assertThat(output.toString()).isEqualTo("<span data-title=\"hello\">foo</span>");
-        assertThat(customHtmlOutput.lastTagName).isEqualTo("span");
-        assertThat(customHtmlOutput.lastAttributeName).isEqualTo("data-title");
+        assertThat(customHtmlOutput.history.toString()).isEqualTo("{span,data-title}{span,null}");
     }
 
     @Test
@@ -1482,6 +1479,16 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         assertThat(output.toString()).isEqualTo("<span>My default is 42</span>");
     }
 
+    @Test
+    void localization_contentParams() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "<span>${localizer.localize(\"link\", @`<a href=\"${\"foo\"}\">`, @`</a>`)}</span>");
+
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer), output);
+
+        assertThat(output.toString()).isEqualTo("<span>Hello? <a href=\"foo\">Click here</a></span>");
+    }
+
     @SuppressWarnings("unused")
     public static class MyLocalizer implements LocalizationSupport {
         Map<String, Object> resources = TemplateUtils.toMap(
@@ -1495,7 +1502,8 @@ public class TemplateEngine_HtmlOutputEscapingTest {
                 "enum", "Content type is: {0}",
                 "quotes", "This is a key with \"quotes\"",
                 "quotes-params", "This is a key with \"quotes\" and params <i>\"{0}\"</i>, <b>\"{1}\"</b>, \"{2}\"...",
-                "empty", ""
+                "empty", "",
+                "link", "Hello? {0}Click here{1}"
         );
 
         @Override

@@ -423,6 +423,8 @@ public class JavaCodeGenerator implements CodeGenerator {
             onConditionStart(depth, "gg.jte.runtime.TemplateUtils.isAttributeRendered(" + javaExpression + ")");
             onTextPart(depth + 1, " " + htmlAttribute.name + "=" + htmlAttribute.quotes);
             onHtmlTagAttributeCodePart(depth + 1, javaExpression, currentHtmlTag.name, htmlAttribute.name);
+            writeIndentation(depth + 1);
+            javaCode.append("jteOutput.setContext(\"").append(currentHtmlTag.name).append("\", null);\n");
             onTextPart(depth + 1, "" + htmlAttribute.quotes);
         }
         onConditionEnd(depth);

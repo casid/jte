@@ -25,7 +25,6 @@ class TemplateParametersCompleteVisitorTest {
         visitor.onComplete();
         visitor.onError(null);
         visitor.onInterceptHtmlTagOpened(0, null);
-        visitor.onInterceptHtmlAttributeStarted(0, null, null);
         visitor.onInterceptHtmlTagClosed(0, null);
         visitor.onHtmlAttributeOutput(0, null, null);
     }

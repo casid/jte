@@ -400,14 +400,6 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     @Override
-    public void onInterceptHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
-        writeIndentation(depth);
-        javaCode.append("jteHtmlInterceptor.onHtmlAttributeStarted(\"").append(htmlAttribute.name).append("\", ");
-        writeAttributeMap(currentHtmlTag);
-        javaCode.append(", jteOutput);\n");
-    }
-
-    @Override
     public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
         javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput);\n");

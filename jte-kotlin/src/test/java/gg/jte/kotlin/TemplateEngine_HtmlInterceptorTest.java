@@ -273,7 +273,7 @@ public class TemplateEngine_HtmlInterceptorTest {
         templateEngine.render("page.kte", "hello.htm", output);
 
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"error\" class=\"error foo\" value=\"?\">\n" +
+                "<input name=\"error\" class=\"foo\" value=\"?\" data-error=\"1\">\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:error\">\n" +
                 "</form>");
     }
@@ -290,7 +290,7 @@ public class TemplateEngine_HtmlInterceptorTest {
         templateEngine.render("page.kte", "hello.htm", output);
 
         assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"error\" class=\"error foo\" value=\"?\">\n" +
+                "<input name=\"error\" class=\"foo\" value=\"?\" data-error=\"1\">\n" +
                 "<input name=\"__fp\" value=\"a:hello.htm, p:error\">\n" +
                 "</form>");
     }
@@ -341,12 +341,9 @@ public class TemplateEngine_HtmlInterceptorTest {
                     output.writeContent(" selected");
                 }
             }
-        }
 
-        @Override
-        public void onHtmlAttributeStarted(String name, Map<String, Object> attributesBefore, TemplateOutput output) {
-            if ("class".equals(name) && "error".equals(attributesBefore.get("name"))) {
-                output.writeContent("error ");
+            if ("error".equals(attributes.get("name"))) {
+                output.writeContent(" data-error=\"1\"");
             }
         }
 

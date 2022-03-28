@@ -110,11 +110,6 @@ class TemplateParametersCompleteVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onInterceptHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
-
-    }
-
-    @Override
     public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
 
     }

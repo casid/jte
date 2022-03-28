@@ -689,13 +689,6 @@ public final class TemplateParser {
                 currentAttribute.quoteCount++;
                 if (currentAttribute.quoteCount == 1) {
                     currentAttribute.valueStartIndex = i + 1;
-
-                    if (isHtmlAttributeIntercepted(currentAttribute.name)) {
-                        extractTextPart(i + 1, null);
-                        lastIndex = i + 1;
-
-                        visitor.onInterceptHtmlAttributeStarted(depth, currentHtmlTag, currentAttribute);
-                    }
                 } else if (currentAttribute.quoteCount == 2) {
                     currentAttribute.value = templateCode.substring(currentAttribute.valueStartIndex, i);
 

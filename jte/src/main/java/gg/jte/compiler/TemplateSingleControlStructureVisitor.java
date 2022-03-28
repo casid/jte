@@ -125,11 +125,6 @@ class TemplateSingleControlStructureVisitor implements TemplateParserVisitor {
     }
 
     @Override
-    public void onInterceptHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
-        // not relevant
-    }
-
-    @Override
     public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
         // not relevant
     }

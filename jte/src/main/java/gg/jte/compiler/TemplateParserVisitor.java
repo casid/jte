@@ -49,8 +49,6 @@ public interface TemplateParserVisitor {
 
     void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag);
 
-    void onInterceptHtmlAttributeStarted(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute);
-
     void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag);
 
     void onHtmlAttributeOutput(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute);

@@ -752,7 +752,7 @@ jte has no built in keywords for localization. Instead, it provides a flexible i
 - your users receive the same localization through jte as they do from the rest of your application
 
 
-Let's implement `gg.jte.support.LocalizationSupport`. There's only on method to implement:
+Let's implement `gg.jte.support.LocalizationSupport`. There's only one method to implement:
 
 ```java
 public static class JteLocalizer implements gg.jte.support.LocalizationSupport {

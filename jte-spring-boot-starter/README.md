@@ -28,6 +28,8 @@ public String view(Model model, HttpServletResponse response) {
 }
 ````
 
+You can use it with Spring WebMVC as well as with Spring WebFlux.
+
 ## Configuration 
 
 By default, the template files are expected in `src/main/jte`.

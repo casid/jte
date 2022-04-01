@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.reactive.result.view.UrlBasedViewResolver;
 
-import java.nio.file.Path;
+import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 
 @Configuration
@@ -45,7 +45,7 @@ public class ReactiveJteAutoConfiguration {
             // Here, a JTE file watcher will recompile the JTE templates upon file save (the web browser will auto-refresh)
             // If using IntelliJ, use Ctrl-F9 to trigger an auto-refresh when editing non-JTE files.
             String[] split = jteProperties.getTemplateLocation().split("/");
-            CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("", split));
+            CodeResolver codeResolver = new DirectoryCodeResolver(FileSystems.getDefault().getPath("", split));
             TemplateEngine templateEngine = TemplateEngine.create(codeResolver, Paths.get("jte-classes"), ContentType.Html, getClass().getClassLoader());
             templateEngine.setBinaryStaticContent(true);
             return templateEngine;

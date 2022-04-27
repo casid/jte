@@ -72,7 +72,7 @@ class JspToJteConverter_FromIntelliJTest {
         }
 
         public String getJteTag() {
-            return jteTag;
+            return jteTag.replace('\\', '/');
         }
     }
 }

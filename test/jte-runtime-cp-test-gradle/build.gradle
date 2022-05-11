@@ -71,6 +71,10 @@ compileNativeMainJava {
 
 // GraalVM currently only has versions 11 or 17
 String graalJavaVersion() {
+    // Currently there is a problem downloading Graal on Linux Github Actions
+    if (!Os.isFamily(Os.FAMILY_WINDOWS) && !Os.isFamily(Os.FAMILY_MAC)) {
+        return 'skip'
+    }
     def javaMajorVersion = targetCompatibility.majorVersion as int
     switch (javaMajorVersion) {
         case { it <= 8 }:

@@ -21,7 +21,7 @@ class JspToJteConverter_FromIntelliJTest {
     @Test
     void simpleTag() {
         whenJspFileIsConverted("jsp/dummy.tag");
-        assertThat(converter.getJteTag()).isEqualTo("tag/dummy.jte");
+        assertThat(converter.getJteTag()).isEqualTo("dummy.jte");
     }
 
     @Test
@@ -33,7 +33,7 @@ class JspToJteConverter_FromIntelliJTest {
     @Test
     void nestedTag2() {
         whenJspFileIsConverted("jsp/tags/dummy.tag");
-        assertThat(converter.getJteTag()).isEqualTo("tag/dummy.jte");
+        assertThat(converter.getJteTag()).isEqualTo("tags/dummy.jte");
     }
 
     @Test
@@ -45,13 +45,13 @@ class JspToJteConverter_FromIntelliJTest {
     @Test
     void nestedLayout2() {
         whenJspFileIsConverted("jsp/layouts/dummy.tag");
-        assertThat(converter.getJteTag()).isEqualTo("layout/dummy.jte");
+        assertThat(converter.getJteTag()).isEqualTo("layouts/dummy.jte");
     }
 
     @Test
     void tagWithKebabCase() {
         whenJspFileIsConverted("jsp/tags/some-tag.tag");
-        assertThat(converter.getJteTag()).isEqualTo("tag/someTag.jte");
+        assertThat(converter.getJteTag()).isEqualTo("tags/someTag.jte");
     }
 
     private void whenJspFileIsConverted(String file) {
@@ -67,13 +67,12 @@ class JspToJteConverter_FromIntelliJTest {
         }
 
         @Override
-        public void convertTag(String jspTag, String jteTag, Consumer<Converter> parserSetup) {
-            checkJteName(jteTag);
-            this.jteTag = jteTag;
+        public void convertTag(String jspTag, Consumer<Converter> parserSetup) {
+            this.jteTag = suggestJteFile(jspTag);
         }
 
         public String getJteTag() {
-            return jteTag;
+            return jteTag.replace('\\', '/');
         }
     }
 }

@@ -127,13 +127,13 @@ jte is available on <a href="http://mvnrepository.com/artifact/gg.jte/jte">Maven
 <dependency>
     <groupId>gg.jte</groupId>
     <artifactId>jte</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.3</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-implementation group: 'gg.jte', name: 'jte', version: '2.0.1'
+implementation group: 'gg.jte', name: 'jte', version: '2.0.3'
 ```
 
 No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and have fun with jte.
@@ -144,6 +144,7 @@ No further dependencies required! Check out the [syntax documentation](DOCUMENTA
 - [Eclipse Vert.x](https://github.com/vert-x3/vertx-web/tree/master/vertx-template-engines/vertx-web-templ-jte)
 - [Spring Boot](https://github.com/casid/jte-spring-boot-demo)
 - [Spring Web MVC](https://github.com/izogfif/demo-spring-jte)
+- [Ktor](https://ktor.io/docs/jte.html)
 - [Micronaut](https://micronaut-projects.github.io/micronaut-views/latest/guide/#jte)
 - [Quarkus](https://github.com/renannprado/quarkus-jte-extension/)
 - [Severell](https://github.com/severell/severell-jte-plugin)

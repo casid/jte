@@ -169,7 +169,7 @@ public final class TemplateParser {
             } else if (currentMode == Mode.JsComment) {
                 if (currentChar == '\n') {
                     pop();
-                    lastIndex = i + 1;
+                    lastIndex = i;
                 } else if (regionMatches("</script>")) {
                     pop();
                     lastIndex = i - 8;

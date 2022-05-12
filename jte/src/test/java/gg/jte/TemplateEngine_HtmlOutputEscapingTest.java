@@ -559,7 +559,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", "Hello", output);
 
-        assertThat(output.toString()).isEqualTo("<script>var x = 'hello';</script>Hello");
+        assertThat(output.toString()).isEqualTo("<script>\nvar x = 'hello';</script>Hello");
     }
 
     @Test
@@ -597,6 +597,22 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "Hello", output);
 
         assertThat(output.toString()).isEqualTo("<script>var x = \"// hello, hello\";</script>Hello");
+    }
+
+    @Test
+    void jsComment_lineBreaks() {
+        codeResolver.givenCode("template.jte", "@param String hello\n<script>\n" +
+                "   x.value = \"false\" // foo\n" +
+                "   x.test() // bar\n" +
+                "</script>\n" +
+                "${hello}");
+
+        templateEngine.render("template.jte", "Hello", output);
+
+        assertThat(output.toString()).isEqualTo("<script>\n" +
+                "   x.value = \"false\" \n" +
+                "   x.test() \n" +
+                "</script>\nHello");
     }
 
     @Test

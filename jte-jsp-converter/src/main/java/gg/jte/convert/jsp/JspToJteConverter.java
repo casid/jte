@@ -4,7 +4,6 @@ import gg.jte.convert.IoUtils;
 import gg.jte.convert.ConverterOutput;
 import gg.jte.convert.cc.CamelCaseConverter;
 import gg.jte.convert.jsp.converter.*;
-import gg.jte.runtime.StringUtils;
 import org.apache.jasper.compiler.JtpConverter;
 
 import java.io.IOException;
@@ -32,9 +31,7 @@ public class JspToJteConverter {
         Path jspFile = Paths.get(commandLineArgs[0]);
         jspFile = converter.jspRoot.toAbsolutePath().relativize(jspFile);
 
-        String jteFile = converter.suggestJteFile(jspFile.toString().replace('\\', '/'));
-
-        converter.convertTag(jspFile.toString(), jteFile, parserSetup);
+        converter.convertTag(jspFile.toString(), parserSetup);
     }
 
     private final Path jspRoot;
@@ -47,46 +44,13 @@ public class JspToJteConverter {
         this.jteTag = jteTag;
     }
 
-    public void convertTag(String jspTag, String jteTag, Consumer<Converter> parserSetup) {
-        checkJteName(jteTag);
-        convertTag(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag), parserSetup);
-    }
+    public void convertTag(String jspTag, Consumer<Converter> parserSetup) {
+        Path jspTagFile = jspRoot.resolve(jspTag);
 
-    @SuppressWarnings("unused")
-    public void replaceUsages(String jspTag, String jteTag) {
-        checkJteName(jteTag);
-        replaceUsages(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag));
-    }
-
-    public void replaceUsages(Path jspTag, Path jteTag) {
-        String oldJspTagPrefix = extractTagPrefix(jspTag);
-        String oldJspTagClosing = "</" + oldJspTagPrefix.substring(1) + ">";
-        String newJteFile = jteRoot.relativize(jteTag).toString().replace('\\', '/');
-
-        IoUtils.deleteFile(jspTag);
-
-        try (Stream<Path> stream = Files.walk(jspRoot)) {
-            stream
-                  .filter(Files::isRegularFile)
-                  .filter(p -> !Files.isDirectory(p))
-                  .filter(p -> {
-                      String fileName = p.toString();
-                      return fileName.endsWith(".jsp") || fileName.endsWith(".jsp.inc") || fileName.endsWith(".tag");
-                  }).forEach(jspFile -> replaceUsages(jspFile, oldJspTagPrefix, oldJspTagClosing, newJteFile));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    protected String readFile(Path jspTag) {
-        return IoUtils.readFile(jspTag);
-    }
-
-    private void convertTag(Path jspTag, Path jteTag, Consumer<Converter> parserSetup) {
-        String relativeFilePath = jspRoot.relativize(jspTag).toString();
+        String relativeFilePath = jspRoot.relativize(jspTagFile).toString();
         Converter converter = new JtpConverter(
                 relativeFilePath,
-                readFile(jspTag).replace("\r", "").getBytes(),
+                readFile(jspTagFile).replace("\r", "").getBytes(),
                 getResourceBase(),
                 relativeFilePath.endsWith(".tag"),
                 new ConverterOutput()
@@ -120,9 +84,40 @@ public class JspToJteConverter {
 
         checkDependencies(jte);
 
-        IoUtils.writeFile(jteTag, jte);
+        String jteTemplate = suggestJteFile(jspTag.replace('\\', '/'));
+        Path jteTemplateFile = jteRoot.resolve(jteTemplate);
+        IoUtils.writeFile(jteTemplateFile, jte);
 
-        replaceUsages(jspTag, jteTag);
+        replaceUsages(jspTagFile, jteTemplateFile);
+    }
+
+    @SuppressWarnings("unused")
+    public void replaceUsages(String jspTag, String jteTag) {
+        replaceUsages(jspRoot.resolve(jspTag), jteRoot.resolve(jteTag));
+    }
+
+    public void replaceUsages(Path jspTag, Path jteTag) {
+        String oldJspTagPrefix = extractTagPrefix(jspTag);
+        String oldJspTagClosing = "</" + oldJspTagPrefix.substring(1) + ">";
+        String newJteFile = jteRoot.relativize(jteTag).toString().replace('\\', '/');
+
+        IoUtils.deleteFile(jspTag);
+
+        try (Stream<Path> stream = Files.walk(jspRoot)) {
+            stream
+                  .filter(Files::isRegularFile)
+                  .filter(p -> !Files.isDirectory(p))
+                  .filter(p -> {
+                      String fileName = p.toString();
+                      return fileName.endsWith(".jsp") || fileName.endsWith(".jsp.inc") || fileName.endsWith(".tag");
+                  }).forEach(jspFile -> replaceUsages(jspFile, oldJspTagPrefix, oldJspTagClosing, newJteFile));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    protected String readFile(Path jspTag) {
+        return IoUtils.readFile(jspTag);
     }
 
     private void replaceUsages(Path jspFile, String oldJspTagPrefix, String oldJspTagClosing, String newJteFile) {
@@ -176,30 +171,6 @@ public class JspToJteConverter {
         return "<" + namespace + ":" + tagName;
     }
 
-    protected String suggestJteFile(String jspFile) {
-        int fileSeparatorIndex = jspFile.indexOf('.');
-        if (fileSeparatorIndex == -1) {
-            throw new IllegalArgumentException("JSP file without file extension " + jspFile);
-        }
-
-        String jspFileWithoutExtension = jspFile.substring(0, fileSeparatorIndex);
-        String jspFileExtension = jspFile.substring(fileSeparatorIndex);
-
-        String jteDirectory = suggestJteDirectory(jspFileWithoutExtension, jspFileExtension);
-
-        StringBuilder jteFile = new StringBuilder();
-        if (!StringUtils.isBlank(jteDirectory)) {
-            jteFile.append(jteDirectory);
-            jteFile.append('/');
-        }
-
-        jteFile.append(skipDirectoryIfRequired(jspFileWithoutExtension));
-        CamelCaseConverter.convertTo(jteFile);
-        jteFile.append(".jte");
-
-        return jteFile.toString();
-    }
-
     protected URL getResourceBase() {
         try {
             return Paths.get("").toUri().toURL();
@@ -208,37 +179,21 @@ public class JspToJteConverter {
         }
     }
 
-    protected String skipDirectoryIfRequired(String jspFileWithoutExtension) {
-        if (jspFileWithoutExtension.startsWith("tags/") || jspFileWithoutExtension.startsWith("tag/")) {
-            return skipFirstDirectory(jspFileWithoutExtension);
+    public String suggestJteFile(String jspFile) {
+        int fileSeparatorIndex = jspFile.indexOf('.');
+        if (fileSeparatorIndex == -1) {
+            throw new IllegalArgumentException("JSP file without file extension " + jspFile);
         }
 
-        if (jspFileWithoutExtension.startsWith("layouts/") || jspFileWithoutExtension.startsWith("layout/")) {
-            return skipFirstDirectory(jspFileWithoutExtension);
-        }
+        String jspFileWithoutExtension = jspFile.substring(0, fileSeparatorIndex);
 
-        return jspFileWithoutExtension;
-    }
+        StringBuilder jteFile = new StringBuilder();
 
-    protected String skipFirstDirectory(String jspFileWithoutExtension) {
-        return jspFileWithoutExtension.substring(jspFileWithoutExtension.indexOf('/') + 1);
-    }
+        jteFile.append(jspFileWithoutExtension);
+        CamelCaseConverter.convertTo(jteFile);
+        jteFile.append(".jte");
 
-    protected String suggestJteDirectory(String jspFileWithoutExtension, String jspFileExtension) {
-        if (jspFileWithoutExtension.startsWith("layouts/") || jspFileWithoutExtension.startsWith("layout/")) {
-            return "layout";
-        }
-
-        if (!".jsp".equals(jspFileExtension)) {
-            return "tag";
-        }
-        return "";
-    }
-
-    protected void checkJteName(String name) {
-        if (name.contains("-")) {
-            throw new IllegalArgumentException("Illegal jte tag name '" + name + "'. Tag names should be camel case.");
-        }
+        return jteFile.toString();
     }
 
     protected void checkDependencies(String jteCode) {

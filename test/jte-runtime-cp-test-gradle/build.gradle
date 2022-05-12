@@ -5,9 +5,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id 'java'
     id 'gg.jte.gradle' version '2.0.2-SNAPSHOT'
-    id "com.palantir.graal" version "0.10.0" /* for native image
-        There are a few native image plugins around. I used this one because it manages downloading and caching GraalVM
-        if necessary. */
+    id 'org.graalvm.buildtools.native' version '0.9.4'
 }
 
 repositories {
@@ -16,15 +14,6 @@ repositories {
 }
 
 group = 'gg.jte.testgroup'
-
-sourceSets {
-    nativeMain {
-        compileClasspath += sourceSets.main.output
-        runtimeClasspath += sourceSets.main.output
-    }
-    nativeTest {
-    }
-}
 
 test {
     useJUnitPlatform()
@@ -35,20 +24,9 @@ dependencies {
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testImplementation('org.assertj:assertj-core:3.20.0')
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
-    nativeMainImplementation 'info.picocli:picocli:4.6.1'
-    nativeMainAnnotationProcessor 'info.picocli:picocli-codegen:4.6.1'
+    implementation 'info.picocli:picocli:4.6.1'
+    annotationProcessor 'info.picocli:picocli-codegen:4.6.1'
 
-}
-
-configurations {
-    nativeMainImplementation.extendsFrom implementation
-    nativeTestImplementation.extendsFrom testImplementation
-    nativeTestRuntimeOnly.extendsFrom testRuntimeOnly
-}
-
-jar {
-    from sourceSets.nativeMain.output.classesDirs
-    from sourceSets.nativeMain.output.resourcesDir
 }
 
 tasks.generateJte {
@@ -64,56 +42,6 @@ tasks.compileJava {
     dependsOn(tasks.generateJte)
 }
 
-compileNativeMainJava {
-    // see https://picocli.info/#_processor_option_project
-    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+nativeBuild {
+    mainClass = 'test.NativeTestApp'
 }
-
-// GraalVM currently only has versions 11 or 17
-String graalJavaVersion() {
-    def javaMajorVersion = targetCompatibility.majorVersion as int
-    switch (javaMajorVersion) {
-        case { it <= 8 }:
-            return 'skip'
-        case { it <= 11 }:
-            return '11'
-        case { it <= 17 }:
-            return '17'
-        default:
-            return 'skip'
-    }
-}
-
-graal {
-    mainClass 'gg.jte.NativeTestApp'
-    outputName 'nativeTestApp'
-    javaVersion(graalJavaVersion() == 'skip' ? '11' : graalJavaVersion())
-    graalVersion('22.0.0.2')
-}
-
-tasks.nativeImage {
-    onlyIf { graalJavaVersion() != 'skip' }
-    dependsOn compileNativeMainJava
-    classpath.set configurations.nativeMainRuntimeClasspath
-}
-
-task nativeTest(type: Test) {
-    onlyIf { graalJavaVersion() != 'skip' }
-    dependsOn nativeImage
-    description = "Run test of native build"
-    group = "verification"
-    systemProperty("nativeApp", tasks.nativeImage.outputFile.get().toString())
-    testClassesDirs = sourceSets.nativeTest.output.classesDirs
-    classpath = sourceSets.nativeTest.runtimeClasspath
-    shouldRunAfter test
-    useJUnitPlatform()
-}
-
-task skippedNativeTest {
-    onlyIf { graalJavaVersion() == 'skip' }
-    doLast {
-        println "Skipped native-image test, incompatible Java version"
-    }
-}
-
-check.dependsOn(nativeTest, skippedNativeTest)

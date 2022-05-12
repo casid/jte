@@ -67,13 +67,6 @@ class JspToJteConverterTest {
     }
 
     @Test
-    void simpleTag_kebabCase() {
-        givenUsecase("simpleTag");
-        Throwable throwable = catchThrowable(() -> whenJspTagIsConverted("simple.tag", "tag/not-so-simple.jte"));
-        assertThat(throwable).isInstanceOf(IllegalArgumentException.class).hasMessage("Illegal jte tag name 'tag/not-so-simple.jte'. Tag names should be camel case.");
-    }
-
-    @Test
     void simpleTagWithTwoOutputsAfterEachOther() {
         givenUsecase("simpleTagWithTwoOutputsAfterEachOther");
         whenJspTagIsConverted("simple.tag", "tag/simple.jte");
@@ -252,8 +245,8 @@ class JspToJteConverterTest {
     }
 
     void whenJspTagIsConverted(String jspTag, String jteTag) {
-        JspToJteConverter converter = new MyConverter();
-        converter.convertTag(jspTag, jteTag, c -> {
+        JspToJteConverter converter = new MyConverter(jteTag);
+        converter.convertTag(jspTag, c -> {
             c.setPrefix("@import static example.JteContext.*\n");
             setups.forEach(s -> s.accept(c));
         });
@@ -276,13 +269,21 @@ class JspToJteConverterTest {
 
     private class MyConverter extends JspToJteConverter {
 
-        public MyConverter() {
+        private final String jteTag;
+
+        public MyConverter(String jteTag) {
             super(jspRoot, jteRoot, "my:jte");
+            this.jteTag = jteTag;
         }
 
         @Override
         protected String[] getNotConvertedTags() {
             return notConvertedTags;
+        }
+
+        @Override
+        public String suggestJteFile(String jspFile) {
+            return jteTag;
         }
     }
 }

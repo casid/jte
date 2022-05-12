@@ -2,9 +2,7 @@ package gg.jte.gradle;
 
 import gg.jte.ContentType;
 import gg.jte.runtime.Constants;
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
-import org.gradle.api.UnknownTaskException;
+import org.gradle.api.*;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
@@ -25,11 +23,10 @@ public class JteGradle implements Plugin<Project> {
         project.getTasks().named("test").configure(t -> t.dependsOn(precompileJteTask));
 
         TaskProvider<GenerateJteTask> generateJteTask = project.getTasks().register("generateJte", GenerateJteTask.class, extension);
-        project.getTasks().named("compileJava").configure(t -> t.dependsOn(generateJteTask));
-        try {
-            project.getTasks().named("compileKotlin").configure(t -> t.dependsOn(generateJteTask));
-        } catch (UnknownTaskException ignore) {
-        }
+        configureTask(project, "compileJava", t -> t.dependsOn(generateJteTask));
+        configureTask(project, "sourcesJar", t -> t.dependsOn(generateJteTask));
+        configureTask(project, "processResources", t -> t.dependsOn(generateJteTask));
+        configureTask(project, "compileKotlin", t -> t.dependsOn(generateJteTask));
 
         project.getTasks().named("clean").configure(t -> t.dependsOn("cleanPrecompileJte", "cleanGenerateJte")); // clean tasks are generated based on task outputs
 
@@ -64,5 +61,12 @@ public class JteGradle implements Plugin<Project> {
         extension.getTargetResourceDirectory().convention(new File(project.getBuildDir(), "generated-resources/jte").toPath());
 
         extension.getCompilePath().setFrom(main.getRuntimeClasspath());
+    }
+
+    private void configureTask(Project project, String taskName, Action<Task> action) {
+        try {
+            project.getTasks().named(taskName).configure(action);
+        } catch (UnknownTaskException ignore) {
+        }
     }
 }

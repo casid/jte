@@ -579,7 +579,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.kte", "Hello", output);
 
-        assertThat(output.toString()).isEqualTo("<script>var x = 'hello';</script>Hello");
+        assertThat(output.toString()).isEqualTo("<script>\nvar x = 'hello';</script>Hello");
     }
 
     @Test

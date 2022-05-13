@@ -1,8 +1,8 @@
-package gg.jte;
+package test;
 
+import gg.jte.*;
 import gg.jte.output.StringOutput;
 import picocli.CommandLine;
-import test.Model;
 
 import java.util.Map;
 import java.util.concurrent.Callable;

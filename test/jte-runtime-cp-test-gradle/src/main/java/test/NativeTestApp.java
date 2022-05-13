@@ -1,5 +1,6 @@
-package gg.jte;
+package test;
 
+import gg.jte.*;
 import gg.jte.output.StringOutput;
 import picocli.CommandLine;
 import test.Model;

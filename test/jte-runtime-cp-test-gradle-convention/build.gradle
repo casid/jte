@@ -30,6 +30,7 @@ dependencies {
 jte {
     generate()
     generateNativeImageResources = true
+    binaryStaticContent = true
 }
 
 nativeBuild {

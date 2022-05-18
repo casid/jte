@@ -231,6 +231,11 @@ public class TemplateCompiler extends TemplateLoader {
 
             List<byte[]> textParts = classDefinition.getBinaryTextParts();
             if (!textParts.isEmpty()) {
+                try {
+                    Files.createDirectories(resourceDirectory.resolve(classDefinition.getBinaryTextPartsFileName()).getParent());
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
                 try (OutputStream os = Files.newOutputStream(resourceDirectory.resolve(classDefinition.getBinaryTextPartsFileName()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
                     for (byte[] textPart : textParts) {
                         os.write(textPart);

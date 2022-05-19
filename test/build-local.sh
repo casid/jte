@@ -4,11 +4,12 @@
 # This is not a substitute for the full Git workflow tests, but makes it easier
 # to do testing before commit.
 function usage() {
-    echo "Usage: build-local.sh [--clean] [--help] [--no-maven] [--no-gradle]"
+    echo "Usage: build-local.sh [--clean] [--help] [--no-maven] [--no-gradle] [--native]"
 }
 
 MAVEN=true
 GRADLE=true
+NATIVE=
 
 while (( "$#" )); do
     case "$1" in
@@ -26,6 +27,10 @@ while (( "$#" )); do
             ;;
         --no-gradle)
             GRADLE=""
+            shift
+            ;;
+        --native)
+            NATIVE=nativeTest
             shift
             ;;
         *)
@@ -48,9 +53,9 @@ fi
 if [[ "$GRADLE" == "true" ]]; then
 (cd "$PROJECT_PATH"/jte-gradle-plugin && ./gradlew $CLEAN build publishToMavenLocal)
 (cd "$PROJECT_PATH"/test/jte-runtime-test-gradle && ./gradlew $CLEAN check)
-(cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle && ./gradlew $CLEAN check)
+(cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle && ./gradlew $CLEAN check $NATIVE)
 (cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle-kotlin && ./gradlew $CLEAN check)
 (cd "$PROJECT_PATH"/test/jte-runtime-test-gradle-convention && ./gradlew $CLEAN check)
-(cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle-convention && ./gradlew $CLEAN check)
+(cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle-convention && ./gradlew $CLEAN check $NATIVE)
 (cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle-kotlin-convention && ./gradlew $CLEAN check)
 fi

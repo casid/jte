@@ -43,7 +43,7 @@ public class TemplateEngine_NativeResourcesTest {
 
         Path properties = getNativeImageProperties();
         assertThat(properties).exists();
-        assertThat(properties).hasContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json");
+        assertThat(properties).hasContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json -H:ResourceConfigurationResources=${.}/resource-config.json");
 
         Path config = getNativeImageReflectionConfig();
         assertThat(config).exists();
@@ -87,7 +87,7 @@ public class TemplateEngine_NativeResourcesTest {
 
         Path properties = getNativeImageProperties();
         assertThat(properties).exists();
-        assertThat(properties).hasContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json");
+        assertThat(properties).hasContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json -H:ResourceConfigurationResources=${.}/resource-config.json");
 
         Path config = getNativeImageReflectionConfig();
         assertThat(config).exists();

@@ -105,13 +105,13 @@ public class TemplateCompiler extends TemplateLoader {
         String namespace = config.projectNamespace != null ? config.projectNamespace : packageName;
         Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/jte-generated/" + namespace);
         try (FileOutput properties = new FileOutput(nativeImageResourceRoot.resolve("native-image.properties"))) {
-            properties.writeContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json\n");
+            properties.writeContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json -H:ResourceConfigurationResources=${.}/resource-config.json\n");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
 
+        // avoid adding a json dependency to the project by just writing text
         try (FileOutput reflection = new FileOutput(nativeImageResourceRoot.resolve("reflection-config.json"))) {
-            // avoid adding a json dependency to the project by just writing
             boolean first = true;
 
             reflection.writeContent("[\n");
@@ -127,6 +127,12 @@ public class TemplateCompiler extends TemplateLoader {
                 first = false;
             }
             reflection.writeContent("\n]\n");
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        try (FileOutput resource = new FileOutput(nativeImageResourceRoot.resolve("resource-config.json"))) {
+            resource.writeContent("{\"resources\": {\"includes\": [{\"pattern\": \".*Generated\\\\.bin$\"}]}}\n");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

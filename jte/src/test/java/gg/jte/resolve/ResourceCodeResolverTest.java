@@ -60,4 +60,12 @@ public class ResourceCodeResolverTest {
         assertThat(resourceCodeResolver.exists("welcome.jte")).isTrue();
         assertThat(resourceCodeResolver.exists("doesNotExist.jte")).isFalse();
     }
+
+    @Test
+    void noRootDirectory() {
+        resourceCodeResolver = new ResourceCodeResolver("");
+
+        assertThat(resourceCodeResolver.exists("root-template.jte")).isTrue();
+        assertThat(resourceCodeResolver.exists("doesNotExist.jte")).isFalse();
+    }
 }

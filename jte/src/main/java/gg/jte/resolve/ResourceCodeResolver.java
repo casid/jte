@@ -19,7 +19,11 @@ public class ResourceCodeResolver implements CodeResolver {
     }
 
     public ResourceCodeResolver(String root, ClassLoader classLoader) {
-        this.root = root + "/";
+        if (root.isEmpty()) {
+            this.root = "";
+        } else {
+            this.root = root + "/";
+        }
         this.classLoader = classLoader;
     }
 

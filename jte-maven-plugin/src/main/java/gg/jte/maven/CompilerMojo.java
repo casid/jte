@@ -31,13 +31,13 @@ public class CompilerMojo extends AbstractMojo {
     /**
      * The directory where template files are located
      */
-    @Parameter
+    @Parameter(required = true)
     public String sourceDirectory;
 
     /**
      * The directory where compiled classes should be written to
      */
-    @Parameter
+    @Parameter(required = true)
     public String targetDirectory;
 
     @Parameter(defaultValue = "${project.compileClasspathElements}", readonly = true, required = true)

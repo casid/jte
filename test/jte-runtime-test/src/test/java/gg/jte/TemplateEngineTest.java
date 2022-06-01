@@ -28,7 +28,7 @@ public class TemplateEngineTest {
     @BeforeAll
     static void beforeAll() {
         targetDirectory = Paths.get("jte-classes");
-        templateEngine = TemplateEngine.createPrecompiled(targetDirectory, ContentType.Html);
+        templateEngine = TemplateEngine.createPrecompiled(targetDirectory, ContentType.Html, null, "gg.jte.custom");
     }
 
     @BeforeEach
@@ -50,7 +50,7 @@ public class TemplateEngineTest {
 
     @Test
     void sourceFilesAreDeleted() {
-        Path precompiledResult = targetDirectory.resolve("gg").resolve("jte").resolve("generated").resolve("precompiled");
+        Path precompiledResult = targetDirectory.resolve("gg").resolve("jte").resolve("custom");
         assertThat(precompiledResult).isDirectoryContaining (p -> p.toString().endsWith(".class"));
         assertThat(precompiledResult).isDirectoryNotContaining (p -> p.toString().endsWith(".java"));
     }

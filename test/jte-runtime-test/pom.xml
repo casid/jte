@@ -79,6 +79,7 @@
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/jte</sourceDirectory>
                     <targetDirectory>${basedir}/jte-classes</targetDirectory>
+                    <packageName>gg.jte.custom</packageName>
                     <contentType>Html</contentType>
                 </configuration>
                 <executions>

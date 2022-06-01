@@ -24,7 +24,7 @@ public class WrongContentTypeTest {
 
     @BeforeAll
     static void beforeAll() {
-        templateEngine = TemplateEngine.createPrecompiled(Paths.get("jte-classes"), ContentType.Plain); // That's not the content type we precompiled with.
+        templateEngine = TemplateEngine.createPrecompiled(Paths.get("jte-classes"), ContentType.Plain, null, "gg.jte.custom"); // That's not the content type we precompiled with.
     }
 
     @BeforeEach

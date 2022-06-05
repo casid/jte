@@ -40,37 +40,37 @@ public class CompilerMojo extends AbstractMojo {
     @Parameter(required = true)
     public String targetDirectory;
 
-    @Parameter(defaultValue = "${project.compileClasspathElements}", readonly = true, required = true)
+    @Parameter(defaultValue = "${project.compileClasspathElements}", required = true)
     public List<String> compilePath;
 
-    @Parameter(readonly = true, required = true)
+    @Parameter(required = true)
     public String contentType;
 
-    @Parameter(readonly = true)
+    @Parameter
     public boolean trimControlStructures;
 
-    @Parameter(readonly = true)
+    @Parameter
     public String[] htmlTags;
 
-    @Parameter(readonly = true)
+    @Parameter
     public String[] htmlAttributes;
 
-    @Parameter(readonly = true)
+    @Parameter
     public String htmlPolicyClass;
 
-    @Parameter(readonly = true)
+    @Parameter
     public boolean htmlCommentsPreserved;
 
-    @Parameter(readonly = true)
+    @Parameter
     public boolean binaryStaticContent;
 
-    @Parameter(readonly = true)
+    @Parameter
     public String[] compileArgs;
 
-    @Parameter(readonly = true)
+    @Parameter
     public String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
 
-    @Parameter(readonly = true)
+    @Parameter
     public boolean keepGeneratedSourceFiles;
 
 

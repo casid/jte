@@ -24,7 +24,7 @@ public class GeneratorMojo extends AbstractMojo {
     /**
      * The directory where template files are located.
      */
-    @Parameter
+    @Parameter(required = true)
     public String sourceDirectory;
 
     /**
@@ -33,25 +33,25 @@ public class GeneratorMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}/generated-sources/jte")
     public String targetDirectory;
 
-    @Parameter(readonly = true, required = true)
+    @Parameter(required = true)
     public String contentType;
 
-    @Parameter(readonly = true)
+    @Parameter
     public boolean trimControlStructures;
 
-    @Parameter(readonly = true)
+    @Parameter
     public String[] htmlTags;
 
-    @Parameter(readonly = true)
+    @Parameter
     public String[] htmlAttributes;
 
-    @Parameter(readonly = true)
+    @Parameter
     public boolean htmlCommentsPreserved;
 
-    @Parameter(readonly = true)
+    @Parameter
     public boolean binaryStaticContent;
 
-    @Parameter(readonly = true)
+    @Parameter
     public String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
 
     @Parameter

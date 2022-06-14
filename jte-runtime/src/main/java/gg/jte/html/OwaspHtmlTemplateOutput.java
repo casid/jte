@@ -23,6 +23,13 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         this.templateOutput = templateOutput;
     }
 
+    /**
+     * Override in case of subclassing.
+     */
+    protected OwaspHtmlTemplateOutput newInstance(TemplateOutput output) {
+        return new OwaspHtmlTemplateOutput(output);
+    }
+
     @Override
     public void setContext(String tagName, String attributeName) {
         this.tagName = tagName;
@@ -47,7 +54,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         if (content != null) {
             if (tagName != null && attributeName != null) {
                 StringOutput output = new StringOutput(1024);
-                content.writeTo(new OwaspHtmlTemplateOutput(output));
+                content.writeTo(newInstance(output));
 
                 writeTagAttributeUserContent(output.toString());
             } else {

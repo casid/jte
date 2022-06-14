@@ -23,7 +23,6 @@ public interface JteExtension
     Property<ContentType> getContentType();
     Property<Boolean> getTrimControlStructures();
     Property<String[]> getHtmlTags();
-    Property<String[]> getHtmlAttributes();
     Property<Boolean> getHtmlCommentsPreserved();
     Property<Boolean> getBinaryStaticContent();
     Property<String> getPackageName();

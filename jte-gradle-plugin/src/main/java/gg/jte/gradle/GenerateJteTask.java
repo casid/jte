@@ -57,7 +57,6 @@ public class GenerateJteTask extends JteTaskBase {
                 getPackageName());
         templateEngine.setTrimControlStructures(Boolean.TRUE.equals(getTrimControlStructures()));
         templateEngine.setHtmlTags(getHtmlTags());
-        templateEngine.setHtmlAttributes(getHtmlAttributes());
         templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(getHtmlCommentsPreserved()));
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
         templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());

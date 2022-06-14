@@ -79,7 +79,6 @@ public class PrecompileJteTask extends JteTaskBase {
                 getPackageName());
         templateEngine.setTrimControlStructures(Boolean.TRUE.equals(getTrimControlStructures()));
         templateEngine.setHtmlTags(getHtmlTags());
-        templateEngine.setHtmlAttributes(getHtmlAttributes());
         if (extension.getHtmlPolicyClass().isPresent()) {
             templateEngine.setHtmlPolicy(createHtmlPolicy(getHtmlPolicyClass()));
         }

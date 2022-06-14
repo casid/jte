@@ -84,17 +84,6 @@ public abstract class JteTaskBase extends DefaultTask {
 
     @Input
     @Optional
-    public String[] getHtmlAttributes() {
-        return extension.getHtmlAttributes().getOrNull();
-    }
-
-    public void setHtmlAttributes(String[] value) {
-        extension.getHtmlAttributes().set(value);
-        setterCalled();
-    }
-
-    @Input
-    @Optional
     public Boolean getHtmlCommentsPreserved() {
         return extension.getHtmlCommentsPreserved().getOrNull();
     }

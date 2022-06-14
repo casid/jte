@@ -429,16 +429,6 @@ public final class TemplateEngine {
     }
 
     /**
-     * Intercepts the given html attributes for configured htmlTags
-     * during template compilation and calls the configured htmlInterceptor during template
-     * rendering.
-     * @param htmlAttributes attributes to be intercepted, for instance setHtmlAttributes("class");
-     */
-    public void setHtmlAttributes(String ... htmlAttributes) {
-        config.htmlAttributes = htmlAttributes;
-    }
-
-    /**
      * Interceptor that is called during template rendering when one of the
      * configured htmlTags is rendered.
      * This allows to integrate existing frameworks into jte.

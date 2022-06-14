@@ -24,7 +24,6 @@ public class TemplateEngine_HtmlInterceptorTest {
     @BeforeEach
     void setUp() {
         templateEngine.setHtmlTags("form", "input", "select", "option");
-        templateEngine.setHtmlAttributes("class");
         templateEngine.setHtmlInterceptor(htmlInterceptor);
         templateEngine.setTrimControlStructures(true);
     }

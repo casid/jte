@@ -17,7 +17,6 @@ public class TemplateConfig {
     public boolean trimControlStructures;
     public HtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
     public String[] htmlTags;
-    public String[] htmlAttributes;
     public boolean htmlCommentsPreserved;
     public boolean binaryStaticContent;
     public List<String> classPath;

@@ -53,9 +53,6 @@ public class CompilerMojo extends AbstractMojo {
     public String[] htmlTags;
 
     @Parameter
-    public String[] htmlAttributes;
-
-    @Parameter
     public String htmlPolicyClass;
 
     @Parameter
@@ -94,7 +91,6 @@ public class CompilerMojo extends AbstractMojo {
         TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target, ContentType.valueOf(contentType), null, packageName);
         templateEngine.setTrimControlStructures(trimControlStructures);
         templateEngine.setHtmlTags(htmlTags);
-        templateEngine.setHtmlAttributes(htmlAttributes);
         if (htmlPolicyClass != null) {
             templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass));
         }

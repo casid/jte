@@ -18,7 +18,6 @@ public final class TemplateParser {
     private final ContentType contentType;
     private final HtmlPolicy htmlPolicy;
     private final String[] htmlTags;
-    private final String[] htmlAttributes;
     private final boolean trimControlStructures;
     private final boolean htmlCommentsPreserved;
 
@@ -59,7 +58,6 @@ public final class TemplateParser {
         this.contentType = config.contentType;
         this.htmlPolicy = config.htmlPolicy;
         this.htmlTags = config.htmlTags;
-        this.htmlAttributes = config.htmlAttributes;
         this.trimControlStructures = config.trimControlStructures;
         this.htmlCommentsPreserved = config.htmlCommentsPreserved;
 
@@ -903,17 +901,6 @@ public final class TemplateParser {
         if (htmlTags != null) {
             for (String htmlTag : htmlTags) {
                 if (name.equals(htmlTag)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean isHtmlAttributeIntercepted(String name) {
-        if (htmlAttributes != null && currentHtmlTag.intercepted) {
-            for (String htmlAttribute : htmlAttributes) {
-                if (name.equals(htmlAttribute)) {
                     return true;
                 }
             }

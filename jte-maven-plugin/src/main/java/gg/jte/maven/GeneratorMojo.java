@@ -43,9 +43,6 @@ public class GeneratorMojo extends AbstractMojo {
     public String[] htmlTags;
 
     @Parameter
-    public String[] htmlAttributes;
-
-    @Parameter
     public boolean htmlCommentsPreserved;
 
     @Parameter
@@ -73,7 +70,6 @@ public class GeneratorMojo extends AbstractMojo {
         TemplateEngine templateEngine = TemplateEngine.create(new DirectoryCodeResolver(source), target, ContentType.valueOf(contentType), null, packageName);
         templateEngine.setTrimControlStructures(trimControlStructures);
         templateEngine.setHtmlTags(htmlTags);
-        templateEngine.setHtmlAttributes(htmlAttributes);
         templateEngine.setHtmlCommentsPreserved(htmlCommentsPreserved);
         templateEngine.setBinaryStaticContent(binaryStaticContent);
         if (targetResourceDirectory != null) {

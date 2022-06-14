@@ -315,12 +315,10 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onUnsafeCodePart(int depth, String codePart) {
-        if (config.contentType == ContentType.Html) {
-            writeIndentation(depth);
-            javaCode.append("jteOutput.setContext(null, null);\n");
-        }
-
-        writeCodePart(depth, codePart);
+        writeIndentation(depth);
+        javaCode.append("jteOutput.writeContent(");
+        javaCode.append(codePart);
+        javaCode.append(");\n");
     }
 
     private void writeCodePart(int depth, String codePart) {

@@ -41,10 +41,8 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         if (value != null) {
             if (tagName != null && attributeName != null) {
                 writeTagAttributeUserContent(value);
-            } else if (tagName != null) {
-                writeTagBodyUserContent(value);
             } else {
-                writeContent(value);
+                writeTagBodyUserContent(value);
             }
         }
     }

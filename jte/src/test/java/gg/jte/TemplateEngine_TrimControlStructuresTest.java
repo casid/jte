@@ -346,12 +346,12 @@ public class TemplateEngine_TrimControlStructuresTest {
     @Test
     void variable_unsafe() {
         givenTemplate(
-                "!{int x = 1;}\n" +
-                "!{int y = 2;}\n" +
+                "!{String x = \"1\";}\n" +
+                "!{String y = \"2\";}\n" +
                 "$unsafe{x + y}\n" +
                 "done..\n"
         );
-        thenOutputIs("3\ndone..\n");
+        thenOutputIs("12\ndone..\n");
     }
 
     @Test

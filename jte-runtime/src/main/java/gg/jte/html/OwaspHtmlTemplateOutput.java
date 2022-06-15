@@ -11,7 +11,7 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 
 /**
- * See https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+ * See <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html">OWASP Cross Site Prevention Cheat Sheet</a>
  */
 public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     private final TemplateOutput templateOutput;
@@ -23,11 +23,8 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         this.templateOutput = templateOutput;
     }
 
-    /**
-     * Override in case of subclassing.
-     */
-    protected OwaspHtmlTemplateOutput newInstance(TemplateOutput output) {
-        return new OwaspHtmlTemplateOutput(output);
+    protected OutputForAttributeContent createOutputForAttributeContent() {
+        return new OutputForAttributeContent();
     }
 
     @Override
@@ -51,8 +48,8 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     public void writeUserContent(Content content) {
         if (content != null) {
             if (tagName != null && attributeName != null) {
-                StringOutput output = new StringOutput(1024);
-                content.writeTo(newInstance(output));
+                OutputForAttributeContent output = createOutputForAttributeContent();
+                content.writeTo(output);
 
                 writeTagAttributeUserContent(output.toString());
             } else {
@@ -137,5 +134,17 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     @Override
     public void writeUserContent(double value) {
         templateOutput.writeUserContent(value);
+    }
+
+    protected static class OutputForAttributeContent extends StringOutput implements HtmlTemplateOutput {
+
+        public OutputForAttributeContent() {
+            super(1024);
+        }
+
+        @Override
+        public void setContext( String tagName, String attributeName ) {
+            // ignored
+        }
     }
 }

@@ -1155,7 +1155,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "p1", "<script>evil()</script>", "p2", "p2", "p3", "p3"), output);
 
-        assertThat(output.toString()).isEqualTo("<span data-title=\"This is a key with &#34;quotes&#34; and params &lt;i>&#34;&lt;script>evil()&lt;/script>&#34;&lt;/i>, &lt;b>&#34;p2&#34;&lt;/b>, &#34;p3&#34;...\"></span>");
+        assertThat(output.toString()).isEqualTo("<span data-title=\"This is a key with &#34;quotes&#34; and params &lt;i>&#34;&amp;lt;script&amp;gt;evil()&amp;lt;/script&amp;gt;&#34;&lt;/i>, &lt;b>&#34;p2&#34;&lt;/b>, &#34;p3&#34;...\"></span>");
     }
 
     @Test

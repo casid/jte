@@ -18,7 +18,7 @@ implementation "gg.jte:jte-spring-boot-starter:INSERT_LATEST_VERSION"
 
 The starter configures a ViewResolver and a jte Template engine.
 
-Now you can return a string, pointing to template file name and the resolver will take care to instantiete the view and render the template.
+Now you can return a string, pointing to template file name and the resolver will take care to instantiate the view and render the template.
 
 ````java
 @GetMapping("/") 

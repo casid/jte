@@ -34,6 +34,12 @@ class TemplateEngineTest {
     }
 
     @Test
+    internal fun helloValueClass() {
+        templateEngine.render("helloValueClass.kte", ValueClass("Hello valued"), output)
+        thenOutputIs("Hello valued World")
+    }
+
+    @Test
     internal fun templateNotFound() {
         val exception = thenRenderingFailsWithException("unknown.kte")
         assertEquals("Failed to load unknown.kte", exception.message)

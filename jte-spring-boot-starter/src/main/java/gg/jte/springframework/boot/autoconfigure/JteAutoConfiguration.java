@@ -31,7 +31,7 @@ public class JteAutoConfiguration {
     @ConditionalOnMissingBean(JteViewResolver.class)
     public JteViewResolver jteViewResolver(TemplateEngine templateEngine) {
 
-        return new JteViewResolver(templateEngine);
+        return new JteViewResolver(templateEngine, jteProperties.getTemplateSuffix());
     }
 
 

@@ -11,9 +11,9 @@ public class JteViewResolver  extends AbstractTemplateViewResolver {
 
     private final TemplateEngine templateEngine;
 
-    public JteViewResolver(TemplateEngine templateEngine) {
+    public JteViewResolver(TemplateEngine templateEngine, final String templateSuffix) {
         this.templateEngine = templateEngine;
-        this.setSuffix(".jte");
+        this.setSuffix(templateSuffix);
         this.setViewClass(JteView.class);
         this.setContentType(MediaType.TEXT_HTML_VALUE);
         this.setOrder(Ordered.HIGHEST_PRECEDENCE);

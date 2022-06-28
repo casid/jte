@@ -11,6 +11,15 @@ public class JteProperties {
 
     private String productionProfileName = "prod";
     private String templateLocation = "src/main/jte";
+    private String templateSuffix = ".jte";
+
+    public String getTemplateSuffix() {
+        return templateSuffix;
+    }
+
+    public void setTemplateSuffix(final String templateSuffix) {
+        this.templateSuffix = templateSuffix;
+    }
 
     public String getProductionProfileName() {
         return productionProfileName;

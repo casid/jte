@@ -22,7 +22,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     private final TemplateConfig config;
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder;
     private final ClassInfo classInfo;
-    private final CodeBuilder javaCode = new CodeBuilder();
+    private final CodeBuilder javaCode = new CodeBuilder(CodeType.Java);
     private final LinkedHashSet<ClassDefinition> classDefinitions;
     private final LinkedHashSet<TemplateDependency> templateDependencies;
     private final List<ParamInfo> parameters = new ArrayList<>();
@@ -426,7 +426,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     private void writeJavaCodeWithContentSupport(int depth, String code) {
         if (code.contains("@`")) {
-            new ContentProcessor(depth, code).process();
+            new JavaContentProcessor(depth, code).process();
         } else {
             javaCode.append(code);
         }
@@ -512,52 +512,15 @@ public class JavaCodeGenerator implements CodeGenerator {
         return binaryTextParts;
     }
 
-    class ContentProcessor {
-        private final int depth;
-        private final String param;
+    class JavaContentProcessor extends ContentProcessor {
 
-        private int startIndex = -1;
-        private int endIndex = -1;
-        private int lastWrittenIndex = -1;
-        private int nestedCount;
-
-        @SuppressWarnings("FieldCanBeLocal")
-        private char previousChar0;
-        private char currentChar;
-
-        ContentProcessor(int depth, String param) {
-            this.depth = depth;
-            this.param = param;
+        public JavaContentProcessor( int depth, String code ) {
+            super(depth, code);
         }
 
-        public void process() {
-            for (int i = 0; i < param.length(); ++i) {
-                previousChar0 = currentChar;
-                currentChar = param.charAt(i);
-
-                if (previousChar0 == '@' && currentChar == '`') {
-                    if (startIndex == -1) {
-                        startIndex = i + 1;
-                    } else {
-                        ++nestedCount;
-                    }
-                } else if (currentChar == '`') {
-                    if (nestedCount == 0) {
-                        endIndex = i;
-                        writeJavaCode();
-                    } else {
-                        --nestedCount;
-                    }
-                }
-            }
-
-            if (lastWrittenIndex + 1 < param.length()) {
-                javaCode.append(param, lastWrittenIndex + 1, param.length());
-            }
-        }
-
-        private void writeJavaCode() {
-            javaCode.append(param, lastWrittenIndex + 1, startIndex - 2);
+        @Override
+        protected void onContentBlock( int depth, String code, int lastWrittenIndex, int startIndex, int endIndex ) {
+            javaCode.append(code, lastWrittenIndex + 1, startIndex - 2);
 
             javaCode.append("new ").append(getContentClass()).append("() {\n");
 
@@ -566,7 +529,7 @@ public class JavaCodeGenerator implements CodeGenerator {
             writeTemplateOutputParam();
             javaCode.append(") {\n");
 
-            TemplateParser parser = new TemplateParser(param, TemplateType.Content, JavaCodeGenerator.this, config);
+            TemplateParser parser = new TemplateParser(code, TemplateType.Content, JavaCodeGenerator.this, config);
             parser.setStartIndex(startIndex);
             parser.setEndIndex(endIndex);
             parser.setParamsComplete(true);
@@ -577,11 +540,11 @@ public class JavaCodeGenerator implements CodeGenerator {
 
             writeIndentation(depth);
             javaCode.append("}");
+        }
 
-            lastWrittenIndex = endIndex;
-
-            startIndex = -1;
-            endIndex = -1;
+        @Override
+        protected void onRemainingCode( String code, int startIndex, int endIndex ) {
+            javaCode.append(code, startIndex, endIndex);
         }
     }
 

@@ -133,12 +133,17 @@ public final class TemplateParser {
                 push(Mode.Raw);
 
                 visitor.onRawStart(depth);
+            } else if (currentMode == Mode.Content && regionMatches("@raw")) {
+                push(Mode.Raw);
             } else if (currentMode == Mode.Raw && regionMatches("@endraw")) {
                 pop();
-                extractTextPart(i - 6, Mode.RawEnd);
-                lastIndex = i + 1;
 
-                visitor.onRawEnd(depth);
+                if (currentMode == Mode.Text) {
+                    extractTextPart(i - 6, Mode.RawEnd);
+                    lastIndex = i + 1;
+
+                    visitor.onRawEnd(depth);
+                }
             } else if (isCommentAllowed() && regionMatches("<%--")) {
                 extractComment(Mode.Comment, i - 3);
             } else if (isCommentAllowed() && regionMatches("<!--") && isHtmlCommentAllowed()) {

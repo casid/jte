@@ -300,6 +300,28 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void jsStringInterpolationInContentBlock() {
+        givenTemplate("!{gg.jte.Content content = @`\n"
+              + "    <p>Hello World!</p>\n"
+              + "    @raw\n"
+              + "    <script>\n"
+              + "        const hello = \"Hello!\"\n"
+              + "        console.log(`${hello}`)\n"
+              + "    </script>\n"
+              + "    @endraw\n"
+              + "`;}\n"
+              + "${content}");
+        thenOutputIs("\n\n"
+              + "    <p>Hello World!</p>\n"
+              + "    \n"
+              + "    <script>\n"
+              + "        const hello = \"Hello!\"\n"
+              + "        console.log(`${hello}`)\n"
+              + "    </script>\n"
+              + "    \n");
+    }
+
+    @Test
     void statement() {
         givenTemplate("!{model.setX(12)}${model.x}");
         thenOutputIs("12");

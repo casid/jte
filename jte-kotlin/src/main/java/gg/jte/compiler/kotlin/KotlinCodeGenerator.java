@@ -23,7 +23,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private final TemplateConfig config;
     private final ConcurrentHashMap<String, List<ParamInfo>> paramOrder;
     private final ClassInfo classInfo;
-    private final CodeBuilder kotlinCode = new CodeBuilder();
+    private final CodeBuilder kotlinCode = new CodeBuilder(CodeType.Kotlin);
     private final LinkedHashSet<ClassDefinition> classDefinitions;
     private final LinkedHashSet<TemplateDependency> templateDependencies;
     private final List<ParamInfo> parameters = new ArrayList<>();
@@ -433,7 +433,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     private void writeCodeWithContentSupport(int depth, String code) {
         if (code.contains("@`")) {
-            new ContentProcessor(depth, code).process();
+            new KotlinContentProcessor(depth, code).process();
         } else {
             kotlinCode.append(code);
         }
@@ -519,52 +519,15 @@ public class KotlinCodeGenerator implements CodeGenerator {
         return binaryTextParts;
     }
 
-    class ContentProcessor {
-        private final int depth;
-        private final String param;
+    class KotlinContentProcessor extends ContentProcessor {
 
-        private int startIndex = -1;
-        private int endIndex = -1;
-        private int lastWrittenIndex = -1;
-        private int nestedCount;
-
-        @SuppressWarnings("FieldCanBeLocal")
-        private char previousChar0;
-        private char currentChar;
-
-        ContentProcessor(int depth, String param) {
-            this.depth = depth;
-            this.param = param;
+        KotlinContentProcessor(int depth, String param) {
+            super(depth, param);
         }
 
-        public void process() {
-            for (int i = 0; i < param.length(); ++i) {
-                previousChar0 = currentChar;
-                currentChar = param.charAt(i);
-
-                if (previousChar0 == '@' && currentChar == '`') {
-                    if (startIndex == -1) {
-                        startIndex = i + 1;
-                    } else {
-                        ++nestedCount;
-                    }
-                } else if (currentChar == '`') {
-                    if (nestedCount == 0) {
-                        endIndex = i;
-                        writeCode();
-                    } else {
-                        --nestedCount;
-                    }
-                }
-            }
-
-            if (lastWrittenIndex + 1 < param.length()) {
-                kotlinCode.append(param, lastWrittenIndex + 1, param.length());
-            }
-        }
-
-        private void writeCode() {
-            kotlinCode.append(param, lastWrittenIndex + 1, startIndex - 2);
+        @Override
+        protected void onContentBlock( int depth, String code, int lastWrittenIndex, int startIndex, int endIndex ) {
+            kotlinCode.append(code, lastWrittenIndex + 1, startIndex - 2);
 
             kotlinCode.append("object : ").append(getContentClass()).append(" {\n");
 
@@ -573,7 +536,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
             writeTemplateOutputParam();
             kotlinCode.append(") {\n");
 
-            TemplateParser parser = new TemplateParser(param, TemplateType.Content, KotlinCodeGenerator.this, config);
+            TemplateParser parser = new TemplateParser(code, TemplateType.Content, KotlinCodeGenerator.this, config);
             parser.setStartIndex(startIndex);
             parser.setEndIndex(endIndex);
             parser.setParamsComplete(true);
@@ -584,11 +547,11 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
             writeIndentation(depth);
             kotlinCode.append("}");
+        }
 
-            lastWrittenIndex = endIndex;
-
-            startIndex = -1;
-            endIndex = -1;
+        @Override
+        protected void onRemainingCode( String code, int startIndex, int endIndex ) {
+            kotlinCode.append(code, startIndex, endIndex);
         }
     }
 

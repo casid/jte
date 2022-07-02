@@ -9,6 +9,7 @@ public final class CodeBuilder {
     private static final int INITIAL_CAPACITY = 10;
     private static final int LOAD_FACTOR = 2;
 
+    private final CodeType codeType;
     private final StringBuilder code = new StringBuilder(1024);
     private int currentCodeLine;
     private int currentTemplateLine;
@@ -16,6 +17,10 @@ public final class CodeBuilder {
     private int fieldsCodeLine;
     private int fieldsTemplateLine;
     private int[] lineInfo = new int[INITIAL_CAPACITY];
+
+    public CodeBuilder(CodeType codeType) {
+        this.codeType = codeType;
+    }
 
     public CodeBuilder append(String code) {
         this.code.append(code);
@@ -45,8 +50,37 @@ public final class CodeBuilder {
 
     @SuppressWarnings("UnusedReturnValue")
     public CodeBuilder appendEscaped(String text) {
-        StringUtils.appendEscaped(code, text);
+        if (codeType == CodeType.Kotlin) {
+            appendEscapedKotlin(code, text);
+        } else {
+            StringUtils.appendEscaped(code, text);
+        }
         return this;
+    }
+
+    private void appendEscapedKotlin(StringBuilder result, String string) {
+        for (int i = 0; i < string.length(); ++i) {
+            char c = string.charAt(i);
+            if (c == '\"') {
+                result.append("\\\"");
+            } else if (c == '\n') {
+                result.append("\\n");
+            } else if (c == '\t') {
+                result.append("\\t");
+            } else if (c == '\r') {
+                result.append("\\r");
+            } else if (c == '\f') {
+                result.append("\\f");
+            } else if (c == '\b') {
+                result.append("\\b");
+            } else if (c == '\\') {
+                result.append("\\\\");
+            } else if (c == '$') {
+                result.append("\\$");
+            } else {
+                result.append(c);
+            }
+        }
     }
 
     public CodeBuilder finishTemplateLine() {

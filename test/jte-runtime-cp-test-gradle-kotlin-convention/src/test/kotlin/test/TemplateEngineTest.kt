@@ -48,6 +48,12 @@ class TemplateEngineTest {
     }
 
     @Test
+    internal fun helloValueClassTemplateCall_map() {
+        templateEngine.render("helloValueClassTemplateCall.kte", mapOf("model" to ValueClass("Hello valued")), output)
+        thenOutputIs("Calling template.. you passed Hello valued")
+    }
+
+    @Test
     internal fun templateNotFound() {
         val exception = thenRenderingFailsWithException("unknown.kte")
         assertEquals("Failed to load unknown.kte", exception.message)

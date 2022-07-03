@@ -1,0 +1,2 @@
+@param model:test.ValueClass
+Calling template.. @template.tag.usesValueClass(model = model)

@@ -1,0 +1,2 @@
+@param model:test.ValueClass
+you passed ${model.s()}

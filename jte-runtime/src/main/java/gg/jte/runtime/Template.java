@@ -42,7 +42,13 @@ public final class Template {
             } else {
                 String expectedType = render.getParameterTypes()[2].getName();
                 String actualType = param != null ? param.getClass().getName() : null;
-                throw new TemplateException("Failed to render " + name + ", type mismatch for parameter: Expected " + expectedType + ", got " + actualType, e);
+                String message = "Failed to render " + name + ", type mismatch for parameter: Expected " + expectedType + ", got " + actualType;
+
+                if (isMangledKotlinRenderMethod(render)) {
+                    message += "\nIt looks like you're rendering a template with a Kotlin value class parameter. To make this work, pass the value class parameter in a map.\nExample: templateEngine.render(\"" + name + "\", mapOf(\"myValue\" to MyValueClass(), output)";
+                }
+
+                throw new TemplateException(message, e);
             }
         }
     }
@@ -65,6 +71,8 @@ public final class Template {
                 render = declaredMethod;
             } else if ("renderMap".equals(declaredMethod.getName())) {
                 renderMap = declaredMethod;
+            } else if (isMangledKotlinRenderMethod(declaredMethod)) {
+                render = declaredMethod;
             }
         }
 
@@ -100,5 +108,13 @@ public final class Template {
         }
 
         return Collections.unmodifiableMap(result);
+    }
+
+    /**
+     * The Kotlin compiler mangles methods value class parameters, for example "render-JMhnnco"
+     * See: https://github.com/casid/jte/issues/163
+     */
+    private boolean isMangledKotlinRenderMethod(Method method) {
+        return name.endsWith(".kte") && method.getName().startsWith("render-");
     }
 }

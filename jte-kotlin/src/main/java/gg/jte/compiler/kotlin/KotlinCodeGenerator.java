@@ -76,7 +76,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         kotlinCode.append("class ").append(classInfo.className).append(" {\n");
         kotlinCode.append("companion object {\n");
         kotlinCode.markFieldsIndex();
-        kotlinCode.append("\t@JvmStatic @JvmName(\"render\") fun render(");
+        kotlinCode.append("\t@JvmStatic fun render(");
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
 
@@ -133,7 +133,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
         kotlinCode.append("\t}\n");
 
-        kotlinCode.append("\t@JvmStatic @JvmName(\"renderMap\") fun renderMap(");
+        kotlinCode.append("\t@JvmStatic fun renderMap(");
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
 

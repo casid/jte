@@ -35,7 +35,15 @@ class TemplateEngineTest {
 
     @Test
     internal fun helloValueClass() {
-        templateEngine.render("helloValueClass.kte", ValueClass("Hello valued"), output)
+        val exception:TemplateException = assertThrows { templateEngine.render("helloValueClass.kte", ValueClass("Hello valued"), output) }
+        assertEquals("Failed to render helloValueClass.kte, type mismatch for parameter: Expected java.lang.String, got test.ValueClass\n" +
+                "It looks like you're rendering a template with a Kotlin value class parameter. To make this work, pass the value class parameter in a map.\n" +
+                "Example: templateEngine.render(\"helloValueClass.kte\", mapOf(\"myValue\" to MyValueClass(), output)", exception.message)
+    }
+
+    @Test
+    internal fun helloValueClass_map() {
+        templateEngine.render("helloValueClass.kte", mapOf("model" to ValueClass("Hello valued")), output)
         thenOutputIs("Hello valued World")
     }
 

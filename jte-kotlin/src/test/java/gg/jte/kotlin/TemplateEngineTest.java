@@ -1152,6 +1152,12 @@ public class TemplateEngineTest {
         assertThat(output.toString()).isEqualTo("println(\"Today is 2021-08-21 07:50\")");
     }
 
+    @Test
+    void spaceAfterParameterName() {
+        givenRawTemplate("@param model :gg.jte.kotlin.TemplateEngineTest.Model\nHello ${model.x}");
+        thenOutputIs("Hello 42");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + ".kte", code);
     }

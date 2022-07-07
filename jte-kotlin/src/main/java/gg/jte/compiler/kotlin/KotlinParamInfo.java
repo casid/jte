@@ -38,7 +38,7 @@ public class KotlinParamInfo {
                     nameEndIndex = i;
                 }
             } else if (typeStartIndex == -1) {
-                if (!Character.isWhitespace(character)) {
+                if (!Character.isWhitespace(character) && character != ':') {
                     typeStartIndex = i;
                 }
             } else if (typeEndIndex == -1) {

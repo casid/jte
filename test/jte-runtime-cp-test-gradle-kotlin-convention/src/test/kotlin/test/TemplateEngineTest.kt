@@ -54,6 +54,18 @@ class TemplateEngineTest {
     }
 
     @Test
+    internal fun helloDataClass() {
+        templateEngine.render("helloDataClass.kte", DataClass(42, "data"), output)
+        thenOutputIs("Hello data, your id is 42.")
+    }
+
+    @Test
+    internal fun helloDataClass_map() {
+        templateEngine.render("helloDataClass.kte", mapOf("model" to DataClass(42, "data")), output)
+        thenOutputIs("Hello data, your id is 42.")
+    }
+
+    @Test
     internal fun templateNotFound() {
         val exception = thenRenderingFailsWithException("unknown.kte")
         assertEquals("Failed to load unknown.kte", exception.message)

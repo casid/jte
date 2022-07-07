@@ -43,7 +43,7 @@ Here is a small jte template `example.jte`:
 So what is going on here?
 - `@import` directly translates to Java imports, in this case so that `org.example.Page` is known to the template.
 - `@param Page page` is the parameter that needs to be passed to this template.
-- `@if`/`@endif` is an if-block. The stuff inside the braces (`page.getDescription() != null`) is plain Java code. @JSP users: Yes, there is `@elseif()` and `@else` in jte ❤️.
+- `@if`/`@endif` is an if-block. The stuff inside the braces (`page.getDescription() != null`) is plain Java code.
 - `${}` writes to the underlying template output, as known from various other template engines.
 
 To render this template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):

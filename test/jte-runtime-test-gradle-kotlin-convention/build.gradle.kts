@@ -1,7 +1,7 @@
 
 plugins {
     id("java")
-    id("gg.jte.gradle").version("2.1.2-SNAPSHOT")
+    id("gg.jte.gradle").version("2.1.2")
 }
 
 repositories {
@@ -14,7 +14,7 @@ tasks.test {
 }
 
 dependencies {
-    implementation("gg.jte:jte-runtime:2.1.2-SNAPSHOT")
+    implementation("gg.jte:jte-runtime:2.1.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
     testImplementation("org.assertj:assertj-core:3.20.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")

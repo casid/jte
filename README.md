@@ -16,7 +16,7 @@
 
 ## TLDR
 
-jte is a lot of fun to work with! This is IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
+jte gives you the same productive, type safe experience you're used to from writing Java or Kotlin. This is IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
 
 <img alt="jte in IntelliJ" src="jte-intellij.gif" />
 

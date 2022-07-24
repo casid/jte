@@ -18,7 +18,7 @@
 
 jte is a lot of fun to work with! This is IntelliJ with the <a href="https://plugins.jetbrains.com/plugin/14521-jte">jte plugin</a> installed:
 
-<img alt="jte in IntelliJ" src="jte-intellij.gif" width="696" />
+<img alt="jte in IntelliJ" src="jte-intellij.gif" />
 
 ## 5 minutes example
 

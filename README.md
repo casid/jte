@@ -108,11 +108,8 @@ By design, jte provides very fast output. This is a <a href="https://github.com/
 ![alt Template Benchmark](https://raw.githubusercontent.com/casid/template-benchmark/master/results.png)
 
 ### High concurrency
-This is a <a href="https://github.com/casid/template-benchmark/tree/ryzen-5950x">fork of mbosecke/template-benchmark</a> with jte included, running on an AMD Ryzen 5950x:
-
+This is the same benchmark as above, but the amount of threads was set to `@Threads(16)`, to fully utilize all cores. jte has pretty much zero serialization bottlenecks and runs  very concurrent on servers with a lot of CPU cores:
 ![alt Template Benchmark](https://raw.githubusercontent.com/casid/template-benchmark/ryzen-5950x/results.png)
-
-For this benchmark, the amount of threads was manually set `@Threads(32)`, to fully utilize all cores. jte has pretty much zero serialization bottlenecks and runs  very concurrent on servers with a lot of CPU cores.
 
 ## Getting started
 

@@ -12,7 +12,7 @@
 - Context-sensitive [HTML escaping](https://github.com/casid/jte/blob/master/DOCUMENTATION.md#html-escaping) at compile time
 - <a href="https://plugins.jetbrains.com/plugin/14521-jte">IntelliJ plugin</a> with completion and refactoring support
 - Hot reloading of templates during development
-- Blazing fast execution ([benchmarks](#performance))
+- Blazing fast execution ([see benchmarks](#performance))
 
 ## TLDR
 

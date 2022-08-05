@@ -107,10 +107,6 @@ By design, jte provides very fast output. This is a <a href="https://github.com/
 
 ![alt Template Benchmark](https://raw.githubusercontent.com/casid/template-benchmark/master/results.png)
 
-Note that the above is with `ContentType.Plain`, so no output escaping is done. This is what the other engines in the benchmark are set-up with. Since jte 0.8.0, you will want to render HTML pages with `ContentType.Html`, so that output is automatically escaped by the engine, depending on where in the HTML data is written to. With `ContentType.Html`, jte is still extremly fast, thanks to [owasp-java-encoder](https://github.com/OWASP/owasp-java-encoder):
-
-![alt Template Benchmark](https://raw.githubusercontent.com/casid/template-benchmark/jte-html/results.png)
-
 ### High concurrency
 This is a <a href="https://github.com/casid/template-benchmark/tree/ryzen-5950x">fork of mbosecke/template-benchmark</a> with jte included, running on an AMD Ryzen 5950x:
 

@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * jte is designed to introduce as few new keywords as possible and builds upon existing Java features,
  * so that it is very easy to reason about what a template does.
  *
- * Read more at the official documentation at https://github.com/casid/jte/blob/master/DOCUMENTATION.md
+ * Read more at the <a href="https://github.com/casid/jte/blob/master/DOCUMENTATION.md">official documentation</a>
  */
 public final class TemplateEngine {
     private final TemplateLoader templateLoader;
@@ -103,7 +103,7 @@ public final class TemplateEngine {
      * No JDK is required.
      * All templates share one class loader with each other.
      * This is recommended when running templates in production.
-     * How to precompile templates: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates
+     * How to <a href="https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates">precompile templates</a>.
      *
      * @param classDirectory where template class files are located
      * @param contentType the content type of all templates this engine manages
@@ -120,7 +120,7 @@ public final class TemplateEngine {
      * This means all template classes must be bundled in you application JAR file.
      * No JDK is required.
      * This is recommended when running templates in production.
-     * How to precompile templates: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates
+     * How to <a href="https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates">precompile templates</a>.
      *
      * @param contentType the content type of all templates this engine manages
      * @return a fresh TemplateEngine instance
@@ -136,7 +136,7 @@ public final class TemplateEngine {
      * No JDK is required.
      * All templates share one class loader with each other.
      * This is recommended when running templates in production.
-     * How to precompile templates: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates
+     * How to <a href="https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates">precompile templates</a>.
      *
      * @param classDirectory where template class files are located
      * @param contentType the content type of all templates this engine manages
@@ -154,7 +154,7 @@ public final class TemplateEngine {
      * No JDK is required.
      * All templates share one class loader with each other.
      * This is recommended when running templates in production.
-     * How to precompile templates: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates
+     * How to <a href="https://github.com/casid/jte/blob/master/DOCUMENTATION.md#precompiling-templates">precompile templates</a>.
      *
      * @param classDirectory where template class files are located
      * @param contentType the content type of all templates this engine manages

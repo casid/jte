@@ -86,7 +86,7 @@ public class TemplateCompiler extends TemplateLoader {
     
     /**
      * Generate configuration files that can be read by Graal native-image.
-     * See https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/
+     * See <a href="https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/">GraalVM reference manual</a>.
      * @param classDefinitions details of generated classes
      */
     private void generateNativeResources(LinkedHashSet<ClassDefinition> classDefinitions) {

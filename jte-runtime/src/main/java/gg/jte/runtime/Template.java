@@ -111,8 +111,8 @@ public final class Template {
     }
 
     /**
-     * The Kotlin compiler mangles methods value class parameters, for example "render-JMhnnco"
-     * See: https://github.com/casid/jte/issues/163
+     * The Kotlin compiler mangles methods value class parameters, for example <code>render-JMhnnco</code><br>
+     * See <a href="https://github.com/casid/jte/issues/163">related GitHub issue</a>.
      */
     private boolean isMangledKotlinRenderMethod(Method method) {
         return name.endsWith(".kte") && method.getName().startsWith("render-");

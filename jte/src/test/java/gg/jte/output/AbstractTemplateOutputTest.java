@@ -1,5 +1,7 @@
 package gg.jte.output;
 
+import gg.jte.Content;
+import gg.jte.ContentType;
 import gg.jte.TemplateOutput;
 import org.junit.jupiter.api.Test;
 
@@ -74,6 +76,23 @@ public abstract class AbstractTemplateOutputTest<T extends TemplateOutput> {
         output.writeUserContent('b');
 
         thenOutputIs("ab");
+    }
+
+    @Test
+    void writeEnum() {
+        output.writeUserContent(ContentType.Html);
+        thenOutputIs("Html");
+    }
+
+    @Test
+    void writeNull() {
+        output.writeUserContent((String) null);
+        output.writeUserContent((Content) null);
+        output.writeUserContent((ContentType) null);
+        output.writeUserContent((Boolean) null);
+        output.writeUserContent((Number) null);
+        output.writeUserContent((Character) null);
+        thenOutputIs("");
     }
 
     @Test

@@ -143,7 +143,7 @@ class TemplateSingleControlStructureVisitor implements TemplateParserVisitor {
 
     public static final class NotSingleControlStructure extends RuntimeException {
         @Override
-        public synchronized Throwable fillInStackTrace() {
+        public Throwable fillInStackTrace() {
             return this;
         }
     }

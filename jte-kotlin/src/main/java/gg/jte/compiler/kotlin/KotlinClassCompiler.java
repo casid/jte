@@ -24,7 +24,6 @@ public class KotlinClassCompiler implements ClassCompiler {
     @Override
     public void compile(String[] files, List<String> classPath, TemplateConfig config, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         K2JVMCompilerArguments compilerArguments = new K2JVMCompilerArguments();
-        //compilerArguments.setJvmTarget("");
         compilerArguments.setJavaParameters(true);
         compilerArguments.setNoStdlib(true);
         compilerArguments.setDestination(classDirectory.toFile().getAbsolutePath());

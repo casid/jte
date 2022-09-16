@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * jte is a simple, yet powerful template engine for Java.
@@ -23,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 public final class TemplateEngine {
     private final TemplateLoader templateLoader;
     private final TemplateMode templateMode;
-    private final ConcurrentMap<String, Template> templateCache;
+    private final ConcurrentHashMap<String, Template> templateCache;
     private final TemplateConfig config;
     private final ContentType contentType;
     private final Path classDirectory;
@@ -334,17 +333,39 @@ public final class TemplateEngine {
     }
 
     private Template resolveTemplate(String name) {
-        if (templateMode == TemplateMode.OnDemand && templateLoader.hasChanged(name)) {
-            synchronized (templateCache) {
-                if (templateLoader.hasChanged(name)) {
-                    templateCache.remove(name);
-                    Template template = templateLoader.hotReload(name);
-                    templateCache.put(name, template);
-                    return template;
-                }
-            }
+        if (templateMode == TemplateMode.OnDemand) {
+            return resolveTemplateOnDemand(name);
+        } else {
+            return templateCache.computeIfAbsent(name, templateLoader::load);
         }
-        return templateCache.computeIfAbsent(name, templateLoader::load);
+    }
+
+    private Template resolveTemplateOnDemand(String name) {
+        RuntimeException[] exception = {null};
+
+        // We use the guarantees of ConcurrentHashMap#compute to avoid synchronized with double hasChanged() check
+        Template result = templateCache.compute(name, (templateName, template) -> {
+            if (template != null && !templateLoader.hasChanged(templateName)) {
+                return template;
+            }
+
+            try {
+                if (template == null) {
+                    return templateLoader.load(templateName);
+                } else {
+                    return templateLoader.hotReload(templateName);
+                }
+            } catch (RuntimeException e) {
+                exception[0] = e; // Store exception to throw later
+                return null; // null removes the template from the template cache
+            }
+        });
+
+        if (exception[0] != null) {
+            throw exception[0];
+        }
+
+        return result;
     }
 
     /**

@@ -8,7 +8,11 @@ import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
 
-public class MigrateV1To2 {
+public final class MigrateV1To2 {
+
+    private MigrateV1To2() {
+    }
+
     public static void migrateTemplates(Path sourceDirectory) {
         System.out.println("Migrating jte templates from v1 to v2...");
         System.out.println("Source root directory: " + sourceDirectory);

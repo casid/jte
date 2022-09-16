@@ -10,6 +10,9 @@ import java.util.stream.Stream;
 
 public final class IoUtils {
 
+    private IoUtils() {
+    }
+
     public static String toString(Path file) {
         try {
             byte[] bytes = Files.readAllBytes(file);

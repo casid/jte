@@ -1,6 +1,10 @@
 package gg.jte.runtime;
 
 public final class StringUtils {
+
+    private StringUtils() {
+    }
+
     public static boolean startsWithIgnoringCaseAndWhitespaces(String string, String prefix) {
         int j = 0;
         for (int i = 0; i < string.length() && j < prefix.length(); ++i) {

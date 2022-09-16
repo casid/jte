@@ -1,6 +1,10 @@
 package gg.jte.html.support;
 
 public final class HtmlSupport {
+
+    private HtmlSupport() {
+    }
+
     public static CssClasses addClass(String cssClass) {
         return new CssClasses().addClass(cssClass);
     }

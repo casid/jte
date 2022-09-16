@@ -11,7 +11,11 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.stream.Stream;
 
-public class IoUtils {
+public final class IoUtils {
+
+    private IoUtils() {
+    }
+
     public static String readFile(Path file) {
         try {
             return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);

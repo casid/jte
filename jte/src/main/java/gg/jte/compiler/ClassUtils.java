@@ -10,7 +10,10 @@ import java.net.URLClassLoader;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ClassUtils {
+public final class ClassUtils {
+
+    private ClassUtils() {
+    }
 
     public static String join(List<String> classPath) {
         return String.join(File.pathSeparator, classPath);

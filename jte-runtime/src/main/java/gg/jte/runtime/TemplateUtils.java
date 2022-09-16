@@ -8,6 +8,10 @@ import java.util.Map;
 
 @SuppressWarnings("unused") // by template code
 public final class TemplateUtils {
+
+    private TemplateUtils() {
+    }
+
     public static Map<String, Object> toMap() {
         return Collections.emptyMap();
     }

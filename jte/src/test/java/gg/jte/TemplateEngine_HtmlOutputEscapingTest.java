@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.Writer;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -1374,6 +1375,28 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "contentType", ContentType.Html), output);
 
         assertThat(output.toString()).isEqualTo("<span alt=\"Content type is: Html\">Content type is: Html</span>");
+    }
+
+    @Test
+    void localization_null() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "@param gg.jte.ContentType contentType\n" +
+                "<span alt=\"${localizer.localize(\"enum\", contentType)}\">${localizer.localize(\"enum\", contentType)}</span>");
+
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "contentType", null), output);
+
+        assertThat(output.toString()).isEqualTo("<span alt=\"Content type is: \">Content type is: </span>");
+    }
+
+    @Test
+    void localization_unsupportedType() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "@param java.util.Date date\n" +
+                "${localizer.localize(\"enum\", date)}");
+
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "date", new Date()), output);
+
+        assertThat(output.toString()).isEqualTo("Content type is: ");
     }
 
     @Test

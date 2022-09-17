@@ -11,6 +11,9 @@ final class LineInfo {
     private static final List<TemplateParser.Mode> ForLoopEndModes = Arrays.asList(TemplateParser.Mode.ForLoop, TemplateParser.Mode.Text);
     private static final List<TemplateParser.Mode> RawEndModes = Collections.singletonList(TemplateParser.Mode.Raw);
 
+    private LineInfo() {
+    }
+
     static boolean isSingleControlStructure(String templateCode, int currentIndex, int endIndex, int startLineIndex, TemplateParser.Mode mode) {
         int endLineIndex = templateCode.indexOf('\n', currentIndex);
         if (endLineIndex == -1) {

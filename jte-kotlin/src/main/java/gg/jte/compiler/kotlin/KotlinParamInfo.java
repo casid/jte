@@ -3,7 +3,11 @@ package gg.jte.compiler.kotlin;
 import gg.jte.compiler.ParamInfo;
 import gg.jte.compiler.TemplateParserVisitor;
 
-public class KotlinParamInfo {
+public final class KotlinParamInfo {
+
+    private KotlinParamInfo() {
+    }
+
     public static ParamInfo parse(String parameterString, TemplateParserVisitor visitor, int templateLine) {
         String type;
         String name;

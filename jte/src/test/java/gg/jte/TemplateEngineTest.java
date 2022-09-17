@@ -881,8 +881,8 @@ public class TemplateEngineTest {
 
     @Test
     void escaping() {
-        givenTemplate("\\");
-        thenOutputIs("\\");
+        givenTemplate("\" \n \t \r \f \b \\");
+        thenOutputIs("\" \n \t \r \f \b \\");
     }
 
     @Test
@@ -975,6 +975,7 @@ public class TemplateEngineTest {
                 "i is: ${i}\n" +
                 "${model.getThatThrows()}");
 
+        @SuppressWarnings("resource")
         StringOutput output = new StringOutput();
         Throwable throwable = catchThrowable(() -> templateEngine.render("my/model.jte", TemplateUtils.toMap("model", model, "i", 1L), output));
 

@@ -69,8 +69,6 @@ public final class CodeBuilder {
                 result.append("\\t");
             } else if (c == '\r') {
                 result.append("\\r");
-            } else if (c == '\f') {
-                result.append("\\f");
             } else if (c == '\b') {
                 result.append("\\b");
             } else if (c == '\\') {

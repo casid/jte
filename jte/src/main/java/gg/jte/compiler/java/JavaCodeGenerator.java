@@ -333,7 +333,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     public void onCodeStatement(int depth, String codePart) {
         writeIndentation(depth);
         writeJavaCodeWithContentSupport(depth, codePart);
-        javaCode.append(";\n");
+        javaCode.append("\n");
     }
 
     @Override

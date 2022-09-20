@@ -259,7 +259,7 @@ public class TemplateEngineTest {
     void loopWithVariable() {
         model.array = new int[]{1, 2, 3};
         givenTemplate("@for (int i : model.array)" +
-                "!{int y = i + 1}" +
+                "!{int y = i + 1;}" +
                 "${y}" +
                 "@endfor");
         thenOutputIs("234");
@@ -323,7 +323,7 @@ public class TemplateEngineTest {
 
     @Test
     void statement() {
-        givenTemplate("!{model.setX(12)}${model.x}");
+        givenTemplate("!{model.setX(12);}${model.x}");
         thenOutputIs("12");
     }
 
@@ -335,7 +335,7 @@ public class TemplateEngineTest {
 
     @Test
     void variable() {
-        givenTemplate("!{int y = 50}${y}");
+        givenTemplate("!{int y = 50;}${y}");
         thenOutputIs("50");
     }
 
@@ -611,13 +611,13 @@ public class TemplateEngineTest {
 
     @Test
     void commentBeforeImports() {
-        givenRawTemplate("<%--This is a comment--%>@import gg.jte.TemplateEngineTest.Model\n@param Model model\n" + "!{model.setX(12)}${model.x}");
+        givenRawTemplate("<%--This is a comment--%>@import gg.jte.TemplateEngineTest.Model\n@param Model model\n" + "!{model.setX(12);}${model.x}");
         thenOutputIs("12");
     }
 
     @Test
     void commentBeforeParams() {
-        givenRawTemplate("<%--This is a comment--%>@param gg.jte.TemplateEngineTest.Model model\n" + "!{model.setX(12)}${model.x}");
+        givenRawTemplate("<%--This is a comment--%>@param gg.jte.TemplateEngineTest.Model model\n" + "!{model.setX(12);}${model.x}");
         thenOutputIs("12");
     }
 
@@ -987,7 +987,7 @@ public class TemplateEngineTest {
 
     @Test
     void curlyBracesAreTracked() {
-        givenRawTemplate("!{java.util.Optional<String> name = java.util.Optional.ofNullable(null)}" +
+        givenRawTemplate("!{java.util.Optional<String> name = java.util.Optional.ofNullable(null);}" +
                 "${name.map((n) -> { return \"name: \" + n; }).orElse(\"empty\")}");
 
         StringOutput output = new StringOutput();
@@ -998,7 +998,7 @@ public class TemplateEngineTest {
 
     @Test
     void curlyBracesAreTracked_unsafe() {
-        givenRawTemplate("!{java.util.Optional<String> name = java.util.Optional.ofNullable(null)}" +
+        givenRawTemplate("!{java.util.Optional<String> name = java.util.Optional.ofNullable(null);}" +
                 "$unsafe{name.map((n) -> { return \"name: \" + n; }).orElse(\"empty\")}");
 
         StringOutput output = new StringOutput();
@@ -1009,7 +1009,7 @@ public class TemplateEngineTest {
 
     @Test
     void curlyBracesAreTracked_statement() {
-        givenRawTemplate("!{String name = java.util.Optional.ofNullable(null).map((n) -> { return \"name: \" + n; }).orElse(\"empty\")}" +
+        givenRawTemplate("!{String name = java.util.Optional.ofNullable(null).map((n) -> { return \"name: \" + n; }).orElse(\"empty\");}" +
                 "${name}");
 
         StringOutput output = new StringOutput();

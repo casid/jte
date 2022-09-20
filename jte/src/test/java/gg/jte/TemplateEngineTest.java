@@ -345,7 +345,7 @@ public class TemplateEngineTest {
             return;
         }
 
-        givenTemplate("!{var y = 50}${y}");
+        givenTemplate("!{var y = 50;}${y}");
         thenOutputIs("50");
     }
 

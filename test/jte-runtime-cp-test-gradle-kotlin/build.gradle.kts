@@ -3,7 +3,7 @@ import java.nio.file.Paths
 
 plugins {
     kotlin("jvm") version "1.7.10"
-    id("gg.jte.gradle") version("2.1.3-SNAPSHOT")
+    id("gg.jte.gradle") version("2.2.0")
 }
 
 repositories {
@@ -14,7 +14,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.junit.jupiter:junit-jupiter:5.4.2")
-    implementation("gg.jte:jte-runtime:2.1.3-SNAPSHOT")
+    implementation("gg.jte:jte-runtime:2.2.0")
 }
 
 tasks.test {

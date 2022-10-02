@@ -256,7 +256,7 @@ public class TemplateEngineTest {
     @Test
     void unsafeInContentBlock() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("${@`$unsafe{model.array.size}`}");
+        givenTemplate("${@`$unsafe{\"\" + model.array.size}`}");
         thenOutputIs("3");
     }
 

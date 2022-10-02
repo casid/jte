@@ -320,12 +320,10 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     @Override
     public void onUnsafeCodePart(int depth, String codePart) {
-        if (config.contentType == ContentType.Html) {
-            writeIndentation(depth);
-            kotlinCode.append("jteOutput.setContext(null, null)\n");
-        }
-
-        writeCodePart(depth, codePart);
+        writeIndentation(depth);
+        kotlinCode.append("jteOutput.writeContent(");
+        kotlinCode.append(codePart);
+        kotlinCode.append(")\n");
     }
 
     private void writeCodePart(int depth, String codePart) {

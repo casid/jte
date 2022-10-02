@@ -1085,11 +1085,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void localization_noParams() {
         codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span alt=\"${localizer.localize(\"no-params\")}\">${localizer.localize(\"no-params\")}</span> $unsafe{localizer.localize(\"no-params\")}");
+                "<span alt=\"${localizer.localize(\"no-params\")}\">${localizer.localize(\"no-params\")}</span>${localizer.localize(\"no-params\")}");
 
         templateEngine.render("template.kte", localizer, output);
 
-        assertThat(output.toString()).isEqualTo("<span alt=\"This is a key without params\">This is a key without params</span> This is a key without params");
+        assertThat(output.toString()).isEqualTo("<span alt=\"This is a key without params\">This is a key without params</span>This is a key without params");
     }
 
     @Test
@@ -1234,24 +1234,14 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
-    void localization_primitives_unsafe() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span>$unsafe{localizer.localize(\"all-primitives\", false, 1.toByte(), 2.toShort(), 3, 4L, 5.0f, 6.0, 'c')}</span>");
-
-        templateEngine.render("template.kte", localizer, output);
-
-        assertThat(output.toString()).isEqualTo("<span>boolean: false, byte: 1, short: 2, int: 3, long: 4, float: 5.0, double: 6.0, char: c</span>");
-    }
-
-    @Test
     void localization_enum() {
         codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
                 "@param contentType:gg.jte.ContentType\n" +
-                "<span alt=\"${localizer.localize(\"enum\", contentType)}\">${localizer.localize(\"enum\", contentType)}</span> Unsafe: $unsafe{localizer.localize(\"enum\", contentType)}");
+                "<span alt=\"${localizer.localize(\"enum\", contentType)}\">${localizer.localize(\"enum\", contentType)}</span>");
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "contentType", ContentType.Html), output);
 
-        assertThat(output.toString()).isEqualTo("<span alt=\"Content type is: Html\">Content type is: Html</span> Unsafe: Content type is: Html");
+        assertThat(output.toString()).isEqualTo("<span alt=\"Content type is: Html\">Content type is: Html</span>");
     }
 
     @Test

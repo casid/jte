@@ -321,7 +321,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public void onUnsafeCodePart(int depth, String codePart) {
         writeIndentation(depth);
-        kotlinCode.append("jteOutput.writeContent(");
+        kotlinCode.append("jteOutput.writeUnsafeContent(");
         kotlinCode.append(codePart);
         kotlinCode.append(")\n");
     }

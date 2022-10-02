@@ -1063,6 +1063,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void unsafe_null() {
+        codeResolver.givenCode("template.kte", "@param x:String?\nHello, $unsafe{x}");
+
+        templateEngine.render("template.kte", (String)null, output);
+
+        assertThat(output.toString()).isEqualTo("Hello, ");
+    }
+
+    @Test
     void localization_notFound_noParams() {
         codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
                 "<span>${localizer.localize(\"unknown\")}</span>");

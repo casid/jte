@@ -80,4 +80,10 @@ public interface TemplateOutput {
             writeUserContent(value.charValue());
         }
     }
+
+    default void writeUnsafeContent(String value) {
+        if (value != null) {
+            writeContent(value);
+        }
+    }
 }

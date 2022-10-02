@@ -1156,6 +1156,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void unsafe_null() {
+        codeResolver.givenCode("template.jte", "@param String x\nHello, $unsafe{x}");
+
+        templateEngine.render("template.jte", (String)null, output);
+
+        assertThat(output.toString()).isEqualTo("Hello, ");
+    }
+
+    @Test
     void localization_notFound_noParams() {
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span>${localizer.localize(\"unknown\")}</span>");

@@ -316,7 +316,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onUnsafeCodePart(int depth, String codePart) {
         writeIndentation(depth);
-        javaCode.append("jteOutput.writeContent(");
+        javaCode.append("jteOutput.writeUnsafeContent(");
         javaCode.append(codePart);
         javaCode.append(");\n");
     }

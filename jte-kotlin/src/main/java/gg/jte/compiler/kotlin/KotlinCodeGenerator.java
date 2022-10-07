@@ -49,6 +49,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     private void writePackageIfRequired() {
         if (!hasWrittenPackage) {
+            kotlinCode.append("@file:Suppress(\"ktlint\")\n");
             kotlinCode.append("package " + classInfo.packageName + "\n");
             hasWrittenPackage = true;
         }

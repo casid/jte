@@ -430,7 +430,7 @@ Sometimes it is required to output text as is. The `@raw` keyword can be used to
 @raw
 <script>
   const foo = "foo";
-  console.log("This is ${foo}");
+  console.log(`This is ${foo}`);
 </script>
 @endraw
 ```

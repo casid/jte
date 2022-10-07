@@ -1159,6 +1159,21 @@ public class TemplateEngineTest {
         thenOutputIs("Hello 42");
     }
 
+    @Test
+    void rawWithJavaScript() {
+        givenTemplate("@raw\n" +
+                      "<script>\n" +
+                      "  const foo = \"foo\";\n" +
+                      "  console.log(`This is ${foo}`);\n" +
+                      "</script>\n" +
+                      "@endraw");
+        thenOutputIs("\n" +
+                     "<script>\n" +
+                     "  const foo = \"foo\";\n" +
+                     "  console.log(`This is ${foo}`);\n" +
+                     "</script>\n");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + ".kte", code);
     }

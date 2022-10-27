@@ -1,6 +1,10 @@
 package gg.jte.compiler;
 
+import gg.jte.TemplateConfig;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface CodeGenerator extends TemplateParserVisitor {
     String getCode();
@@ -40,16 +44,57 @@ public interface CodeGenerator extends TemplateParserVisitor {
     }
 
     static String extractTemplateExpression(String value) {
-        int startIndex = value.indexOf("${");
-        if (startIndex == -1) {
+        if (!value.contains("${") || !value.contains("}")) {
+            return null; // Avoid parser creation in case of no expression
+        }
+
+        List<TemplateExpressionPart> parts = new ArrayList<>();
+
+        TemplateParser parser = new TemplateParser(value, TemplateType.Content, new TemplateParserVisitorAdapter() {
+
+            @Override
+            public void onTextPart(int depth, String textPart) {
+                if (!textPart.isEmpty()) {
+                    parts.add(new TemplateExpressionPart(TemplateExpressionPart.Type.Text, textPart));
+                }
+            }
+
+            @Override
+            public void onCodePart(int depth, String codePart) {
+                parts.add(new TemplateExpressionPart(TemplateExpressionPart.Type.Code, codePart));
+            }
+
+        }, TemplateConfig.PLAIN, null);
+
+        parser.parse();
+
+        if (parts.isEmpty()) {
             return null;
         }
 
-        int endIndex = value.lastIndexOf('}');
-        if (endIndex == -1) {
-            return null;
+        return parts.stream().map(TemplateExpressionPart::toJavaExpression).collect(Collectors.joining(" + \"\" + "));
+    }
+
+    class TemplateExpressionPart {
+        final Type type;
+        final String value;
+
+        public TemplateExpressionPart(Type type, String value) {
+            this.type = type;
+            this.value = value;
         }
 
-        return value.substring(startIndex + 2, endIndex);
+        public String toJavaExpression() {
+            if (type == Type.Code) {
+                return "(" + value + ")";
+            } else {
+                return "\"" + value + "\"";
+            }
+        }
+
+        enum Type {
+            Text,
+            Code,
+        }
     }
 }

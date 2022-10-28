@@ -395,6 +395,16 @@ public class TemplateEngine_HtmlInterceptorTest {
             assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"${112}\"/>");
             assertThat(interceptor.lastAttributes.get("name")).isEqualTo("${112}");
         }
+
+        @Test
+        void case5() {
+            dummyCodeResolver.givenCode("page.jte", "@param String name\n<input type=\"checkbox\" name=\"check-${name}\"/>");
+
+            templateEngine.render("page.jte", "\"<script>", output);
+
+            assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"check-&#34;&lt;script>\"/>");
+            assertThat(interceptor.lastAttributes.get("name")).isEqualTo("check-\"<script>");
+        }
     }
 
     @SuppressWarnings("unused")
@@ -457,7 +467,7 @@ public class TemplateEngine_HtmlInterceptorTest {
         }
     }
 
-    public class MyAttributeTrackingInterceptor implements HtmlInterceptor {
+    public static class MyAttributeTrackingInterceptor implements HtmlInterceptor {
 
         Map<String, Object> lastAttributes;
 

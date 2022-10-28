@@ -32,10 +32,14 @@ public interface CodeGenerator extends TemplateParserVisitor {
             } else {
                 List<TemplateExpressionPart> expressionParts = extractTemplateExpressionParts(attribute.value);
                 if (!expressionParts.isEmpty()) {
+                    if (expressionParts.size() > 1) {
+                        code.append("\"\" + ");
+                    }
+
                     int index = 0;
                     for (TemplateExpressionPart expressionPart : expressionParts) {
                         if (index++ > 0) {
-                            code.append(" + \"\" + ");
+                            code.append(" + ");
                         }
 
                         switch (expressionPart.type) {

@@ -3,8 +3,8 @@ package gg.jte.compiler;
 import gg.jte.TemplateConfig;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface CodeGenerator extends TemplateParserVisitor {
     String getCode();
@@ -30,22 +30,52 @@ public interface CodeGenerator extends TemplateParserVisitor {
                     code.append("null");
                 }
             } else {
-                String javaExpression = extractTemplateExpression(attribute.value);
-                if (javaExpression != null) {
-                    code.append(javaExpression);
+                List<TemplateExpressionPart> expressionParts = extractTemplateExpressionParts(attribute.value);
+                if (!expressionParts.isEmpty()) {
+                    int index = 0;
+                    for (TemplateExpressionPart expressionPart : expressionParts) {
+                        if (index++ > 0) {
+                            code.append(" + \"\" + ");
+                        }
+
+                        switch (expressionPart.type) {
+                            case Code:
+                                code.append("(").append(expressionPart.value).append(")");
+                                break;
+                            case Text:
+                                code.append("\"").appendEscaped(expressionPart.value).append("\"");
+                                break;
+                        }
+                    }
                 } else {
-                    code.append("\"");
-                    code.appendEscaped(attribute.value);
-                    code.append("\"");
+                    code.append("\"").appendEscaped(attribute.value).append("\"");
                 }
             }
         }
         code.append(")");
     }
 
-    static String extractTemplateExpression(String value) {
+    /**
+     * In case the given value was previously checked to contain only a single template expression,
+     * this method could be used instead of a more expensive call to extractTemplateExpressionParts.
+     */
+    static String extractSingleOutputTemplateExpression(String value) {
+        int startIndex = value.indexOf("${");
+        if (startIndex == -1) {
+            return null;
+        }
+
+        int endIndex = value.lastIndexOf('}');
+        if (endIndex == -1) {
+            return null;
+        }
+
+        return value.substring(startIndex + 2, endIndex);
+    }
+
+    static List<TemplateExpressionPart> extractTemplateExpressionParts(String value) {
         if (!value.contains("${") || !value.contains("}")) {
-            return null; // Avoid parser creation in case of no expression
+            return Collections.emptyList(); // Avoid parser creation in case of no expression
         }
 
         List<TemplateExpressionPart> parts = new ArrayList<>();
@@ -68,11 +98,7 @@ public interface CodeGenerator extends TemplateParserVisitor {
 
         parser.parse();
 
-        if (parts.isEmpty()) {
-            return null;
-        }
-
-        return parts.stream().map(TemplateExpressionPart::toJavaExpression).collect(Collectors.joining(" + \"\" + "));
+        return parts;
     }
 
     class TemplateExpressionPart {
@@ -82,14 +108,6 @@ public interface CodeGenerator extends TemplateParserVisitor {
         public TemplateExpressionPart(Type type, String value) {
             this.type = type;
             this.value = value;
-        }
-
-        public String toJavaExpression() {
-            if (type == Type.Code) {
-                return "(" + value + ")";
-            } else {
-                return "\"" + value + "\"";
-            }
         }
 
         enum Type {

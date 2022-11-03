@@ -412,7 +412,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     @Override
     public void onHtmlAttributeOutput(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
-        String javaExpression = CodeGenerator.extractTemplateExpression(htmlAttribute.value);
+        String javaExpression = CodeGenerator.extractSingleOutputTemplateExpression(htmlAttribute.value);
         if (htmlAttribute.bool) {
             onConditionStart(depth, javaExpression);
             onTextPart(depth, " " + htmlAttribute.name);

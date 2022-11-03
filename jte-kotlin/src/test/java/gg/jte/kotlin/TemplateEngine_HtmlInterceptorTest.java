@@ -7,12 +7,10 @@ import gg.jte.TemplateOutput;
 import gg.jte.html.HtmlInterceptor;
 import gg.jte.output.StringOutput;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -294,6 +292,78 @@ public class TemplateEngine_HtmlInterceptorTest {
                 "</form>");
     }
 
+    @Nested
+    class InterpolationInInterceptedName {
+
+        MyAttributeTrackingInterceptor interceptor = new MyAttributeTrackingInterceptor();
+
+        @BeforeEach
+        void setUp() {
+            templateEngine.setHtmlInterceptor(interceptor);
+        }
+
+        @Test
+        void case1() {
+            dummyCodeResolver.givenCode("page.kte", "<input type=\"checkbox\" name=\"check-${1}\"/>");
+
+            templateEngine.render("page.kte", Collections.emptyMap(), output);
+
+            assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"check-1\"/>");
+            assertThat(interceptor.lastAttributes.get("name")).isEqualTo("check-1");
+        }
+
+        @Test
+        void case2() {
+            dummyCodeResolver.givenCode("page.kte", "<input type=\"checkbox\" name=\"${1}${2}\"/>");
+
+            templateEngine.render("page.kte", Collections.emptyMap(), output);
+
+            assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"12\"/>");
+            assertThat(interceptor.lastAttributes.get("name")).isEqualTo("12");
+        }
+
+        @Test
+        void case3() {
+            dummyCodeResolver.givenCode("page.kte", "<input type=\"checkbox\" name=\"${1}+${2}+${1+2}\"/>");
+
+            templateEngine.render("page.kte", Collections.emptyMap(), output);
+
+            assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"1+2+3\"/>");
+            assertThat(interceptor.lastAttributes.get("name")).isEqualTo("1+2+3");
+        }
+
+        @Test
+        void case4() {
+            dummyCodeResolver.givenCode("page.kte", "<input type=\"checkbox\" name=\"${\"${112}\"}\"/>");
+
+            templateEngine.render("page.kte", Collections.emptyMap(), output);
+
+            // Kotlin itself has string interpolation, too.
+            assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"112\"/>");
+            assertThat(interceptor.lastAttributes.get("name")).isEqualTo("112");
+        }
+
+        @Test
+        void case5() {
+            dummyCodeResolver.givenCode("page.kte", "@param name: String\n<input type=\"checkbox\" name=\"check-${name}\"/>");
+
+            templateEngine.render("page.kte", "\"<script>", output);
+
+            assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"check-&#34;&lt;script>\"/>");
+            assertThat(interceptor.lastAttributes.get("name")).isEqualTo("check-\"<script>");
+        }
+
+        @Test
+        void case6() {
+            dummyCodeResolver.givenCode("page.kte", "@param name: String\n<input type=\"checkbox\" name=\"check\\${name}\"/>");
+
+            templateEngine.render("page.kte", "foo", output);
+
+            assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"check\\foo\"/>");
+            assertThat(interceptor.lastAttributes.get("name")).isEqualTo("check\\foo");
+        }
+    }
+
     @SuppressWarnings("unused")
     public static class Controller {
         private String foodOption;
@@ -351,6 +421,21 @@ public class TemplateEngine_HtmlInterceptorTest {
             if ("form".equals(name)) {
                 output.writeContent("<input name=\"__fp\" value=\"a:" + action + ", p:" + String.join(",", fieldNames) + "\">\n");
             }
+        }
+    }
+
+    public static class MyAttributeTrackingInterceptor implements HtmlInterceptor {
+
+        Map<String, Object> lastAttributes;
+
+        @Override
+        public void onHtmlTagOpened(String name, Map<String, Object> attributes, TemplateOutput output) {
+            lastAttributes = attributes;
+        }
+
+        @Override
+        public void onHtmlTagClosed(String name, TemplateOutput output) {
+
         }
     }
 }

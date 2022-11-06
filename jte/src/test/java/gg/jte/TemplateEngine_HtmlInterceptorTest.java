@@ -415,6 +415,16 @@ public class TemplateEngine_HtmlInterceptorTest {
             assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"check\\foo\"/>");
             assertThat(interceptor.lastAttributes.get("name")).isEqualTo("check\\foo");
         }
+
+        @Test
+        void case7() {
+            dummyCodeResolver.givenCode("page.jte", "@param int index\n<input type=\"checkbox\" name=\"${\"name-\" + index}\"/>");
+
+            templateEngine.render("page.jte", 42, output);
+
+            assertThat(output.toString()).isEqualTo("<input type=\"checkbox\" name=\"name-42\"/>");
+            assertThat(interceptor.lastAttributes.get("name")).isEqualTo("name-42");
+        }
     }
 
     @SuppressWarnings("unused")

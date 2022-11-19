@@ -21,7 +21,7 @@ public interface TemplateOutput {
 
     default void writeUserContent(Enum<?> value) {
         if (value != null) {
-            writeContent(value.toString());
+            writeContent(value.name());
         }
     }
 

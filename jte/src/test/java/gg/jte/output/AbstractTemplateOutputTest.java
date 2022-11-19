@@ -85,6 +85,12 @@ public abstract class AbstractTemplateOutputTest<T extends TemplateOutput> {
     }
 
     @Test
+    void writeEnum_nameIsUsed() {
+        output.writeUserContent(EnumWithToStringOverride.Volvo);
+        thenOutputIs("Volvo");
+    }
+
+    @Test
     void writeNull() {
         output.writeUserContent((String) null);
         output.writeUserContent((Content) null);
@@ -140,5 +146,18 @@ public abstract class AbstractTemplateOutputTest<T extends TemplateOutput> {
     void writer_unusedMethodsAreNoops() throws IOException {
         output.getWriter().flush();
         output.getWriter().close();
+    }
+
+    public enum EnumWithToStringOverride {
+        Volvo,
+        Saab,
+        Fiat,
+        Audi,
+        ;
+
+        @Override
+        public String toString() {
+            return name() + " is a fine car!";
+        }
     }
 }

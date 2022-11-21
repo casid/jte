@@ -439,7 +439,7 @@ Sometimes it is required to output text as is. The `@raw` keyword can be used to
 
 ### For a regular website
 
-When using the `DirectoryCodeResolver`, hot reloading is supported out of the box. Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If there is any modification detected, the template is recompiled and the old one discarded to GC.
+When using the `DirectoryCodeResolver` (or the `ResourceCodeResolver` with resources located outside of JAR files), hot reloading is supported out of the box. Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If there is any modification detected, the template is recompiled and the old one discarded to GC.
 
 > It makes sense to do this on your local development environment only. When running in production, for maximum performance and security [precompiled templates](#precompiling-templates) are recommended instead.
 
@@ -654,7 +654,7 @@ There is a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) yo
 
 #### Gradle
 
-Since 1.6.0 there is a <a href="https://plugins.gradle.org/plugin/gg.jte.gradle">Gradle plugin</a> you can use to generate all templates during the Gradle build. Please note that paths specified in Java need to match those specified in Gradle. 
+Since 1.6.0 there is a <a href="https://plugins.gradle.org/plugin/gg.jte.gradle">Gradle plugin</a> you can use to generate all templates during the Gradle build. Please note that paths specified in Java need to match those specified in Gradle.
 
 > Make sure that the jte gradle plugin version always matches the jte dependency version.
 
@@ -756,15 +756,15 @@ Let's implement `gg.jte.support.LocalizationSupport`. There's only one method to
 
 ```java
 public static class JteLocalizer implements gg.jte.support.LocalizationSupport {
-    
+
     private final OtherFrameworkLocalizer frameworkLocalizer;
     private final Locale locale;
-    
+
     public JteLocalizer(OtherFrameworkLocalizer frameworkLocalizer, Locale locale) {
         this.frameworkLocalizer = frameworkLocalizer;
         this.locale = locale;
     }
-    
+
     @Override
     public String lookup(String key) {
         // However this works in your localization framework
@@ -793,15 +793,15 @@ public class JteContext {
     public static Content localize(String key) {
         context.get().localize(key);
     }
-    
+
     public static Content localize(String key, Object... params) {
         context.get().localize(key, params);
     }
-    
+
     static void init(JteLocalizer localizer) {
         context.set(localizer);
     }
-    
+
     static void dispose() {
         context.remove();
     }

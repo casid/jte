@@ -497,7 +497,7 @@ To do this, you need to create a `TemplateEngine` with the `createPrecompiled` f
 When using this method you need to deploy the precompiled templates to your server.
 
 ```java
-Path targetDirectory = Path.of("jte-classes"); // This is the directoy where compiled templates are located.
+Path targetDirectory = Path.of("jte-classes"); // This is the directory where compiled templates are located.
 
 TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory, ContentType.Html);
 ```
@@ -515,7 +515,7 @@ There is a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) yo
     <version>${jte.version}</version>
     <configuration>
         <sourceDirectory>src/main/jte</sourceDirectory> <!-- This is the directory where your .jte files are located. -->
-        <targetDirectory>jte-classes</targetDirectory> <!-- This is the directoy where compiled templates are located. -->
+        <targetDirectory>jte-classes</targetDirectory> <!-- This is the directory where compiled templates are located. -->
         <contentType>Html</contentType>
     </configuration>
     <executions>

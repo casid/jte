@@ -41,7 +41,16 @@ public class ResourceCodeResolverTest {
 
         long lastModified = resourceCodeResolver.getLastModified("welcome.jte");
 
-        assertThat(lastModified).isNotEqualTo(0L);
+        assertThat(lastModified).isGreaterThan(0L);
+    }
+
+    @Test
+    void lastModified_templateDoesNotExist() {
+        resourceCodeResolver = new ResourceCodeResolver("benchmark");
+
+        long lastModified = resourceCodeResolver.getLastModified("template-that-does-not-exist.jte");
+
+        assertThat(lastModified).isEqualTo(0L);
     }
 
     @Test

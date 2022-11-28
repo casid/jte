@@ -318,6 +318,9 @@ public class KotlinCodeGenerator implements CodeGenerator {
         kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\")\n");
 
         writeCodePart(depth, codePart);
+
+        writeIndentation(depth + 1);
+        kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", null)\n");
     }
 
     @Override
@@ -420,8 +423,6 @@ public class KotlinCodeGenerator implements CodeGenerator {
             onConditionStart(depth, "gg.jte.runtime.TemplateUtils.isAttributeRendered(" + javaExpression + ")");
             onTextPart(depth + 1, " " + htmlAttribute.name + "=" + htmlAttribute.quotes);
             onHtmlTagAttributeCodePart(depth + 1, javaExpression, currentHtmlTag.name, htmlAttribute.name);
-            writeIndentation(depth + 1);
-            kotlinCode.append("jteOutput.setContext(\"").append(currentHtmlTag.name).append("\", null)\n");
             onTextPart(depth + 1, "" + htmlAttribute.quotes);
         }
         onConditionEnd(depth);

@@ -1527,6 +1527,16 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         assertThat(output.toString()).isEqualTo("<span>Hello? <a href=\"foo\">Click here</a></span>");
     }
 
+    @Test
+    void localization_contentParams2() {
+        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
+                "<span>${localizer.localize(\"link\", @`<a style=\"color: ${\"foo\"};\">`, @`</a>`)}</span>");
+
+        templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer), output);
+
+        assertThat(output.toString()).isEqualTo("<span>Hello? <a style=\"color: foo;\">Click here</a></span>");
+    }
+
     @SuppressWarnings("unused")
     public static class MyLocalizer implements LocalizationSupport {
         Map<String, Object> resources = TemplateUtils.toMap(

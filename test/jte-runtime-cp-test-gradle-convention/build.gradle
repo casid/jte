@@ -2,7 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     id 'java'
-    id 'gg.jte.gradle' version '2.2.4-SNAPSHOT'
+    id 'gg.jte.gradle' version '2.2.4'
     id 'org.graalvm.buildtools.native' version '0.9.13'
 }
 
@@ -18,7 +18,7 @@ test {
 }
 
 dependencies {
-    implementation('gg.jte:jte-runtime:2.2.4-SNAPSHOT')
+    implementation('gg.jte:jte-runtime:2.2.4')
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testImplementation('org.assertj:assertj-core:3.23.1')
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'

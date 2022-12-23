@@ -13,7 +13,7 @@ public class ReactiveJteViewResolver extends UrlBasedViewResolver {
     public ReactiveJteViewResolver(TemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
         this.setSuffix(".jte");
-        this.setViewClass(JteView.class);
+        this.setViewClass(ReactiveJteView.class);
         this.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
 

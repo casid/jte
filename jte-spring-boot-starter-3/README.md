@@ -1,17 +1,19 @@
 # jte Spring Boot Starter
 
+This starter is compatible with spring boot 3.x!
+
 ## Add required dependency
 
 ````xml
 <dependency>
     <groupId>gg.jte</groupId>
-    <artifactId>jte-spring-boot-starter</artifactId>
+    <artifactId>jte-spring-boot-starter-3</artifactId>
     <version>INSERT_LATEST_VERSION</version>
 </dependency>
 ````
 
 ````groovy
-implementation "gg.jte:jte-spring-boot-starter:INSERT_LATEST_VERSION"
+implementation "gg.jte:jte-spring-boot-starter-3:INSERT_LATEST_VERSION"
 ````
 
 ## Usage

@@ -50,7 +50,8 @@
         <module>jte-watcher</module>
         <module>jte-maven-plugin</module>
         <module>jte-jsp-converter</module>
-        <module>jte-spring-boot-starter</module>
+        <module>jte-spring-boot-starter-2</module>
+        <module>jte-spring-boot-starter-3</module>
         <module>test/jte-runtime-test</module>
         <module>test/jte-runtime-test-kotlin</module>
         <module>test/jte-runtime-cp-test</module>

@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v2
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.1.0'
+          version: '22.3.0'
           java-version: ${{ matrix.java_version }}
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}

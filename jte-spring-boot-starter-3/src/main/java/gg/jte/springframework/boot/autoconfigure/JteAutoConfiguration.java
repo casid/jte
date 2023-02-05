@@ -3,6 +3,7 @@ package gg.jte.springframework.boot.autoconfigure;
 import gg.jte.*;
 import gg.jte.resolve.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.context.properties.*;
 import org.springframework.context.annotation.*;
@@ -11,7 +12,7 @@ import org.springframework.web.servlet.view.*;
 
 import java.nio.file.*;
 
-@Configuration
+@AutoConfiguration
 @ConditionalOnClass({TemplateEngine.class, AbstractTemplateViewResolver.class})
 @EnableConfigurationProperties(JteProperties.class)
 public class JteAutoConfiguration {

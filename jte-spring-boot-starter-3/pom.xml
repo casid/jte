@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>jte-spring-boot-starter</artifactId>
+    <artifactId>jte-spring-boot-starter-3</artifactId>
     <packaging>jar</packaging>
 
     <parent>
@@ -13,10 +13,10 @@
         <version>2.2.5-SNAPSHOT</version>
     </parent>
 
-    <name>jte-spring-boot-starter</name>
+    <name>jte-spring-boot-starter-3</name>
 
     <properties>
-        <spring-boot.version>2.6.6</spring-boot.version>
+        <spring-boot.version>3.0.2</spring-boot.version>
     </properties>
 
     <dependencyManagement>
@@ -47,9 +47,9 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
             <optional>true</optional>
         </dependency>
         <dependency>

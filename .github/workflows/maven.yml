@@ -22,7 +22,13 @@ jobs:
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
-      - name: Build with Maven
+      - name: Build with Maven (1.8, 11)
+        if: matrix.java_version == '1.8' || matrix.java_version == '11'
+        run: ./mvnw install -pl !jte-spring-boot-starter-3 --file pom.xml --batch-mode
+        env:
+          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+      - name: Build with Maven (17)
+        if: matrix.java_version == '17'
         run: ./mvnw install --file pom.xml --batch-mode
         env:
           MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
@@ -57,7 +63,7 @@ jobs:
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw verify --file pom.xml --batch-mode -Pcoverage
+        run: ./mvnw verify -pl !jte-spring-boot-starter-3 --file pom.xml --batch-mode -Pcoverage
         env:
           MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn  
       

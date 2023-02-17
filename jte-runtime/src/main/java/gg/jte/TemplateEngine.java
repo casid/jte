@@ -414,6 +414,8 @@ public final class TemplateEngine {
 
     /**
      * Sets additional compiler arguments for jte templates.
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param compileArgs for instance templateEngine.setCompileArgs("--enable-preview", "--release", "" + Runtime.version().feature());
      */
     public void setCompileArgs(String ... compileArgs) {
@@ -422,6 +424,8 @@ public final class TemplateEngine {
 
     /**
      * Trims control structures, resulting in prettier output.
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param value true, to enable
      */
     public void setTrimControlStructures(boolean value) {
@@ -430,6 +434,8 @@ public final class TemplateEngine {
 
     /**
      * Policy that checks the parsed HTML at compile time.
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param htmlPolicy the policy
      * @throws NullPointerException if policy is null
      */
@@ -443,6 +449,8 @@ public final class TemplateEngine {
     /**
      * Intercepts the given html tags during template compilation
      * and calls the configured htmlInterceptor during template rendering.
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param htmlTags tags to be intercepted, for instance setHtmlTags("form", "input");
      */
     public void setHtmlTags(String ... htmlTags) {
@@ -462,6 +470,8 @@ public final class TemplateEngine {
     /**
      * By default, jte omits all HMTL/CSS/JS comments, when compiling with {@link ContentType#Html}.
      * If you don't want this behavior, you can disable it here.
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param htmlCommentsPreserved true, to preserve HTML comments in templates
      */
     public void setHtmlCommentsPreserved(boolean htmlCommentsPreserved) {
@@ -470,7 +480,8 @@ public final class TemplateEngine {
 
     /**
      * Experimental setting, that UTF-8 encodes all static template parts.
-     *
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param binaryStaticContent true, to pre-generate UTF-8 encoded byte arrays for all static template parts
      */
     public void setBinaryStaticContent(boolean binaryStaticContent) {
@@ -479,6 +490,8 @@ public final class TemplateEngine {
 
     /**
      * The class path used for compiling templates.
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param classPath list of elements on the class path
      */
     public void setClassPath(List<String> classPath) {
@@ -488,6 +501,8 @@ public final class TemplateEngine {
     /**
      * Directory in which to generate non-java files (resources). Typically set by plugin rather than end user.
      * Optional - if null, resources will not be generated
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param targetResourceDirectory directory to generate resources in
      */
     public void setTargetResourceDirectory(Path targetResourceDirectory) {
@@ -497,6 +512,8 @@ public final class TemplateEngine {
     /**
      * "group/artifact" of the project using jte. Typically set by plugin rather than end user.
      * If null, the compiler will make one up.
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param projectNamespace "groupId/artifactId"
      */
     public void setProjectNamespace(String projectNamespace) {
@@ -507,6 +524,8 @@ public final class TemplateEngine {
      * Whether to try and generate configuration files to support Graal native-image.
      * If true, setTargetResourceDirectory should also be used to indicate where to
      * put the resources.
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param value true to generate native image configuration resources
      */
     public void setGenerateNativeImageResources(boolean value) {

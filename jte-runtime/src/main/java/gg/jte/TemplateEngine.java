@@ -421,7 +421,7 @@ public final class TemplateEngine {
     }
 
     /**
-     * Experimental mode, that trims control structures, resulting in prettier output.
+     * Trims control structures, resulting in prettier output.
      * @param value true, to enable
      */
     public void setTrimControlStructures(boolean value) {

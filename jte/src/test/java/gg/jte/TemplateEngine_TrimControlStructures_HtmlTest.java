@@ -10,10 +10,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for experimental mode {@link TemplateEngine#setTrimControlStructures(boolean)}
+ * Tests for mode {@link TemplateEngine#setTrimControlStructures(boolean)} with {@link ContentType#Html}
  */
 @SuppressWarnings("SameParameterValue")
-public class TemplateEngine_TrimControlStructuresTest {
+public class TemplateEngine_TrimControlStructures_HtmlTest {
     String templateName = "test/template.jte";
 
     DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();

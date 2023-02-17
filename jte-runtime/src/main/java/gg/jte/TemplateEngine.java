@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * All jte templates are compiled to Java class files, meaning jte adds essentially zero overhead to your application.
  * jte is designed to introduce as few new keywords as possible and builds upon existing Java features,
  * so that it is very easy to reason about what a template does.
- *
+ * <br>
  * Read more at the <a href="https://github.com/casid/jte/blob/master/DOCUMENTATION.md">official documentation</a>
  */
 public final class TemplateEngine {
@@ -373,7 +373,7 @@ public final class TemplateEngine {
      * This template engine will be entirely unaffected by this call. Instead, a fresh template engine will be created.
      * When this call succeeds, you can safely switch the template engine reference to the new instance. The old instance including all
      * old templates should then be subject to garbage collection.
-     *
+     * <br>
      * This only works if you're running on the JDK and if templates have their own classloader.
      *
      * @param precompiler a template engine that is configured exactly as you usually would precompile your templates.
@@ -390,10 +390,10 @@ public final class TemplateEngine {
      * This template engine will be entirely unaffected by this call. Instead, a fresh template engine will be created.
      * When this call succeeds, you can safely switch the template engine reference to the new instance. The old instance including all
      * old templates should then be subject to garbage collection.
-     *
+     * <br>
      * Basically you could recompile all templates on your build server, upload them to your production server
      * and call this method afterwards.
-     *
+     * <br>
      * This only works if templates have their own classloader.
      *
      * @param classDirectory the class directory to load the new templates from.

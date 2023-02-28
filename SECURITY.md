@@ -13,7 +13,7 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-If you believe that you have found a vulnerability in jte, first please search the GitHut issues list (for both open and closed issues) to see if it has already been reported.
+If you believe that you have found a vulnerability in jte, first please search the GitHub issues list (for both open and closed issues) to see if it has already been reported.
 
 If it has not, then please contact Andreas Hager (andy at mazebert.com) directly. Please do not report any suspected vulnerabilities via GitHub issues as we wish to keep our users secure while a patch is implemented and deployed. This is because if this is reported as a GitHub issue, it more or less is equivalent to dropping a 0-day on all applications using jte. Instead, we encourage responsible disclosure.
 

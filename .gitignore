@@ -104,6 +104,8 @@ Temporary Items
 /test/jte-runtime-test/jte-classes/
 /test/jte-runtime-test-kotlin/jte-classes/
 /test/jte-runtime-test-gradle/jte-classes/
+/test/jte-runtime-test-gradle-convention/jte-classes/
+/test/jte-runtime-test-gradle-kotlin-convention/jte-classes/
 /test/jte-hotreload-test/jte-classes/
 .run
 

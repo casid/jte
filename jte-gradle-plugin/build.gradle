@@ -2,7 +2,7 @@
 plugins {
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version '0.12.0'
+    id 'com.gradle.plugin-publish' version '1.1.0'
 }
 
 repositories {
@@ -23,19 +23,16 @@ compileJava   {
     targetCompatibility = '1.8'
 }
 
-// See https://docs.gradle.org/nightly/userguide/publishing_gradle_plugins.html
-pluginBundle {
+gradlePlugin {
     website = 'https://jte.gg'
     vcsUrl = 'https://github.com/casid/jte.git'
-    tags = ['templates', 'compiler']
-}
 
-gradlePlugin {
     plugins {
         simplePlugin {
             id = 'gg.jte.gradle'
             displayName = 'jte gradle plugin'
-            description = 'Precompile all jte templates to Java classes during gradle build'
+            description = 'Precompile all jte/kte templates to Java/Kotlin classes during gradle build'
+            tags.set(['jte', 'kte', 'templates', 'compiler', 'Java', 'Kotlin'])
             implementationClass = 'gg.jte.gradle.JteGradle'
         }
     }

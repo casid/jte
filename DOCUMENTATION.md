@@ -28,6 +28,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
   - [GraalVM native-image support](#graalvm-native-image-support-since-1100)
 - [Binary rendering for max throughput](#binary-rendering-for-max-throughput)
 - [Localization](#localization)
+- [Migrating to jte](#migrating-to-jte)
 
 ## Rendering a template
 
@@ -833,3 +834,10 @@ It really is a matter of taste, if you prefer a parameter or a static method cal
 Further reading:
 - Javalin example app [with localization support](https://github.com/casid/jte-javalin-tutorial)
 - The localization part of the [Javalin jte tutorial](https://javalin.io/tutorials/jte)
+
+## Migrating to jte
+
+In case you plan to migrate an existing project to jte, you may find tooling for an easier migration here:
+
+- Migrate from [JSP](https://github.com/casid/jte/tree/main/jte-jsp-converter)
+- Migrate from [Rocker](https://github.com/casid/jte/issues/205)

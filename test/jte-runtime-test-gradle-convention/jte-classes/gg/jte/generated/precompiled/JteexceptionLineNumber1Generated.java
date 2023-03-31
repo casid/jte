@@ -1,8 +1,9 @@
 package gg.jte.generated.precompiled;
 import test.Model;
+@javax.annotation.processing.Generated(value = "gg.jte.compiler.java.JavaCodeGenerator", comments="template name exceptionLineNumber1.jte")
 public final class JteexceptionLineNumber1Generated {
 	public static final String JTE_NAME = "exceptionLineNumber1.jte";
-	public static final int[] JTE_LINE_INFO = {0,0,2,2,2,4,4,4,4};
+	public static final int[] JTE_LINE_INFO = {0,0,2,2,2,2,4,4,4,4};
 	public static void render(gg.jte.html.HtmlTemplateOutput jteOutput, gg.jte.html.HtmlInterceptor jteHtmlInterceptor, Model model) {
 		jteOutput.writeContent("\n");
 		jteOutput.setContext("html", null);

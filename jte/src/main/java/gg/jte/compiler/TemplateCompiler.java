@@ -295,7 +295,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         classDefinitions.add(classDefinition);
 
-        CodeGenerator codeGenerator = createCodeGenerator(classInfo, classDefinitions, templateDependencies);
+        CodeGenerator codeGenerator = createCodeGenerator(name, classInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, TemplateType.Template, codeGenerator, config, codeResolver).parse();
 
         classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
@@ -308,7 +308,7 @@ public class TemplateCompiler extends TemplateLoader {
         return classInfo;
     }
 
-    private CodeGenerator createCodeGenerator(ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
+    private CodeGenerator createCodeGenerator(String templateName, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
         if ("kte".equals(classInfo.extension)) {
             try {
                 Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinCodeGenerator");
@@ -317,7 +317,7 @@ public class TemplateCompiler extends TemplateLoader {
                 throw new TemplateException("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.", e);
             }
         } else {
-            return new JavaCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+            return new JavaCodeGenerator(templateName, this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
         }
     }
 

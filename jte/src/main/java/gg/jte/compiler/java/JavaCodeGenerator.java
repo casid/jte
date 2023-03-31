@@ -1,21 +1,28 @@
 package gg.jte.compiler.java;
 
-import gg.jte.ContentType;
-import gg.jte.TemplateConfig;
-import gg.jte.TemplateException;
-import gg.jte.compiler.*;
-import gg.jte.runtime.ClassInfo;
-import gg.jte.runtime.Constants;
-import gg.jte.runtime.DebugInfo;
-import gg.jte.compiler.TemplateType;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import gg.jte.ContentType;
+import gg.jte.TemplateConfig;
+import gg.jte.TemplateException;
+import gg.jte.compiler.ClassDefinition;
+import gg.jte.compiler.CodeBuilder;
+import gg.jte.compiler.CodeGenerator;
+import gg.jte.compiler.CodeType;
+import gg.jte.compiler.ContentProcessor;
+import gg.jte.compiler.ParamInfo;
+import gg.jte.compiler.TemplateCompiler;
+import gg.jte.compiler.TemplateDependency;
+import gg.jte.compiler.TemplateParser;
+import gg.jte.compiler.TemplateType;
+import gg.jte.runtime.ClassInfo;
+import gg.jte.runtime.Constants;
 import static gg.jte.runtime.Constants.TEXT_PART_BINARY;
+import gg.jte.runtime.DebugInfo;
 
 public class JavaCodeGenerator implements CodeGenerator {
     private final TemplateCompiler compiler;
@@ -27,11 +34,13 @@ public class JavaCodeGenerator implements CodeGenerator {
     private final LinkedHashSet<TemplateDependency> templateDependencies;
     private final List<ParamInfo> parameters = new ArrayList<>();
     private final List<byte[]> binaryTextParts = new ArrayList<>();
+    private final String templateName;
 
     private boolean hasWrittenPackage;
     private boolean hasWrittenClass;
 
-    public JavaCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
+    public JavaCodeGenerator(String templateName, TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
+        this.templateName = templateName;
         this.compiler = compiler;
         this.config = config;
         this.paramOrder = paramOrder;
@@ -68,6 +77,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private void writeClass() {
+        javaCode.append("@javax.annotation.processing.Generated(value = \"").append(getClass().getName()).append("\", comments=\"template name ").append(templateName).append("\")\n");
         javaCode.append("public final class ").append(classInfo.className).append(" {\n");
         javaCode.markFieldsIndex();
         javaCode.append("\tpublic static void render(");

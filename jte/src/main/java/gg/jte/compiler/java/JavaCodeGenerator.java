@@ -77,7 +77,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private void writeClass() {
-        javaCode.append("@javax.annotation.processing.Generated(value = \"").append(getClass().getName()).append("\", comments=\"template name ").append(templateName).append("\")\n");
+        javaCode.append("@javax.annotation.processing.Generated(value = \"").append(getClass().getName()).append("\", comments=\"template ").append(templateName).append("\")\n");
         javaCode.append("public final class ").append(classInfo.className).append(" {\n");
         javaCode.markFieldsIndex();
         javaCode.append("\tpublic static void render(");

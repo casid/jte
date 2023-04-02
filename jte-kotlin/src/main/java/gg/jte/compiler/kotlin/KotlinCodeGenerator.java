@@ -28,11 +28,13 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private final LinkedHashSet<TemplateDependency> templateDependencies;
     private final List<ParamInfo> parameters = new ArrayList<>();
     private final List<byte[]> binaryTextParts = new ArrayList<>();
+    private final String templateName;
 
     private boolean hasWrittenPackage;
     private boolean hasWrittenClass;
 
-    public KotlinCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
+    public KotlinCodeGenerator(String templateName, TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
+        this.templateName = templateName;
         this.compiler = compiler;
         this.config = config;
         this.paramOrder = paramOrder;
@@ -74,6 +76,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     }
 
     private void writeClass() {
+        kotlinCode.append("@javax.annotation.processing.Generated(value = [\"").append(getClass().getName()).append("\"], comments=\"template ").append(templateName).append("\")\n");
         kotlinCode.append("@Suppress(\"UNCHECKED_CAST\", \"UNUSED_PARAMETER\")").append('\n');
         kotlinCode.append("class ").append(classInfo.className).append(" {\n");
         kotlinCode.append("companion object {\n");

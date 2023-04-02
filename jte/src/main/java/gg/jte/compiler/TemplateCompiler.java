@@ -312,7 +312,7 @@ public class TemplateCompiler extends TemplateLoader {
         if ("kte".equals(classInfo.extension)) {
             try {
                 Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinCodeGenerator");
-                return (CodeGenerator)compilerClass.getConstructor(TemplateCompiler.class, TemplateConfig.class, ConcurrentHashMap.class, ClassInfo.class, LinkedHashSet.class, LinkedHashSet.class).newInstance(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+                return (CodeGenerator)compilerClass.getConstructor(String.class, TemplateCompiler.class, TemplateConfig.class, ConcurrentHashMap.class, ClassInfo.class, LinkedHashSet.class, LinkedHashSet.class).newInstance(templateName, this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
             } catch (Exception e) {
                 throw new TemplateException("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.", e);
             }

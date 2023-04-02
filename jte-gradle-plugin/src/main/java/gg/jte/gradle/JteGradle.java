@@ -61,6 +61,7 @@ public class JteGradle implements Plugin<Project> {
         extension.getTargetResourceDirectory().convention(new File(project.getBuildDir(), "generated-resources/jte").toPath());
 
         extension.getCompilePath().setFrom(main.getRuntimeClasspath());
+        extension.getProjectNamespace().convention(project.getGroup() + "/" + project.getName());
     }
 
     private void configureTask(Project project, String taskName, Action<Task> action) {

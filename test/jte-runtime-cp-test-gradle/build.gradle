@@ -5,7 +5,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id 'java'
     id 'gg.jte.gradle' version '2.3.1-SNAPSHOT'
-    id 'org.graalvm.buildtools.native' version '0.9.13'
+    id 'org.graalvm.buildtools.native' version '0.9.20'
 }
 
 repositories {
@@ -42,6 +42,11 @@ tasks.compileJava {
     dependsOn(tasks.generateJte)
 }
 
-nativeBuild {
-    mainClass = 'test.NativeTestApp'
+graalvmNative {
+    toolchainDetection = false
+    binaries {
+        main {
+            mainClass = 'test.NativeTestApp'
+        }
+    }
 }

@@ -17,7 +17,19 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class GradleMatrixTest {
-    public static final List<String> GRADLE_VERSIONS = Arrays.asList("8.1-rc-2", "8.0.1", "7.6.1", "7.3.3");
+    public static final List<String> GRADLE_VERSIONS = getTestGradleVersions();
+    public static final String DEFAULT = "DEFAULT";
+
+    /**
+     * Use system property "gradle.matrix.versions" to test multiple versions. Note this may result in downloading those
+     * versions if they are not already present.
+     * @return
+     */
+    private static List<String> getTestGradleVersions() {
+        String versionProperty = System.getProperty("gradle.matrix.versions", DEFAULT);
+        return Arrays.asList(versionProperty.split("[,\\s]+"));
+    }
+
     public static final String TASK_NAME = ":check";
     public static Stream<Arguments> runGradleBuild() throws IOException {
         return Files.find(Paths.get(".."), 2, (p, attr) -> p.getFileName().toString().startsWith("settings.gradle"))
@@ -29,12 +41,16 @@ public class GradleMatrixTest {
     @ParameterizedTest
     @MethodSource
     public void runGradleBuild(Path projectDir, String gradleVersion) {
-        BuildResult result = GradleRunner.create()
+        GradleRunner runner = GradleRunner.create()
                 .withProjectDir(projectDir.toFile())
                 .withTestKitDir(Paths.get("build").resolve(projectDir.getFileName()).toAbsolutePath().toFile())
-                .withGradleVersion(gradleVersion)
-                .withArguments("--configuration-cache", TASK_NAME)
-                .build();
+                .withArguments("--configuration-cache", TASK_NAME);
+
+        if (!DEFAULT.equals(gradleVersion)) {
+            runner = runner.withGradleVersion(gradleVersion);
+        }
+
+        BuildResult result = runner.build();
 
         Assertions.assertNotEquals(TaskOutcome.FAILED, result.task(TASK_NAME).getOutcome(), String.format("Build failed in %s with Gradle Version %s", projectDir, gradleVersion));
     }

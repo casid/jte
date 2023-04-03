@@ -1,10 +1,11 @@
 package gg.jte.compiler;
 
+import gg.jte.extension.JteClassDefinition;
 import gg.jte.runtime.ClassInfo;
 
 import java.util.List;
 
-public final class ClassDefinition {
+public final class ClassDefinition implements JteClassDefinition {
     private final String name;
     private final String extension;
     private String code;

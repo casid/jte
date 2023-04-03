@@ -25,6 +25,7 @@ public class TemplateConfig {
 
     public String projectNamespace;
     public boolean generateNativeImageResources;
+    public String[] extensionClasses;
 
     public TemplateConfig(ContentType contentType, String packageName) {
         this.contentType = contentType;

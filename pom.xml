@@ -58,6 +58,7 @@
         <module>test/jte-hotreload-test</module>
         <module>test/jte-test-report</module>
         <module>jte-deploy-nexus</module>
+        <module>jte-extension-api</module>
     </modules>
 
     <dependencies>

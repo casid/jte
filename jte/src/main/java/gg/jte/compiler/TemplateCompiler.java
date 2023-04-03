@@ -6,6 +6,8 @@ import gg.jte.TemplateException;
 import gg.jte.TemplateNotFoundException;
 import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
+import gg.jte.extension.JteConfig;
+import gg.jte.extension.JteExtension;
 import gg.jte.output.FileOutput;
 import gg.jte.runtime.*;
 
@@ -18,6 +20,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TemplateCompiler extends TemplateLoader {
 
@@ -32,12 +35,18 @@ public class TemplateCompiler extends TemplateLoader {
     private final ConcurrentHashMap<String, ClassInfo> templateByClassName = new ConcurrentHashMap<>();
 
     private List<String> classPath;
+    private List<JteExtension> generatorExtensions = Collections.emptyList();
 
     public TemplateCompiler(TemplateConfig config, CodeResolver codeResolver, Path classDirectory, ClassLoader parentClassLoader) {
         super(classDirectory, config.packageName);
         this.config = config;
         this.codeResolver = codeResolver;
         this.parentClassLoader = parentClassLoader;
+        if (config.extensionClasses != null) {
+            generatorExtensions = Stream.of(config.extensionClasses)
+                    .map(this::loadExtension)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
@@ -253,6 +262,8 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         generateNativeResources(classDefinitions);
+        JteConfig extensionConfig = new ExtensionConfig(config);
+        generatorExtensions.forEach(x -> x.generate(extensionConfig, classDefinitions));
 
         return classDefinitions;
     }
@@ -361,5 +372,14 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         return result;
+    }
+
+    private JteExtension loadExtension(String classname) {
+        try {
+            Class<?> extensionClass = Class.forName(classname);
+            return (JteExtension) extensionClass.newInstance();
+        } catch(Exception e) {
+            throw new TemplateException("Failed to load extension " + classname, e);
+        }
     }
 }

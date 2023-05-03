@@ -1,16 +1,18 @@
 package gg.jte.compiler;
 
-import gg.jte.extension.JteClassDefinition;
+import gg.jte.extension.TemplateDescription;
 import gg.jte.runtime.ClassInfo;
 
 import java.util.List;
 
-public final class ClassDefinition implements JteClassDefinition {
+public final class ClassDefinition {
     private final String name;
     private final String extension;
     private String code;
     private List<byte[]> binaryTextParts;
     private boolean changed = true;
+    private List<ParamInfo> params;
+    private List<String> imports;
 
     public ClassDefinition(String name, ClassInfo classInfo) {
         this.name = name;
@@ -22,9 +24,11 @@ public final class ClassDefinition implements JteClassDefinition {
         this.extension = extension;
     }
 
-    void setCode(String code, List<byte[]> binaryTextParts) {
+    void setCode(String code, List<byte[]> binaryTextParts, List<ParamInfo> params, List<String> imports) {
         this.code = code;
         this.binaryTextParts = binaryTextParts;
+        this.params = params;
+        this.imports = imports;
     }
 
     public String getCode() {
@@ -72,5 +76,17 @@ public final class ClassDefinition implements JteClassDefinition {
 
     public void setChanged(boolean changed) {
         this.changed = changed;
+    }
+
+    void setParams(List<ParamInfo> params) {
+        this.params = params;
+    }
+
+    public List<ParamInfo> getParams() {
+        return params;
+    }
+
+    public List<String> getImports() {
+        return imports;
     }
 }

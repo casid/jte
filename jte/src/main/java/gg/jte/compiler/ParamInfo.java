@@ -1,6 +1,8 @@
 package gg.jte.compiler;
 
-public final class ParamInfo {
+import gg.jte.extension.ParamDescription;
+
+public final class ParamInfo implements ParamDescription {
     public final String type;
     public final String name;
     public final String defaultValue;
@@ -13,5 +15,20 @@ public final class ParamInfo {
         this.defaultValue = defaultValue;
         this.varargs = varargs;
         this.templateLine = templateLine;
+    }
+
+    @Override
+    public String type() {
+        return type;
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public String defaultValue() {
+        return defaultValue;
     }
 }

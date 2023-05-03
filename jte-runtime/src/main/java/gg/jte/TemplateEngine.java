@@ -527,8 +527,18 @@ public final class TemplateEngine {
      * <br>
      * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param value true to generate native image configuration resources
+     * @deprecated moved to extension
      */
+    @Deprecated
     public void setGenerateNativeImageResources(boolean value) {
         config.generateNativeImageResources = value;
+        if (value) {
+            config.extensionClasses.put("gg.jte.nativeimage.NativeResourcesExtension", Collections.emptyMap());
+        }
+    }
+
+    public void setExtensions(Map<String, Map<String, String>> extensionSettings) {
+        System.out.printf("setExtensions(%s)%n", extensionSettings);
+        config.extensionClasses.putAll(extensionSettings);
     }
 }

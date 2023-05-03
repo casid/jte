@@ -57,8 +57,12 @@
         <module>test/jte-runtime-cp-test</module>
         <module>test/jte-hotreload-test</module>
         <module>test/jte-test-report</module>
+        <module>test/jte-runtime-cp-test-models</module>
         <module>jte-deploy-nexus</module>
         <module>jte-extension-api</module>
+        <module>jte-extension-api-mocks</module>
+        <module>jte-native-resources</module>
+        <module>jte-models</module>
     </modules>
 
     <dependencies>

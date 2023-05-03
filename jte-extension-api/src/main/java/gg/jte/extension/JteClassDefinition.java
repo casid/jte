@@ -1,4 +1,0 @@
-package gg.jte.extension;
-
-public interface JteClassDefinition {
-}

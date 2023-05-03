@@ -105,6 +105,10 @@ public interface CodeGenerator extends TemplateParserVisitor {
         return parts;
     }
 
+    List<ParamInfo> getParamInfo();
+
+    List<String> getImports();
+
     class TemplateExpressionPart {
         final Type type;
         final String value;

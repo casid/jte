@@ -11,7 +11,10 @@ import org.apache.maven.project.MavenProject;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.GENERATE_SOURCES;
 
@@ -57,6 +60,9 @@ public class GeneratorMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     public boolean generateNativeImageResources;
 
+    @Parameter
+    public List<ExtensionSettings> extensions;
+
     @Override
     public void execute() {
 
@@ -77,7 +83,13 @@ public class GeneratorMojo extends AbstractMojo {
             templateEngine.setGenerateNativeImageResources(generateNativeImageResources);
         }
         templateEngine.setProjectNamespace(project.getGroupId() + "/" + project.getArtifactId());
-
+        getLog().info("extensions=" + extensions);
+        if (extensions != null) {
+            templateEngine.setExtensions(
+                    extensions.stream()
+                            .collect(Collectors.toMap(ExtensionSettings::getClassName, ExtensionSettings::getSettings))
+            );
+        }
         int amount;
         try {
             templateEngine.cleanAll();

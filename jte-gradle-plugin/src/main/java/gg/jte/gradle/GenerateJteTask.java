@@ -61,7 +61,7 @@ public class GenerateJteTask extends JteTaskBase {
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
         templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());
         templateEngine.setGenerateNativeImageResources(getGenerateNativeImageResources());
-        templateEngine.setProjectNamespace(getProject().getGroup() + "/" + getProject().getName());
+        templateEngine.setProjectNamespace(extension.getProjectNamespace().getOrNull());
 
         int amount;
         try {

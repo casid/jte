@@ -49,6 +49,42 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void unclosedTag_worksWithHyperScript() {
+        codeResolver.givenCode("closed.jte", "<body>\n" +
+                "<p _=\"on load log 'hello world from console'\">Hello world</p>\n" +
+                "\n" +
+                "<form action=\"/login\" method=\"post\" _=\"on submit toggle @disabled on <button[type='submit']/>\">\n" +
+                "    <input type=\"email\" name=\"username\">\n" +
+                "    <input type=\"password\" name=\"password\">\n" +
+                "\n" +
+                "    <button type=\"submit\">Login</button>\n" +
+                "</form>\n" +
+                "</body>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("closed.jte", null, output));
+
+        assertThat(throwable).isNull();
+    }
+
+    @Test
+    void unclosedTag_worksWithHtmlInAttribute() {
+        codeResolver.givenCode("closed.jte", "<form><input name=\">\" disabled=\"${true}\"></form>");
+
+        templateEngine.render("closed.jte", null, output);
+
+        assertThat(output.toString()).isEqualTo("<form><input name=\">\" disabled></form>"); // tag processing must not end after name=">", otherwise disabled="true" instead of just disabled would be the output.
+    }
+
+    @Test
+    void unclosedTag_worksWithClosingHtmlInAttribute() {
+        codeResolver.givenCode("closed.jte", "<form><input text=\"</form>\"></form>");
+
+        templateEngine.render("closed.jte", null, output);
+
+        assertThat(output.toString()).isEqualTo("<form><input text=\"</form>\"></form>");
+    }
+
+    @Test
     void codeInTag() {
         codeResolver.givenCode("template.jte", "@param String tag\n\n<span><${tag}/></span>");
 

@@ -31,6 +31,7 @@ public interface JteExtension
     Property<String> getHtmlPolicyClass();
     Property<Boolean> getGenerateNativeImageResources();
     Property<String[]> getCompileArgs();
+    Property<String> getProjectNamespace();
 
     default void precompile() {
         getStage().set(JteStage.PRECOMPILE);

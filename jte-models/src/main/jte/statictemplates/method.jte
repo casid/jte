@@ -10,7 +10,7 @@
     public JteModel ${Util.methodName(template)}(${Util.typedParams(template)}) {
         return new StaticJteModel<${outputClass}>(
             ContentType.${config.contentType()},
-            (output, interceptor) -> ${template.fullyQualifiedClassName()}.render(output, interceptor, ${Util.paramNames(template)}),
+            (output, interceptor) -> ${template.fullyQualifiedClassName()}.render(output, interceptor${Util.paramNames(template)}),
             "${template.name()}",
             "${template.packageName()}",
             ${template.fullyQualifiedClassName()}.JTE_LINE_INFO

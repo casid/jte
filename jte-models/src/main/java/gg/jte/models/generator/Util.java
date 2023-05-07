@@ -16,10 +16,13 @@ public class Util {
     }
 
     public static String paramNames(TemplateDescription template) {
+        if (template.params().isEmpty()) {
+            return "";
+        }
         return template.params()
                 .stream()
                 .map(ParamDescription::name)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(", ", ", ", ""));
     }
 
     public static String methodName(TemplateDescription template) {

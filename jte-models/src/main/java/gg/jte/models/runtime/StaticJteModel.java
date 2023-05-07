@@ -67,6 +67,19 @@ public class StaticJteModel<OUTPUT extends TemplateOutput> implements JteModel {
         return new TemplateException(message, e);
     }
 
+    @Override
+    public void writeTo(TemplateOutput output) {
+        renderer.accept(getOutput(output), null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private OUTPUT getOutput(TemplateOutput output) {
+        if (contentType == ContentType.Html) {
+            return (OUTPUT) new OwaspHtmlTemplateOutput(output);
+        }
+        return (OUTPUT) output;
+    }
+
     // TemplateLoader is extended just to re-use exception handling helpers
     private static class StaticTemplateLoader extends TemplateLoader {
 

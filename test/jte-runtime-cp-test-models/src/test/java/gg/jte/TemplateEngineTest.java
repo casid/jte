@@ -1,5 +1,6 @@
 package gg.jte;
 
+import gg.jte.generated.precompiled.Templates;
 import gg.jte.output.StringOutput;
 import gg.jte.runtime.TemplateUtils;
 import org.assertj.core.api.AbstractThrowableAssert;
@@ -61,5 +62,19 @@ public class TemplateEngineTest {
     void unusedTag(gg.jte.generated.precompiled.Templates templates) {
         String output = templates.tagUnused("One", "Two").render();
         assertThat(output).isEqualTo("One is One, two is Two.");
+    }
+
+    @ParameterizedTest
+    @MethodSource("templates")
+    void normalContent(Templates templates) {
+        String output = templates.main().render();
+        assertThat(output).containsIgnoringWhitespaces("Header", "Main", "Footer");
+    }
+
+    @ParameterizedTest
+    @MethodSource("templates")
+    void nestedContent(Templates templates) {
+        String output = templates.layout(templates.helloWorld(model)).render();
+        assertThat(output).containsIgnoringWhitespaces("Header", "Hello World", "Footer");
     }
 }

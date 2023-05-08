@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +36,12 @@ public class NativeResourcesExtension implements JteExtension {
             namespace = config.packageName();
         }
 
-        Path resourceRoot = config.generatedResourcesRoot().resolve("META-INF/native-image/jte-generated/").resolve(namespace);
-
+        Path resourceRoot = config.generatedResourcesRoot().resolve("META-INF/native-image/jte-generated/" + namespace);
+        try {
+            Files.createDirectories(resourceRoot);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         return Arrays.asList(
             writeFile(resourceRoot.resolve("native-image.properties"), "Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json -H:ResourceConfigurationResources=${.}/resource-config.json\n"),
             writeFile(resourceRoot.resolve("resource-config.json"), "{\"resources\": {\"includes\": [{\"pattern\": \".*Generated\\\\.bin$\"}]}}\n"),

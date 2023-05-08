@@ -30,9 +30,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.cliftonlabs</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>4.0.1</version>
+            <groupId>gg.jte</groupId>
+            <artifactId>jte-native-resources</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

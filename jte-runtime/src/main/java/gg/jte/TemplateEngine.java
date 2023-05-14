@@ -538,7 +538,6 @@ public final class TemplateEngine {
     }
 
     public void setExtensions(Map<String, Map<String, String>> extensionSettings) {
-        System.out.printf("setExtensions(%s)%n", extensionSettings);
         config.extensionClasses.putAll(extensionSettings);
     }
 }

@@ -214,7 +214,10 @@ public class TemplateCompiler extends TemplateLoader {
             Set<TemplateDescription> descriptions = classDefinitions.stream()
                     .map(classDefinition -> new ExtensionTemplateDescription(classDefinition, templateByClassName.get(classDefinition.getName())))
                     .collect(Collectors.toSet());
-            generatorExtensions.forEach(x -> x.generate(extensionConfig, descriptions));
+            generatorExtensions.forEach(x -> {
+                Collection<Path> generated = x.generate(extensionConfig, descriptions);
+                System.out.printf("Extension %s generated %d files.%n", x.getClass().getName(), generated.size());
+            });
         }
 
         return classDefinitions;

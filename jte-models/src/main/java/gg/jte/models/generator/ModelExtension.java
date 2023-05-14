@@ -23,7 +23,6 @@ public class ModelExtension implements JteExtension {
 
     @Override
     public Collection<Path> generate(JteConfig config, Set<TemplateDescription> templateDescriptions) {
-        System.out.println("ModelExtension: generate " + config + templateDescriptions);
         TemplateEngine engine = TemplateEngine.createPrecompiled(ContentType.Plain);
         return Stream.of(
                 new ModelGenerator(engine, "interfacetemplates", "Templates", "Templates"),

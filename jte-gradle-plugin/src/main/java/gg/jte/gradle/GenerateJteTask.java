@@ -2,22 +2,28 @@ package gg.jte.gradle;
 
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.logging.Logger;
-import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.workers.WorkParameters;
+import org.gradle.workers.WorkQueue;
+import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
-public class GenerateJteTask extends JteTaskBase {
+public abstract class GenerateJteTask extends JteTaskBase {
+
+    private final WorkerExecutor workerExecutor;
 
     @Inject
-    public GenerateJteTask(JteExtension extension) {
+    public GenerateJteTask(JteExtension extension, WorkerExecutor workerExecutor) {
         super(extension, JteStage.GENERATE);
+        this.workerExecutor = workerExecutor;
     }
 
     @Override
@@ -35,6 +41,10 @@ public class GenerateJteTask extends JteTaskBase {
         return extension.getGenerateNativeImageResources().getOrElse(false);
     }
 
+    @InputFiles
+    @Classpath
+    public abstract ConfigurableFileCollection getClasspath();
+
     public void setGenerateNativeImageResources(boolean value) {
         extension.getGenerateNativeImageResources().set(value);
         setterCalled();
@@ -42,41 +52,26 @@ public class GenerateJteTask extends JteTaskBase {
 
     @TaskAction
     public void execute() {
-        Logger logger = getLogger();
-        long start = System.nanoTime();
+        // use worker api so the classpath can be modified
+        WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
 
-        Path sourceDirectory = getSourceDirectory();
-        Path targetDirectory = getTargetDirectory();
-        logger.info("Generating jte templates found in " + sourceDirectory);
-
-        TemplateEngine templateEngine = TemplateEngine.create(
-                new DirectoryCodeResolver(sourceDirectory),
-                targetDirectory,
-                getContentType(),
-                null,
-                getPackageName());
-        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(getTrimControlStructures()));
-        templateEngine.setHtmlTags(getHtmlTags());
-        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(getHtmlCommentsPreserved()));
-        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
-        templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());
-        templateEngine.setGenerateNativeImageResources(getGenerateNativeImageResources());
-        templateEngine.setProjectNamespace(extension.getProjectNamespace().getOrNull());
-
-        int amount;
-        try {
-            templateEngine.cleanAll();
-            amount = templateEngine.generateAll().size();
-        } catch (Exception e) {
-            logger.error("Failed to generate templates.", e);
-
-            throw e;
-        }
-
-        long end = System.nanoTime();
-        long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
-        logger.info("Successfully generated " + amount + " jte file" + (amount == 1 ? "" : "s") + " in " + duration + "s to " + targetDirectory);
+        workQueue.submit(GenerateJteWorker.class, this::buildParams);
+        workQueue.await();
     }
 
+    private void buildParams(GenerateJteParams params) {
+        params.getSourceDirectory().fileValue(getSourceDirectory().toFile());
+        params.getTargetDirectory().fileValue(getTargetDirectory().toFile());
+        params.getContentType().value(getContentType());
+        params.getPackageName().value(getPackageName());
+        params.getTrimControlStructures().value(getTrimControlStructures());
+        params.getHtmlTags().value(getHtmlTags());
+        params.getHtmlCommentsPreserved().value(getHtmlCommentsPreserved());
+        params.getBinaryStaticContent().value(getBinaryStaticContent());
+        params.getTargetResourceDirectory().fileValue(getTargetResourceDirectory().toFile());
+        params.getGenerateNativeImageResources().value(getGenerateNativeImageResources());
+        params.getProjectNamespace().value(extension.getProjectNamespace());
+        extension.getJteExtensions().get().forEach(e -> params.getJteExtensions().put(e.getClassName().get(), e.getProperties().get()));
+    }
 
 }

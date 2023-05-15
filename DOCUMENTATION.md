@@ -350,7 +350,7 @@ Output escaping depends on the `ContentType` the engine is created with:
 In `Html` mode, user content `${}` is automatically escaped, depending what part of the template it is placed into:
 
 - HTML tag bodies
-- HMTL attributes
+- HTML attributes
 - JavaScript attributes, e.g. `onclick`
 - `<script>` blocks
 

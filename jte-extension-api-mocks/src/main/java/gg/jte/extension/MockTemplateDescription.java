@@ -1,16 +1,18 @@
 package gg.jte.extension;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Mock implementation to help with testing extensions.
+ */
 public class MockTemplateDescription implements TemplateDescription {
     String name;
     String packageName;
     String className;
     List<ParamDescription> params = new ArrayList<>();
-    private List<String> imports = new ArrayList<>();
+    private final List<String> imports = new ArrayList<>();
 
     public static MockTemplateDescription mockTemplateDescription() {
         return new MockTemplateDescription();

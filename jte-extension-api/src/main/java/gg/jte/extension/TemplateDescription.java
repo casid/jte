@@ -1,8 +1,10 @@
 package gg.jte.extension;
 
-import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * An instance of this class will be given to an extension for each jte template.
+ */
 public interface TemplateDescription {
     String name();
     String packageName();

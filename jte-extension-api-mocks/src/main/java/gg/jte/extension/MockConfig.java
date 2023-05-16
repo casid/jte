@@ -4,6 +4,9 @@ import gg.jte.ContentType;
 
 import java.nio.file.Path;
 
+/**
+ * Mock implementation to help with testing extensions.
+ */
 public class MockConfig implements JteConfig {
     Path generatedSourcesRoot;
     Path generatedResourcesRoot;

@@ -1,5 +1,8 @@
 package gg.jte.extension;
 
+/**
+ * Mock implementation to help with testing extensions.
+ */
 public class MockParamDescription implements ParamDescription {
     String type;
     String name;

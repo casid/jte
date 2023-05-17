@@ -26,7 +26,7 @@ public interface JteExtension {
     /**
      * init will be called after the extension instance is constructed. The map can be used to pass additional
      * configuration properties from a build script.
-     * @param value Map of property key -> configured value
+     * @param value Map of property key to configured value
      * @return self or a replacement
      */
     default JteExtension init(Map<String, String> value) {

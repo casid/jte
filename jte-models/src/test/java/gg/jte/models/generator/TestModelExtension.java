@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,7 +22,7 @@ import static gg.jte.extension.MockTemplateDescription.mockTemplateDescription;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestModelExtension {
-    public static final String INTERFACE_SOURCE_FILE = "target/generated-test-sources/test/mytemplates/Templates.java";
+    public static final Pattern INTERFACE_SOURCE_FILE = Pattern.compile("target.generated-test-sources.test.mytemplates.Templates.java");
     JteExtension modelExtension = new ModelExtension();
     private static final String TEST_PACKAGE = "test.mytemplates";
 
@@ -45,7 +46,7 @@ public class TestModelExtension {
 
         assertEquals(3, generatedPaths.size());
         Collection<String> pathStrings = generatedPaths.stream().map(Path::toString).collect(Collectors.toList());
-        assertThat(pathStrings).contains(INTERFACE_SOURCE_FILE);
+        assertThat(pathStrings).anyMatch(p -> INTERFACE_SOURCE_FILE.matcher(p).find());
         generatedPaths.forEach(path -> {
             try (Stream<String> lines = Files.lines(path)) {
                 assertThat(lines).anyMatch(line -> line.matches(".*JteModel hello\\(.*"));

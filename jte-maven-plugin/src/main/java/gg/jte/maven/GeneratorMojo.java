@@ -83,12 +83,12 @@ public class GeneratorMojo extends AbstractMojo {
             templateEngine.setGenerateNativeImageResources(generateNativeImageResources);
         }
         templateEngine.setProjectNamespace(project.getGroupId() + "/" + project.getArtifactId());
-        getLog().info("extensions=" + extensions);
         if (extensions != null) {
             templateEngine.setExtensions(
                     extensions.stream()
                             .collect(Collectors.toMap(ExtensionSettings::getClassName, ExtensionSettings::getSettings))
             );
+            getLog().info("Using extensions = " + extensions);
         }
         int amount;
         try {

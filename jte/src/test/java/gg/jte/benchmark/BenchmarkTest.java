@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,5 +28,11 @@ public class BenchmarkTest {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         utf8ByteOutput.writeTo(os);
         assertThat(os.toString("UTF-8")).contains("This page has 42 visits already.");
+    }
+
+    @Test
+    void binaryArrayOutput() throws UnsupportedEncodingException {
+        byte[] bytes = new Benchmark_BinaryArray().render(new WelcomePage(42));
+        assertThat(new String(bytes, "UTF-8")).contains("This page has 42 visits already.");
     }
 }

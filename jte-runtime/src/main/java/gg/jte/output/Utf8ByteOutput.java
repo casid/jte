@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  * Heavily optimized UTF-8 template output, designed to be CPU and memory friendly.
- * You may want to use this class, if you write to a low-level binary output stream and you need the exact content-size of the output.
+ * You may want to use this class, if you write to a low-level binary output stream, and you need the exact content-size of the output.
  *
  * CAUTION: You must enable {@link gg.jte.TemplateEngine#setBinaryStaticContent(boolean)}, otherwise this class won't provide any benefits over {@link StringOutput}!
  */

@@ -3,11 +3,30 @@ package gg.jte.benchmark;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.output.StringOutput;
-import gg.jte.resolve.ResourceCodeResolver;
+import gg.jte.resolve.DirectoryCodeResolver;
+import gg.jte.runtime.Constants;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 class Benchmark {
+
+    public static Path getTemplateDirectory() {
+        URL res = Benchmark.class.getClassLoader().getResource("benchmark/welcome.jte");
+        if (res == null) {
+            throw new IllegalStateException("Resource benchmark/welcome.jte not found!");
+        }
+
+        try {
+            return new File(res.toURI()).toPath().getParent();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private final TemplateEngine templateEngine;
 
@@ -16,8 +35,13 @@ class Benchmark {
     }
 
     Benchmark() {
-        templateEngine = TemplateEngine.create(new ResourceCodeResolver("benchmark"), ContentType.Html);
-        templateEngine.setTrimControlStructures(true);
+        Path classDirectory = Paths.get("jte-classes");
+
+        TemplateEngine compiler = TemplateEngine.create(new DirectoryCodeResolver(getTemplateDirectory()), classDirectory, ContentType.Html, null, Constants.PACKAGE_NAME_PRECOMPILED);
+        compiler.setTrimControlStructures(true);
+        compiler.precompileAll();
+
+        templateEngine = TemplateEngine.createPrecompiled(classDirectory, ContentType.Html);
     }
 
     public void run() {

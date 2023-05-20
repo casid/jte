@@ -34,7 +34,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Automatic-Module-Name>gg.jte</Automatic-Module-Name>
+                            <Automatic-Module-Name>gg.jte.extension.api.mocks</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>

@@ -2,13 +2,9 @@ package gg.jte.html;
 
 import gg.jte.Content;
 import gg.jte.TemplateOutput;
+import gg.jte.html.escape.Escape;
 import gg.jte.runtime.StringUtils;
 import gg.jte.output.StringOutput;
-import org.owasp.encoder.Encode;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.io.Writer;
 
 /**
  * See <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html">OWASP Cross Site Prevention Cheat Sheet</a>
@@ -59,14 +55,10 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     }
 
     private void writeTagBodyUserContent(String value) {
-        try {
-            if ("script".equals(tagName)) {
-                Encode.forJavaScriptBlock(getWriter(), value);
-            } else {
-                Encode.forHtmlContent(getWriter(), value);
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        if ("script".equals(tagName)) {
+            Escape.javaScriptBlock(value, templateOutput);
+        } else {
+            Escape.htmlContent(value, templateOutput);
         }
     }
 
@@ -75,25 +67,21 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
             return;
         }
 
-        try {
-            if (attributeName.startsWith("on")) {
-                Encode.forJavaScriptAttribute(getWriter(), value);
-            } else {
-                Encode.forHtmlAttribute(getWriter(), value);
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        if (attributeName.startsWith("on")) {
+            Escape.javaScriptAttribute(value, templateOutput);
+        } else {
+            Escape.htmlAttribute(value, templateOutput);
         }
-    }
-
-    @Override
-    public Writer getWriter() {
-        return templateOutput.getWriter();
     }
 
     @Override
     public void writeContent(String value) {
         templateOutput.writeContent(value);
+    }
+
+    @Override
+    public void writeContent(String value, int beginIndex, int endIndex) {
+        templateOutput.writeContent(value, beginIndex, endIndex);
     }
 
     @Override

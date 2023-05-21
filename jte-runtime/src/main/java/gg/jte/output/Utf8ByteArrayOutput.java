@@ -2,8 +2,6 @@ package gg.jte.output;
 
 import gg.jte.TemplateOutput;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -14,7 +12,7 @@ import java.util.Arrays;
  *
  * CAUTION: You must enable {@link gg.jte.TemplateEngine#setBinaryStaticContent(boolean)}, otherwise this class won't provide any benefits over {@link StringOutput}!
  */
-public final class Utf8ByteArrayOutput extends Writer implements TemplateOutput {
+public final class Utf8ByteArrayOutput implements TemplateOutput {
 
     private byte[] buffer;
     private int position;
@@ -28,13 +26,13 @@ public final class Utf8ByteArrayOutput extends Writer implements TemplateOutput 
     }
 
     @Override
-    public Writer getWriter() {
-        return this;
+    public void writeContent(String value) {
+        writeBinaryContent(value.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
-    public void writeContent(String value) {
-        writeBinaryContent(value.getBytes(StandardCharsets.UTF_8));
+    public void writeContent(String value, int beginIndex, int endIndex) {
+        writeBinaryContent(value.substring(beginIndex, endIndex).getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
@@ -42,26 +40,6 @@ public final class Utf8ByteArrayOutput extends Writer implements TemplateOutput 
         ensureCapacity(position + value.length);
         System.arraycopy(value, 0, buffer, position, value.length);
         position += value.length;
-    }
-
-    @Override
-    public void write(String value) {
-        writeBinaryContent(value.getBytes(StandardCharsets.UTF_8));
-    }
-
-    @Override
-    public void write(char[] cbuf, int off, int len) throws IOException {
-        writeContent(new String(cbuf, off, len));
-    }
-
-    @Override
-    public void flush() {
-        // nothing to do
-    }
-
-    @Override
-    public void close() {
-        // nothing to do
     }
 
     public byte[] toByteArray() {

@@ -1,6 +1,9 @@
 package gg.jte.models.runtime;
 
 import gg.jte.Content;
+import gg.jte.TemplateOutput;
+import gg.jte.output.StringOutput;
+import gg.jte.output.Utf8ByteOutput;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -10,21 +13,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public interface JteModel extends Content {
-    default void render(OutputStream outputStream, Charset charset) {
-        Writer writer = new OutputStreamWriter(outputStream, charset);
-        render(writer);
-    }
-
-    default void render(OutputStream outputStream) {
-        render(outputStream, StandardCharsets.UTF_8);
-    }
-
     default String render() {
-        Writer writer = new StringWriter();
-        render(writer);
-        return writer.toString();
+        try (StringOutput output = new StringOutput()) {
+            render(output);
+            return output.toString();
+        }
     }
 
-    void render(Writer writer);
+    void render(TemplateOutput output);
 
 }

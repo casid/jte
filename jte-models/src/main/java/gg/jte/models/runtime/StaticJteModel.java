@@ -4,17 +4,15 @@ import gg.jte.ContentType;
 import gg.jte.TemplateException;
 import gg.jte.TemplateOutput;
 import gg.jte.html.HtmlInterceptor;
+import gg.jte.html.HtmlTemplateOutput;
 import gg.jte.html.OwaspHtmlTemplateOutput;
-import gg.jte.output.WriterOutput;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.DebugInfo;
 import gg.jte.runtime.Template;
 import gg.jte.runtime.TemplateLoader;
 
-import java.io.Writer;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class StaticJteModel<OUTPUT extends TemplateOutput> implements JteModel {
 
@@ -30,23 +28,14 @@ public class StaticJteModel<OUTPUT extends TemplateOutput> implements JteModel {
     }
 
     @Override
-    public void render(Writer writer) {
+    public void render(TemplateOutput output) {
         try {
             renderer.accept(
-                    getOutput(writer),
+                    getOutput(output),
                     null
             );
         } catch (Exception e) {
             throw handleException(e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private OUTPUT getOutput(Writer writer) {
-        if (contentType == ContentType.Html) {
-            return (OUTPUT) new OwaspHtmlTemplateOutput(new WriterOutput(writer));
-        } else {
-            return (OUTPUT) new WriterOutput(writer);
         }
     }
 
@@ -74,7 +63,7 @@ public class StaticJteModel<OUTPUT extends TemplateOutput> implements JteModel {
 
     @SuppressWarnings("unchecked")
     private OUTPUT getOutput(TemplateOutput output) {
-        if (contentType == ContentType.Html) {
+        if (contentType == ContentType.Html && !(output instanceof HtmlTemplateOutput)) {
             return (OUTPUT) new OwaspHtmlTemplateOutput(output);
         }
         return (OUTPUT) output;

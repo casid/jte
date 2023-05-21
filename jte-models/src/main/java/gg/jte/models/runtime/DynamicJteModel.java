@@ -2,9 +2,7 @@ package gg.jte.models.runtime;
 
 import gg.jte.TemplateEngine;
 import gg.jte.TemplateOutput;
-import gg.jte.output.WriterOutput;
 
-import java.io.Writer;
 import java.util.Map;
 
 public class DynamicJteModel implements JteModel {
@@ -19,8 +17,8 @@ public class DynamicJteModel implements JteModel {
     }
 
     @Override
-    public void render(Writer writer) {
-       writeTo(new WriterOutput(writer));
+    public void render(TemplateOutput output) {
+       writeTo(output);
     }
 
     @Override

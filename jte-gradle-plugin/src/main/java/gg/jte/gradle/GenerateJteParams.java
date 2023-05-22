@@ -29,8 +29,6 @@ public interface GenerateJteParams extends WorkParameters {
 
     RegularFileProperty getTargetResourceDirectory();
 
-    Property<Boolean> getGenerateNativeImageResources();
-
     Property<String> getProjectNamespace();
 
     MapProperty<String, Map<String, String>> getJteExtensions();

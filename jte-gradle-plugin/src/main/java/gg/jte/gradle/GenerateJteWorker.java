@@ -34,7 +34,6 @@ public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams>
         templateEngine.setHtmlCommentsPreserved(params.getHtmlCommentsPreserved().getOrElse(false));
         templateEngine.setBinaryStaticContent(params.getBinaryStaticContent().getOrElse(false));
         templateEngine.setTargetResourceDirectory(path(params.getTargetResourceDirectory()));
-        templateEngine.setGenerateNativeImageResources(params.getGenerateNativeImageResources().getOrElse(false));
         templateEngine.setProjectNamespace(params.getProjectNamespace().getOrNull());
         templateEngine.setExtensions(params.getJteExtensions().get());
 

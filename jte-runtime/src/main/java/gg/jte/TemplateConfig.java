@@ -27,12 +27,6 @@ public class TemplateConfig {
     public Path resourceDirectory;
 
     public String projectNamespace;
-
-    /**
-     * @deprecated moved to extension
-     */
-    @Deprecated
-    public boolean generateNativeImageResources;
     public Map<String, Map<String, String>> extensionClasses = new HashMap<>();
 
     public TemplateConfig(ContentType contentType, String packageName) {

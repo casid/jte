@@ -37,8 +37,6 @@ public abstract class JteExtension
     public abstract Property<Path> getTargetResourceDirectory();
     public abstract ConfigurableFileCollection getCompilePath();
     public abstract Property<String> getHtmlPolicyClass();
-    @Deprecated
-    public abstract Property<Boolean> getGenerateNativeImageResources();
     public abstract Property<String[]> getCompileArgs();
     public abstract Property<String> getProjectNamespace();
     public abstract ListProperty<JteExtensionSettings> getJteExtensions();

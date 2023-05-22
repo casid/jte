@@ -3,4 +3,5 @@
 
 @param TemplateDescription template
 
+    @JteView("${template.name()}")
     JteModel ${Util.methodName(template)}(${Util.typedParams(template)});

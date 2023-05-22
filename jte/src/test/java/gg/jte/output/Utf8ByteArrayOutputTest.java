@@ -2,18 +2,15 @@ package gg.jte.output;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutput> {
+public class Utf8ByteArrayOutputTest extends AbstractTemplateOutputTest<Utf8ByteArrayOutput> {
 
     @Override
-    Utf8ByteOutput createTemplateOutput() {
-        return new Utf8ByteOutput(16, 8); // Small chunk size for tests;
+    Utf8ByteArrayOutput createTemplateOutput() {
+        return new Utf8ByteArrayOutput(16); // Small initial capacity size for tests;
     }
 
     @Test
@@ -28,6 +25,12 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
     }
 
     @Test
+    void substring() {
+        output.writeContent("Hello", 1, 3);
+        thenOutputIs("el");
+    }
+
+    @Test
     void longString() {
         output.writeContent("The quick brown fox jumps over the lazy dog");
         thenOutputIs("The quick brown fox jumps over the lazy dog");
@@ -37,12 +40,6 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
     void longStringSpecialChars() {
         output.writeContent("\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9");
         thenOutputIs("\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9");
-    }
-
-    @Test
-    void substring() {
-        output.writeContent("Hello", 1, 3);
-        thenOutputIs("el");
     }
 
     @Test
@@ -127,29 +124,10 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
         thenOutputIs(str);
     }
 
-    @Test
-    void utf8_missingLowSurrogate() {
-        output.writeUserContent('\uD83D');
-        output.writeUserContent('f');
-        output.writeUserContent('o');
-        output.writeUserContent('o');
-        thenOutputIs("�foo");
-    }
-
     protected void thenOutputIs(String expected) {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try {
-            output.writeTo(os);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
-        byte[] bytes = os.toByteArray();
-        assertThat(output.getContentLength()).isEqualTo(bytes.length);
+        byte[] bytes = output.toByteArray();
 
         String actual = new String(bytes, StandardCharsets.UTF_8);
         assertThat(actual).isEqualTo(expected);
     }
-
-
 }

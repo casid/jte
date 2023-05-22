@@ -4,7 +4,6 @@ import gg.jte.TemplateOutput;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Writer;
 import java.util.ArrayList;
 
 /**
@@ -13,7 +12,7 @@ import java.util.ArrayList;
  *
  * CAUTION: You must enable {@link gg.jte.TemplateEngine#setBinaryStaticContent(boolean)}, otherwise this class won't provide any benefits over {@link StringOutput}!
  */
-public final class Utf8ByteOutput extends Writer implements TemplateOutput {
+public final class Utf8ByteOutput implements TemplateOutput {
 
     private final int chunkSize;
 
@@ -92,15 +91,19 @@ public final class Utf8ByteOutput extends Writer implements TemplateOutput {
     }
 
     @Override
-    public Writer getWriter() {
-        return this;
-    }
-
-    @Override
     public void writeContent(String s) {
         int len = s.length();
         for (int i = 0; i < len; i += tempBufferSize) {
             int size = Math.min(tempBufferSize, len - i);
+            s.getChars(i, i + size, tempBuffer, 0);
+            write(tempBuffer, 0, size);
+        }
+    }
+
+    @Override
+    public void writeContent(String s, int beginIndex, int endIndex) {
+        for (int i = beginIndex; i < endIndex; i += tempBufferSize) {
+            int size = Math.min(tempBufferSize, endIndex - i);
             s.getChars(i, i + size, tempBuffer, 0);
             write(tempBuffer, 0, size);
         }
@@ -132,7 +135,7 @@ public final class Utf8ByteOutput extends Writer implements TemplateOutput {
 
     @Override
     public void writeUserContent(char value) {
-        appendUtf8Char(value);
+        write(value);
     }
 
     @Override
@@ -155,10 +158,7 @@ public final class Utf8ByteOutput extends Writer implements TemplateOutput {
         appendLatin1(Double.toString(value));
     }
 
-    // Writer interface
-
-    @Override
-    public void write(@SuppressWarnings("NullableProblems") char[] buffer, int off, int len) {
+    private void write(@SuppressWarnings("NullableProblems") char[] buffer, int off, int len) {
         int i = off;
         len += off;
 
@@ -167,7 +167,7 @@ public final class Utf8ByteOutput extends Writer implements TemplateOutput {
         }
     }
 
-    public void write(char c) {
+    private void write(char c) {
         if (highSurrogate != 0) {
             if (Character.isLowSurrogate(c)) {
                 appendUtf8CodePoint(Character.toCodePoint(highSurrogate, c));
@@ -181,31 +181,6 @@ public final class Utf8ByteOutput extends Writer implements TemplateOutput {
         } else {
             appendUtf8Char(c);
         }
-    }
-
-    @Override
-    public void write(int c) {
-        write((char) c);
-    }
-
-    @Override
-    public void write(@SuppressWarnings("NullableProblems") char[] buffer) {
-        write(buffer, 0, buffer.length);
-    }
-
-    @Override
-    public void write(@SuppressWarnings("NullableProblems") String str) {
-        writeContent(str);
-    }
-
-    @Override
-    public void flush() {
-        // nothing to do
-    }
-
-    @Override
-    public void close() {
-        // nothing to do
     }
 
     private void appendLatin1(String s) {

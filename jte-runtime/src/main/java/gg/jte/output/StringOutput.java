@@ -16,13 +16,13 @@ public class StringOutput extends Writer implements TemplateOutput {
     }
 
     @Override
-    public Writer getWriter() {
-        return this;
+    public void writeContent(String value) {
+        stringBuilder.append(value);
     }
 
     @Override
-    public void writeContent(String value) {
-        stringBuilder.append(value);
+    public void writeContent(String value, int beginIndex, int endIndex) {
+        stringBuilder.append(value, beginIndex, endIndex);
     }
 
     @Override

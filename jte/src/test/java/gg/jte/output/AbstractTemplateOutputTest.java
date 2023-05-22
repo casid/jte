@@ -5,14 +5,28 @@ import gg.jte.ContentType;
 import gg.jte.TemplateOutput;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 public abstract class AbstractTemplateOutputTest<T extends TemplateOutput> {
     T output = createTemplateOutput();
 
     abstract T createTemplateOutput();
 
     abstract void thenOutputIs(String expected);
+
+    @Test
+    void writeString() {
+        output.writeContent("foo");
+        output.writeContent("bar");
+
+        thenOutputIs("foobar");
+    }
+
+    @Test
+    void writeSubstring() {
+        output.writeContent("foobar", 0, 3);
+        output.writeContent("foobar", 3, 6);
+
+        thenOutputIs("foobar");
+    }
 
     @Test
     void writeBoolean() {
@@ -99,53 +113,6 @@ public abstract class AbstractTemplateOutputTest<T extends TemplateOutput> {
         output.writeUserContent((Number) null);
         output.writeUserContent((Character) null);
         thenOutputIs("");
-    }
-
-    @Test
-    void writer_charArray() throws IOException {
-        char[] chars = "The quick brown fox...".toCharArray();
-        output.getWriter().write(chars);
-
-        thenOutputIs("The quick brown fox...");
-    }
-
-    @Test
-    void writer_charArrayWithOffset() throws IOException {
-        char[] chars = "The quick brown fox...".toCharArray();
-        output.getWriter().write(chars, 4, 5);
-        output.getWriter().write(chars, 16, 3);
-
-        thenOutputIs("quickfox");
-    }
-
-    @Test
-    void writer_char() throws IOException {
-        output.getWriter().write('f');
-        output.getWriter().write('o');
-        output.getWriter().write('x');
-
-        thenOutputIs("fox");
-    }
-
-    @Test
-    void writer_string() throws IOException {
-        output.getWriter().write("The quick brown fox...");
-        thenOutputIs("The quick brown fox...");
-    }
-
-    @Test
-    void writer_stringWithOffset() throws IOException {
-        String s = "The quick brown fox...";
-        output.getWriter().write(s, 4, 5);
-        output.getWriter().write(s, 16, 3);
-
-        thenOutputIs("quickfox");
-    }
-
-    @Test
-    void writer_unusedMethodsAreNoops() throws IOException {
-        output.getWriter().flush();
-        output.getWriter().close();
     }
 
     public enum EnumWithToStringOverride {

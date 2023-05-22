@@ -9,7 +9,6 @@ import gg.jte.runtime.TemplateUtils;
 import gg.jte.support.LocalizationSupport;
 import org.junit.jupiter.api.Test;
 
-import java.io.Writer;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1103,13 +1102,13 @@ public class TemplateEngine_HtmlOutputEscapingTest {
             final StringBuilder history = new StringBuilder();
 
             @Override
-            public Writer getWriter() {
-                return output.getWriter();
+            public void writeContent(String value) {
+                output.writeContent(value);
             }
 
             @Override
-            public void writeContent(String value) {
-                output.writeContent(value);
+            public void writeContent(String value, int beginIndex, int endIndex) {
+                output.writeContent(value, beginIndex, endIndex);
             }
 
             @Override

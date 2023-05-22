@@ -356,7 +356,7 @@ In `Html` mode, user content `${}` is automatically escaped, depending what part
 
 ### HTML tag bodies
 
-User output in HTML tag bodies is escaped with `org.owasp.encoder.Encode#forHtmlContent` (`org.owasp.encoder.Encode#forHtml` before jte 1.5.0).
+User output in HTML tag bodies is escaped with `gg.jte.html.escape.Escape.htmlContent`.
 
 ```htm
 <div>${userName}</div>
@@ -368,7 +368,7 @@ the output would be `<div>&lt;script&gt;alert('xss');&lt;/script&gt;</div>`.
 
 ### HTML attributes
 
-User output in HTML attributes is escaped with `org.owasp.encoder.Encode#forHtmlAttribute`. It ensures that all quotes are escaped, so that an attacker cannot escape the attribute.
+User output in HTML attributes is escaped with `gg.jte.html.escape.Escape.htmlAttribute`. It ensures that all quotes are escaped, so that an attacker cannot escape the attribute.
 
 ```htm
 <div data-title="Hello ${userName}"></div>
@@ -380,7 +380,7 @@ the output would be `<div data-title="Hello &#34;>&lt;script>alert(&#39;xss&#39;
 
 ### JavaScript attributes
 
-User output in HTML attributes is escaped with `org.owasp.encoder.Encode#forJavaScriptAttribute`. Those are all HTML attributes starting with `on`.
+User output in HTML attributes is escaped with `gg.jte.html.escape.Escape.javaScriptAttribute`. Those are all HTML attributes starting with `on`.
 
 ```htm
 <span onclick="showName('${userName}')">Click me</span>

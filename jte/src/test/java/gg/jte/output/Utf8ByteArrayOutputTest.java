@@ -2,7 +2,6 @@ package gg.jte.output;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,6 +22,12 @@ public class Utf8ByteArrayOutputTest extends AbstractTemplateOutputTest<Utf8Byte
     void string() {
         output.writeContent("Hello");
         thenOutputIs("Hello");
+    }
+
+    @Test
+    void substring() {
+        output.writeContent("Hello", 1, 3);
+        thenOutputIs("el");
     }
 
     @Test
@@ -78,8 +83,8 @@ public class Utf8ByteArrayOutputTest extends AbstractTemplateOutputTest<Utf8Byte
     }
 
     @Test
-    void utf8_0x00() throws IOException {
-        output.write((char)0);
+    void utf8_0x00() {
+        output.writeUserContent((char)0);
         thenOutputIs("\u0000");
     }
 

@@ -3,7 +3,6 @@ package gg.jte.output;
 import gg.jte.TemplateOutput;
 
 import java.io.PrintWriter;
-import java.io.Writer;
 
 public class PrintWriterOutput implements TemplateOutput {
     private final PrintWriter writer;
@@ -13,12 +12,12 @@ public class PrintWriterOutput implements TemplateOutput {
     }
 
     @Override
-    public Writer getWriter() {
-        return writer;
+    public void writeContent(String value) {
+        writer.write(value);
     }
 
     @Override
-    public void writeContent(String value) {
-        writer.write(value);
+    public void writeContent(String value, int beginIndex, int endIndex) {
+        writer.write(value, beginIndex, endIndex - beginIndex);
     }
 }

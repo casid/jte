@@ -12,15 +12,19 @@ public class SquashBlanksOutput implements TemplateOutput {
     }
 
     @Override
-    public Writer getWriter() {
-        return delegate.getWriter();
-    }
-
-    @Override
     public void writeContent(String value) {
         if (value.contains("\n") && value.trim().isEmpty()) {
             return;
         }
         delegate.writeContent(value);
+    }
+
+    @Override
+    public void writeContent(String value, int beginIndex, int endIndex) {
+        String substring = value.substring(beginIndex, endIndex);
+        if (substring.contains("\n") && value.trim().isEmpty()) {
+            return;
+        }
+        delegate.writeContent(value, beginIndex, endIndex);
     }
 }

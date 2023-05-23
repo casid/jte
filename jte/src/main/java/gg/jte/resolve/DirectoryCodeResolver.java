@@ -25,8 +25,7 @@ public class DirectoryCodeResolver implements CodeResolver {
     public String resolve(String name) {
         try {
             Path file = root.resolve(name);
-            byte[] bytes = Files.readAllBytes(file);
-            return new String(bytes, StandardCharsets.UTF_8);
+            return Files.readString(file, StandardCharsets.UTF_8);
         } catch (NoSuchFileException e) {
             return null;
         } catch (IOException e) {

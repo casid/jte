@@ -15,8 +15,7 @@ public final class IoUtils {
 
     public static String toString(Path file) {
         try {
-            byte[] bytes = Files.readAllBytes(file);
-            return new String(bytes, StandardCharsets.UTF_8);
+            return Files.readString(file, StandardCharsets.UTF_8);
         } catch (Exception e) {
             return null;
         }
@@ -29,7 +28,7 @@ public final class IoUtils {
         while ((length = inputStream.read(buffer)) != -1) {
             result.write(buffer, 0, length);
         }
-        return result.toString("UTF-8");
+        return result.toString(StandardCharsets.UTF_8);
     }
 
     public static void deleteDirectoryContent(Path directory) {

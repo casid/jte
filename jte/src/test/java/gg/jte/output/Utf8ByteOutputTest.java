@@ -13,7 +13,7 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
 
     @Override
     Utf8ByteOutput createTemplateOutput() {
-        return new Utf8ByteOutput(16, 8); // Small chunk size for tests;
+        return new Utf8ByteOutput();
     }
 
     @Test
@@ -133,7 +133,7 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
         output.writeUserContent('f');
         output.writeUserContent('o');
         output.writeUserContent('o');
-        thenOutputIs("�foo");
+        thenOutputIs("?foo");
     }
 
     protected void thenOutputIs(String expected) {

@@ -47,7 +47,7 @@ jobs:
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw verify -pl !jte-spring-boot-starter-3 --file pom.xml --batch-mode -Pcoverage
+        run: ./mvnw verify --file pom.xml --batch-mode -Pcoverage
         env:
           MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn  
       

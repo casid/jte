@@ -46,50 +46,50 @@ public class TemplateEngineTest {
 
     @Test
     void templateWithoutParametersLong() {
-        givenRawTemplate(TestUtils.repeat(".", 65536));
-        thenOutputIs(TestUtils.repeat(".", 65536));
+        givenRawTemplate(".".repeat(65536));
+        thenOutputIs(".".repeat(65536));
     }
 
     @Test
     void templateWithoutParametersLongNull() {
-        givenRawTemplate(TestUtils.repeat("\u0000", 65536) + "foo");
-        thenOutputIs(TestUtils.repeat("\u0000", 65536) + "foo");
+        givenRawTemplate("\u0000".repeat(65536) + "foo");
+        thenOutputIs("\u0000".repeat(65536) + "foo");
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset0() {
-        givenRawTemplate(TestUtils.repeat("\uD83D\uDCA9", 65536));
-        thenOutputIs(TestUtils.repeat("\uD83D\uDCA9", 65536));
+        givenRawTemplate("\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("\uD83D\uDCA9".repeat(65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset1() {
-        givenRawTemplate("." + TestUtils.repeat("\uD83D\uDCA9", 65536));
-        thenOutputIs("." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        givenRawTemplate("." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("." + "\uD83D\uDCA9".repeat(65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset2() {
-        givenRawTemplate(".." + TestUtils.repeat("\uD83D\uDCA9", 65536));
-        thenOutputIs(".." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        givenRawTemplate(".." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs(".." + "\uD83D\uDCA9".repeat(65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset3() {
-        givenRawTemplate("..." + TestUtils.repeat("\uD83D\uDCA9", 65536));
-        thenOutputIs("..." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        givenRawTemplate("..." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("..." + "\uD83D\uDCA9".repeat(65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset4() {
-        givenRawTemplate("...." + TestUtils.repeat("\uD83D\uDCA9", 65536));
-        thenOutputIs("...." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        givenRawTemplate("...." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("...." + "\uD83D\uDCA9".repeat(65536));
     }
 
     @Test
     void templateWithoutParametersLongMultibyteOffset5() {
-        givenRawTemplate("....." + TestUtils.repeat("\uD83D\uDCA9", 65536));
-        thenOutputIs("....." + TestUtils.repeat("\uD83D\uDCA9", 65536));
+        givenRawTemplate("....." + "\uD83D\uDCA9".repeat(65536));
+        thenOutputIs("....." + "\uD83D\uDCA9".repeat(65536));
     }
 
     @Test

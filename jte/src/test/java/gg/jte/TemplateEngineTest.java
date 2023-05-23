@@ -341,10 +341,6 @@ public class TemplateEngineTest {
 
     @Test
     void variable_modern() {
-        if (TestUtils.isLegacyJavaVersion()) {
-            return;
-        }
-
         givenTemplate("!{var y = 50;}${y}");
         thenOutputIs("50");
     }
@@ -1266,10 +1262,6 @@ public class TemplateEngineTest {
 
     @Test
     void compileArgs_enablePreview() {
-        if (TestUtils.isLegacyJavaVersion()) {
-            return;
-        }
-
         templateEngine.setCompileArgs("--enable-preview");
         givenRawTemplate("Hello World!");
         thenRenderingFailsWithException().hasMessageContaining("--enable-preview must be used with either -source or --release");

@@ -34,10 +34,6 @@ public class PreCompileTemplatesTest {
 
     @Test
     void precompileAll_externalClassLoader() {
-        if (TestUtils.isLegacyJavaVersion()) {
-            return;
-        }
-
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             ClassLoader externalClassLoader = new URLClassLoader(new URL[] {contextClassLoader.getResource("external/external.jar")});

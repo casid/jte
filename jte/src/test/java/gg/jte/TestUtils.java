@@ -4,21 +4,7 @@ public class TestUtils {
 
     private static final double JAVA_VERSION = Double.parseDouble(System.getProperty("java.specification.version", "0"));
 
-    public static boolean isLegacyJavaVersion() {
-        return JAVA_VERSION < 11;
-    }
-
     public static boolean isInstanceOfPatternMatchingJavaVersion() {
-        return JAVA_VERSION >= 14;
-    }
-
-    public static void sleepIfLegacyJavaVersion(long millis) {
-        if (isLegacyJavaVersion()) {
-            try {
-                Thread.sleep(millis);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+        return JAVA_VERSION >= 14; // Not really needed since we compile with jdk 17, but leave as pattern for the next Java version features.
     }
 }

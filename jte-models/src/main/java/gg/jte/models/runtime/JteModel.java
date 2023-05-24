@@ -14,10 +14,9 @@ import java.nio.charset.StandardCharsets;
 
 public interface JteModel extends Content {
     default String render() {
-        try (StringOutput output = new StringOutput()) {
-            render(output);
-            return output.toString();
-        }
+        StringOutput output = new StringOutput();
+        render(output);
+        return output.toString();
     }
 
     void render(TemplateOutput output);

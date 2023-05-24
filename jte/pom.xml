@@ -29,11 +29,6 @@
             <artifactId>jte-extension-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>gg.jte</groupId>
-            <artifactId>jte-native-resources</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
     <build>

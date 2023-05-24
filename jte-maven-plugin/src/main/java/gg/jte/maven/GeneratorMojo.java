@@ -57,9 +57,6 @@ public class GeneratorMojo extends AbstractMojo {
     @Parameter
     public String targetResourceDirectory;
 
-    @Parameter(defaultValue = "false")
-    public boolean generateNativeImageResources;
-
     @Parameter
     public List<ExtensionSettings> extensions;
 
@@ -80,7 +77,6 @@ public class GeneratorMojo extends AbstractMojo {
         templateEngine.setBinaryStaticContent(binaryStaticContent);
         if (targetResourceDirectory != null) {
             templateEngine.setTargetResourceDirectory(Paths.get(targetResourceDirectory));
-            templateEngine.setGenerateNativeImageResources(generateNativeImageResources);
         }
         templateEngine.setProjectNamespace(project.getGroupId() + "/" + project.getArtifactId());
         if (extensions != null) {

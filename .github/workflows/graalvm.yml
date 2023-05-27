@@ -33,7 +33,5 @@ jobs:
           MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
-      - name: Test Gradle Plugin Generate (old style)
-        run: cd test/jte-runtime-cp-test-gradle && ./gradlew check nativeTest
       - name: Test Gradle Plugin Generate with conventions
         run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew check nativeTest

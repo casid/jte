@@ -3,6 +3,7 @@ package gg.jte.gradle;
 import gg.jte.ContentType;
 import gg.jte.runtime.Constants;
 import org.gradle.api.*;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
@@ -15,7 +16,7 @@ public class JteGradle implements Plugin<Project> {
     public void apply(Project project) {
         project.getPlugins().apply(JavaPlugin.class);
         SourceSet main = getMainSourceSet(project);
-        JteExtension extension = project.getExtensions().create("jte", JteExtension.class);
+        JteExtension extension = project.getExtensions().create("jte", JteExtension.class, project.getObjects());
         defaults(project, extension, main);
 
         TaskProvider<PrecompileJteTask> precompileJteTask = project.getTasks().register("precompileJte", PrecompileJteTask.class, extension);
@@ -30,12 +31,15 @@ public class JteGradle implements Plugin<Project> {
 
         project.getTasks().named("clean").configure(t -> t.dependsOn("cleanPrecompileJte", "cleanGenerateJte")); // clean tasks are generated based on task outputs
 
+        Configuration additionalClasspath = project.getConfigurations().create("jteGenerate");
         generateJteTask.configure(t -> {
+            t.getClasspath().from(additionalClasspath);
             if (extension.getStage().isPresent() && extension.getStage().get() == JteStage.GENERATE) {
                 main.getJava().srcDir(t.getTargetDirectory());
                 main.getResources().srcDir(t.getTargetResourceDirectory());
             }
         });
+        project.getConfigurations().named(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME, conf -> conf.extendsFrom(additionalClasspath));
     }
 
     private SourceSet getMainSourceSet(Project project) {

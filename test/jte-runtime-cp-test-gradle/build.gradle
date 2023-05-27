@@ -1,11 +1,10 @@
 import gg.jte.ContentType
+
 import java.nio.file.Paths
-import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     id 'java'
     id 'gg.jte.gradle' version '2.3.3-SNAPSHOT'
-    id 'org.graalvm.buildtools.native' version '0.9.20'
 }
 
 repositories {
@@ -31,8 +30,7 @@ dependencies {
 
 tasks.generateJte {
     sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
-    contentType = gg.jte.ContentType.Html
-    generateNativeImageResources = true
+    contentType = ContentType.Html
 }
 
 sourceSets.main.java.srcDir(tasks.generateJte.targetDirectory)
@@ -40,13 +38,4 @@ sourceSets.main.resources.srcDir(tasks.generateJte.targetResourceDirectory)
 
 tasks.compileJava {
     dependsOn(tasks.generateJte)
-}
-
-graalvmNative {
-    toolchainDetection = false
-    binaries {
-        main {
-            mainClass = 'test.NativeTestApp'
-        }
-    }
 }

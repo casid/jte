@@ -4,8 +4,13 @@ import gg.jte.CodeResolver;
 import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.TemplateNotFoundException;
+import gg.jte.compiler.extensionsupport.ExtensionConfig;
+import gg.jte.compiler.extensionsupport.ExtensionTemplateDescription;
 import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
+import gg.jte.extension.JteConfig;
+import gg.jte.extension.JteExtension;
+import gg.jte.extension.TemplateDescription;
 import gg.jte.output.FileOutput;
 import gg.jte.runtime.*;
 
@@ -82,60 +87,6 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public List<String> precompileAll() {
         return precompile(codeResolver.resolveAllTemplateNames());
-    }
-    
-    /**
-     * Generate configuration files that can be read by Graal native-image.
-     * See <a href="https://www.graalvm.org/reference-manual/native-image/BuildConfiguration/">GraalVM reference manual</a>.
-     * @param classDefinitions details of generated classes
-     */
-    private void generateNativeResources(LinkedHashSet<ClassDefinition> classDefinitions) {
-        if (!config.generateNativeImageResources) {
-            return;
-        }
-
-        if (config.resourceDirectory == null) {
-            return;
-        }
-
-        if (classDefinitions.isEmpty()) {
-            return;
-        }
-
-        String namespace = config.projectNamespace != null ? config.projectNamespace : packageName;
-        Path nativeImageResourceRoot = config.resourceDirectory.resolve("META-INF/native-image/jte-generated/" + namespace);
-        try (FileOutput properties = new FileOutput(nativeImageResourceRoot.resolve("native-image.properties"))) {
-            properties.writeContent("Args = -H:ReflectionConfigurationResources=${.}/reflection-config.json -H:ResourceConfigurationResources=${.}/resource-config.json\n");
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
-        // avoid adding a json dependency to the project by just writing text
-        try (FileOutput reflection = new FileOutput(nativeImageResourceRoot.resolve("reflection-config.json"))) {
-            boolean first = true;
-
-            reflection.writeContent("[\n");
-            for (ClassDefinition classDefinition : classDefinitions) {
-                if (!first) {
-                    reflection.writeContent(",\n");
-                }
-
-                reflection.writeContent("{\n  \"name\":\"");
-                reflection.writeContent(classDefinition.getName());
-                reflection.writeContent("\",\n  \"allDeclaredMethods\":true,\n  \"allDeclaredFields\":true\n}");
-
-                first = false;
-            }
-            reflection.writeContent("\n]\n");
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
-        try (FileOutput resource = new FileOutput(nativeImageResourceRoot.resolve("resource-config.json"))) {
-            resource.writeContent("{\"resources\": {\"includes\": [{\"pattern\": \".*Generated\\\\.bin$\"}]}}\n");
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 
     public List<String> precompile(List<String> names) {
@@ -252,7 +203,22 @@ public class TemplateCompiler extends TemplateLoader {
             }
         }
 
-        generateNativeResources(classDefinitions);
+        List<JteExtension> generatorExtensions = config.extensionClasses.entrySet().stream()
+                .map(this::loadExtension)
+                .collect(Collectors.toList());
+        if (DEBUG) {
+            System.out.printf("extensionClasses=%s generatorExtensions=%s%n", config.extensionClasses, generatorExtensions);
+        }
+        if (!generatorExtensions.isEmpty()) {
+            JteConfig extensionConfig = new ExtensionConfig(config, classDirectory, getClassLoader());
+            Set<TemplateDescription> descriptions = classDefinitions.stream()
+                    .map(classDefinition -> new ExtensionTemplateDescription(classDefinition, templateByClassName.get(classDefinition.getName())))
+                    .collect(Collectors.toSet());
+            generatorExtensions.forEach(x -> {
+                Collection<Path> generated = x.generate(extensionConfig, descriptions);
+                System.out.printf("Extension %s generated %d files.%n", x.getClass().getName(), generated.size());
+            });
+        }
 
         return classDefinitions;
     }
@@ -298,7 +264,7 @@ public class TemplateCompiler extends TemplateLoader {
         CodeGenerator codeGenerator = createCodeGenerator(classInfo, classDefinitions, templateDependencies);
         new TemplateParser(code, TemplateType.Template, codeGenerator, config, codeResolver).parse();
 
-        classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts());
+        classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts(), codeGenerator.getParamInfo(), codeGenerator.getImports());
         templateByClassName.put(classDefinition.getName(), classInfo);
 
         if (DEBUG) {
@@ -361,5 +327,18 @@ public class TemplateCompiler extends TemplateLoader {
         }
 
         return result;
+    }
+
+    private JteExtension loadExtension(Map.Entry<String, Map<String, String>> extensionSettings) {
+        if (DEBUG) {
+            System.out.printf("loadExtension(%s)%n", extensionSettings);
+        }
+        try {
+            Class<?> extensionClass = Class.forName(extensionSettings.getKey());
+            JteExtension extension = (JteExtension) extensionClass.newInstance();
+            return extension.init(extensionSettings.getValue());
+        } catch(Exception e) {
+            throw new TemplateException("Failed to load extension " + extensionSettings.getKey(), e);
+        }
     }
 }

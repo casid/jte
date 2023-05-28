@@ -54,7 +54,6 @@ if [[ "$GRADLE" == "true" ]]; then
   (cd "$PROJECT_PATH"/jte-gradle-plugin && ./gradlew $CLEAN build publishToMavenLocal)
   (cd "$PROJECT_PATH"/test/gradle-test-wrapper && ./gradlew $CLEAN check)
   if [[ -n "$NATIVE" ]]; then
-    (cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle && echo "Building in $PWD" && ./gradlew $CLEAN $NATIVE)
     (cd "$PROJECT_PATH"/test/jte-runtime-cp-test-gradle-convention && echo "Building in $PWD" && ./gradlew $CLEAN $NATIVE)
   fi
 fi

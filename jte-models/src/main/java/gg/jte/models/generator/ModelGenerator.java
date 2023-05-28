@@ -1,8 +1,8 @@
 package gg.jte.models.generator;
 
 import gg.jte.TemplateEngine;
-import gg.jte.extension.JteConfig;
-import gg.jte.extension.TemplateDescription;
+import gg.jte.extension.api.JteConfig;
+import gg.jte.extension.api.TemplateDescription;
 import gg.jte.output.WriterOutput;
 
 import java.io.FileWriter;
@@ -12,7 +12,6 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;

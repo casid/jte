@@ -2,7 +2,7 @@ package gg.jte.compiler.extensionsupport;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateConfig;
-import gg.jte.extension.JteConfig;
+import gg.jte.extension.api.JteConfig;
 
 import java.nio.file.Path;
 

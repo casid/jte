@@ -1,4 +1,4 @@
-package gg.jte.extension;
+package gg.jte.extension.api;
 
 /**
  * Instances of this type will be given to an extension as part of TemplateDescriptions.

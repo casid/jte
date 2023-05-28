@@ -1,4 +1,4 @@
-@import gg.jte.extension.*
+@import gg.jte.extension.api.*
 @import gg.jte.models.generator.Util
 
 @param TemplateDescription template

@@ -1,6 +1,7 @@
-package gg.jte.extension;
+package gg.jte.extension.api.mocks;
 
 import gg.jte.ContentType;
+import gg.jte.extension.api.JteConfig;
 
 import java.nio.file.Path;
 

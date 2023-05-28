@@ -1,5 +1,5 @@
 @import gg.jte.ContentType
-@import gg.jte.extension.*
+@import gg.jte.extension.api.*
 @import gg.jte.models.generator.Util
 
 @param JteConfig config

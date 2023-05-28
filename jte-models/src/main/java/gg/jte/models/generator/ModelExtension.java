@@ -2,13 +2,11 @@ package gg.jte.models.generator;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
-import gg.jte.extension.JteConfig;
-import gg.jte.extension.JteExtension;
-import gg.jte.extension.TemplateDescription;
-import gg.jte.resolve.ResourceCodeResolver;
+import gg.jte.extension.api.JteConfig;
+import gg.jte.extension.api.JteExtension;
+import gg.jte.extension.api.TemplateDescription;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;

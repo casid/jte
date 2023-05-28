@@ -1,8 +1,8 @@
 package gg.jte.nativeimage;
 
-import gg.jte.extension.JteConfig;
-import gg.jte.extension.JteExtension;
-import gg.jte.extension.TemplateDescription;
+import gg.jte.extension.api.JteConfig;
+import gg.jte.extension.api.JteExtension;
+import gg.jte.extension.api.TemplateDescription;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,11 +10,9 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 

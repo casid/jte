@@ -16,6 +16,7 @@
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <jacoco.version>0.8.5</jacoco.version>
         <kotlin.version>1.4.30</kotlin.version>
+	    <project.build.outputTimestamp>2023-01-01T00:00:00Z</project.build.outputTimestamp>
     </properties>
 
     <dependencies>
@@ -73,6 +74,35 @@
     </profiles>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.3.0</version>
+                    <executions>
+                        <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-archiver</artifactId>
+                            <version>4.7.1</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>

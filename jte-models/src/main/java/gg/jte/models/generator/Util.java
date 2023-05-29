@@ -1,7 +1,7 @@
 package gg.jte.models.generator;
 
-import gg.jte.extension.ParamDescription;
-import gg.jte.extension.TemplateDescription;
+import gg.jte.extension.api.ParamDescription;
+import gg.jte.extension.api.TemplateDescription;
 
 import java.util.stream.Collectors;
 

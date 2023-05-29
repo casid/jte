@@ -12,15 +12,9 @@ public class Escape {
         for (int i = 0; i < length; i++) {
             char c = value.charAt(i);
             switch (c) {
-                case '&':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "&amp;", output);
-                    break;
-                case '<':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "&lt;", output);
-                    break;
-                case '>':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "&gt;", output);
-                    break;
+                case '&' -> lastIndex = flushAndEscape(value, lastIndex, i, "&amp;", output);
+                case '<' -> lastIndex = flushAndEscape(value, lastIndex, i, "&lt;", output);
+                case '>' -> lastIndex = flushAndEscape(value, lastIndex, i, "&gt;", output);
             }
         }
 
@@ -35,18 +29,10 @@ public class Escape {
         for (int i = 0; i < length; i++) {
             char c = value.charAt(i);
             switch (c) {
-                case '\'':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "&#39;", output);
-                    break;
-                case '"':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "&#34;", output);
-                    break;
-                case '&':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "&amp;", output);
-                    break;
-                case '<':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "&lt;", output);
-                    break;
+                case '\'' -> lastIndex = flushAndEscape(value, lastIndex, i, "&#39;", output);
+                case '"' -> lastIndex = flushAndEscape(value, lastIndex, i, "&#34;", output);
+                case '&' -> lastIndex = flushAndEscape(value, lastIndex, i, "&amp;", output);
+                case '<' -> lastIndex = flushAndEscape(value, lastIndex, i, "&lt;", output);
             }
         }
 
@@ -61,36 +47,16 @@ public class Escape {
         for (int i = 0; i < length; i++) {
             char c = value.charAt(i);
             switch (c) {
-                case '\'':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\'", output);
-                    break;
-                case '"':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\\"", output);
-                    break;
-                case '/':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\/", output);
-                    break;
-                case '-':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\-", output);
-                    break;
-                case '\\':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\\\", output);
-                    break;
-                case '\n':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\n", output);
-                    break;
-                case '\t':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\t", output);
-                    break;
-                case '\r':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\r", output);
-                    break;
-                case '\f':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\f", output);
-                    break;
-                case '\b':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\b", output);
-                    break;
+                case '\'' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\'", output);
+                case '"' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\\"", output);
+                case '/' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\/", output);
+                case '-' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\-", output);
+                case '\\' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\\\", output);
+                case '\n' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\n", output);
+                case '\t' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\t", output);
+                case '\r' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\r", output);
+                case '\f' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\f", output);
+                case '\b' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\b", output);
             }
         }
 
@@ -105,30 +71,14 @@ public class Escape {
         for (int i = 0; i < length; i++) {
             char c = value.charAt(i);
             switch (c) {
-                case '\'':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\x27", output);
-                    break;
-                case '"':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\x22", output);
-                    break;
-                case '\\':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\\\", output);
-                    break;
-                case '\n':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\n", output);
-                    break;
-                case '\t':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\t", output);
-                    break;
-                case '\r':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\r", output);
-                    break;
-                case '\f':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\f", output);
-                    break;
-                case '\b':
-                    lastIndex = flushAndEscape(value, lastIndex, i, "\\b", output);
-                    break;
+                case '\'' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\x27", output);
+                case '"' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\x22", output);
+                case '\\' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\\\", output);
+                case '\n' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\n", output);
+                case '\t' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\t", output);
+                case '\r' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\r", output);
+                case '\f' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\f", output);
+                case '\b' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\b", output);
             }
         }
 

@@ -1,6 +1,6 @@
 package gg.jte.models.generator;
 
-import gg.jte.extension.JteExtension;
+import gg.jte.extension.api.JteExtension;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -14,11 +14,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static gg.jte.extension.MockParamDescription.mockParamDescription;
+import static gg.jte.extension.api.mocks.MockParamDescription.mockParamDescription;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import static gg.jte.extension.MockConfig.mockConfig;
-import static gg.jte.extension.MockTemplateDescription.mockTemplateDescription;
+import static gg.jte.extension.api.mocks.MockConfig.mockConfig;
+import static gg.jte.extension.api.mocks.MockTemplateDescription.mockTemplateDescription;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestModelExtension {

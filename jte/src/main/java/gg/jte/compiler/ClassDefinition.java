@@ -1,6 +1,5 @@
 package gg.jte.compiler;
 
-import gg.jte.extension.TemplateDescription;
 import gg.jte.runtime.ClassInfo;
 
 import java.util.List;

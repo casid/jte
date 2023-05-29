@@ -1,4 +1,7 @@
-package gg.jte.extension;
+package gg.jte.extension.api.mocks;
+
+import gg.jte.extension.api.ParamDescription;
+import gg.jte.extension.api.TemplateDescription;
 
 import java.util.ArrayList;
 import java.util.Arrays;

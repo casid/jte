@@ -1,6 +1,6 @@
 package gg.jte.compiler;
 
-import gg.jte.extension.ParamDescription;
+import gg.jte.extension.api.ParamDescription;
 
 public final class ParamInfo implements ParamDescription {
     public final String type;

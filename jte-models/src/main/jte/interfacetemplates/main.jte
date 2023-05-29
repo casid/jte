@@ -1,4 +1,4 @@
-@import gg.jte.extension.*
+@import gg.jte.extension.api.*
 @import java.util.Set
 
 @param String targetClassName

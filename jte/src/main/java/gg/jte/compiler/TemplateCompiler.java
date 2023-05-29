@@ -8,9 +8,9 @@ import gg.jte.compiler.extensionsupport.ExtensionConfig;
 import gg.jte.compiler.extensionsupport.ExtensionTemplateDescription;
 import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
-import gg.jte.extension.JteConfig;
-import gg.jte.extension.JteExtension;
-import gg.jte.extension.TemplateDescription;
+import gg.jte.extension.api.JteConfig;
+import gg.jte.extension.api.JteExtension;
+import gg.jte.extension.api.TemplateDescription;
 import gg.jte.output.FileOutput;
 import gg.jte.runtime.*;
 

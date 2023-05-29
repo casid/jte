@@ -1,4 +1,6 @@
-package gg.jte.extension;
+package gg.jte.extension.api.mocks;
+
+import gg.jte.extension.api.ParamDescription;
 
 /**
  * Mock implementation to help with testing extensions.

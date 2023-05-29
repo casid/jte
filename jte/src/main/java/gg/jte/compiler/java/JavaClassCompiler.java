@@ -9,6 +9,7 @@ import gg.jte.runtime.ClassInfo;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,14 +43,10 @@ public class JavaClassCompiler implements ClassCompiler {
 
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
-        try {
-            int result = compiler.run(null, null, new PrintStream(errorStream, true, "UTF-8"), args);
-            if (result != 0) {
-                String errors = errorStream.toString("UTF-8");
-                throw new TemplateException(getErrorMessage(errors, classDirectory, templateByClassName));
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new UncheckedIOException("UTF-8 encoding not found, this is very unexpected!", e);
+        int result = compiler.run(null, null, new PrintStream(errorStream, true, StandardCharsets.UTF_8), args);
+        if (result != 0) {
+            String errors = errorStream.toString(StandardCharsets.UTF_8);
+            throw new TemplateException(getErrorMessage(errors, classDirectory, templateByClassName));
         }
     }
 

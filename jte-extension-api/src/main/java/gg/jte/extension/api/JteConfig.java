@@ -1,4 +1,4 @@
-package gg.jte.extension;
+package gg.jte.extension.api;
 
 import gg.jte.ContentType;
 

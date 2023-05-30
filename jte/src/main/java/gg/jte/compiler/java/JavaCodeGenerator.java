@@ -33,6 +33,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     private final LinkedHashSet<ClassDefinition> classDefinitions;
     private final LinkedHashSet<TemplateDependency> templateDependencies;
     private final List<ParamInfo> parameters = new ArrayList<>();
+    private final List<String> imports = new ArrayList<>();
     private final List<byte[]> binaryTextParts = new ArrayList<>();
     private final String templateName;
 
@@ -52,6 +53,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onImport(String importClass) {
         writePackageIfRequired();
+        imports.add(importClass);
         javaCode.append("import ").append(importClass).append(";\n");
     }
 
@@ -454,6 +456,16 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public int getCurrentTemplateLine() {
         return javaCode.getCurrentTemplateLine();
+    }
+
+    @Override
+    public List<ParamInfo> getParamInfo() {
+        return parameters;
+    }
+
+    @Override
+    public List<String> getImports() {
+        return imports;
     }
 
     private void appendParams(int depth, String name, List<String> params) {

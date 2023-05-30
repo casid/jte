@@ -2,9 +2,7 @@ package gg.jte.output;
 
 import gg.jte.TemplateOutput;
 
-import java.io.Writer;
-
-public class StringOutput extends Writer implements TemplateOutput {
+public class StringOutput implements TemplateOutput {
     private final StringBuilder stringBuilder;
 
     public StringOutput() {
@@ -16,13 +14,13 @@ public class StringOutput extends Writer implements TemplateOutput {
     }
 
     @Override
-    public Writer getWriter() {
-        return this;
+    public void writeContent(String value) {
+        stringBuilder.append(value);
     }
 
     @Override
-    public void writeContent(String value) {
-        stringBuilder.append(value);
+    public void writeContent(String value, int beginIndex, int endIndex) {
+        stringBuilder.append(value, beginIndex, endIndex);
     }
 
     @Override
@@ -67,42 +65,5 @@ public class StringOutput extends Writer implements TemplateOutput {
 
     public void reset() {
         stringBuilder.setLength(0);
-    }
-
-    // Writer interface
-
-    @Override
-    public void write(char[] buffer, int off, int len) {
-        stringBuilder.append(buffer, off, len);
-    }
-
-    @Override
-    public void write(int c) {
-        stringBuilder.append((char)c);
-    }
-
-    @Override
-    public void write(char[] cbuf) {
-        stringBuilder.append(cbuf);
-    }
-
-    @Override
-    public void write(String str) {
-        stringBuilder.append(str);
-    }
-
-    @Override
-    public void write(String str, int off, int len) {
-        stringBuilder.append(str, off, off + len);
-    }
-
-    @Override
-    public void flush() {
-        // nothing to do
-    }
-
-    @Override
-    public void close() {
-        // nothing to do
     }
 }

@@ -4,14 +4,13 @@
 
     <groupId>gg.jte</groupId>
     <artifactId>jte-runtime-test-kotlin</artifactId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <junit.jupiter.version>5.9.0</junit.jupiter.version>
+        <java.version>17</java.version>
+        <junit.jupiter.version>5.9.2</junit.jupiter.version>
         <maven.deploy.skip>true</maven.deploy.skip>
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <jacoco.version>0.8.5</jacoco.version>
@@ -22,7 +21,7 @@
         <dependency>
             <groupId>gg.jte</groupId>
             <artifactId>jte-runtime</artifactId>
-            <version>2.3.1-SNAPSHOT</version>
+            <version>3.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -40,7 +39,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.23.1</version>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -75,6 +74,16 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
             </plugin>
@@ -82,7 +91,7 @@
             <plugin>
                 <groupId>gg.jte</groupId>
                 <artifactId>jte-maven-plugin</artifactId>
-                <version>2.3.1-SNAPSHOT</version>
+                <version>3.0.0-SNAPSHOT</version>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/jte</sourceDirectory>
                     <targetDirectory>${basedir}/jte-classes</targetDirectory>

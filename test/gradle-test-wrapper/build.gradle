@@ -1,0 +1,18 @@
+plugins {
+    id('java')
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation gradleTestKit()
+    testImplementation('org.junit.jupiter:junit-jupiter:5.9.0')
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.0")
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    systemProperty("gradle.matrix.versions", System.getProperty("gradle.matrix.versions", "DEFAULT"))
+}

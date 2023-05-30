@@ -23,14 +23,18 @@ public class FileOutput implements TemplateOutput, Closeable {
     }
 
     @Override
-    public Writer getWriter() {
-        return writer;
-    }
-
-    @Override
     public void writeContent(String value) {
         try {
             writer.write(value);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @Override
+    public void writeContent(String value, int beginIndex, int endIndex) {
+        try {
+            writer.write(value, beginIndex, endIndex - beginIndex);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

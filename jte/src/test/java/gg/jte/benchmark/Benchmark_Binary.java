@@ -3,8 +3,11 @@ package gg.jte.benchmark;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.output.Utf8ByteOutput;
-import gg.jte.resolve.ResourceCodeResolver;
+import gg.jte.resolve.DirectoryCodeResolver;
+import gg.jte.runtime.Constants;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 class Benchmark_Binary {
@@ -16,9 +19,14 @@ class Benchmark_Binary {
     }
 
     Benchmark_Binary() {
-        templateEngine = TemplateEngine.create(new ResourceCodeResolver("benchmark"), ContentType.Html);
-        templateEngine.setTrimControlStructures(true);
-        templateEngine.setBinaryStaticContent(true);
+        Path classDirectory = Paths.get("jte-classes");
+
+        TemplateEngine compiler = TemplateEngine.create(new DirectoryCodeResolver(Benchmark.getTemplateDirectory()), classDirectory, ContentType.Html, null, Constants.PACKAGE_NAME_PRECOMPILED);
+        compiler.setTrimControlStructures(true);
+        compiler.setBinaryStaticContent(true);
+        compiler.precompileAll();
+
+        templateEngine = TemplateEngine.createPrecompiled(classDirectory, ContentType.Html);
     }
 
     public void run() {

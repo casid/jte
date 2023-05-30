@@ -13,7 +13,7 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
 
     @Override
     Utf8ByteOutput createTemplateOutput() {
-        return new Utf8ByteOutput(16, 8); // Small chunk size for tests;
+        return new Utf8ByteOutput();
     }
 
     @Test
@@ -37,6 +37,12 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
     void longStringSpecialChars() {
         output.writeContent("\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9");
         thenOutputIs("\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9\uD83D\uDCA9");
+    }
+
+    @Test
+    void substring() {
+        output.writeContent("Hello", 1, 3);
+        thenOutputIs("el");
     }
 
     @Test
@@ -81,7 +87,7 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
 
     @Test
     void utf8_0x00() {
-        output.write(0);
+        output.writeUserContent((char)0);
         thenOutputIs("\u0000");
     }
 
@@ -123,23 +129,11 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
 
     @Test
     void utf8_missingLowSurrogate() {
-        output.write(new char[]{'\uD83D'});
-        output.write(new char[0]); // Will be ignored
-        output.write(new char[]{'\uDCA9'}); // Will continue, where the char array was split
-        thenOutputIs("\uD83D\uDCA9");
-    }
-
-    @Test
-    void utf8_missingLowSurrogate_reallyMissing() {
-        output.write(new char[]{'\uD83D'});
-        output.write(new char[]{'f', 'o', 'o'});
-        thenOutputIs("�foo");
-    }
-
-    @Test
-    void utf8_missingLowSurrogate_reallyMissingInOneBuffer() {
-        output.write(new char[]{'\uD83D', 'f', 'o', 'o'});
-        thenOutputIs("�foo");
+        output.writeUserContent('\uD83D');
+        output.writeUserContent('f');
+        output.writeUserContent('o');
+        output.writeUserContent('o');
+        thenOutputIs("?foo");
     }
 
     protected void thenOutputIs(String expected) {

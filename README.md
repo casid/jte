@@ -43,7 +43,7 @@ Here is a small jte template `example.jte`:
 So what is going on here?
 - `@import` directly translates to Java imports, in this case so that `org.example.Page` is known to the template.
 - `@param Page page` is the parameter that needs to be passed to this template.
-- `@if`/`@endif` is an if-block. The stuff inside the braces (`page.getDescription() != null`) is plain Java code.
+- `@if`/`@endif` is an if-block. The stuff inside the parentheses (`page.getDescription() != null`) is plain Java code.
 - `${}` writes to the underlying template output, as known from various other template engines.
 
 To render this template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):
@@ -120,13 +120,13 @@ jte is available on <a href="http://mvnrepository.com/artifact/gg.jte/jte">Maven
 <dependency>
     <groupId>gg.jte</groupId>
     <artifactId>jte</artifactId>
-    <version>2.3.0</version>
+    <version>2.3.2</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-implementation group: 'gg.jte', name: 'jte', version: '2.3.0'
+implementation group: 'gg.jte', name: 'jte', version: '2.3.2'
 ```
 
 No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and have fun with jte.

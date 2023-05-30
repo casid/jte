@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java_version: [1.8, 11, 17]
+        java_version: [17]
         os: [windows-2019, macOS-latest, ubuntu-latest]
 
     steps:
@@ -22,30 +22,14 @@ jobs:
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
-      - name: Build with Maven (1.8, 11)
-        if: matrix.java_version == '1.8' || matrix.java_version == '11'
-        run: ./mvnw install -pl !jte-spring-boot-starter-3 --file pom.xml --batch-mode
-        env:
-          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-      - name: Build with Maven (17)
-        if: matrix.java_version == '17'
+      - name: Build with Maven
         run: ./mvnw install --file pom.xml --batch-mode
         env:
           MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
-      - name: Test Gradle Plugin Precompile (old style)
-        run: cd test/jte-runtime-test-gradle && ./gradlew check
-      - name: Test Gradle Plugin Generate (old style)
-        run: cd test/jte-runtime-cp-test-gradle && ./gradlew check
-      - name: Test Gradle Plugin Generate Pure Kotlin (old style)
-        run: cd test/jte-runtime-cp-test-gradle-kotlin && ./gradlew check
-      - name: Test Gradle Plugin Precompile with conventions
-        run: cd test/jte-runtime-test-gradle-convention && ./gradlew check
-      - name: Test Gradle Plugin Generate with conventions
-        run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew check
-      - name: Test Gradle Plugin Generate Pure Kotlin with conventions
-        run: cd test/jte-runtime-cp-test-gradle-kotlin-convention && ./gradlew check
+      - name: Run all the Gradle Plugin tests
+        run: cd test/gradle-test-wrapper && ./gradlew check
 
 
   coverage:
@@ -58,12 +42,12 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw verify -pl !jte-spring-boot-starter-3 --file pom.xml --batch-mode -Pcoverage
+        run: ./mvnw verify --file pom.xml --batch-mode -Pcoverage
         env:
           MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn  
       

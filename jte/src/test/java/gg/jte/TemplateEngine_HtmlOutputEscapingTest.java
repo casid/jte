@@ -9,7 +9,6 @@ import gg.jte.runtime.TemplateUtils;
 import gg.jte.support.LocalizationSupport;
 import org.junit.jupiter.api.Test;
 
-import java.io.Writer;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,6 +45,42 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         Throwable throwable = catchThrowable(() -> templateEngine.render("unclosed.jte", null, output));
 
         assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile unclosed.jte, error at line 1: Unclosed tag <a>, expected </a>, got </span>.");
+    }
+
+    @Test
+    void unclosedTag_worksWithHyperScript() {
+        codeResolver.givenCode("closed.jte", "<body>\n" +
+                "<p _=\"on load log 'hello world from console'\">Hello world</p>\n" +
+                "\n" +
+                "<form action=\"/login\" method=\"post\" _=\"on submit toggle @disabled on <button[type='submit']/>\">\n" +
+                "    <input type=\"email\" name=\"username\">\n" +
+                "    <input type=\"password\" name=\"password\">\n" +
+                "\n" +
+                "    <button type=\"submit\">Login</button>\n" +
+                "</form>\n" +
+                "</body>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("closed.jte", null, output));
+
+        assertThat(throwable).isNull();
+    }
+
+    @Test
+    void unclosedTag_worksWithHtmlInAttribute() {
+        codeResolver.givenCode("closed.jte", "<form><input name=\">\" disabled=\"${true}\"></form>");
+
+        templateEngine.render("closed.jte", null, output);
+
+        assertThat(output.toString()).isEqualTo("<form><input name=\">\" disabled></form>"); // tag processing must not end after name=">", otherwise disabled="true" instead of just disabled would be the output.
+    }
+
+    @Test
+    void unclosedTag_worksWithClosingHtmlInAttribute() {
+        codeResolver.givenCode("closed.jte", "<form><input text=\"</form>\"></form>");
+
+        templateEngine.render("closed.jte", null, output);
+
+        assertThat(output.toString()).isEqualTo("<form><input text=\"</form>\"></form>");
     }
 
     @Test
@@ -1067,13 +1102,13 @@ public class TemplateEngine_HtmlOutputEscapingTest {
             final StringBuilder history = new StringBuilder();
 
             @Override
-            public Writer getWriter() {
-                return output.getWriter();
+            public void writeContent(String value) {
+                output.writeContent(value);
             }
 
             @Override
-            public void writeContent(String value) {
-                output.writeContent(value);
+            public void writeContent(String value, int beginIndex, int endIndex) {
+                output.writeContent(value, beginIndex, endIndex);
             }
 
             @Override

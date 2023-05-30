@@ -520,15 +520,7 @@ public final class TemplateEngine {
         config.projectNamespace = projectNamespace;
     }
 
-    /**
-     * Whether to try and generate configuration files to support Graal native-image.
-     * If true, setTargetResourceDirectory should also be used to indicate where to
-     * put the resources.
-     * <br>
-     * This is a template compilation setting and has no effect when loading precompiled templates.
-     * @param value true to generate native image configuration resources
-     */
-    public void setGenerateNativeImageResources(boolean value) {
-        config.generateNativeImageResources = value;
+    public void setExtensions(Map<String, Map<String, String>> extensionSettings) {
+        config.extensionClasses.putAll(extensionSettings);
     }
 }

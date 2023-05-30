@@ -704,7 +704,7 @@ public final class TemplateParser {
                         outputPrevented = false;
                     }
                 }
-            } else if (!currentHtmlTag.attributesProcessed && regionMatches("/>")) {
+            } else if (!currentHtmlTag.attributesProcessed && !currentHtmlTag.isInAttributeString() && regionMatches("/>")) {
                 if (currentHtmlTag.intercepted) {
                     extractTextPart(i - 1, null);
                     lastIndex = i - 1;
@@ -713,7 +713,7 @@ public final class TemplateParser {
                 currentHtmlTag.attributesProcessed = true;
 
                 popHtmlTag();
-            } else if (!currentHtmlTag.attributesProcessed && currentChar == '>') {
+            } else if (!currentHtmlTag.attributesProcessed && !currentHtmlTag.isInAttributeString() && currentChar == '>') {
                 if (tagClosed) {
                     tagClosed = false;
                 } else {
@@ -728,7 +728,7 @@ public final class TemplateParser {
                         popHtmlTag();
                     }
                 }
-            } else if (regionMatches("</")) {
+            } else if (currentHtmlTag.attributesProcessed && regionMatches("</")) {
                 if (templateCode.startsWith(currentHtmlTag.name, i + 1)) {
                     if (!currentHtmlTag.bodyIgnored) {
                         if (currentHtmlTag.intercepted) {
@@ -1156,6 +1156,15 @@ public final class TemplateParser {
 
             HtmlAttribute currentAttribute = getCurrentAttribute();
             return currentAttribute != null && currentAttribute.quoteCount < 2;
+        }
+
+        public boolean isInAttributeString() {
+            if (attributesProcessed) {
+                return false;
+            }
+
+            HtmlAttribute currentAttribute = getCurrentAttribute();
+            return currentAttribute != null && currentAttribute.quoteCount == 1;
         }
 
         public boolean isInStringLiteral() {

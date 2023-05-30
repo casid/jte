@@ -4,7 +4,7 @@
 
     <groupId>gg.jte</groupId>
     <artifactId>jte-parent</artifactId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>jte-parent</name>
@@ -36,10 +36,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <junit.jupiter.version>5.9.0</junit.jupiter.version>
-        <jacoco.version>0.8.5</jacoco.version>
+        <java.version>17</java.version>
+        <junit.jupiter.version>5.9.2</junit.jupiter.version>
+        <jacoco.version>0.8.10</jacoco.version>
         <argLine>-Dfile.encoding=UTF-8</argLine>
     </properties>
 
@@ -47,6 +46,10 @@
         <module>jte-runtime</module>
         <module>jte</module>
         <module>jte-kotlin</module>
+        <module>jte-extension-api</module>
+        <module>jte-extension-api-mocks</module>
+        <module>jte-native-resources</module>
+        <module>jte-models</module>
         <module>jte-watcher</module>
         <module>jte-maven-plugin</module>
         <module>jte-jsp-converter</module>
@@ -57,6 +60,7 @@
         <module>test/jte-runtime-cp-test</module>
         <module>test/jte-hotreload-test</module>
         <module>test/jte-test-report</module>
+        <module>test/jte-runtime-cp-test-models</module>
         <module>jte-deploy-nexus</module>
     </modules>
 
@@ -70,14 +74,24 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.23.1</version>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Test -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -94,10 +108,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.5.0</version>
                 <configuration>
-                    <source>8</source>
+                    <source>${java.version}</source>
                     <detectJavaApiLink>false</detectJavaApiLink>
+                    <doclint>all,-missing</doclint>
                 </configuration>
                 <executions>
                     <execution>

@@ -27,6 +27,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private final LinkedHashSet<ClassDefinition> classDefinitions;
     private final LinkedHashSet<TemplateDependency> templateDependencies;
     private final List<ParamInfo> parameters = new ArrayList<>();
+    private final List<String> imports = new ArrayList<>();
     private final List<byte[]> binaryTextParts = new ArrayList<>();
     private final String templateName;
 
@@ -454,6 +455,16 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public int getCurrentTemplateLine() {
         return kotlinCode.getCurrentTemplateLine();
+    }
+
+    @Override
+    public List<ParamInfo> getParamInfo() {
+        return parameters;
+    }
+
+    @Override
+    public List<String> getImports() {
+        return imports;
     }
 
     private void appendParams(int depth, String name, List<String> params) {

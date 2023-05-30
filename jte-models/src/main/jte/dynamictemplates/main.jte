@@ -1,4 +1,5 @@
 @import gg.jte.extension.api.*
+@import gg.jte.models.generator.ModelConfig
 @import java.util.Set
 
 @param String targetClassName
@@ -6,6 +7,8 @@
 @param JteConfig config
 @param Set<TemplateDescription> templates
 @param Iterable<String> imports
+@param ModelConfig modelConfig
+
 
 package ${config.packageName()};
 
@@ -16,6 +19,7 @@ import gg.jte.models.runtime.*;
 @for(String imp: imports)
     import ${imp};@endfor
 
+${modelConfig.implementationAnnotation()}
 public class ${targetClassName} implements ${interfaceName} {
     private final TemplateEngine engine;
 

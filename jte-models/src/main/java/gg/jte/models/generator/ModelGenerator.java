@@ -30,7 +30,7 @@ public class ModelGenerator {
         this.interfaceName = interfaceName;
     }
 
-    public Path generate(JteConfig config, Set<TemplateDescription> templateDescriptions) {
+    public Path generate(JteConfig config, Set<TemplateDescription> templateDescriptions, ModelConfig modelConfig) {
         Path sourceFilePath = config.generatedSourcesRoot()
                 .resolve(config.packageName().replace('.', '/'))
                 .resolve(targetClassName + ".java");
@@ -46,6 +46,7 @@ public class ModelGenerator {
                 paramMap.put("config", config);
                 paramMap.put("templates", templateDescriptions);
                 paramMap.put("imports", imports);
+                paramMap.put("modelConfig", modelConfig);
                 engine.render(templateSubDirectory + "/main.jte", paramMap, new SquashBlanksOutput(new WriterOutput(w)));
             }
         } catch (IOException e) {

@@ -46,6 +46,10 @@
         <module>jte-runtime</module>
         <module>jte</module>
         <module>jte-kotlin</module>
+        <module>jte-extension-api</module>
+        <module>jte-extension-api-mocks</module>
+        <module>jte-native-resources</module>
+        <module>jte-models</module>
         <module>jte-watcher</module>
         <module>jte-maven-plugin</module>
         <module>jte-jsp-converter</module>
@@ -58,10 +62,6 @@
         <module>test/jte-test-report</module>
         <module>test/jte-runtime-cp-test-models</module>
         <module>jte-deploy-nexus</module>
-        <module>jte-extension-api</module>
-        <module>jte-extension-api-mocks</module>
-        <module>jte-native-resources</module>
-        <module>jte-models</module>
     </modules>
 
     <dependencies>

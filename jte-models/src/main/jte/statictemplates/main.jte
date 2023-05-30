@@ -17,7 +17,8 @@ import gg.jte.TemplateOutput;
 import gg.jte.html.HtmlInterceptor;
 import gg.jte.html.HtmlTemplateOutput;
 @for(String imp: imports)
-    import ${imp};@endfor
+    import ${imp};
+@endfor
 
 ${modelConfig.implementationAnnotation()}
 public class ${targetClassName} implements ${interfaceName} {

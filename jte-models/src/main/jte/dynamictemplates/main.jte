@@ -17,7 +17,8 @@ import java.util.Map;
 import java.util.HashMap;
 import gg.jte.models.runtime.*;
 @for(String imp: imports)
-    import ${imp};@endfor
+    import ${imp};
+@endfor
 
 ${modelConfig.implementationAnnotation()}
 public class ${targetClassName} implements ${interfaceName} {

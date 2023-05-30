@@ -47,7 +47,7 @@ public abstract class JteExtension
         getJteExtensions().add(extensionSettings);
     }
 
-    public void jtExtension(String className, Action<JteExtensionSettings> action) {
+    public void jteExtension(String className, Action<JteExtensionSettings> action) {
         JteExtensionSettings extensionSettings = objectFactory.newInstance(JteExtensionSettings.class);
         extensionSettings.getClassName().set(className);
         getJteExtensions().add(extensionSettings);

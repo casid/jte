@@ -30,7 +30,9 @@ dependencies {
 jte {
     generate()
     binaryStaticContent = true
-    jteExtension 'gg.jte.models.generator.ModelExtension'
+    jteExtension('gg.jte.models.generator.ModelExtension') {
+        property('implementationAnnotation', '@test.Dummy')
+    }
 }
 
 graalvmNative {

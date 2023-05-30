@@ -10,8 +10,9 @@
 
 package ${config.packageName()};
 import gg.jte.models.runtime.*;
-    @for(String imp: imports)
-import ${imp};@endfor
+@for(String imp: imports)
+import ${imp};
+@endfor
 
 ${modelConfig.interfaceAnnotation()}
 public interface ${targetClassName} {

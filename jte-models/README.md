@@ -68,8 +68,8 @@ jte {
     // or to add annotations to generated classes:
     /*
     jteExtension('gg.jte.models.generator.ModelExtension') {
-        property('interfaceAnnotation', '@foo.bar.MyAnnotation')
-        property('implementationAnnotation', '@foo.bar.MyAnnotation')
+        interfaceAnnotation = '@foo.bar.MyAnnotation'
+        implementationAnnotation = '@foo.bar.MyAnnotation'
     }
      */
 }

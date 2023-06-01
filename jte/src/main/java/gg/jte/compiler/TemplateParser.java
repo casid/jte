@@ -229,8 +229,7 @@ public final class TemplateParser {
                             previousMode.params.add(c);
                         }
                     });
-                } else if (currentMode instanceof JavaCodeMode) {
-                    JavaCodeMode javaCodeMode = (JavaCodeMode)currentMode;
+                } else if (currentMode instanceof JavaCodeMode javaCodeMode) {
                     char closingBrace = javaCodeMode.getClosingBrace();
                     if (currentChar != closingBrace) {
                         visitor.onError("Unexpected closing brace " + currentChar + ", expected " + closingBrace);
@@ -253,8 +252,7 @@ public final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onForLoopStart);
                     lastIndex = i + 1;
                     push(Mode.Text);
-                } else if (currentMode instanceof TemplateCallMode) {
-                    TemplateCallMode templateCallMode = (TemplateCallMode) currentMode;
+                } else if (currentMode instanceof TemplateCallMode templateCallMode) {
                     if (contentType == ContentType.Html && currentHtmlTag != null && currentHtmlTag.innerTagsIgnored) {
                         visitor.onError("Template calls in <" + currentHtmlTag.name + "> blocks are not allowed.");
                     }
@@ -387,8 +385,7 @@ public final class TemplateParser {
             pop();
         }
 
-        if (currentMode instanceof JavaCodeMode) {
-            JavaCodeMode mode = (JavaCodeMode)currentMode;
+        if (currentMode instanceof JavaCodeMode mode) {
             visitor.onError("Missing closing brace " + mode.getClosingBrace(), mode.getTemplateLine());
         } else if (currentMode == Mode.Condition || currentMode == Mode.ConditionElse) {
             visitor.onError("Missing @endif");

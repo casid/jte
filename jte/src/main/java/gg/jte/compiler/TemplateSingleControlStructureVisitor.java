@@ -56,6 +56,11 @@ class TemplateSingleControlStructureVisitor extends TemplateParserVisitorAdapter
     }
 
     @Override
+    public void onForLoopElse(int depth) {
+        incrementAmount();
+    }
+
+    @Override
     public void onForLoopEnd(int depth) {
         incrementAmount();
     }

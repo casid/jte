@@ -74,6 +74,11 @@ public class TemplateParserVisitorAdapter implements TemplateParserVisitor {
     }
 
     @Override
+    public void onForLoopElse(int depth) {
+
+    }
+
+    @Override
     public void onForLoopEnd(int depth) {
 
     }

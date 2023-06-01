@@ -4,15 +4,14 @@ import gg.jte.ContentType;
 import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.compiler.*;
+import gg.jte.compiler.CodeBuilder.CodeMarker;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import gg.jte.runtime.DebugInfo;
 import gg.jte.compiler.TemplateType;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static gg.jte.runtime.Constants.TEXT_PART_BINARY;
@@ -28,9 +27,11 @@ public class JavaCodeGenerator implements CodeGenerator {
     private final List<ParamInfo> parameters = new ArrayList<>();
     private final List<String> imports = new ArrayList<>();
     private final List<byte[]> binaryTextParts = new ArrayList<>();
+    private final Deque<ForLoopStart> forLoopStack = new ArrayDeque<>();
 
     private boolean hasWrittenPackage;
     private boolean hasWrittenClass;
+    private CodeMarker fieldsMarker;
 
     public JavaCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
         this.compiler = compiler;
@@ -71,7 +72,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     private void writeClass() {
         javaCode.append("public final class ").append(classInfo.className).append(" {\n");
-        javaCode.markFieldsIndex();
+        fieldsMarker = javaCode.getMarkerOfCurrentPosition();
         javaCode.append("\tpublic static void render(");
         writeTemplateOutputParam();
         javaCode.append(", gg.jte.html.HtmlInterceptor jteHtmlInterceptor");
@@ -114,18 +115,12 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onComplete() {
-        int lineCount = 2;
-        if (!binaryTextParts.isEmpty()) {
-            lineCount += binaryTextParts.size() + 1;
-        }
-        javaCode.insertFieldLines(lineCount);
-
-        StringBuilder fields = new StringBuilder(64 + 32 * lineCount);
+        StringBuilder fields = new StringBuilder();
         addNameField(fields, classInfo.name);
         addLineInfoField(fields);
         writeBinaryTextParts(fields);
 
-        javaCode.insertFields(fields);
+        javaCode.insert(fieldsMarker, fields);
 
         javaCode.append("\t}\n");
 
@@ -372,12 +367,45 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onForLoopStart(int depth, String codePart) {
+        CodeMarker beforeLoop = javaCode.getMarkerOfCurrentPosition();
+
         writeIndentation(depth);
         javaCode.append("for (").append(codePart).append(") {\n");
+
+        CodeMarker inLoop = javaCode.getMarkerOfCurrentPosition();
+
+        forLoopStack.push(new ForLoopStart(beforeLoop, inLoop, depth));
+    }
+
+    @Override
+    public void onForLoopElse(int depth) {
+        ForLoopStart forLoopStart = forLoopStack.peek();
+
+        if (forLoopStart != null) {
+            String variableName = "__jte_for_loop_entered_" + forLoopStack.size();
+
+            StringBuilder variableDeclaration = new StringBuilder();
+            writeIndentation(variableDeclaration, forLoopStart.indentation);
+            variableDeclaration.append("boolean ").append(variableName).append(" = false;\n");
+            javaCode.insert(forLoopStart.beforeLoop, variableDeclaration);
+
+            StringBuilder variableAssignment = new StringBuilder();
+            writeIndentation(variableAssignment, forLoopStart.indentation + 1);
+            variableAssignment.append(variableName).append(" = true;\n");
+            javaCode.insert(forLoopStart.inLoop, variableAssignment);
+
+            writeIndentation(depth);
+            javaCode.append("}\n");
+
+            writeIndentation(depth);
+            javaCode.append("if (!").append(variableName).append(") {\n");
+        }
     }
 
     @Override
     public void onForLoopEnd(int depth) {
+        forLoopStack.pop();
+
         writeIndentation(depth);
         javaCode.append("}\n");
     }
@@ -515,6 +543,13 @@ public class JavaCodeGenerator implements CodeGenerator {
         }
     }
 
+    @SuppressWarnings("StringRepeatCanBeUsed")
+    private void writeIndentation(StringBuilder code, int depth) {
+        for (int i = 0; i < depth + 2; ++i) {
+            code.append('\t');
+        }
+    }
+
     @Override
     public String getCode() {
         return javaCode.getCode();
@@ -596,4 +631,6 @@ public class JavaCodeGenerator implements CodeGenerator {
             }
         }
     }
+
+    private record ForLoopStart(CodeMarker beforeLoop, CodeMarker inLoop, int indentation) {}
 }

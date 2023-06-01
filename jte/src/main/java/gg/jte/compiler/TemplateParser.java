@@ -279,7 +279,11 @@ public final class TemplateParser {
 
                 pop();
 
-                visitor.onConditionElse(depth);
+                if (currentMode == Mode.ForLoop) {
+                    visitor.onForLoopElse(depth);
+                } else {
+                    visitor.onConditionElse(depth);
+                }
                 push(Mode.Text);
             } else if (currentMode == Mode.Text && regionMatches("@elseif")) {
                 extractTextPart(i - 6, Mode.ConditionElse);

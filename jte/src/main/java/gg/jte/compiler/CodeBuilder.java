@@ -2,7 +2,9 @@ package gg.jte.compiler;
 
 import gg.jte.runtime.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("UnusedReturnValue")
 public final class CodeBuilder {
@@ -13,10 +15,8 @@ public final class CodeBuilder {
     private final StringBuilder code = new StringBuilder(1024);
     private int currentCodeLine;
     private int currentTemplateLine;
-    private int fieldsIndex;
-    private int fieldsCodeLine;
-    private int fieldsTemplateLine;
     private int[] lineInfo = new int[INITIAL_CAPACITY];
+    private final List<CodeMarker> codeMarkers = new ArrayList<>();
 
     public CodeBuilder(CodeType codeType) {
         this.codeType = codeType;
@@ -86,8 +86,30 @@ public final class CodeBuilder {
         return this;
     }
 
-    public CodeBuilder insertFieldLines(int count) {
-        fillLines(fieldsCodeLine, fieldsTemplateLine, count);
+    public CodeBuilder insert(CodeMarker position, CharSequence codeToInsert) {
+        code.insert(position.codeIndex, codeToInsert);
+
+        int insertedLineCount = 0;
+        for (int i = 0; i < codeToInsert.length(); ++i) {
+            if (codeToInsert.charAt(i) == '\n') {
+                ++insertedLineCount;
+            }
+        }
+
+        fillLines(position.codeLine, position.templateLine, insertedLineCount);
+
+        // Adjust any created markers that point to code after this marker.
+        for (CodeMarker codeMarker : codeMarkers) {
+            if (codeMarker == position) {
+                continue;
+            }
+
+            if (codeMarker.codeIndex > position.codeIndex) {
+                codeMarker.codeIndex += codeToInsert.length();
+                codeMarker.codeLine += insertedLineCount;
+            }
+        }
+
         return this;
     }
 
@@ -99,14 +121,10 @@ public final class CodeBuilder {
         return code.toString();
     }
 
-    public void markFieldsIndex() {
-        fieldsIndex = code.length();
-        fieldsCodeLine = currentCodeLine;
-        fieldsTemplateLine = currentTemplateLine;
-    }
-
-    public void insertFields(StringBuilder fields) {
-        code.insert(fieldsIndex, fields);
+    public CodeMarker getMarkerOfCurrentPosition() {
+        CodeMarker codeMarker = new CodeMarker(code.length(), currentCodeLine, currentTemplateLine);
+        codeMarkers.add(codeMarker);
+        return codeMarker;
     }
 
     private void addLine(int templateLine) {
@@ -151,5 +169,17 @@ public final class CodeBuilder {
 
     public void setCurrentTemplateLine(int templateLine) {
         currentTemplateLine = templateLine;
+    }
+
+    public static class CodeMarker {
+        private int codeIndex;
+        private int codeLine;
+        private final int templateLine;
+
+        public CodeMarker(int codeIndex, int codeLine, int templateLine) {
+            this.codeIndex = codeIndex;
+            this.codeLine = codeLine;
+            this.templateLine = templateLine;
+        }
     }
 }

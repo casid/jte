@@ -253,6 +253,99 @@ public class TemplateEngineTest {
         thenOutputIs("123");
     }
 
+
+    @Test
+    void loopElse_empty() {
+        model.array = new int[]{};
+        givenTemplate("@for (i in model.array)" +
+                "${i}" +
+                "@else" +
+                "Empty" +
+                "@endfor");
+        thenOutputIs("Empty");
+    }
+
+    @Test
+    void loopElse_notEmpty() {
+        model.array = new int[]{1};
+        givenTemplate("@for (i in model.array)" +
+                "${i}" +
+                "@else" +
+                "Empty" +
+                "@endfor");
+        thenOutputIs("1");
+    }
+
+    @Test
+    void loopElseNested_innerEmpty() {
+        templateEngine.setTrimControlStructures(true);
+        model.array = new int[]{1};
+        model.doubleArray = new double[]{};
+        givenTemplate("""
+                @for (i in model.array)
+                  @for (d in model.doubleArray)
+                    ${d}
+                  @else
+                    Inner empty
+                  @endfor
+                @else
+                  Outer empty
+                @endfor""");
+        thenOutputIs("Inner empty\n");
+    }
+
+    @Test
+    void loopElseNestedContentBlock_innerEmpty() {
+        templateEngine.setTrimControlStructures(true);
+        model.array = new int[]{1};
+        model.doubleArray = new double[]{};
+        givenTemplate("""
+                !{var content = @`@for (i in model.array)
+                  @for (d in model.doubleArray)
+                    ${d}
+                  @else
+                    Inner empty
+                  @endfor
+                @else
+                  Outer empty
+                @endfor`;}
+                Result: ${content}""");
+        thenOutputIs("\nResult: Inner empty\n");
+    }
+
+    @Test
+    void loopElse_if() {
+        model.array = new int[]{};
+        givenTemplate("@for (i in model.array)" +
+                "@if(i > 0)${i}@else@endif" +
+                "@else" +
+                "Empty" +
+                "@endfor");
+        thenOutputIs("Empty");
+    }
+
+    @Test
+    void loopElseNested_innerEmptyThrowsException() {
+        templateEngine.setTrimControlStructures(true);
+        model.array = new int[]{1};
+        model.doubleArray = new double[]{};
+        givenTemplate("""
+                @for (i in model.array)
+                  @for (d in model.doubleArray)
+                    ${d}
+                  @else
+                    Inner empty
+                    ${model.getThatThrows()}
+                  @endfor
+                @else
+                  Outer empty
+                @endfor""");
+
+        thenRenderingFailsWithException()
+                .hasCauseInstanceOf(NullPointerException.class)
+                .hasMessage("Failed to render test/template.kte, error at test/template.kte:7");
+    }
+
     @Test
     void unsafeInContentBlock() {
         model.array = new int[]{1, 2, 3};

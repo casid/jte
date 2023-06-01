@@ -1073,6 +1073,24 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void exceptionLineNumber7() {
+        givenTemplate("my/model.jte", """
+                @import gg.jte.TemplateEngineTest.Model
+                                
+                @param Model model
+                                
+                ${model.getThatThrows()}
+                """);
+
+        StringOutput output = new StringOutput();
+        Throwable throwable = catchThrowable(() -> templateEngine.render("my/model.jte", model, output));
+
+        assertThat(throwable)
+                .hasCauseInstanceOf(NullPointerException.class)
+                .hasMessage("Failed to render my/model.jte, error at my/model.jte:5");
+    }
+
+    @Test
     void curlyBracesAreTracked() {
         givenRawTemplate("!{java.util.Optional<String> name = java.util.Optional.ofNullable(null);}" +
                 "${name.map((n) -> { return \"name: \" + n; }).orElse(\"empty\")}");

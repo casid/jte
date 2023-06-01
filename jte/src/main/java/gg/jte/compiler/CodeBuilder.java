@@ -87,6 +87,10 @@ public final class CodeBuilder {
     }
 
     public CodeBuilder insert(CodeMarker position, CharSequence codeToInsert) {
+        return insert(position, codeToInsert, true);
+    }
+
+    public CodeBuilder insert(CodeMarker position, CharSequence codeToInsert, boolean fillLines) {
         code.insert(position.codeIndex, codeToInsert);
 
         int insertedLineCount = 0;
@@ -96,7 +100,9 @@ public final class CodeBuilder {
             }
         }
 
-        fillLines(position.codeLine, position.templateLine, insertedLineCount);
+        if (fillLines) {
+            fillLines(position, insertedLineCount);
+        }
 
         // Adjust any created markers that point to code after this marker.
         for (CodeMarker codeMarker : codeMarkers) {
@@ -107,6 +113,10 @@ public final class CodeBuilder {
         }
 
         return this;
+    }
+
+    public void fillLines(CodeMarker position, int insertedLineCount) {
+        fillLines(position.codeLine, position.templateLine, insertedLineCount);
     }
 
     public int getCurrentTemplateLine() {

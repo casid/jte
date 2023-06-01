@@ -14,7 +14,7 @@ public class ForSupport<T> implements Iterable<ForSupport<T>> {
     }
 
     public static <T> ForSupport<T> of(T[] array) {
-        return new ForSupport<>(new Iterator<T>() {
+        return new ForSupport<>(new Iterator<>() {
             private int i;
             @Override
             public boolean hasNext() {
@@ -50,7 +50,7 @@ public class ForSupport<T> implements Iterable<ForSupport<T>> {
 
     @Override
     public Iterator<ForSupport<T>> iterator() {
-        return new Iterator<ForSupport<T>>() {
+        return new Iterator<>() {
             @Override
             public boolean hasNext() {
                 return iterator.hasNext();

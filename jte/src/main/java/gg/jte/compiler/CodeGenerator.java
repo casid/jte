@@ -43,12 +43,8 @@ public interface CodeGenerator extends TemplateParserVisitor {
                         }
 
                         switch (expressionPart.type) {
-                            case Code:
-                                code.append("(").append(expressionPart.value).append(")");
-                                break;
-                            case Text:
-                                code.append("\"").appendEscaped(expressionPart.value).append("\"");
-                                break;
+                            case Code -> code.append("(").append(expressionPart.value).append(")");
+                            case Text -> code.append("\"").appendEscaped(expressionPart.value).append("\"");
                         }
                     }
                 } else {

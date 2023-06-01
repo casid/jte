@@ -335,7 +335,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
         try {
             Class<?> extensionClass = Class.forName(extensionSettings.getKey());
-            JteExtension extension = (JteExtension) extensionClass.newInstance();
+            JteExtension extension = (JteExtension) extensionClass.getConstructor().newInstance();
             return extension.init(extensionSettings.getValue());
         } catch(Exception e) {
             throw new TemplateException("Failed to load extension " + extensionSettings.getKey(), e);

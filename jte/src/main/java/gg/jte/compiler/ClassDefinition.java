@@ -77,10 +77,6 @@ public final class ClassDefinition {
         this.changed = changed;
     }
 
-    void setParams(List<ParamInfo> params) {
-        this.params = params;
-    }
-
     public List<ParamInfo> getParams() {
         return params;
     }

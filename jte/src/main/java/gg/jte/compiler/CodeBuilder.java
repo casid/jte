@@ -100,10 +100,6 @@ public final class CodeBuilder {
 
         // Adjust any created markers that point to code after this marker.
         for (CodeMarker codeMarker : codeMarkers) {
-            if (codeMarker == position) {
-                continue;
-            }
-
             if (codeMarker.codeIndex > position.codeIndex) {
                 codeMarker.codeIndex += codeToInsert.length();
                 codeMarker.codeLine += insertedLineCount;
@@ -176,7 +172,7 @@ public final class CodeBuilder {
         private int codeLine;
         private final int templateLine;
 
-        public CodeMarker(int codeIndex, int codeLine, int templateLine) {
+        private CodeMarker(int codeIndex, int codeLine, int templateLine) {
             this.codeIndex = codeIndex;
             this.codeLine = codeLine;
             this.templateLine = templateLine;

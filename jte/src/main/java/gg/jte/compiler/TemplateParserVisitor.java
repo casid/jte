@@ -31,6 +31,8 @@ public interface TemplateParserVisitor {
 
     void onForLoopStart(int depth, String codePart);
 
+    void onForLoopElse(int depth);
+
     void onForLoopEnd(int depth);
 
     default void onRawStart(int depth) {}

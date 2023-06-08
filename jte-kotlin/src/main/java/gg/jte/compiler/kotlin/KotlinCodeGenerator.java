@@ -4,15 +4,14 @@ import gg.jte.ContentType;
 import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.compiler.*;
+import gg.jte.compiler.CodeBuilder.CodeMarker;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import gg.jte.runtime.DebugInfo;
 import gg.jte.compiler.TemplateType;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static gg.jte.runtime.Constants.TEXT_PART_BINARY;
@@ -29,9 +28,11 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private final List<ParamInfo> parameters = new ArrayList<>();
     private final List<String> imports = new ArrayList<>();
     private final List<byte[]> binaryTextParts = new ArrayList<>();
+    private final Deque<ForLoopStart> forLoopStack = new ArrayDeque<>();
 
     private boolean hasWrittenPackage;
     private boolean hasWrittenClass;
+    private CodeMarker fieldsMarker;
 
     public KotlinCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
         this.compiler = compiler;
@@ -78,7 +79,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         kotlinCode.append("@Suppress(\"UNCHECKED_CAST\", \"UNUSED_PARAMETER\")").append('\n');
         kotlinCode.append("class ").append(classInfo.className).append(" {\n");
         kotlinCode.append("companion object {\n");
-        kotlinCode.markFieldsIndex();
+        fieldsMarker = kotlinCode.getMarkerOfCurrentPosition();
         kotlinCode.append("\t@JvmStatic fun render(");
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
@@ -121,18 +122,19 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     @Override
     public void onComplete() {
+        // Line information must be updated before insert, otherwise the line info field is not up-to-date
         int lineCount = 2;
         if (!binaryTextParts.isEmpty()) {
             lineCount += binaryTextParts.size() + 1;
         }
-        kotlinCode.insertFieldLines(lineCount);
+        kotlinCode.fillLines(fieldsMarker, lineCount);
 
-        StringBuilder fields = new StringBuilder(64 + 32 * lineCount);
+        StringBuilder fields = new StringBuilder();
         addNameField(fields, classInfo.name);
         addLineInfoField(fields);
         writeBinaryTextParts(fields);
 
-        kotlinCode.insertFields(fields);
+        kotlinCode.insert(fieldsMarker, fields, false);
 
         kotlinCode.append("\t}\n");
 
@@ -378,12 +380,45 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     @Override
     public void onForLoopStart(int depth, String codePart) {
+        CodeMarker beforeLoop = kotlinCode.getMarkerOfCurrentPosition();
+
         writeIndentation(depth);
         kotlinCode.append("for (").append(codePart).append(") {\n");
+
+        CodeMarker inLoop = kotlinCode.getMarkerOfCurrentPosition();
+
+        forLoopStack.push(new ForLoopStart(beforeLoop, inLoop, depth));
+    }
+
+    @Override
+    public void onForLoopElse(int depth) {
+        ForLoopStart forLoopStart = forLoopStack.peek();
+
+        if (forLoopStart != null) {
+            String variableName = "__jte_for_loop_entered_" + forLoopStack.size();
+
+            StringBuilder variableDeclaration = new StringBuilder();
+            writeIndentation(variableDeclaration, forLoopStart.indentation);
+            variableDeclaration.append("var ").append(variableName).append(" = false\n");
+            kotlinCode.insert(forLoopStart.beforeLoop, variableDeclaration);
+
+            StringBuilder variableAssignment = new StringBuilder();
+            writeIndentation(variableAssignment, forLoopStart.indentation + 1);
+            variableAssignment.append(variableName).append(" = true\n");
+            kotlinCode.insert(forLoopStart.inLoop, variableAssignment);
+
+            writeIndentation(depth);
+            kotlinCode.append("}\n");
+
+            writeIndentation(depth);
+            kotlinCode.append("if (!").append(variableName).append(") {\n");
+        }
     }
 
     @Override
     public void onForLoopEnd(int depth) {
+        forLoopStack.pop();
+
         writeIndentation(depth);
         kotlinCode.append("}\n");
     }
@@ -521,6 +556,13 @@ public class KotlinCodeGenerator implements CodeGenerator {
         }
     }
 
+    @SuppressWarnings("StringRepeatCanBeUsed")
+    private void writeIndentation(StringBuilder code, int depth) {
+        for (int i = 0; i < depth + 2; ++i) {
+            code.append('\t');
+        }
+    }
+
     @Override
     public String getCode() {
         return kotlinCode.getCode();
@@ -602,4 +644,6 @@ public class KotlinCodeGenerator implements CodeGenerator {
             }
         }
     }
+
+    private record ForLoopStart(CodeMarker beforeLoop, CodeMarker inLoop, int indentation) {}
 }

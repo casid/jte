@@ -20,6 +20,12 @@ To use jte-models, set up your build script to include one of these:
                     <extensions>
                         <extension>
                             <className>gg.jte.models.generator.ModelExtension</className>
+                            <!-- optional settings to include annotations on generated classes:
+                            <settings>
+                                <interfaceAnnotation>@foo.bar.MyAnnotation</interfaceAnnotation>
+                                <implementationAnnotation>@foo.bar.MyAnnotation</implementationAnnotation>
+                            </settings>
+                            -->
                         </extension>
                     </extensions>
                 </configuration>
@@ -59,6 +65,13 @@ jte {
     generate()
     binaryStaticContent = true
     jteExtension 'gg.jte.models.generator.ModelExtension'
+    // or to add annotations to generated classes:
+    /*
+    jteExtension('gg.jte.models.generator.ModelExtension') {
+        interfaceAnnotation = '@foo.bar.MyAnnotation'
+        implementationAnnotation = '@foo.bar.MyAnnotation'
+    }
+     */
 }
 
 ```
@@ -81,6 +94,13 @@ jte {
     generate()
     binaryStaticContent.set(true)
     jteExtension("gg.jte.models.generator.ModelExtension")
+    // or to add annotations to generated classes:
+    /*
+    jteExtension("gg.jte.models.generator.ModelExtension") {
+        property("interfaceAnnotation", "@foo.bar.MyAnnotation")
+        property("implementationAnnotation", "@foo.bar.MyAnnotation")
+    }
+     */
 }
 
 ```

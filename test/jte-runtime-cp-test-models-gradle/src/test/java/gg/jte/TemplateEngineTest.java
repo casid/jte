@@ -10,8 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import test.Dummy;
 import test.Model;
 
+import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,5 +78,13 @@ public class TemplateEngineTest {
     void nestedContent(Templates templates) {
         String output = templates.layout(templates.helloWorld(model)).render();
         assertThat(output).containsIgnoringWhitespaces("Header", "Hello World", "Footer");
+    }
+
+    @ParameterizedTest
+    @MethodSource("templates")
+    void hasAnnotation(Templates templates) {
+        Class<? extends Templates> clazz = templates.getClass();
+        Annotation[] annotations = clazz.getDeclaredAnnotations();
+        assertThat(annotations).anyMatch(a -> a instanceof Dummy);
     }
 }

@@ -84,6 +84,24 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void unclosedTag_form() {
+        codeResolver.givenCode("unclosed.jte", "<form>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("unclosed.jte", null, output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile unclosed.jte, error at line 1: Unclosed tag <form>.");
+    }
+
+    @Test
+    void unclosedTag_input_doesNotNeedToBeClosed() {
+        codeResolver.givenCode("unclosed.jte", "<input>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("unclosed.jte", null, output));
+
+        assertThat(throwable).isNull();
+    }
+
+    @Test
     void codeInTag() {
         codeResolver.givenCode("template.jte", "@param String tag\n\n<span><${tag}/></span>");
 
@@ -903,11 +921,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void forbidUnqotedAttributeValues_emptyAttribute() {
-        codeResolver.givenCode("template.jte", "<div data-test-important-content>");
+        codeResolver.givenCode("template.jte", "<div data-test-important-content></div>");
 
         templateEngine.render("template.jte", null, output);
 
-        assertThat(output.toString()).isEqualTo("<div data-test-important-content>");
+        assertThat(output.toString()).isEqualTo("<div data-test-important-content></div>");
     }
 
     @Test
@@ -1183,11 +1201,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void alpineJsAttributes() {
-        codeResolver.givenCode("template.jte", "<div @click.away=\"open = false\" x-data=\"{ open: false }\">");
+        codeResolver.givenCode("template.jte", "<div @click.away=\"open = false\" x-data=\"{ open: false }\"></div>");
 
         templateEngine.render("template.jte", localizer, output);
 
-        assertThat(output.toString()).isEqualTo("<div @click.away=\"open = false\" x-data=\"{ open: false }\">");
+        assertThat(output.toString()).isEqualTo("<div @click.away=\"open = false\" x-data=\"{ open: false }\"></div>");
     }
 
     @Test

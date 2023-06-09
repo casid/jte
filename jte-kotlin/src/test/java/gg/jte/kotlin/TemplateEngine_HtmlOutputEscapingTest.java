@@ -50,6 +50,24 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void unclosedTag_form() {
+        codeResolver.givenCode("unclosed.kte", "<form>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("unclosed.kte", null, output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile unclosed.kte, error at line 1: Unclosed tag <form>.");
+    }
+
+    @Test
+    void unclosedTag_input_doesNotNeedToBeClosed() {
+        codeResolver.givenCode("unclosed.kte", "@param unused:String\n<input>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("unclosed.kte", "", output));
+
+        assertThat(throwable).isNull();
+    }
+
+    @Test
     void codeInTag() {
         codeResolver.givenCode("template.kte", "@param String tag\n\n<span><${tag}/></span>");
 
@@ -866,11 +884,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void forbidUnqotedAttributeValues_emptyAttribute() {
-        codeResolver.givenCode("template.kte", "<div data-test-important-content>");
+        codeResolver.givenCode("template.kte", "<div data-test-important-content></div>");
 
         templateEngine.render("template.kte", (Object)null, output);
 
-        assertThat(output.toString()).isEqualTo("<div data-test-important-content>");
+        assertThat(output.toString()).isEqualTo("<div data-test-important-content></div>");
     }
 
     @Test

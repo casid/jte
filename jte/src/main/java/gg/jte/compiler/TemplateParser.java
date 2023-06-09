@@ -173,9 +173,9 @@ public final class TemplateParser {
                 if (currentChar == '\n') {
                     pop();
                     lastIndex = i;
-                } else if (regionMatches("</script>")) {
+                } else if (lookAheadRegionMatches("</script>")) {
                     pop();
-                    lastIndex = i - 8;
+                    lastIndex = i;
                 }
             } else if (currentMode == Mode.Text && regionMatches("${")) {
                 if (!outputPrevented) {
@@ -362,6 +362,10 @@ public final class TemplateParser {
             handleUnclosedKeywords();
         }
 
+        if (contentType == ContentType.Html && type == TemplateType.Template && !htmlStack.isEmpty()) {
+            visitor.onError("Unclosed tag <" + htmlStack.peek().name + ">.");
+        }
+
         if (lastIndex < endIndex) {
             extractTextPart(endIndex, null);
         }
@@ -382,6 +386,10 @@ public final class TemplateParser {
 
     private boolean regionMatches(String s) {
         return templateCode.regionMatches(i - s.length() + 1, s, 0, s.length());
+    }
+
+    private boolean lookAheadRegionMatches( @SuppressWarnings("SameParameterValue") String s) {
+        return templateCode.regionMatches(i, s, 0, s.length());
     }
 
     private void handleUnclosedKeywords() {

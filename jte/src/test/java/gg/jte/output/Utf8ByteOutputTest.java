@@ -149,6 +149,8 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
 
         String actual = new String(bytes, StandardCharsets.UTF_8);
         assertThat(actual).isEqualTo(expected);
+
+        assertThat(output.toByteArray()).isEqualTo(bytes);
     }
 
 

@@ -16,18 +16,21 @@ import java.util.List;
  */
 public final class Utf8ByteOutput implements TemplateOutput {
 
-    private final List<byte[]> chunks = new ArrayList<>();
+    private final List<byte[]> chunks;
+    private int contentLength;
+
+    public Utf8ByteOutput() {
+        this(512);
+    }
+
+    public Utf8ByteOutput(int initialCapacity) {
+        chunks = new ArrayList<>(initialCapacity);
+    }
 
     /**
      * @return The amount of bytes written to this output.
      */
     public int getContentLength() {
-        int contentLength = 0;
-
-        for (byte[] chunk : chunks) {
-            contentLength += chunk.length;
-        }
-
         return contentLength;
     }
 
@@ -52,19 +55,36 @@ public final class Utf8ByteOutput implements TemplateOutput {
         }
     }
 
+    public byte[] toByteArray() {
+        byte[] result = new byte[contentLength];
+
+        int index = 0;
+        for (byte[] chunk : chunks) {
+            System.arraycopy(chunk, 0, result, index, chunk.length);
+            index += chunk.length;
+        }
+
+        return result;
+    }
+
     @Override
     public void writeContent(String s) {
-        chunks.add(s.getBytes(StandardCharsets.UTF_8));
+        addChunk(s.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public void writeContent(String s, int beginIndex, int endIndex) {
-        chunks.add(s.substring(beginIndex, endIndex).getBytes(StandardCharsets.UTF_8));
+        addChunk(s.substring(beginIndex, endIndex).getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public void writeBinaryContent(byte[] value) {
-        chunks.add(value);
+        addChunk(value);
+    }
+
+    private void addChunk(byte[] chunk) {
+        chunks.add(chunk);
+        contentLength += chunk.length;
     }
 
     @FunctionalInterface

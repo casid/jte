@@ -191,8 +191,7 @@ public class CompilerMojo extends AbstractMojo {
     }
 
     private HtmlPolicy createHtmlPolicy(String htmlPolicyClass) {
-        try {
-            URLClassLoader projectClassLoader = createProjectClassLoader();
+        try (URLClassLoader projectClassLoader = createProjectClassLoader()) {
             Class<?> clazz = projectClassLoader.loadClass(htmlPolicyClass);
             return (HtmlPolicy) clazz.getConstructor().newInstance();
         } catch (Exception e) {

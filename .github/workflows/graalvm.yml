@@ -16,10 +16,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.3.0'
+          distribution: 'graalvm'
           java-version: ${{ matrix.java_version }}
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}

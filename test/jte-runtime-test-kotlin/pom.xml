@@ -13,7 +13,7 @@
         <junit.jupiter.version>5.9.2</junit.jupiter.version>
         <maven.deploy.skip>true</maven.deploy.skip>
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-        <jacoco.version>0.8.5</jacoco.version>
+        <jacoco.version>0.8.10</jacoco.version>
         <kotlin.version>1.4.30</kotlin.version>
     </properties>
 

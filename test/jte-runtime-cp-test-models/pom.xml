@@ -14,7 +14,7 @@
         <junit.jupiter.version>5.9.0</junit.jupiter.version>
         <maven.deploy.skip>true</maven.deploy.skip>
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-        <jacoco.version>0.8.5</jacoco.version>
+        <jacoco.version>0.8.10</jacoco.version>
     </properties>
 
     <dependencies>

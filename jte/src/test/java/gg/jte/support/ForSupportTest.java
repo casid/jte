@@ -17,9 +17,11 @@ class ForSupportTest {
         whenIteratingOverArray(items);
 
         assertThat(result.toString()).isEqualTo(
-                "First: true, Last: false, Index: 0, Item: one\n" +
-                "First: false, Last: false, Index: 1, Item: two\n" +
-                "First: false, Last: true, Index: 2, Item: three\n");
+                """
+                        First: true, Last: false, Index: 0, Item: one
+                        First: false, Last: false, Index: 1, Item: two
+                        First: false, Last: true, Index: 2, Item: three
+                        """);
     }
 
     @Test
@@ -29,9 +31,11 @@ class ForSupportTest {
         whenIteratingOverIterable(items);
 
         assertThat(result.toString()).isEqualTo(
-                "First: true, Last: false, Index: 0, Item: one\n" +
-                "First: false, Last: false, Index: 1, Item: two\n" +
-                "First: false, Last: true, Index: 2, Item: three\n");
+                """
+                        First: true, Last: false, Index: 0, Item: one
+                        First: false, Last: false, Index: 1, Item: two
+                        First: false, Last: true, Index: 2, Item: three
+                        """);
     }
 
     private void whenIteratingOverArray(String[] items) {

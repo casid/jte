@@ -7,7 +7,6 @@ public class ForSupport<T> implements Iterable<ForSupport<T>> {
 
     private T item;
     private int index = -1;
-    private boolean last;
 
     public static <T> ForSupport<T> of(Iterable<T> iterable) {
         return new ForSupport<>(iterable.iterator());
@@ -33,7 +32,7 @@ public class ForSupport<T> implements Iterable<ForSupport<T>> {
     }
 
     public boolean isLast() {
-        return last;
+        return !iterator.hasNext();
     }
 
     public boolean isFirst() {
@@ -60,7 +59,6 @@ public class ForSupport<T> implements Iterable<ForSupport<T>> {
             public ForSupport<T> next() {
                 item = iterator.next();
                 ++index;
-                last = !hasNext();
                 return ForSupport.this;
             }
         };

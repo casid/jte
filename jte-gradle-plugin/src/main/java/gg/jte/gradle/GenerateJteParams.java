@@ -13,24 +13,70 @@ import java.util.Map;
  * All property types must be Serializable.
  */
 public interface GenerateJteParams extends WorkParameters {
+
+    /**
+     * The directory where template files are located.
+     */
     RegularFileProperty getSourceDirectory();
+
+    /**
+     * Destination directory to store generated templates.
+     */
     RegularFileProperty getTargetDirectory();
+
+    /**
+     * The content type of all templates. Either Plain or Html.
+     */
     Property<ContentType> getContentType();
 
+    /**
+     * The package name, where template classes are generated to
+     */
     Property<String> getPackageName();
 
+    /**
+     * Trims control structures, resulting in prettier output.
+     */
     Property<Boolean> getTrimControlStructures();
 
+    /**
+     * Intercepts the given html tags during template compilation
+     * and calls the configured htmlInterceptor during template rendering.
+     */
     Property<String[]> getHtmlTags();
 
+    /**
+     * By default, jte omits all HTML/CSS/JS comments, when compiling with {@link ContentType#Html}.
+     * If you don't want this behavior, you can disable it here.
+     */
     Property<Boolean> getHtmlCommentsPreserved();
 
+    /**
+     * Setting, that UTF-8 encodes all static template parts at compile time.
+     * Only makes sense if you use a binary output, like {@link gg.jte.output.Utf8ByteOutput}.
+     */
     Property<Boolean> getBinaryStaticContent();
 
+    /**
+     * Directory in which to generate non-java files (resources). Typically, set by plugin rather than end user.
+     * Optional - if null, resources will not be generated
+     */
     RegularFileProperty getTargetResourceDirectory();
 
+    /**
+     * "group/artifact" of the project using jte. Typically, set by plugin rather than end user.
+     * Optional - usually done by Gradle.
+     */
     Property<String> getProjectNamespace();
 
+    /**
+     * Optional - Extensions this template engine should load. Currently, the following extensions exist:
+     *
+     * <ul>
+     *     <li>gg.jte.models.generator.ModelExtension</li>
+     *     <li>gg.jte.nativeimage.NativeResourcesExtension</li>
+     * </ul>
+     */
     MapProperty<String, Map<String, String>> getJteExtensions();
 }
 

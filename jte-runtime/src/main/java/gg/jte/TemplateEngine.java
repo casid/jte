@@ -468,7 +468,7 @@ public final class TemplateEngine {
     }
 
     /**
-     * By default, jte omits all HMTL/CSS/JS comments, when compiling with {@link ContentType#Html}.
+     * By default, jte omits all HTML/CSS/JS comments, when compiling with {@link ContentType#Html}.
      * If you don't want this behavior, you can disable it here.
      * <br>
      * This is a template compilation setting and has no effect when loading precompiled templates.
@@ -479,7 +479,8 @@ public final class TemplateEngine {
     }
 
     /**
-     * Experimental setting, that UTF-8 encodes all static template parts.
+     * Setting, that UTF-8 encodes all static template parts at compile time.
+     * Only makes sense if you use a binary output, like {@link gg.jte.output.Utf8ByteOutput}.
      * <br>
      * This is a template compilation setting and has no effect when loading precompiled templates.
      * @param binaryStaticContent true, to pre-generate UTF-8 encoded byte arrays for all static template parts
@@ -499,7 +500,7 @@ public final class TemplateEngine {
     }
 
     /**
-     * Directory in which to generate non-java files (resources). Typically set by plugin rather than end user.
+     * Directory in which to generate non-java files (resources). Typically, set by plugin rather than end user.
      * Optional - if null, resources will not be generated
      * <br>
      * This is a template compilation setting and has no effect when loading precompiled templates.
@@ -510,7 +511,7 @@ public final class TemplateEngine {
     }
 
     /**
-     * "group/artifact" of the project using jte. Typically set by plugin rather than end user.
+     * "group/artifact" of the project using jte. Typically, set by plugin rather than end user.
      * If null, the compiler will make one up.
      * <br>
      * This is a template compilation setting and has no effect when loading precompiled templates.
@@ -520,6 +521,20 @@ public final class TemplateEngine {
         config.projectNamespace = projectNamespace;
     }
 
+    /**
+     * Optional - Extensions this template engine should load. Currently, the following extensions exist:
+     *
+     * <ul>
+     *     <li>gg.jte.models.generator.ModelExtension</li>
+     *     <li>gg.jte.nativeimage.NativeResourcesExtension</li>
+     * </ul>
+     *
+     * Sample usage:
+     *
+     * <code>
+     *     templateEngine.setExtensions(Map.of("gg.jte.models.generator.ModelExtension", Map.of()));
+     * </code>
+     */
     public void setExtensions(Map<String, Map<String, String>> extensionSettings) {
         config.extensionClasses.putAll(extensionSettings);
     }

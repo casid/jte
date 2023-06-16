@@ -11,7 +11,6 @@ import org.apache.maven.project.MavenProject;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -36,27 +35,60 @@ public class GeneratorMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}/generated-sources/jte")
     public String targetDirectory;
 
+    /**
+     * The content type of all templates. Either Plain or Html.
+     */
     @Parameter(required = true)
     public String contentType;
 
+    /**
+     * Trims control structures, resulting in prettier output.
+     */
     @Parameter
     public boolean trimControlStructures;
 
+    /**
+     * Intercepts the given html tags during template compilation
+     * and calls the configured htmlInterceptor during template rendering.
+     */
     @Parameter
     public String[] htmlTags;
 
+    /**
+     * By default, jte omits all HTML/CSS/JS comments, when compiling with {@link ContentType#Html}.
+     * If you don't want this behavior, you can disable it here.
+     */
     @Parameter
     public boolean htmlCommentsPreserved;
 
+    /**
+     * Setting, that UTF-8 encodes all static template parts at compile time.
+     * Only makes sense if you use a binary output, like {@link gg.jte.output.Utf8ByteOutput}.
+     */
     @Parameter
     public boolean binaryStaticContent;
 
+    /**
+     * The package name, where template classes are generated to
+     */
     @Parameter
     public String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
 
+    /**
+     * Directory in which to generate non-java files (resources). Typically, set by plugin rather than end user.
+     * Optional - if null, resources will not be generated
+     */
     @Parameter
     public String targetResourceDirectory;
 
+    /**
+     * Optional - Extensions this template engine should load. Currently, the following extensions exist:
+     *
+     * <ul>
+     *     <li>gg.jte.models.generator.ModelExtension</li>
+     *     <li>gg.jte.nativeimage.NativeResourcesExtension</li>
+     * </ul>
+     */
     @Parameter
     public List<ExtensionSettings> extensions;
 

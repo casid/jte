@@ -69,7 +69,7 @@ public class GeneratorMojo extends AbstractMojo {
     public boolean binaryStaticContent;
 
     /**
-     * The package name, where template classes are generated to
+     * The package name, where template classes are generated to.
      */
     @Parameter
     public String packageName = Constants.PACKAGE_NAME_PRECOMPILED;

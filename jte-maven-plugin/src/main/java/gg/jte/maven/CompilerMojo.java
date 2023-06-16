@@ -40,33 +40,67 @@ public class CompilerMojo extends AbstractMojo {
     @Parameter(required = true)
     public String targetDirectory;
 
+    /**
+     * The compile-classpath to use. Defaults to project.compileClasspathElements
+     */
     @Parameter(defaultValue = "${project.compileClasspathElements}", required = true)
     public List<String> compilePath;
 
+    /**
+     * The content type of all templates. Either Plain or Html.
+     */
     @Parameter(required = true)
     public String contentType;
 
+    /**
+     * Trims control structures, resulting in prettier output.
+     */
     @Parameter
     public boolean trimControlStructures;
 
+    /**
+     * Intercepts the given html tags during template compilation
+     * and calls the configured htmlInterceptor during template rendering.
+     */
     @Parameter
     public String[] htmlTags;
 
+    /**
+     * Policy class that checks the parsed HTML at compile time. Must be an instance of {@link HtmlPolicy}
+     */
     @Parameter
     public String htmlPolicyClass;
 
+    /**
+     * By default, jte omits all HTML/CSS/JS comments, when compiling with {@link ContentType#Html}.
+     * If you don't want this behavior, you can disable it here.
+     */
     @Parameter
     public boolean htmlCommentsPreserved;
 
+    /**
+     * Setting, that UTF-8 encodes all static template parts at compile time.
+     * Only makes sense if you use a binary output, like {@link gg.jte.output.Utf8ByteOutput}.
+     */
     @Parameter
     public boolean binaryStaticContent;
 
+    /**
+     * Sets additional compiler arguments for jte templates.
+     */
     @Parameter
     public String[] compileArgs;
 
+    /**
+     * The package name, where template classes are generated to.
+     */
     @Parameter
     public String packageName = Constants.PACKAGE_NAME_PRECOMPILED;
 
+    /**
+     * By default, this plugin deletes all generated jte source files after compilation.
+     * If you want to keep them, set this property to true.
+     */
     @Parameter
     public boolean keepGeneratedSourceFiles;
 

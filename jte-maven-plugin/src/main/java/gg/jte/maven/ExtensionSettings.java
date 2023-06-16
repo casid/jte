@@ -6,11 +6,18 @@ import java.util.Collections;
 import java.util.Map;
 
 public class ExtensionSettings {
-    @Parameter
-    private String className;
 
+    /**
+     * The class name of the extension, e.g. <code>gg.jte.models.generator.ModelExtension</code>
+     */
     @Parameter
-    private Map<String, String> settings;
+    public String className;
+
+    /**
+     * The settings the extension should use.
+     */
+    @Parameter
+    public Map<String, String> settings;
 
     public String getClassName() {
         return className;

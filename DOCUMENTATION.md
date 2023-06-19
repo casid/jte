@@ -338,7 +338,7 @@ Will render this HTML:
 
 ### Natural comments
 
-All HTML, CSS and JavaScript comments are not rendered. You can use the natural comment syntax without worrying to leak too much information/data to the outside.
+All HTML, CSS and JavaScript comments are not rendered. You can use the natural comment syntax without worrying to leak information/data to the outside.
 
 ## HTML Escaping
 

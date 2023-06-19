@@ -474,14 +474,14 @@ if (isDeveloperEnvironment()) {
 ### Customizing generated class directory
 
 By default generated sources and classes are outputted into the subdirectory `jte-classes` under the current directory.
-It is possible to customize this directory when creating template engine. But in order to have the hot reload feature
+It is possible to customize this directory when creating the template engine. But in order to have the hot reload feature
 working, a custom class directory must not be on the classpath. If it is on the classpath, generated classes
 will be visible to the default class loader and once a generated class is loaded, it will not be possible to reload it
 after recompiling a template, thus making the hot reload effectively non-functional.
 
 ## Precompiling Templates
 
-To speed up startup and rendering your production server, it is possible to precompile all templates during the build. This way, the template engine can load the .class file for each template directly, without first compiling it. For security reasons you may not want to run a JDK on production - with precompiled templates this is not needed. The recommended way to setup jte, is to instantiate the engine differently, depending on when you are developing or running on a server.
+To speed up startup and rendering on your production server, it is possible to precompile all templates during the build. This way, the template engine can load the .class file for each template directly, without first compiling it. For security reasons you may not want to run a JDK on production - with precompiled templates this is not needed. The recommended way to setup jte, is to instantiate the engine differently, depending on when you are developing or running on a server.
 
 ```java
 if (isDeveloperMachine()) {
@@ -708,7 +708,7 @@ There's an example [gradle test project](https://github.com/casid/jte/blob/maste
 
 ## Binary rendering for max throughput
 
-Most template parts are static content and only few parts of a template are dynamic. It is wasteful to convert those static parts over and over on every request, if your web-framework sends binary UTF-8 content to the user. Since jte 1.7.0 it is possible to encode those static parts at compile time:
+Most template parts are static content and only few parts of a template are dynamic. It is wasteful to encode those static parts over and over on every request, if your web-framework sends binary UTF-8 content to the user. Since jte 1.7.0 it is possible to encode those static parts at compile time:
 
 ```java
 templateEngine.setBinaryStaticContent(true);
@@ -718,7 +718,7 @@ This generates a binary content resource for each template at compile time. Thos
 
 To fully utilize binary templates you need to use a binary template output, like `Utf8ByteOutput`. This output is heavily optimized to consume as little CPU and memory as possible when using binary templates.
 
-> Hint: You will only see a performance increase if you use binaryStaticContent in tandem with a binary output. Other outputs convert the pre-encoded byte[] arrays back to Java Strings and defeat this optimization.
+> Hint: You will only see a performance increase if you use binaryStaticContent together with a binary output. Other outputs convert the pre-encoded byte[] arrays back to Java Strings and defeat this optimization.
 
 Example usage with `HttpServletResponse`:
 

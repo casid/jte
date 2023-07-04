@@ -26,6 +26,13 @@ To use jte-models, set up your build script to include one of these:
                                 <implementationAnnotation>@foo.bar.MyAnnotation</implementationAnnotation>
                             </settings>
                             -->
+                            <!-- optional settings to include (or exclude) certain templates.
+                            The value is a regular expression matched against the class name of the generated JTE class.
+                            <settings>
+                                <includePattern>\.pages\..*</includePattern>
+                                <excludePattern>\.components\..*</excludePattern>
+                            </settings>
+                            -->
                         </extension>
                     </extensions>
                 </configuration>
@@ -70,6 +77,8 @@ jte {
     jteExtension('gg.jte.models.generator.ModelExtension') {
         interfaceAnnotation = '@foo.bar.MyAnnotation'
         implementationAnnotation = '@foo.bar.MyAnnotation'
+        includePattern = '\.pages\..*'
+        excludePattern = '\.components\..*'
     }
      */
 }
@@ -99,6 +108,8 @@ jte {
     jteExtension("gg.jte.models.generator.ModelExtension") {
         property("interfaceAnnotation", "@foo.bar.MyAnnotation")
         property("implementationAnnotation", "@foo.bar.MyAnnotation")
+        property("includePattern", "\.pages\..*")
+        property("excludePattern", '\.components\..*")
     }
      */
 }

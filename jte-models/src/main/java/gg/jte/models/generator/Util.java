@@ -29,19 +29,20 @@ public class Util {
         String name = template.name();
         StringBuilder builder = new StringBuilder();
         boolean end = false;
-        boolean slash = false;
+        boolean capitalizeNextCharacter = false;
         for (int i = 0; i < name.length() && !end; i++) {
             char c = name.charAt(i);
             switch (c) {
                 case '.':
                     end = true;
                     break;
+                case '-':
                 case '/':
-                    slash = true;
+                    capitalizeNextCharacter = true;
                     break;
                 default:
-                    builder.append(slash ? Character.toUpperCase(c) : c);
-                    slash = false;
+                    builder.append(capitalizeNextCharacter ? Character.toUpperCase(c) : c);
+                    capitalizeNextCharacter = false;
                     break;
             }
         }

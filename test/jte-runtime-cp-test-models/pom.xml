@@ -89,6 +89,8 @@
                             <className>gg.jte.models.generator.ModelExtension</className>
                             <settings>
                                 <implementationAnnotation>@test.Dummy</implementationAnnotation>
+                                <includePattern>.*</includePattern>
+                                <excludePattern>.*Exclude.*</excludePattern>
                             </settings>
                         </extension>
                     </extensions>

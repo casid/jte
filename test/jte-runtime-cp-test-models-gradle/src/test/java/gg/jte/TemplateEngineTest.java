@@ -75,6 +75,12 @@ public class TemplateEngineTest {
 
     @ParameterizedTest
     @MethodSource("templates")
+    void excludedTemplates(gg.jte.generated.precompiled.Templates templates){
+        assertThat(templates.getClass().getMethods()).noneMatch(m -> m.getName().contains("Exclude"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("templates")
     void nestedContent(Templates templates) {
         String output = templates.layout(templates.helloWorld(model)).render();
         assertThat(output).containsIgnoringWhitespaces("Header", "Hello World", "Footer");

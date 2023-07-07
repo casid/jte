@@ -225,6 +225,13 @@ class JspToJteConverterTest {
     }
 
     @Test
+    void simpleTagWithUsagesNoParams() {
+        givenUsecase("simpleTagWithUsagesNoParams");
+        whenJspTagIsConverted("my/simple.tag", "tag/my/simple.jte");
+        thenConversionIsAsExpected();
+    }
+
+    @Test
     void simpleTagWithComment() {
         givenUsecase("simpleTagWithComment");
         whenJspTagIsConverted("simple.tag", "tag/simple.jte");

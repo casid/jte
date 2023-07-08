@@ -131,7 +131,7 @@ public class JspToJteConverter {
             lastIndex = jspContent.indexOf(oldJspTagPrefix, lastIndex);
             if (lastIndex >= 0 && lastIndex < jspContent.length()) {
                 char character = jspContent.charAt(lastIndex + oldJspTagPrefix.length());
-                if (Character.isWhitespace(character) || character == '/') {
+                if (Character.isWhitespace(character) || character == '/' || character == '>') {
                     jspContent.replace(lastIndex, lastIndex + oldJspTagPrefix.length(), "<" + jteTag + " jte=\"" + newJteFile + "\"");
                     modified = true;
                 } else {

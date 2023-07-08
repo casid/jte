@@ -32,6 +32,8 @@ jte {
     binaryStaticContent = true
     jteExtension('gg.jte.models.generator.ModelExtension') {
         implementationAnnotation = '@test.Dummy'
+        includePattern = '.*'
+        excludePattern = '.*Excluded.*'
     }
 }
 

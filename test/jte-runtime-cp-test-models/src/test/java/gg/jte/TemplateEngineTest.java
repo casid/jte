@@ -14,6 +14,7 @@ import test.Dummy;
 import test.Model;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,6 +66,11 @@ public class TemplateEngineTest {
         String output = templates.tagUnused("One", "Two").render();
         assertThat(output).isEqualTo("One is One, two is Two.");
     }
+    @ParameterizedTest
+    @MethodSource("templates")
+    void excludedTemplates(gg.jte.generated.precompiled.Templates templates){
+        assertThat(templates.getClass().getMethods()).noneMatch(m -> m.getName().contains("Exclude"));
+    }
 
     @ParameterizedTest
     @MethodSource("templates")
@@ -79,6 +85,7 @@ public class TemplateEngineTest {
         String output = templates.layout(templates.helloWorld(model)).render();
         assertThat(output).containsIgnoringWhitespaces("Header", "Hello World", "Footer");
     }
+
 
     @ParameterizedTest
     @MethodSource("templates")

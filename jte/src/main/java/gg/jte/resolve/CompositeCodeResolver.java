@@ -3,11 +3,8 @@ package gg.jte.resolve;
 
 import gg.jte.CodeResolver;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Resolves template code from multiple other resolvers
@@ -20,22 +17,24 @@ public class CompositeCodeResolver implements CodeResolver {
         this.codeResolvers = codeResolvers;
     }
 
+    public CompositeCodeResolver(CodeResolver... codeResolvers) {
+        this(List.of(codeResolvers));
+    }
+
     @Override
     public String resolve(String name) {
-        var content = "";
+        String content = null;
         for (CodeResolver codeResolver : this.codeResolvers) {
             try {
                 String resolve = codeResolver.resolve(name);
-                if(Objects.nonNull(resolve)){
+                if(resolve != null){
                     content = resolve;
                 }
             } catch (Exception ex) {
                 // ignore
             }
         }
-        if(!content.isEmpty())
-            return content;
-        throw new UncheckedIOException(new IOException("Could not find template " + name));
+        return content;
     }
 
     @Override

@@ -316,7 +316,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
         writeCodePart(depth, codePart);
 
-        writeIndentation(depth + 1);
+        writeIndentation(depth);
         javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", null);\n");
     }
 

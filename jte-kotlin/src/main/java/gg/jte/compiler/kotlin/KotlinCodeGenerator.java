@@ -322,7 +322,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
         writeCodePart(depth, codePart);
 
-        writeIndentation(depth + 1);
+        writeIndentation(depth);
         kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", null)\n");
     }
 

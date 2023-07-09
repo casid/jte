@@ -1197,6 +1197,7 @@ public final class TemplateParser {
         public final boolean containsSingleOutput;
         public final boolean bool;
         public String value;
+        public String variableName;
 
         public int quoteCount;
         public int valueStartIndex;

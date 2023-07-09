@@ -29,6 +29,8 @@ public interface CodeGenerator extends TemplateParserVisitor {
                 } else {
                     code.append("null");
                 }
+            } else if (attribute.variableName != null) {
+                code.append(attribute.variableName);
             } else {
                 List<TemplateExpressionPart> expressionParts = extractTemplateExpressionParts(attribute.value);
                 if (!expressionParts.isEmpty()) {

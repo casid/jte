@@ -33,6 +33,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private boolean hasWrittenPackage;
     private boolean hasWrittenClass;
     private CodeMarker fieldsMarker;
+    private int attributeCounter;
 
     public KotlinCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
         this.compiler = compiler;
@@ -451,17 +452,32 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     @Override
     public void onHtmlAttributeOutput(int depth, TemplateParser.HtmlTag currentHtmlTag, TemplateParser.HtmlAttribute htmlAttribute) {
-        String javaExpression = CodeGenerator.extractSingleOutputTemplateExpression(htmlAttribute.value);
+        String variableName = assignAttributeToVariable(depth, htmlAttribute);
         if (htmlAttribute.bool) {
-            onConditionStart(depth, javaExpression);
+            onConditionStart(depth, variableName);
             onTextPart(depth, " " + htmlAttribute.name);
         } else {
-            onConditionStart(depth, "gg.jte.runtime.TemplateUtils.isAttributeRendered(" + javaExpression + ")");
+            onConditionStart(depth, "gg.jte.runtime.TemplateUtils.isAttributeRendered(" + variableName + ")");
             onTextPart(depth + 1, " " + htmlAttribute.name + "=" + htmlAttribute.quotes);
-            onHtmlTagAttributeCodePart(depth + 1, javaExpression, currentHtmlTag.name, htmlAttribute.name);
+            onHtmlTagAttributeCodePart(depth + 1, variableName, currentHtmlTag.name, htmlAttribute.name);
             onTextPart(depth + 1, "" + htmlAttribute.quotes);
         }
         onConditionEnd(depth);
+    }
+
+    private String assignAttributeToVariable(int depth, TemplateParser.HtmlAttribute htmlAttribute) {
+        String variableName = "__jte_html_attribute_" + attributeCounter;
+        String variableValue = CodeGenerator.extractSingleOutputTemplateExpression(htmlAttribute.value);
+
+        ++attributeCounter;
+
+        htmlAttribute.variableName = variableName;
+
+        writeIndentation(depth);
+
+        kotlinCode.append("val ").append(variableName).append(" = ").append(variableValue).append("\n");
+
+        return variableName;
     }
 
     private void writeAttributeMap(TemplateParser.HtmlTag htmlTag) {

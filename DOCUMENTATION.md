@@ -141,6 +141,21 @@ When looping, you may use the `ForSupport`class to gain information about the lo
 @endfor
 ```
 
+Since jte 3.0 it is possible to use `@else` before `@endfor`. The `@else` content renders in case no elements where iterated over in the loop. This is useful to display empty state of lists without an additional `@if`. For example:
+
+```html
+@for(var item : groceryList)
+  <tr>
+    <td>${item.getName()}</td>
+    <td>${item.getQuantity()}</td>
+  </tr>
+@else
+  <tr>
+    <td colspan="2">You have forgotten your groceries list at home!</td>
+  </tr>
+@endfor
+```
+
 ## Comments
 
 jte allows you to define comments in your templates. jte comments are not included in the output of your template:

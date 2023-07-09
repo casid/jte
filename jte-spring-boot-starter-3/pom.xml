@@ -10,7 +10,7 @@
     <parent>
         <groupId>gg.jte</groupId>
         <artifactId>jte-parent</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.1</version>
     </parent>
 
     <name>jte-spring-boot-starter-3</name>

@@ -288,15 +288,15 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     private String resolveCode(String name, DebugInfo debugInfo) {
-        String code = codeResolver.resolve(name);
-        if (code == null) {
-            String message = name + " not found";
+        try {
+            return codeResolver.resolveRequired(name);
+        } catch (TemplateNotFoundException e) {
+            String message = e.getMessage();
             if (debugInfo != null) {
                 message += ", referenced at " + debugInfo.name + ":" + debugInfo.line;
             }
             throw new TemplateNotFoundException(message);
         }
-        return code;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package gg.jte.resolve;
 
 import gg.jte.CodeResolver;
+import gg.jte.TemplateNotFoundException;
 import gg.jte.compiler.IoUtils;
 
 import java.io.IOException;
@@ -24,10 +25,20 @@ public class DirectoryCodeResolver implements CodeResolver {
     @Override
     public String resolve(String name) {
         try {
-            Path file = root.resolve(name);
+            return resolveRequired(name);
+        } catch (TemplateNotFoundException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public String resolveRequired(String name) throws TemplateNotFoundException {
+        Path file = root.resolve(name);
+
+        try {
             return Files.readString(file, StandardCharsets.UTF_8);
         } catch (NoSuchFileException e) {
-            return null;
+            throw new TemplateNotFoundException(name + " not found (tried to load file at " + file.toAbsolutePath() + ")");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

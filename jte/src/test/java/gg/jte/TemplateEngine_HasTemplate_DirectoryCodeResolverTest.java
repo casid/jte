@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 public class TemplateEngine_HasTemplate_DirectoryCodeResolverTest {
 
@@ -28,5 +29,14 @@ public class TemplateEngine_HasTemplate_DirectoryCodeResolverTest {
     void templateExists() {
         assertThat(codeResolver.exists("welcome.jte")).isTrue();
         assertThat(templateEngine.hasTemplate("welcome.jte")).isTrue();
+    }
+
+    @Test
+    void resolveRequired() {
+        Throwable throwable = catchThrowable(() -> codeResolver.resolveRequired("does-not-exist.jte"));
+
+        assertThat(throwable).isInstanceOf(TemplateNotFoundException.class)
+                .hasMessageStartingWith("does-not-exist.jte not found (tried to load file at ")
+                .hasMessageEndingWith("does-not-exist.jte)");
     }
 }

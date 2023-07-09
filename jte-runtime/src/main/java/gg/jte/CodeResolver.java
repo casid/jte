@@ -17,6 +17,24 @@ public interface CodeResolver {
     String resolve(String name);
 
     /**
+     * Resolves the code of a template, which is required to exist.
+     * @param name The name of the template, e.g. <code>"tag/util/card.jte"</code>.
+     * @return The code of the resolved template, this is never <code>null</code>.
+     * @throws TemplateNotFoundException if no template with this name exists.
+     *
+     * Implementations that have better knowledge why the loading failed, are expected to
+     * override this method and provide information about the problem in the thrown exception message.
+     */
+    default String resolveRequired(String name) throws TemplateNotFoundException {
+        String code = resolve(name);
+        if (code == null) {
+            throw new TemplateNotFoundException(name + " not found");
+        }
+
+        return code;
+    }
+
+    /**
      * Resolves the last modification time of a template.
      * @param name The name of the template, e.g. <code>"tag/util/card.jte"</code>.
      * @return The last modification time of this template in milliseconds, or <code>0L</code> if no template with this name exists.

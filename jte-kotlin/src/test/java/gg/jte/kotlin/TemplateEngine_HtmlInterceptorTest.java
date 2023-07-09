@@ -292,6 +292,23 @@ public class TemplateEngine_HtmlInterceptorTest {
                 "</form>");
     }
 
+    @Test
+    void getterWithSideEffect() {
+        dummyCodeResolver.givenCode("page.kte", """
+                @param controller:gg.jte.kotlin.TemplateEngine_HtmlInterceptorTest.Controller
+                <form action="${controller.getterWithSideEffect()}">
+                </form>""");
+
+        templateEngine.render("page.kte", controller, output);
+
+        assertThat(output.toString()).isEqualTo("""
+                <form action="1" data-form="x">
+                <input name="__fp" value="a:1, p:">
+                </form>""");
+
+        assertThat(controller.getterWithSideEffectCount).isEqualTo(1); // Method is called only once.
+    }
+
     @Nested
     class InterpolationInInterceptedName {
 
@@ -367,9 +384,15 @@ public class TemplateEngine_HtmlInterceptorTest {
     @SuppressWarnings("unused")
     public static class Controller {
         private String foodOption;
+        private int getterWithSideEffectCount;
 
         public String getUrl() {
             return "hello.htm";
+        }
+
+        public String getterWithSideEffect() {
+            ++getterWithSideEffectCount;
+            return "" + getterWithSideEffectCount;
         }
 
         public String getFoodOption() {

@@ -55,7 +55,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("unclosed.kte", null, output));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile unclosed.kte, error at line 1: Unclosed tag <form>.");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile unclosed.kte, error at line 1: Unclosed tag <form>. Maybe you want to use gg.jte.Content? More information: https://github.com/casid/jte/releases/tag/3.0.0#user-content-html-tags-must-be-properly-closed");
     }
 
     @Test

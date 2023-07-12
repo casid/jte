@@ -363,7 +363,7 @@ public final class TemplateParser {
         }
 
         if (contentType == ContentType.Html && type == TemplateType.Template && !htmlStack.isEmpty()) {
-            visitor.onError("Unclosed tag <" + htmlStack.peek().name + ">.");
+            visitor.onError("Unclosed tag <" + htmlStack.peek().name + ">. Maybe you want to use gg.jte.Content? More information: https://github.com/casid/jte/releases/tag/3.0.0#user-content-html-tags-must-be-properly-closed");
         }
 
         if (lastIndex < endIndex) {

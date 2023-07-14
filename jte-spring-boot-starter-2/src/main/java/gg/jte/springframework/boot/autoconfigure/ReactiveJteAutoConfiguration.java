@@ -20,26 +20,25 @@ import java.nio.file.Paths;
 @ConditionalOnClass({TemplateEngine.class, UrlBasedViewResolver.class})
 @EnableConfigurationProperties(JteProperties.class)
 public class ReactiveJteAutoConfiguration {
+    private final JteProperties jteProperties;
 
-    @Autowired
-    private Environment environment;
-
-    @Autowired
-    private JteProperties jteProperties;
+    public ReactiveJteAutoConfiguration(JteProperties jteProperties) {
+        this.jteProperties = jteProperties;
+    }
 
     @Bean
     @ConditionalOnMissingBean(ReactiveJteViewResolver.class)
     public ReactiveJteViewResolver reactiveJteViewResolver(TemplateEngine templateEngine) {
 
-        return new ReactiveJteViewResolver(templateEngine);
+        return new ReactiveJteViewResolver(templateEngine,jteProperties.getTemplateSuffix());
     }
 
     @Bean
     @ConditionalOnMissingBean(TemplateEngine.class)
     public TemplateEngine jteTemplateEngine() {
 
-        if (jteProperties.isProductionEnabled(environment)) {
-            // Templates will be compiled by the maven build task
+        if (jteProperties.usePreCompiledTemplates()) {
+            // Templates will need to be compiled by the maven/gradle build task
             return TemplateEngine.createPrecompiled(ContentType.Html);
         } else {
             // Here, a JTE file watcher will recompile the JTE templates upon file save (the web browser will auto-refresh)

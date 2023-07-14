@@ -1,0 +1,30 @@
+{
+  "groups": [
+    {
+      "name": "gg.jte",
+      "type": "gg.jte.springframework.boot.autoconfigure.JteProperties",
+      "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "gg.jte.usePrecompiledTemplates",
+      "type": "java.lang.Boolean",
+      "description": "You can precompile the templates for faster startup and rendering. To use this you need to include the Maven or Gradle Plugin: https://github.com/casid/jte/blob/main/DOCUMENTATION.md#precompiling-templates",
+      "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
+    },
+    {
+      "name": "gg.jte.templateLocation",
+      "type": "java.lang.String",
+      "description": "You can change the location where jte expects the templates to compile",
+      "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
+    },
+    {
+      "name": "gg.jte.templateSuffix",
+      "type": "java.lang.String",
+      "description": "You can configure the file suffix of jte templates the compiler resolves",
+      "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
+    },
+  ],
+  "hints": []
+}

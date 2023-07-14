@@ -21,16 +21,15 @@ import java.nio.file.Paths;
 @EnableConfigurationProperties(JteProperties.class)
 public class JteAutoConfiguration {
 
-    @Autowired
-    private Environment environment;
+    private final JteProperties jteProperties;
 
-    @Autowired
-    private JteProperties jteProperties;
+    public JteAutoConfiguration(JteProperties jteProperties) {
+        this.jteProperties = jteProperties;
+    }
 
     @Bean
     @ConditionalOnMissingBean(JteViewResolver.class)
     public JteViewResolver jteViewResolver(TemplateEngine templateEngine) {
-
         return new JteViewResolver(templateEngine, jteProperties.getTemplateSuffix());
     }
 
@@ -39,8 +38,8 @@ public class JteAutoConfiguration {
     @ConditionalOnMissingBean(TemplateEngine.class)
     public TemplateEngine jteTemplateEngine() {
 
-        if (jteProperties.isProductionEnabled(environment)) {
-            // Templates will be compiled by the maven build task
+        if (jteProperties.usePreCompiledTemplates()) {
+            // Templates will need to be compiled by the maven/gradle build task
             return TemplateEngine.createPrecompiled(ContentType.Html);
         } else {
             // Here, a JTE file watcher will recompile the JTE templates upon file save (the web browser will auto-refresh)

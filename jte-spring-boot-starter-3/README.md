@@ -53,13 +53,17 @@ You can use it with Spring WebMVC as well as with Spring WebFlux.
 
 By default, the template files are expected in `src/main/jte`.
 
-If any active profile is named prod the template engine will be configured
-to use precompiled templates otherwise the jte file watcher will watch for changes in templates and recompile them.
+If you set `usePrecompiledTemplates` to true you need to configure the Maven/Gradle Plugin to precompile your templates:
+https://github.com/casid/jte/blob/main/DOCUMENTATION.md#precompiling-templates
 
-Both options can be changed via
+If you don't set it the jte file watcher will watch for changes in templates and recompile them.
+
+You can also set the templateSuffix of your jte templates
+
 
 ````
-gg.jte.productionProfileName=k8s
+gg.jte.usePrecompiledTemplates=true
 gg.jte.templateLocation=src/main/templates
+gg.jte.templateSuffix=.jte
 ````
 

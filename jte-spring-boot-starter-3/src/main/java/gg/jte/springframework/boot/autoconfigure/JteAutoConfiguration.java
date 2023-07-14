@@ -34,9 +34,8 @@ public class JteAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(TemplateEngine.class)
     public TemplateEngine jteTemplateEngine() {
-
-        if (jteProperties.isProductionEnabled(environment)) {
-            // Templates will be compiled by the maven build task
+        if(jteProperties.usePreCompiledTemplates()){
+            // Templates will need to be compiled by the maven/gradle build task
             return TemplateEngine.createPrecompiled(ContentType.Html);
         } else {
             // Here, a JTE file watcher will recompile the JTE templates upon file save (the web browser will auto-refresh)

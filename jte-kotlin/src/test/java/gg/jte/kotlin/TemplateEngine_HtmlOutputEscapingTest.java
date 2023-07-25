@@ -68,6 +68,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void unclosedTag_declaration() {
+        codeResolver.givenCode("closed.kte", "@param unused:String\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+        templateEngine.render("closed.kte", "", output);
+
+        assertThat(output.toString()).isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+    }
+
+    @Test
     void codeInTag() {
         codeResolver.givenCode("template.kte", "@param String tag\n\n<span><${tag}/></span>");
 

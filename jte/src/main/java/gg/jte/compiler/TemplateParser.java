@@ -1123,7 +1123,7 @@ public final class TemplateParser {
             this.name = name;
             this.intercepted = intercepted;
             this.attributeStartIndex = attributeStartIndex;
-            this.bodyIgnored = VOID_HTML_TAGS.contains(name);
+            this.bodyIgnored = VOID_HTML_TAGS.contains(name) || name.startsWith("?");
             this.isScript = "script".equals(name);
             this.isStyle = "style".equals(name);
             this.innerTagsIgnored = isScript || isStyle;

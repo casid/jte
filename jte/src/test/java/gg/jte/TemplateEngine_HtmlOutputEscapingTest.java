@@ -477,7 +477,20 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", "", output);
 
-        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+        assertThat(output.toString()).isEqualTo("<button data-value=\"\">Click</button>");
+    }
+
+    /**
+     * This is essentially the same test as gg.jte.TemplateEngine_HtmlOutputEscapingTest#attributes_String_empty()
+     * But it especially shows that there is a semantic difference between an empty String and null.
+     */
+    @Test
+    void attributes_String_empty_option() {
+        codeResolver.givenCode("template.jte", "@param String value\n<option value=\"${value}\">Empty</option>");
+
+        templateEngine.render("template.jte", "", output);
+
+        assertThat(output.toString()).isEqualTo("<option value=\"\">Empty</option>");
     }
 
     @Test

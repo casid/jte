@@ -317,7 +317,7 @@ For rendering HTML documents, `ContentType.Html` is highly recommended for [secu
 
 ### Smart Attributes
 
-Expressions in HTML attributes are evaluated, so that optimal output is generated. This means attributes with a single output that evaluates to an empty string, null, or false, are not rendered. For instance:
+Expressions in HTML attributes are evaluated, so that optimal output is generated. This means attributes with a single output that evaluates to null, or false, are not rendered. For instance:
 
 ```html
 <span data-title="${null}">Info</span>

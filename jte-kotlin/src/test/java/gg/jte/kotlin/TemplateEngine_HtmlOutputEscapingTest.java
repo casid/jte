@@ -470,7 +470,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.kte", "", output);
 
-        assertThat(output.toString()).isEqualTo("<button>Click</button>");
+        assertThat(output.toString()).isEqualTo("<button data-value=\"\">Click</button>");
     }
 
     @Test

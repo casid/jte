@@ -7,6 +7,16 @@ import gg.jte.html.HtmlTag;
 
 public class PreventOutputInTagsAndAttributes implements HtmlPolicy {
 
+    private final boolean preventExpressionsInAttributes;
+
+    public PreventOutputInTagsAndAttributes() {
+        this(true);
+    }
+
+    public PreventOutputInTagsAndAttributes(boolean preventExpressionsInAttributes) {
+        this.preventExpressionsInAttributes = preventExpressionsInAttributes;
+    }
+
     @Override
     public void validateHtmlTag(HtmlTag htmlTag) throws HtmlPolicyException {
         if ( htmlTag.getName().contains("${") ) {
@@ -16,7 +26,7 @@ public class PreventOutputInTagsAndAttributes implements HtmlPolicy {
 
     @Override
     public void validateHtmlAttribute(HtmlTag htmlTag, HtmlAttribute htmlAttribute) throws HtmlPolicyException {
-        if ( htmlAttribute.getName().contains("${") ) {
+        if ( preventExpressionsInAttributes && htmlAttribute.getName().contains("${") ) {
             throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! Expressions in HTML attribute names are not allowed.");
         }
 

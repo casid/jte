@@ -704,7 +704,7 @@ public final class TemplateParser {
                 } else if (currentAttribute.quoteCount == 2) {
                     currentAttribute.value = templateCode.substring(currentAttribute.valueStartIndex, i);
 
-                    if (currentAttribute.containsSingleOutput) {
+                    if (currentAttribute.isSmartAttribute()) {
                         extractTextPart(getLastWhitespaceIndex(currentAttribute.startIndex - 1), Mode.Code);
                         lastIndex = i + 1;
 
@@ -760,7 +760,7 @@ public final class TemplateParser {
 
                     currentHtmlTag.attributes.add(attribute);
 
-                    if (attribute.containsSingleOutput) {
+                    if (attribute.isSmartAttribute()) {
                         outputPrevented = true;
                     }
 
@@ -1228,6 +1228,10 @@ public final class TemplateParser {
         @Override
         public boolean isBoolean() {
             return bool;
+        }
+
+        public boolean isSmartAttribute() {
+            return containsSingleOutput && !name.contains("${") && !name.contains("$unsafe{");
         }
     }
 }

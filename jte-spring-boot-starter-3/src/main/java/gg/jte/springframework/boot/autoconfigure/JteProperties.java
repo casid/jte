@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "gg.jte")
 public class JteProperties {
-    private Boolean usePrecompiledTemplates = false;
+    private boolean usePrecompiledTemplates = false;
     private String templateLocation = "src/main/jte";
     private String templateSuffix = ".jte";
 
@@ -24,7 +24,7 @@ public class JteProperties {
         this.templateLocation = templateLocation;
     }
 
-    public Boolean usePreCompiledTemplates() {
+    public boolean usePreCompiledTemplates() {
         return usePrecompiledTemplates;
     }
 

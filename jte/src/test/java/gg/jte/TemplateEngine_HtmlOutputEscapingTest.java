@@ -1240,6 +1240,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void invalidAttribute_semicolon() {
+        codeResolver.givenCode("template.jte", "<p class=\"my-class\" style=\"margin: 0\";>This is a text</p>");
+
+        Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", null, output));
+
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("Failed to compile template.jte, error at line 1: Invalid HTML attribute name ;!");
+    }
+
+    @Test
     void localization_notFound_noParams() {
         codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
                 "<span>${localizer.localize(\"unknown\")}</span>");

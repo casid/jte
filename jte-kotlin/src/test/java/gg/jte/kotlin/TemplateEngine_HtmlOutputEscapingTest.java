@@ -5,11 +5,12 @@ import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.TemplateException;
 import gg.jte.html.OwaspHtmlPolicy;
-import gg.jte.html.policy.PreventInlineEventHandlers;
-import gg.jte.html.policy.PreventSingleQuotedAttributes;
+import gg.jte.html.policy.*;
 import gg.jte.output.StringOutput;
 import gg.jte.runtime.TemplateUtils;
 import gg.jte.support.LocalizationSupport;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -1407,6 +1408,51 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer), output);
 
         assertThat(output.toString()).isEqualTo("<span>Hello? <a style=\"color: foo;\">Click here</a></span>");
+    }
+
+    @Nested
+    class DynamicAttributesForHotwire {
+
+        class HotwireHtmlPolicy extends PolicyGroup {
+            HotwireHtmlPolicy() {
+                addPolicy(new PreventUppercaseTagsAndAttributes());
+                addPolicy(new PreventOutputInTagsAndAttributes(false));
+                addPolicy(new PreventUnquotedAttributes());
+            }
+        }
+
+        @BeforeEach
+        void setUp() {
+            templateEngine.setHtmlPolicy(new HotwireHtmlPolicy());
+        }
+
+        @Test
+        void attributes_dynamicNameForHotwire() {
+            codeResolver.givenCode("template.kte", "@param controller:String\n@param target:String\n<div data-controller=\"hello\">\n<input data-${controller}-target=\"${target}\"/></div>");
+
+            templateEngine.render("template.kte", TemplateUtils.toMap("controller", "hello", "target", "name"), output);
+
+            assertThat(output.toString()).isEqualTo("<div data-controller=\"hello\">\n<input data-hello-target=\"name\"/></div>");
+        }
+
+        @Test
+        void attributes_dynamicNameForHotwire_unsafe() {
+            codeResolver.givenCode("template.kte", "@param controller:String\n@param target:String\n<div data-controller=\"hello\">\n<input data-$unsafe{controller}-target=\"${target}\"/></div>");
+
+            templateEngine.render("template.kte", TemplateUtils.toMap("controller", "hello", "target", "name"), output);
+
+            assertThat(output.toString()).isEqualTo("<div data-controller=\"hello\">\n<input data-hello-target=\"name\"/></div>");
+        }
+
+        @Test
+        void attributes_dynamicNameForHotwire_unsafe_worksWithDefaultPolicyToo() {
+            templateEngine.setHtmlPolicy(new OwaspHtmlPolicy());
+            codeResolver.givenCode("template.kte", "@param controller:String\n@param target:String\n<div data-controller=\"hello\">\n<input data-$unsafe{controller}-target=\"${target}\"/></div>");
+
+            templateEngine.render("template.kte", TemplateUtils.toMap("controller", "hello", "target", "name"), output);
+
+            assertThat(output.toString()).isEqualTo("<div data-controller=\"hello\">\n<input data-hello-target=\"name\"/></div>");
+        }
     }
 
     @SuppressWarnings("unused")

@@ -319,7 +319,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
         writeIndentation(depth);
-        kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\")\n");
+        kotlinCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").appendEscaped(attributeName).append("\")\n");
 
         writeCodePart(depth, codePart);
 

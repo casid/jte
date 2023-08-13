@@ -143,7 +143,8 @@ No further dependencies required! Check out the [syntax documentation](DOCUMENTA
 - [Micronaut](https://micronaut-projects.github.io/micronaut-views/latest/guide/#jte)
 - [Quarkus](https://github.com/renannprado/quarkus-jte-extension/)
 - [Severell](https://github.com/severell/severell-jte-plugin)
-
+- [http4k](https://www.http4k.org/guide/reference/templating)
+  
 ## Websites rendered with jte
 
 - <a href="https://jte.gg">The jte website</a> (<a href="https://github.com/casid/jte-website">Source</a>)

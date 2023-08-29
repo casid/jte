@@ -1,15 +1,10 @@
 package gg.jte.springframework.boot.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.env.Environment;
-import org.springframework.lang.NonNull;
-
-import java.util.Arrays;
 
 @ConfigurationProperties(prefix = "gg.jte")
 public class JteProperties {
-
-    private String productionProfileName = "prod";
+    private Boolean usePrecompiledTemplates = false;
     private String templateLocation = "src/main/jte";
     private String templateSuffix = ".jte";
 
@@ -21,14 +16,6 @@ public class JteProperties {
         this.templateSuffix = templateSuffix;
     }
 
-    public String getProductionProfileName() {
-        return productionProfileName;
-    }
-
-    public void setProductionProfileName(String productionProfileName) {
-        this.productionProfileName = productionProfileName;
-    }
-
     public String getTemplateLocation() {
         return templateLocation;
     }
@@ -37,7 +24,11 @@ public class JteProperties {
         this.templateLocation = templateLocation;
     }
 
-    public boolean isProductionEnabled(@NonNull Environment environment) {
-        return Arrays.stream(environment.getActiveProfiles()).anyMatch(it -> it.equals(this.getProductionProfileName()));
+    public Boolean usePreCompiledTemplates() {
+        return usePrecompiledTemplates;
+    }
+
+    public void setUsePrecompiledTemplates(Boolean usePrecompiledTemplates) {
+        this.usePrecompiledTemplates = usePrecompiledTemplates;
     }
 }

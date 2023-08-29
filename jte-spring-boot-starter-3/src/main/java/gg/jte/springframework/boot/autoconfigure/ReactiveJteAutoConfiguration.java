@@ -2,12 +2,10 @@ package gg.jte.springframework.boot.autoconfigure;
 
 import gg.jte.*;
 import gg.jte.resolve.*;
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.context.properties.*;
 import org.springframework.context.annotation.*;
-import org.springframework.core.env.*;
 import org.springframework.web.reactive.result.view.*;
 
 import java.nio.file.*;
@@ -17,24 +15,24 @@ import java.nio.file.*;
 @EnableConfigurationProperties(JteProperties.class)
 public class ReactiveJteAutoConfiguration {
 
-    @Autowired
-    private Environment environment;
+    private final JteProperties jteProperties;
 
-    @Autowired
-    private JteProperties jteProperties;
+    public ReactiveJteAutoConfiguration(JteProperties jteProperties) {
+        this.jteProperties = jteProperties;
+    }
 
     @Bean
     @ConditionalOnMissingBean(ReactiveJteViewResolver.class)
     public ReactiveJteViewResolver reactiveJteViewResolver(TemplateEngine templateEngine) {
 
-        return new ReactiveJteViewResolver(templateEngine);
+        return new ReactiveJteViewResolver(templateEngine, jteProperties.getTemplateSuffix());
     }
 
     @Bean
     @ConditionalOnMissingBean(TemplateEngine.class)
     public TemplateEngine jteTemplateEngine() {
 
-        if (jteProperties.isProductionEnabled(environment)) {
+        if (jteProperties.usePreCompiledTemplates()) {
             // Templates will be compiled by the maven build task
             return TemplateEngine.createPrecompiled(ContentType.Html);
         } else {

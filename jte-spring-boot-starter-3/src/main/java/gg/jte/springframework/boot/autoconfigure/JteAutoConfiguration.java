@@ -35,7 +35,7 @@ public class JteAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(TemplateEngine.class)
     public TemplateEngine jteTemplateEngine() {
-        if (Boolean.TRUE.equals(jteProperties.usePreCompiledTemplates())) {
+        if (jteProperties.usePreCompiledTemplates()) {
             // Templates will need to be compiled by the maven/gradle build task
             return TemplateEngine.createPrecompiled(ContentType.Html);
         } else {

@@ -49,12 +49,15 @@ public final class ClassDefinition {
 
         ClassDefinition that = (ClassDefinition) o;
 
-        return name.equals(that.name);
+        if (!name.equals(that.name)) return false;
+        return extension.equals(that.extension);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        int result = name.hashCode();
+        result = 31 * result + extension.hashCode();
+        return result;
     }
 
     public String getSourceFileName() {

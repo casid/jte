@@ -2,13 +2,10 @@ package gg.jte.kotlin;
 
 import gg.jte.CodeResolver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DummyCodeResolver implements CodeResolver {
-    private final Map<String, String> codeLookup = new HashMap<>();
+    private final Map<String, String> codeLookup = new TreeMap<>();
 
     @Override
     public String resolve(String name) {

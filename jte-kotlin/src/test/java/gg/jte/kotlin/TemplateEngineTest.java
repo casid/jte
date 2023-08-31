@@ -1198,6 +1198,16 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void mixedTemplates_callJteFromKte_generateAll() {
+        dummyCodeResolver.givenCode("a.jte", "Java!"); // Hack: named 'a' to be generated first
+        dummyCodeResolver.givenCode(templateName = "b.kte", "Hello @template.a()");
+
+        List<String> generated = templateEngine.generateAll();
+
+        assertThat(generated).hasSize(2);
+    }
+
+    @Test
     void nestedKotlinStringTemplates() {
         givenRawTemplate("@import java.time.format.DateTimeFormatter\n" +
                 "@import java.time.LocalDateTime\n" +

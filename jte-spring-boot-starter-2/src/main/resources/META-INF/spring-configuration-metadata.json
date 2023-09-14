@@ -14,6 +14,12 @@
       "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
     },
     {
+      "name": "gg.jte.developmentMode",
+      "type": "java.lang.Boolean",
+      "description": "You can enable developmentMode so that the jte file watcher will watch for changes in templates and recompile them.",
+      "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
+    },
+    {
       "name": "gg.jte.templateLocation",
       "type": "java.lang.String",
       "description": "You can change the location where jte expects the templates to compile",
@@ -24,7 +30,7 @@
       "type": "java.lang.String",
       "description": "You can configure the file suffix of jte templates the compiler resolves",
       "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
-    },
+    }
   ],
   "hints": []
 }

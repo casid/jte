@@ -96,7 +96,7 @@ public interface CodeGenerator extends TemplateParserVisitor {
                 parts.add(new TemplateExpressionPart(TemplateExpressionPart.Type.Code, codePart));
             }
 
-        }, TemplateConfig.PLAIN, null);
+        }, TemplateConfig.PLAIN);
 
         parser.parse();
 

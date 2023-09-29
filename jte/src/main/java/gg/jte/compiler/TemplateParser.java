@@ -5,7 +5,6 @@ import gg.jte.ContentType;
 import gg.jte.TemplateConfig;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.html.HtmlPolicyException;
-import gg.jte.resolve.DirectoryCodeResolver;
 import gg.jte.runtime.StringUtils;
 
 import java.util.*;
@@ -24,8 +23,6 @@ public final class TemplateParser {
     private final Deque<Mode> stack = new ArrayDeque<>();
     private final Deque<Indent> indentStack = new ArrayDeque<>();
     private final Deque<HtmlTag> htmlStack = new ArrayDeque<>();
-
-    private final CodeResolver codeResolver;
 
     private Mode currentMode;
     private Mode previousControlStructureTrimmed;
@@ -47,10 +44,6 @@ public final class TemplateParser {
     private char currentChar;
 
     public TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, TemplateConfig config) {
-        this(templateCode, type, visitor, config, null);
-    }
-
-    public TemplateParser(String templateCode, TemplateType type, TemplateParserVisitor visitor, TemplateConfig config, CodeResolver codeResolver) {
         this.templateCode = templateCode;
         this.type = type;
         this.visitor = visitor;
@@ -64,7 +57,6 @@ public final class TemplateParser {
         this.startIndex = 0;
         this.endIndex = templateCode.length();
 
-        this.codeResolver = codeResolver;
     }
 
     public void setStartIndex(int startIndex) {
@@ -330,11 +322,8 @@ public final class TemplateParser {
                 push(Mode.TemplateCallName);
             } else if (currentMode == Mode.Text && (regionMatches("@tag.") || regionMatches("@layout."))) {
                 String rootDirectory = "jte-root-directory";
-                if (codeResolver instanceof DirectoryCodeResolver) {
-                    rootDirectory = ((DirectoryCodeResolver)codeResolver).getRoot().toAbsolutePath().toString().replace("\\", "\\\\");
-                }
 
-                visitor.onError("@tag and @layout have been replace with @template since jte 2.\nYour templates must be migrated. You can do this automatically by running the following Java code in your project:\n\n" +
+                visitor.onError("@tag and @layout have been replaced with @template since jte 2.\nYour templates must be migrated. You can do this automatically by running the following Java code in your project:\n\n" +
                         "public class Migration {\n" +
                         "    public static void main(String[] args) {\n" +
                         "        gg.jte.migrate.MigrateV1To2.migrateTemplates(java.nio.file.Paths.get(\"" + rootDirectory + "\"));\n" +

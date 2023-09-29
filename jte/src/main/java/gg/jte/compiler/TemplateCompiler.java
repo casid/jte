@@ -8,10 +8,15 @@ import gg.jte.compiler.extensionsupport.ExtensionConfig;
 import gg.jte.compiler.extensionsupport.ExtensionTemplateDescription;
 import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
+import gg.jte.compiler.module.Module;
+import gg.jte.compiler.module.ModuleImport;
+import gg.jte.compiler.module.ModuleInfo;
+import gg.jte.compiler.module.ModuleInfoParser;
 import gg.jte.extension.api.JteConfig;
 import gg.jte.extension.api.JteExtension;
 import gg.jte.extension.api.TemplateDescription;
 import gg.jte.output.FileOutput;
+import gg.jte.resolve.DirectoryCodeResolver;
 import gg.jte.runtime.*;
 
 import java.io.IOException;
@@ -86,7 +91,8 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public List<String> precompileAll() {
-        return precompile(codeResolver.resolveAllTemplateNames());
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames(), false);
+        return precompileClasses(classDefinitions);
     }
 
     public List<String> precompile(List<String> names) {
@@ -161,12 +167,14 @@ public class TemplateCompiler extends TemplateLoader {
         }
     }
 
-    private LinkedHashSet<ClassDefinition> generate(List<String> names, boolean trackChanges) {
+    private LinkedHashSet<ClassDefinition> generate(List<String> names, boolean trackChanges ) {
+        Module module = readModuleInformation("", codeResolver);
+
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
             LinkedHashSet<TemplateDependency> dependencies = initTemplateDependencies(name);
 
-            ClassInfo templateInfo = generateTemplateCall(name, classDefinitions, dependencies, null);
+            ClassInfo templateInfo = generateTemplateCall(name, classDefinitions, dependencies, null, module);
 
             templateDependencies.put(name, dependencies);
             templateByClassName.put(templateInfo.name, templateInfo);
@@ -223,21 +231,44 @@ public class TemplateCompiler extends TemplateLoader {
         return classDefinitions;
     }
 
+    private Module readModuleInformation(String alias, CodeResolver codeResolver) {
+        String jteRootContent = codeResolver.resolve(".jteroot");
+        if (jteRootContent == null) {
+            return new Module(alias, codeResolver, Map.of());
+        }
+
+        if (!(codeResolver instanceof DirectoryCodeResolver directoryCodeResolver)) {
+            return new Module(alias, codeResolver, Map.of());
+        }
+
+        ModuleInfo moduleInfo = ModuleInfoParser.parse(jteRootContent);
+        Map<String, Module> children = new LinkedHashMap<>();
+
+        for ( ModuleImport moduleImport : moduleInfo.imports() ) {
+            DirectoryCodeResolver moduleDirectoryResolver = new DirectoryCodeResolver(directoryCodeResolver.getRoot().resolve(moduleImport.from()));
+            children.put(moduleImport.alias(), readModuleInformation(moduleImport.alias(), moduleDirectoryResolver));
+        }
+
+        return new Module(alias, codeResolver, children);
+    }
+
     private LinkedHashSet<TemplateDependency> initTemplateDependencies(String name) {
         LinkedHashSet<TemplateDependency> templateDependencies = new LinkedHashSet<>();
         templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
         return templateDependencies;
     }
 
-    public ClassInfo generateTemplateCall(String simpleName, String extension, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo) {
+    public ClassInfo generateTemplateCall(String simpleName, String extension, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo, Module module) {
         String name = resolveTemplateName(simpleName, extension);
         try {
-            return generateTemplateCall(name, classDefinitions, templateDependencies, debugInfo);
+            return generateTemplateCall(name, classDefinitions, templateDependencies, debugInfo, module);
         } catch (TemplateNotFoundException e) {
             String alternativeName = resolveTemplateName(simpleName, "jte".equals(extension) ? "kte" : "jte");
 
+            Module templateModule = module.resolve(name);
+            CodeResolver codeResolver = templateModule.getCodeResolver();
             if (codeResolver.exists(alternativeName)) {
-                return generateTemplateCall(alternativeName, classDefinitions, templateDependencies, debugInfo);
+                return generateTemplateCall(alternativeName, classDefinitions, templateDependencies, debugInfo, module);
             } else {
                 throw e;
             }
@@ -248,7 +279,10 @@ public class TemplateCompiler extends TemplateLoader {
         return simpleName.replace('.', '/') + "." + extension;
     }
 
-    public ClassInfo generateTemplateCall(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo) {
+    public ClassInfo generateTemplateCall(String name, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, DebugInfo debugInfo, Module module) {
+        Module templateModule = module.resolve(name);
+        CodeResolver codeResolver = templateModule.getCodeResolver();
+
         templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
         ClassInfo classInfo = new ClassInfo(name, config.packageName);
 
@@ -257,11 +291,11 @@ public class TemplateCompiler extends TemplateLoader {
             return classInfo;
         }
 
-        String code = resolveCode(name, debugInfo);
+        String code = resolveCode(codeResolver, name, debugInfo);
 
         classDefinitions.add(classDefinition);
 
-        CodeGenerator codeGenerator = createCodeGenerator(classInfo, classDefinitions, templateDependencies);
+        CodeGenerator codeGenerator = createCodeGenerator(classInfo, classDefinitions, templateDependencies, templateModule);
         new TemplateParser(code, TemplateType.Template, codeGenerator, config).parse();
 
         classDefinition.setCode(codeGenerator.getCode(), codeGenerator.getBinaryTextParts(), codeGenerator.getParamInfo(), codeGenerator.getImports());
@@ -274,20 +308,21 @@ public class TemplateCompiler extends TemplateLoader {
         return classInfo;
     }
 
-    private CodeGenerator createCodeGenerator(ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
+    private CodeGenerator createCodeGenerator(ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies,
+          Module module ) {
         if ("kte".equals(classInfo.extension)) {
             try {
                 Class<?> compilerClass = Class.forName("gg.jte.compiler.kotlin.KotlinCodeGenerator");
-                return (CodeGenerator)compilerClass.getConstructor(TemplateCompiler.class, TemplateConfig.class, ConcurrentHashMap.class, ClassInfo.class, LinkedHashSet.class, LinkedHashSet.class).newInstance(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+                return (CodeGenerator)compilerClass.getConstructor(TemplateCompiler.class, TemplateConfig.class, ConcurrentHashMap.class, ClassInfo.class, LinkedHashSet.class, LinkedHashSet.class, Module.class).newInstance(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies, module);
             } catch (Exception e) {
                 throw new TemplateException("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.", e);
             }
         } else {
-            return new JavaCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies);
+            return new JavaCodeGenerator(this, this.config, paramOrder, classInfo, classDefinitions, templateDependencies, module);
         }
     }
 
-    private String resolveCode(String name, DebugInfo debugInfo) {
+    private String resolveCode(CodeResolver codeResolver, String name, DebugInfo debugInfo) {
         try {
             return codeResolver.resolveRequired(name);
         } catch (TemplateNotFoundException e) {
@@ -341,4 +376,5 @@ public class TemplateCompiler extends TemplateLoader {
             throw new TemplateException("Failed to load extension " + extensionSettings.getKey(), e);
         }
     }
+
 }

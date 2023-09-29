@@ -5,6 +5,7 @@ import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
 import gg.jte.compiler.*;
 import gg.jte.compiler.CodeBuilder.CodeMarker;
+import gg.jte.compiler.module.Module;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import gg.jte.runtime.DebugInfo;
@@ -25,6 +26,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private final CodeBuilder kotlinCode = new CodeBuilder(CodeType.Kotlin);
     private final LinkedHashSet<ClassDefinition> classDefinitions;
     private final LinkedHashSet<TemplateDependency> templateDependencies;
+    private final Module module;
     private final List<ParamInfo> parameters = new ArrayList<>();
     private final List<String> imports = new ArrayList<>();
     private final List<byte[]> binaryTextParts = new ArrayList<>();
@@ -35,13 +37,14 @@ public class KotlinCodeGenerator implements CodeGenerator {
     private CodeMarker fieldsMarker;
     private int attributeCounter;
 
-    public KotlinCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
+    public KotlinCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies, Module module ) {
         this.compiler = compiler;
         this.config = config;
         this.paramOrder = paramOrder;
         this.classInfo = classInfo;
         this.classDefinitions = classDefinitions;
         this.templateDependencies = templateDependencies;
+        this.module = module;
     }
 
     @Override
@@ -426,7 +429,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
     @Override
     public void onTemplateCall(int depth, String name, List<String> params) {
-        ClassInfo tagInfo = compiler.generateTemplateCall(name, "kte", classDefinitions, templateDependencies, getCurrentDebugInfo());
+        ClassInfo tagInfo = compiler.generateTemplateCall(name, "kte", classDefinitions, templateDependencies, getCurrentDebugInfo(), module);
 
         writeIndentation(depth);
 

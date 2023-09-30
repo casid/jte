@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -68,6 +69,21 @@ public class TemplateEngine_ModulesTest {
               <style>important</style>
               <p>line chart (checkout)</p>
               line chart (core)""");
+   }
+
+   @Test
+   void emptyTopLevelModule_generateAll() {
+      DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src/test/modules/empty-top-level-module"));
+      TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+
+      List<String> templates = templateEngine.generateAll();
+
+      assertThat(templates).containsExactlyInAnyOrder(
+              "gg/jte/generated/ondemand/apexcharts/JtelinechartGenerated.java",
+              "gg/jte/generated/ondemand/checkout/JtepageGenerated.java",
+              "gg/jte/generated/ondemand/core/JtelayoutGenerated.java",
+              "gg/jte/generated/ondemand/core/component/JtecssGenerated.java"
+      );
    }
 
    // TODO adjust precompileAll() and generateAll() to iterate over all module files as well!

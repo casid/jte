@@ -44,6 +44,18 @@ public final class Module {
       return result;
    }
 
+   public String normalize(String name) {
+      if (isRoot()) {
+         return name;
+      } else {
+         if (name.startsWith(alias + "/")) {
+            return name;
+         } else {
+            return alias + "/" + name;
+         }
+      }
+   }
+
    public boolean isRoot() {
       return alias.isEmpty();
    }

@@ -284,6 +284,8 @@ public class TemplateCompiler extends TemplateLoader {
         Module templateModule = module.resolve(name);
         CodeResolver codeResolver = templateModule.getCodeResolver();
 
+        name = templateModule.normalize(name);
+
         templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
         ClassInfo classInfo = new ClassInfo(name, config.packageName);
 

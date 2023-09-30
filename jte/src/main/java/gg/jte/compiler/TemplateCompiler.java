@@ -245,7 +245,8 @@ public class TemplateCompiler extends TemplateLoader {
         Map<String, Module> children = new LinkedHashMap<>();
 
         for ( ModuleImport moduleImport : moduleInfo.imports() ) {
-            DirectoryCodeResolver moduleDirectoryResolver = new DirectoryCodeResolver(directoryCodeResolver.getRoot().resolve(moduleImport.from()));
+            Path modulePath = directoryCodeResolver.getRoot().resolve(moduleImport.from()).normalize();
+            DirectoryCodeResolver moduleDirectoryResolver = new DirectoryCodeResolver(modulePath);
             children.put(moduleImport.alias(), readModuleInformation(moduleImport.alias(), moduleDirectoryResolver));
         }
 

@@ -1,0 +1,1 @@
+@template.core.layout(content = @`@template.apexcharts.line-chart("checkout")`)

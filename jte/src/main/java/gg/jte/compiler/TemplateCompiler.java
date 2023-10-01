@@ -58,7 +58,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public Template hotReload(String name) {
-        LinkedHashSet<ClassDefinition> classDefinitions = generate(Collections.singletonList(name), true);
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(Collections.singletonList(name), true, readModuleInformation("", codeResolver));
         classDefinitions.removeIf(c -> !c.isChanged());
 
         if (!classDefinitions.isEmpty()) {
@@ -85,18 +85,24 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public List<String> generateAll() {
-        LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames(), false);
+        Module module = readModuleInformation("", codeResolver);
+        Collection<String> names = module.resolveAllTemplateNames();
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(names, false, module);
+
         return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
     }
 
     @Override
     public List<String> precompileAll() {
-        LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames(), false);
+        Module module = readModuleInformation("", codeResolver);
+        Collection<String> names = module.resolveAllTemplateNames();
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(names, false, module);
+
         return precompileClasses(classDefinitions);
     }
 
     public List<String> precompile(List<String> names) {
-        LinkedHashSet<ClassDefinition> classDefinitions = generate(names, false);
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(names, false, readModuleInformation("", codeResolver));
         return precompileClasses(classDefinitions);
     }
 
@@ -167,8 +173,7 @@ public class TemplateCompiler extends TemplateLoader {
         }
     }
 
-    private LinkedHashSet<ClassDefinition> generate(List<String> names, boolean trackChanges ) {
-        Module module = readModuleInformation("", codeResolver);
+    private LinkedHashSet<ClassDefinition> generate(Collection<String> names, boolean trackChanges, Module module) {
 
         LinkedHashSet<ClassDefinition> classDefinitions = new LinkedHashSet<>();
         for (String name : names) {
@@ -234,11 +239,11 @@ public class TemplateCompiler extends TemplateLoader {
     private Module readModuleInformation(String alias, CodeResolver codeResolver) {
         String jteRootContent = codeResolver.resolve(".jteroot");
         if (jteRootContent == null) {
-            return new Module(alias, codeResolver, Map.of());
+            return new Module(alias, codeResolver, Map.of(), false);
         }
 
         if (!(codeResolver instanceof DirectoryCodeResolver directoryCodeResolver)) {
-            return new Module(alias, codeResolver, Map.of());
+            return new Module(alias, codeResolver, Map.of(), false);
         }
 
         ModuleInfo moduleInfo = ModuleInfoParser.parse(jteRootContent);
@@ -250,7 +255,7 @@ public class TemplateCompiler extends TemplateLoader {
             children.put(moduleImport.alias(), readModuleInformation(moduleImport.alias(), moduleDirectoryResolver));
         }
 
-        return new Module(alias, codeResolver, children);
+        return new Module(alias, codeResolver, children, moduleInfo.parent());
     }
 
     private LinkedHashSet<TemplateDependency> initTemplateDependencies(String name) {

@@ -3,6 +3,7 @@ package gg.jte.compiler.module;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 
 public class ModuleInfoParser {
@@ -29,7 +30,8 @@ public class ModuleInfoParser {
    }
 
    private ModuleInfo parse() {
-      ModuleInfo result = new ModuleInfo(new ArrayList<>());
+      boolean parent = false;
+      List<ModuleImport> imports = new ArrayList<>();
 
       push(Mode.Root);
 
@@ -44,13 +46,16 @@ public class ModuleInfoParser {
                importMode.alias = extractFromLastIndex(-4).trim();
             } else if ( currentChar == '\n' || i == endIndex - 1) {
                importMode.from = extractFromLastIndex(1).trim();
-               result.imports().add(new ModuleImport(importMode.alias, importMode.from));
+               imports.add(new ModuleImport(importMode.alias, importMode.from));
                pop();
             }
+         } else if (currentMode == Mode.Root && regionMatches("@parent")) {
+            parent = true;
+            lastIndex = i + 1;
          }
       }
 
-      return result;
+      return new ModuleInfo(parent, imports);
    }
 
    private String extractFromLastIndex(int offset) {

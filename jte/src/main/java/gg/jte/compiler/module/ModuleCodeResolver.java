@@ -3,6 +3,8 @@ package gg.jte.compiler.module;
 import gg.jte.CodeResolver;
 import gg.jte.TemplateNotFoundException;
 
+import java.util.List;
+
 
 public class ModuleCodeResolver implements CodeResolver {
 
@@ -27,6 +29,11 @@ public class ModuleCodeResolver implements CodeResolver {
    @Override
    public long getLastModified( String name ) {
       return codeResolver.getLastModified(removeAlias(name));
+   }
+
+   @Override
+   public List<String> resolveAllTemplateNames() {
+      return codeResolver.resolveAllTemplateNames();
    }
 
    @Override

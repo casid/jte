@@ -1,5 +1,8 @@
 package gg.jte.compiler.module;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 
 import gg.jte.CodeResolver;
@@ -19,11 +22,13 @@ public final class Module {
    private final String alias;
    private final CodeResolver codeResolver;
    private final Map<String, Module> children;
+   private final boolean parent;
 
-   public Module( String alias, CodeResolver codeResolver, Map<String, Module> children ) {
+   public Module( String alias, CodeResolver codeResolver, Map<String, Module> children, boolean parent ) {
       this.alias = alias;
       this.codeResolver = isRoot() ? codeResolver : new ModuleCodeResolver(alias, codeResolver);
       this.children = children;
+      this.parent = parent;
    }
 
    public Module resolve(String name) {
@@ -60,11 +65,26 @@ public final class Module {
       return alias.isEmpty();
    }
 
-   public String getAlias() {
-      return alias;
-   }
-
    public CodeResolver getCodeResolver() {
       return codeResolver;
+   }
+
+   public Collection<String> resolveAllTemplateNames() {
+      LinkedHashSet<String> result = new LinkedHashSet<>();
+      resolveAllTemplateNames(result);
+      return result;
+   }
+
+   private void resolveAllTemplateNames(LinkedHashSet<String> result) {
+      if (!parent) {
+         List<String> names = codeResolver.resolveAllTemplateNames();
+         for (String name : names) {
+            result.add(normalize(name));
+         }
+      }
+
+      for (Module module : children.values()) {
+         module.resolveAllTemplateNames(result);
+      }
    }
 }

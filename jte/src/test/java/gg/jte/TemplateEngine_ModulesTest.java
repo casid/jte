@@ -72,7 +72,7 @@ public class TemplateEngine_ModulesTest {
    }
 
    @Test
-   void emptyTopLevelModule_generateAll() {
+   void generateAll_emptyTopLevelModule() {
       DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src/test/modules/empty-top-level-module"));
       TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
 
@@ -87,5 +87,32 @@ public class TemplateEngine_ModulesTest {
       );
    }
 
-   // TODO adjust precompileAll() and generateAll() to iterate over all module files as well!
+   @Test
+   void generateAll_threeModulesSameAlias() {
+      DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src/test/modules/three-modules-same-alias/app"));
+      TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+
+      List<String> templates = templateEngine.generateAll();
+
+      assertThat(templates).containsExactlyInAnyOrder(
+              "gg/jte/generated/ondemand/JtepageGenerated.java",
+              "gg/jte/generated/ondemand/core/JtelayoutGenerated.java",
+              "gg/jte/generated/ondemand/apexcharts/JtelinechartGenerated.java"
+      );
+   }
+
+   @Test
+   void generateAll_threeModulesDifferentAlias() {
+      DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src/test/modules/three-modules-different-alias/app"));
+      TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+
+      List<String> templates = templateEngine.generateAll();
+
+      assertThat(templates).containsExactlyInAnyOrder(
+              "gg/jte/generated/ondemand/JtepageGenerated.java",
+              "gg/jte/generated/ondemand/core/JtelayoutGenerated.java",
+              "gg/jte/generated/ondemand/apexcharts/JtelinechartGenerated.java",
+              "gg/jte/generated/ondemand/charts/JtelinechartGenerated.java"
+      );
+   }
 }

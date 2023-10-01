@@ -9,14 +9,10 @@ import gg.jte.compiler.extensionsupport.ExtensionTemplateDescription;
 import gg.jte.compiler.java.JavaClassCompiler;
 import gg.jte.compiler.java.JavaCodeGenerator;
 import gg.jte.compiler.module.Module;
-import gg.jte.compiler.module.ModuleImport;
-import gg.jte.compiler.module.ModuleInfo;
-import gg.jte.compiler.module.ModuleInfoParser;
 import gg.jte.extension.api.JteConfig;
 import gg.jte.extension.api.JteExtension;
 import gg.jte.extension.api.TemplateDescription;
 import gg.jte.output.FileOutput;
-import gg.jte.resolve.DirectoryCodeResolver;
 import gg.jte.runtime.*;
 
 import java.io.IOException;
@@ -58,7 +54,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public Template hotReload(String name) {
-        LinkedHashSet<ClassDefinition> classDefinitions = generate(Collections.singletonList(name), true, readModuleInformation("", codeResolver));
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(Collections.singletonList(name), true, getModule());
         classDefinitions.removeIf(c -> !c.isChanged());
 
         if (!classDefinitions.isEmpty()) {
@@ -85,7 +81,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public List<String> generateAll() {
-        Module module = readModuleInformation("", codeResolver);
+        Module module = getModule();
         Collection<String> names = module.resolveAllTemplateNames();
         LinkedHashSet<ClassDefinition> classDefinitions = generate(names, false, module);
 
@@ -94,7 +90,7 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public List<String> precompileAll() {
-        Module module = readModuleInformation("", codeResolver);
+        Module module = getModule();
         Collection<String> names = module.resolveAllTemplateNames();
         LinkedHashSet<ClassDefinition> classDefinitions = generate(names, false, module);
 
@@ -102,7 +98,7 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     public List<String> precompile(List<String> names) {
-        LinkedHashSet<ClassDefinition> classDefinitions = generate(names, false, readModuleInformation("", codeResolver));
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(names, false, getModule());
         return precompileClasses(classDefinitions);
     }
 
@@ -236,28 +232,6 @@ public class TemplateCompiler extends TemplateLoader {
         return classDefinitions;
     }
 
-    private Module readModuleInformation(String alias, CodeResolver codeResolver) {
-        String jteRootContent = codeResolver.resolve(".jteroot");
-        if (jteRootContent == null) {
-            return new Module(alias, codeResolver, Map.of(), false);
-        }
-
-        if (!(codeResolver instanceof DirectoryCodeResolver directoryCodeResolver)) {
-            return new Module(alias, codeResolver, Map.of(), false);
-        }
-
-        ModuleInfo moduleInfo = ModuleInfoParser.parse(jteRootContent);
-        Map<String, Module> children = new LinkedHashMap<>();
-
-        for ( ModuleImport moduleImport : moduleInfo.imports() ) {
-            Path modulePath = directoryCodeResolver.getRoot().resolve(moduleImport.from()).normalize();
-            DirectoryCodeResolver moduleDirectoryResolver = new DirectoryCodeResolver(modulePath);
-            children.put(moduleImport.alias(), readModuleInformation(moduleImport.alias(), moduleDirectoryResolver));
-        }
-
-        return new Module(alias, codeResolver, children, moduleInfo.parent());
-    }
-
     private LinkedHashSet<TemplateDependency> initTemplateDependencies(String name) {
         LinkedHashSet<TemplateDependency> templateDependencies = new LinkedHashSet<>();
         templateDependencies.add(new TemplateDependency(name, codeResolver.getLastModified(name)));
@@ -383,6 +357,10 @@ public class TemplateCompiler extends TemplateLoader {
         } catch(Exception e) {
             throw new TemplateException("Failed to load extension " + extensionSettings.getKey(), e);
         }
+    }
+
+    private Module getModule() {
+        return Module.create("", codeResolver);
     }
 
 }

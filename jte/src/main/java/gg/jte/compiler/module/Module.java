@@ -1,14 +1,35 @@
 package gg.jte.compiler.module;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Path;
+import java.util.*;
 
 import gg.jte.CodeResolver;
+import gg.jte.resolve.DirectoryCodeResolver;
 
 
 public final class Module {
+
+   public static Module create(String alias, CodeResolver codeResolver) {
+      String jteRootContent = codeResolver.resolve(".jteroot");
+      if (jteRootContent == null) {
+         return new Module(alias, codeResolver, Map.of(), false);
+      }
+
+      if (!(codeResolver instanceof DirectoryCodeResolver directoryCodeResolver)) {
+         return new Module(alias, codeResolver, Map.of(), false);
+      }
+
+      ModuleInfo moduleInfo = ModuleInfoParser.parse(jteRootContent);
+      Map<String, Module> children = new LinkedHashMap<>();
+
+      for ( ModuleImport moduleImport : moduleInfo.imports() ) {
+         Path modulePath = directoryCodeResolver.getRoot().resolve(moduleImport.from()).normalize();
+         DirectoryCodeResolver moduleDirectoryResolver = new DirectoryCodeResolver(modulePath);
+         children.put(moduleImport.alias(), create(moduleImport.alias(), moduleDirectoryResolver));
+      }
+
+      return new Module(alias, codeResolver, children, moduleInfo.parent());
+   }
 
    public static String getModuleAlias(String name) {
       int index = name.indexOf('/');

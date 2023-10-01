@@ -81,6 +81,7 @@ public class TemplateEngine_ModulesTest {
       assertThat(templates).containsExactlyInAnyOrder(
               "gg/jte/generated/ondemand/apexcharts/JtelinechartGenerated.java",
               "gg/jte/generated/ondemand/checkout/JtepageGenerated.java",
+              "gg/jte/generated/ondemand/checkout/JteunusedGenerated.java",
               "gg/jte/generated/ondemand/core/JtelayoutGenerated.java",
               "gg/jte/generated/ondemand/core/component/JtecssGenerated.java"
       );

@@ -23,17 +23,27 @@ public class ModelGenerator {
     private final String targetClassName;
     private final String interfaceName;
 
+    private final Language language;
+
     public ModelGenerator(TemplateEngine engine, String templateSubDirectory, String targetClassName, String interfaceName) {
+        this(engine, templateSubDirectory, targetClassName, interfaceName, Language.JAVA);
+    }
+
+    public ModelGenerator(TemplateEngine engine, String templateSubDirectory, String targetClassName, String interfaceName, Language language) {
         this.engine = engine;
         this.templateSubDirectory = templateSubDirectory;
         this.targetClassName = targetClassName;
         this.interfaceName = interfaceName;
+        this.language = language;
     }
 
     public Path generate(JteConfig config, Set<TemplateDescription> templateDescriptions, ModelConfig modelConfig) {
+        String fileExtension = language == Language.JAVA ? ".java" : ".kt";
+        String templateName = language == Language.JAVA ? "/main.jte" : "/kmain.jte";
+
         Path sourceFilePath = config.generatedSourcesRoot()
                 .resolve(config.packageName().replace('.', '/'))
-                .resolve(targetClassName + ".java");
+                .resolve(targetClassName + fileExtension);
         Iterable<String> imports = templateDescriptions.stream()
                 .flatMap(t -> t.imports().stream())
                 .collect(Collectors.toCollection(TreeSet::new));
@@ -47,7 +57,7 @@ public class ModelGenerator {
                 paramMap.put("templates", templateDescriptions);
                 paramMap.put("imports", imports);
                 paramMap.put("modelConfig", modelConfig);
-                engine.render(templateSubDirectory + "/main.jte", paramMap, new SquashBlanksOutput(new WriterOutput(w)));
+                engine.render(templateSubDirectory + templateName, paramMap, new SquashBlanksOutput(new WriterOutput(w)));
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);

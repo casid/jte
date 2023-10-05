@@ -20,6 +20,11 @@ To use jte-models, set up your build script to include one of these:
                     <extensions>
                         <extension>
                             <className>gg.jte.models.generator.ModelExtension</className>
+                            <!-- optional settings to configure the target language (Java and Kotlin are supported):
+                            <settings>
+                                <language>java</language>
+                            </settings>
+                            -->
                             <!-- optional settings to include annotations on generated classes:
                             <settings>
                                 <interfaceAnnotation>@foo.bar.MyAnnotation</interfaceAnnotation>
@@ -72,11 +77,17 @@ jte {
     generate()
     binaryStaticContent = true
     jteExtension 'gg.jte.models.generator.ModelExtension'
-    // or to add annotations to generated classes:
+    // or to configure the generator
     /*
     jteExtension('gg.jte.models.generator.ModelExtension') {
+        // Target language (Java and Kotlin are supported). "Java" is the default.
+        language = 'java'
+
+        // Annotations to add to generated interfaces and classes
         interfaceAnnotation = '@foo.bar.MyAnnotation'
         implementationAnnotation = '@foo.bar.MyAnnotation'
+
+        // Patterns to include (or exclude) certain templates
         includePattern = '\.pages\..*'
         excludePattern = '\.components\..*'
     }
@@ -103,11 +114,17 @@ jte {
     generate()
     binaryStaticContent.set(true)
     jteExtension("gg.jte.models.generator.ModelExtension")
-    // or to add annotations to generated classes:
+    // or to configure the generator:
     /*
     jteExtension("gg.jte.models.generator.ModelExtension") {
+        // Target language (Java and Kotlin are supported). "Java" is the default.
+        property("language", "java")
+
+        // Annotations to add to generated interfaces and classes
         property("interfaceAnnotation", "@foo.bar.MyAnnotation")
         property("implementationAnnotation", "@foo.bar.MyAnnotation")
+
+        // Patterns to include (or exclude) certain templates
         property("includePattern", "\.pages\..*")
         property("excludePattern", '\.components\..*")
     }
@@ -124,9 +141,19 @@ Additional generated classes will include a facade interface named `gg.jte.gener
 
 `Templates` has a method for each of your templates, for example:
 
+### Java
+
 ```java
 public interface Templates {
     JteModel helloWorld(String greeting);
+}
+```
+
+### Kotlin
+
+```kotlin
+interface Templates {
+    fun helloWord(greeting: String): JteModel
 }
 ```
 

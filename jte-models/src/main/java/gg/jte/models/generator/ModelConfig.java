@@ -18,6 +18,17 @@ public class ModelConfig {
         return map.getOrDefault("implementationAnnotation", "");
     }
 
+    public Language language() {
+        String configuredLanguage = map.getOrDefault("language", "JAVA").toUpperCase();
+        Language language = Language.JAVA;
+        try {
+            language = Language.valueOf(configuredLanguage);
+        } catch (IllegalArgumentException ex) {
+            // how to report wrong conciguration? fail or default to Java?
+        }
+        return language;
+    }
+
     public Pattern includePattern() {
         String includePattern = map.get("includePattern");
         if (includePattern == null) {

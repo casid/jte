@@ -20,7 +20,7 @@ public class ModelConfig {
     }
 
     public Language language() {
-        String configuredLanguage = map.getOrDefault("language", "JAVA");
+        String configuredLanguage = map.getOrDefault("language", "Java");
         try {
             return Language.valueOf(configuredLanguage.toUpperCase());
         } catch (IllegalArgumentException ex) {

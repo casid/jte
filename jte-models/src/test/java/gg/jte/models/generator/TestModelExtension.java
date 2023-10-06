@@ -51,7 +51,7 @@ public class TestModelExtension {
     public void simpleKotlinTest() {
         JteExtension modelExtension = new ModelExtension();
         Map<String, String> config = new HashMap<>();
-        config.put("language", Language.KOTLIN.toString());
+        config.put("language", Language.Kotlin.toString());
         modelExtension.init(config);
 
         Collection<Path> generatedPaths = generatedPaths(modelExtension);

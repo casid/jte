@@ -33,8 +33,8 @@ public class ModelGenerator {
     }
 
     public Path generate(JteConfig config, Set<TemplateDescription> templateDescriptions, ModelConfig modelConfig) {
-        String fileExtension = language == Language.JAVA ? ".java" : ".kt";
-        String templateName = language == Language.JAVA ? "/main.jte" : "/kmain.jte";
+        String fileExtension = language == Language.Java ? ".java" : ".kt";
+        String templateName = language == Language.Java ? "/main.jte" : "/kmain.jte";
 
         Path sourceFilePath = config.generatedSourcesRoot()
                 .resolve(config.packageName().replace('.', '/'))

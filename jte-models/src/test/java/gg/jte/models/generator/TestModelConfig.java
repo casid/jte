@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestModelConfig {
@@ -36,20 +35,20 @@ public class TestModelConfig {
 
     @Test
     public void languageConfigurationSupportsJava() {
-        var modelConfig = new ModelConfig(Map.of("language", "JAVA"));
-        assertEquals(modelConfig.language(), Language.JAVA);
+        var modelConfig = new ModelConfig(Map.of("language", "Java"));
+        assertEquals(modelConfig.language(), Language.Java);
     }
 
     @Test
     public void languageConfigurationDefaultsToJava() {
         var modelConfig = new ModelConfig(Map.of());
-        assertEquals(modelConfig.language(), Language.JAVA);
+        assertEquals(modelConfig.language(), Language.Java);
     }
 
     @Test
     public void languageConfigurationSupportsKotlin() {
-        var modelConfig = new ModelConfig(Map.of("language", "KOTLIN"));
-        assertEquals(modelConfig.language(), Language.KOTLIN);
+        var modelConfig = new ModelConfig(Map.of("language", "Kotlin"));
+        assertEquals(modelConfig.language(), Language.Kotlin);
     }
 
     @Test
@@ -65,7 +64,7 @@ public class TestModelConfig {
         });
 
         assertEquals(
-            "JTE ModelExtension 'language' property is not configured correctly (current value is 'Ooops'). Supported values: [JAVA, KOTLIN]",
+            "JTE ModelExtension 'language' property is not configured correctly (current value is 'Ooops'). Supported values: [Java, Kotlin]",
             exception.getMessage()
         );
     }

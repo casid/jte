@@ -22,12 +22,7 @@ public class ModelGenerator {
     private final String templateSubDirectory;
     private final String targetClassName;
     private final String interfaceName;
-
     private final Language language;
-
-    public ModelGenerator(TemplateEngine engine, String templateSubDirectory, String targetClassName, String interfaceName) {
-        this(engine, templateSubDirectory, targetClassName, interfaceName, Language.JAVA);
-    }
 
     public ModelGenerator(TemplateEngine engine, String templateSubDirectory, String targetClassName, String interfaceName, Language language) {
         this.engine = engine;

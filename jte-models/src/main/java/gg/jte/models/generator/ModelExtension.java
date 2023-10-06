@@ -8,7 +8,6 @@ import gg.jte.extension.api.TemplateDescription;
 
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -21,7 +20,7 @@ public class ModelExtension implements JteExtension {
 
     @Override
     public String name() {
-        return "Generate type-safe model facade for templates";
+        return "Generate type-safe model facade for templates in Java";
     }
 
     @Override
@@ -37,15 +36,17 @@ public class ModelExtension implements JteExtension {
         Pattern includePattern = modelConfig.includePattern();
         Pattern excludePattern = modelConfig.excludePattern();
 
+        Language language = modelConfig.language();
+
         var templateDescriptionsFiltered = templateDescriptions.stream() //
                 .filter(x -> includePattern == null || includePattern.matcher(x.fullyQualifiedClassName()).matches()) //
                 .filter(x -> excludePattern == null || !excludePattern.matcher(x.fullyQualifiedClassName()).matches()) //
                 .collect(Collectors.toSet());
 
         return Stream.of(
-                new ModelGenerator(engine, "interfacetemplates", "Templates", "Templates"),
-                new ModelGenerator(engine, "statictemplates", "StaticTemplates", "Templates"),
-                new ModelGenerator(engine, "dynamictemplates", "DynamicTemplates", "Templates")
+                new ModelGenerator(engine, "interfacetemplates", "Templates", "Templates", language),
+                new ModelGenerator(engine, "statictemplates", "StaticTemplates", "Templates", language),
+                new ModelGenerator(engine, "dynamictemplates", "DynamicTemplates", "Templates", language)
         ).map(g -> g.generate(config, templateDescriptionsFiltered, modelConfig))
                 .collect(Collectors.toList());
     }

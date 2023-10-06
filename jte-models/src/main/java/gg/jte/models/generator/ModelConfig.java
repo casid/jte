@@ -1,5 +1,6 @@
 package gg.jte.models.generator;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,19 @@ public class ModelConfig {
 
     public String implementationAnnotation() {
         return map.getOrDefault("implementationAnnotation", "");
+    }
+
+    public Language language() {
+        String configuredLanguage = map.getOrDefault("language", "Java");
+        try {
+            return Language.valueOf(configuredLanguage);
+        } catch (IllegalArgumentException ex) {
+            String supportedValues = Arrays.toString(Language.values());
+            throw new IllegalArgumentException(
+                String.format("JTE ModelExtension 'language' property is not configured correctly (current value is '%s'). Supported values: %s", configuredLanguage, supportedValues),
+                ex
+            );
+        }
     }
 
     public Pattern includePattern() {

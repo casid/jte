@@ -52,9 +52,10 @@ public class TestModelConfig {
     }
 
     @Test
-    public void languageConfigurationIsCaseInsensitive() {
-        var modelConfig = new ModelConfig(Map.of("language", "jAvA"));
-        assertEquals(modelConfig.language(), Language.JAVA);
+    public void languageConfigurationIsCaseSensitive() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ModelConfig(Map.of("language", "jAvA")).language();
+        });
     }
 
     @Test

@@ -20,9 +20,9 @@ To use jte-models, set up your build script to include one of these:
                     <extensions>
                         <extension>
                             <className>gg.jte.models.generator.ModelExtension</className>
-                            <!-- optional settings to configure the target language (Java and Kotlin are supported):
+                            <!-- optional settings to configure the target language ("Java" and "Kotlin" are supported):
                             <settings>
-                                <language>java</language>
+                                <language>Java</language>
                             </settings>
                             -->
                             <!-- optional settings to include annotations on generated classes:
@@ -80,8 +80,8 @@ jte {
     // or to configure the generator
     /*
     jteExtension('gg.jte.models.generator.ModelExtension') {
-        // Target language (Java and Kotlin are supported). "Java" is the default.
-        language = 'java'
+        // Target language ("Java" and "Kotlin" are supported). "Java" is the default.
+        language = 'Java'
 
         // Annotations to add to generated interfaces and classes
         interfaceAnnotation = '@foo.bar.MyAnnotation'
@@ -117,8 +117,8 @@ jte {
     // or to configure the generator:
     /*
     jteExtension("gg.jte.models.generator.ModelExtension") {
-        // Target language (Java and Kotlin are supported). "Java" is the default.
-        property("language", "java")
+        // Target language ("Java" and "Kotlin" are supported). "Java" is the default.
+        property("language", "Java")
 
         // Annotations to add to generated interfaces and classes
         property("interfaceAnnotation", "@foo.bar.MyAnnotation")

@@ -1,6 +1,6 @@
 # JTE: Java Template Engine
 
-<img align="left" alt="jte" src="jte.svg" width="128">jte (**J**ava **T**emplate **E**ngine) is a secure and lightweight template engine for Java and Kotlin. jte is designed to introduce as few new keywords as possible and builds upon existing language features, so that it is very easy to reason about what a template does. The [IntelliJ plugin][intellij-plugin] offers full completion and refactoring support for Java parts as well as for jte keywords.
+<img align="left" alt="jte" src="jte.svg" width="128">jte (**J**ava **T**emplate **E**ngine) is a secure and lightweight template engine for Java and Kotlin. jte is designed to introduce as few new keywords as possible and builds upon existing language features, making it straightforward to reason about what a template does. The [IntelliJ plugin][intellij-plugin] offers full completion and refactoring support for Java parts and jte keywords.
 
 [![Build Status](https://github.com/casid/jte/workflows/Test%20all%20JDKs%20on%20all%20OSes/badge.svg)](https://github.com/casid/jte/actions)
 [![Coverage Status](https://codecov.io/gh/casid/jte/branch/main/graph/badge.svg)](https://codecov.io/gh/casid/jte)
@@ -12,7 +12,7 @@
 ## Features
 
 - Intuitive and easy syntax, you'll rarely need to check the [documentation](DOCUMENTATION.md)
-- Write plain Java or Kotlin for expressions, you don't need to learn yet another expression language
+- Write plain Java or Kotlin for expressions. You don't need to learn yet another expression language
 - Context-sensitive [HTML escaping](https://github.com/casid/jte/blob/master/DOCUMENTATION.md#html-escaping) at compile time
 - [IntelliJ plugin][intellij-plugin] with completion and refactoring support
 - Hot reloading of templates during development
@@ -20,7 +20,7 @@
 
 ## TLDR
 
-jte gives you the same productive, type safe experience you're used to from writing Java or Kotlin. This is IntelliJ with the [JTE plugin][intellij-plugin] installed:
+jte gives you the same productive, typesafe experience you're used to from writing Java or Kotlin. Here is a quick demo of the [IntelliJ jte plugin][intellij-plugin]:
 
 ![jte plugin in IntelliJ](jte-intellij.gif)
 
@@ -47,19 +47,19 @@ Here is a small jte template `example.jte`:
 
 So what is going on here?
 
-- `@import` directly translates to Java imports, in this case so that `org.example.Page` is known to the template.
+- `@import` directly translates to Java imports, in this case, so that `org.example.Page` is known to the template.
 - `@param Page page` is the parameter that needs to be passed to this template.
 - `@if`/`@endif` is an if-block. The stuff inside the parentheses (`page.getDescription() != null`) is plain Java code.
 - `${}` writes to the underlying template output, as known from various other template engines.
 
-To render this template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):
+To render this template, an instance of `TemplateEngine` is required. Typically, you create it once per application (it is safe to share the engine between threads):
 
 ```java
 CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This is the directory where your .jte files are located.
 TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html); // Two choices: Plain or Html
 ```
 
-The content type passed to the engine determines how user output will be escaped. If you render HTML files, `Html` is highly recommended. This enables the engine to analyze HTML templates at compile time and perform context sensitive output escaping of user data, to prevent you from XSS attacks.
+The content type passed to the engine determines how user output will be escaped. If you render HTML files, `Html` is highly recommended. This enables the engine to analyze HTML templates at compile time and perform context sensitive output escaping of user data to prevent you from XSS attacks.
 
 With the `TemplateEngine` ready, templates are rendered like this:
 
@@ -69,9 +69,9 @@ templateEngine.render("example.jte", page, output);
 System.out.println(output);
 ```
 
-> Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required.
+> Besides `StringOutput`, you can use several other `TemplateOutput` implementations or create your own if required.
 
-If you had more than one page like `example.jte`, you would have to duplicate a lot of shared template code. Let's extract the shared code into another template, so that it can be reused.
+If you had more than one page like `example.jte`, you would have to duplicate a lot of shared template code. Let's extract the shared code into a reusable template.
 
 Let's move stuff from our example page to `layout.jte`:
 
@@ -94,7 +94,7 @@ Let's move stuff from our example page to `layout.jte`:
 </body>
 ```
 
-The `@param Content content` is a content block that can be provided by callers of the template. `${content}` renders this content block. Let's refactor `example.jte` to use the new template:
+The `@param Content content` is a content block that callers of the template can provide. `${content}` renders this content block. Let's refactor `example.jte` to use the new template:
 
 ```html
 @import org.example.Page
@@ -108,7 +108,7 @@ The `@param Content content` is a content block that can be provided by callers 
 
 The shorthand to create content blocks within jte templates is an `@` followed by two backticks. For advanced stuff, you can even create Java methods that return custom `Content` implementation and call it from your template code!
 
-Check out the [syntax documentation](DOCUMENTATION.md), for a more comprehensive introduction.
+Check out the [syntax documentation](DOCUMENTATION.md) for a more comprehensive introduction.
 
 ## Performance
 
@@ -118,7 +118,7 @@ By design, jte provides very fast output. This is a [fork of mbosecke/template-b
 
 ### High concurrency
 
-This is the same benchmark as above, but the amount of threads was set to `@Threads(16)`, to fully utilize all cores. jte has pretty much zero serialization bottlenecks and runs very concurrent on servers with a lot of CPU cores:
+This is the same benchmark as above, but the amount of threads was set to `@Threads(16)`, to fully utilize all cores. jte has pretty much zero serialization bottlenecks and runs very concurrent on servers with many CPU cores:
 
 ![alt Template Benchmark](https://raw.githubusercontent.com/casid/template-benchmark/ryzen-5950x/results.png)
 
@@ -142,7 +142,7 @@ jte is available on [Maven Central][maven-central]:
 implementation("gg.jte:jte:3.1.2")
 ```
 
-No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and have fun with jte.
+No further dependencies are required! Check out the [syntax documentation](DOCUMENTATION.md) and have fun with jte.
 
 ## Framework integration
 
@@ -155,7 +155,7 @@ No further dependencies required! Check out the [syntax documentation](DOCUMENTA
 - [Quarkus](https://github.com/renannprado/quarkus-jte-extension/)
 - [Severell](https://github.com/severell/severell-jte-plugin)
 - [http4k](https://www.http4k.org/guide/reference/templating)
-  
+
 ## Websites rendered with jte
 
 - [The jte website](https://jte.gg) ([Source](https://github.com/casid/jte-website))

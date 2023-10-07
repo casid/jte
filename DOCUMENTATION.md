@@ -1,6 +1,6 @@
 # jte Templates
 
-jte is a simple, yet powerful templating engine for Java. All jte templates are compiled to Java class files, meaning jte adds essentially zero overhead to your application. All template files use the .jte file extension.
+jte is a simple yet powerful templating engine for Java. jte compiles all templates into Java class files, adding essentially zero overhead to your application. All template files use the .jte file extension.
 
 ## Table of Contents
 
@@ -32,7 +32,7 @@ jte is a simple, yet powerful templating engine for Java. All jte templates are 
 
 ## Rendering a template
 
-To render any template, an instance of `TemplateEngine` is required. Typically you create it once per application (it is safe to share the engine between threads):
+To render any template, an instance of `TemplateEngine` is required. Typically, you create it once per application (it is safe to share the engine between threads):
 
 ```java
 CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("jte")); // This is the directory where your .jte files are located.
@@ -46,14 +46,14 @@ TemplateOutput output = new StringOutput();
 templateEngine.render("example.jte", model, output);
 ```
 
-Where `output` specifies where the template is rendered to and `model` is the data passed to this template, which can be an instance of any class. Ideally, root templates have exactly one data parameter passed to them. If multiple parameters are required, there is a `render` method overload that takes a `Map<String, Object>`.
+Where `output` specifies where the template is rendered and `model` is the data passed to this template, which can be an instance of any class. Ideally, root templates have exactly one data parameter passed to them. If multiple parameters are required, there is a `render` method overload that takes a `Map<String, Object>`.
 
 > [!NOTE]
-> Besides `StringOutput`, there are several other `TemplateOutput` implementations you can use, or create your own if required. Currently the following implementations are available:
+> Besides `StringOutput`, you can use several other `TemplateOutput` implementations or create your own if required. Currently, the following implementations are available:
 >
 > - `gg.jte.output.StringOutput` - writes to a `String`
 > - `gg.jte.output.FileOutput` - writes to the given `java.io.File`
-> - `gg.jte.output.PrintWriterOutput` - writes to a `PrintWriter`, for instance the writer provided by `HttpServletRequest`
+> - `gg.jte.output.PrintWriterOutput` - writes to a `PrintWriter`, for instance, the writer provided by `HttpServletRequest`
 > - `gg.jte.output.WriterOutput` - writes to a `java.io.Writer`
 
 A minimal template would look like this.
@@ -66,7 +66,7 @@ Rendering it with `templateEngine.render("example.jte", null, output);` will ret
 
 ## Displaying data
 
-Data passed to the template can be displayed by wrapping it in `${}`.
+To display data in a template, wrap it in `${}`:
 
 ```html
 @import my.Model
@@ -88,11 +88,11 @@ The output of the above template would be `Hello jte!`.
 
 ## Control structures
 
-jte provides convenient shortcuts for common Java control structures, such as conditional statements and loops. These shortcuts provide a very clean, terse way of working with  control structures, while also remaining familiar to their Java counterparts.
+jte provides convenient shortcuts for common Java control structures, such as conditional statements and loops. These shortcuts provide a clean, terse way of working with control structures while remaining familiar to their Java counterparts.
 
 ### If Statements
 
-You may construct if statements using the `@if`, `@elseif`, `@else` and `@endif` keywords. These translate directly to their Java counterparts:
+You may construct if statements using the keywords `@if`, `@elseif`, `@else` and `@endif`. These translate directly to their Java counterparts:
 
 ```html
 @if(model.entries.isEmpty())
@@ -104,7 +104,7 @@ You may construct if statements using the `@if`, `@elseif`, `@else` and `@endif`
 @endif
 ```
 
-Since Java 14+ you can also use Pattern Matching for `instanceof` (<https://openjdk.java.net/jeps/394>):
+Since Java 14+, you can also use Pattern Matching for `instanceof` (<https://openjdk.java.net/jeps/394>):
 
 ```html
 @if (model instanceof SubModel subModel)
@@ -130,7 +130,7 @@ In addition to if statements, jte provides the `@for` and `@endfor` keywords to 
 @endfor
 ```
 
-When looping, you may use the `gg.jte.support.ForSupport`class to gain information about the loop, such as whether you are in the first or last iteration through the loop.
+When looping, you may use the `gg.jte.support.ForSupport` class to gain information about the loop, such as whether you are in the first or last iteration through the loop.
 
 ```html
 @import gg.jte.support.ForSupport
@@ -142,7 +142,7 @@ When looping, you may use the `gg.jte.support.ForSupport`class to gain informati
 @endfor
 ```
 
-Since jte 3.0 it is possible to use `@else` before `@endfor`. The `@else` content renders in case no elements where iterated over in the loop. This is useful to display empty state of lists without an additional `@if`. For example:
+Since jte 3.0, it is possible to use `@else` before `@endfor`. The `@else` content renders in case no elements were iterated over in the loop. This is useful for displaying an empty list state without an additional `@if`. For example:
 
 ```html
 @for(var item : groceryList)
@@ -185,7 +185,7 @@ Here is an example template, located in `my/drawEntry.jte`
 @endif
 ```
 
-Templates can be called like regular Java methods.
+Template calls are similar to regular Java methods.
 
 ```html
 @template.my.drawEntry(model.entry1, true)
@@ -213,7 +213,7 @@ If you don't want to depend on the parameter order, you can explicitly name para
 
 ### Default parameters
 
-You can also define default values for all parameters, so that they only need to be passed when needed.
+You can also define default values for all parameters so they only need to be passed when needed.
 
 ```html
 @import my.Entry
@@ -235,7 +235,7 @@ The second call could then be simplified to this:
 
 ### Varargs
 
-The last parameter of a template can be a varargs parameter. For instance, if you created a tag to wrap elements in a list you could create something like `list.jte`:
+The last parameter of a template can be a varargs parameter. For instance, if you created a tag to wrap elements in a list, you could create a template such as `list.jte`:
 
 ```html
 @param String title
@@ -256,7 +256,7 @@ And call it like this:
 
 ## Content
 
-`gg.jte.Content` is a special parameter type to pass template code to other templates, much like lambdas in Java. They are particularly useful to share structure between different templates.
+`gg.jte.Content` is a special parameter type to pass template code to other templates, much like lambdas in Java. They are handy for sharing structures between different templates.
 
 Here is an example layout with a content block:
 
@@ -287,7 +287,7 @@ Here is an example layout with a content block:
 </body>
 ```
 
-The shorthand to create content blocks within jte templates is an `@` followed by two backticks. Let's call the layout we just created and pass a a page content and footer:
+The shorthand to create content blocks within jte templates is an `@` followed by two backticks. Let's call the layout we just created and pass a page content and footer:
 
 ```html
 @import org.example.WelcomePage
@@ -306,7 +306,7 @@ The shorthand to create content blocks within jte templates is an `@` followed b
 
 ## Variables
 
-Local variables can be declared like this:
+Declare local variables like this:
 
 ```html
 !{var innerObject = someObject.get().very().deeply().located().internal().object();}
@@ -323,7 +323,7 @@ For rendering HTML documents, `ContentType.Html` is highly recommended for [secu
 
 ### Smart Attributes
 
-Expressions in HTML attributes are evaluated, so that optimal output is generated. This means attributes with a single output that evaluates to null, or false, are not rendered. For instance:
+Expressions in HTML attributes are evaluated, so that optimal output is generated. This means attributes with a single output that evaluates to `null` or `false` are not rendered. For instance:
 
 ```html
 <span data-title="${null}">Info</span>
@@ -335,7 +335,7 @@ Will be rendered as:
 <span>Info</span>
 ```
 
-If an HTML attribute is boolean, jte requires you to provide a boolean expression and it will omit the attribute if that expression evaluates to `false`. For example:
+If an HTML attribute is boolean, jte requires you to provide a boolean expression, and it will omit the attribute if that expression evaluates to `false`. For example:
 
 ```html
 <select id="cars">
@@ -359,16 +359,16 @@ Will render this HTML:
 
 ### Natural comments
 
-All HTML, CSS and JavaScript comments are not rendered. You can use the natural comment syntax without worrying to leak information/data to the outside.
+jte does not render HTML, CSS and JavaScript comments. You can use the natural comment syntax without worrying about leaking information/data to the outside.
 
 ## HTML Escaping
 
 Output escaping depends on the `ContentType` the engine is created with:
 
-- With `ContentType.Plain` there is no output escaping.
+- With `ContentType.Plain`, there is no output escaping.
 - With `ContentType.Html`, the [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java) is used for context sensitive output escaping.
 
-In `Html` mode, user content `${}` is automatically escaped, depending what part of the template it is placed into:
+In `Html` mode, user content `${}` is automatically escaped, depending on what part of the template it is placed into:
 
 - HTML tag bodies
 - HTML attributes
@@ -391,7 +391,7 @@ With `userName` being `<script>alert('xss');</script>`, the output would be:
 
 ### HTML attributes
 
-User output in HTML attributes is escaped with `gg.jte.html.escape.Escape.htmlAttribute`. It ensures that all quotes are escaped, so that an attacker cannot escape the attribute.
+User output in HTML attributes is escaped with `gg.jte.html.escape.Escape.htmlAttribute`. It ensures that all quotes are escaped, so an attacker cannot escape the attribute.
 
 ```html
 <div data-title="Hello ${userName}"></div>
@@ -419,7 +419,7 @@ With `userName` being `'); alert('xss`, the output would be
 <span onclick="showName('\x27); alert(\x27xss')">Click me</span>
 ```
 
-In case you run a [strict content security policy](https://csp.withgoogle.com/docs/strict-csp.html) without `unsafe-inline`, you could configure jte to run with `gg.jte.html.policy.PreventInlineEventHandlers`. This would cause errors at compile time, if inline event handlers are used. See [this issue](https://github.com/casid/jte/issues/20) for additional context.
+In case you run a [strict content security policy](https://csp.withgoogle.com/docs/strict-csp.html) without `unsafe-inline`, you could configure jte to run with `gg.jte.html.policy.PreventInlineEventHandlers`. Then, using inline event handlers would cause errors at compile time. See [this issue](https://github.com/casid/jte/issues/20) for additional context.
 
 ```java
 public class MyHtmlPolicy extends OwaspHtmlPolicy {
@@ -435,17 +435,17 @@ For more examples, you may want to check out the [TemplateEngine_HtmlOutputEscap
 
 ### Unsafe
 
-In rare cases you may want to skip output escaping for a certain element. You can do this by using `$unsafe{}` instead of `${}`. For instance, to trust the `userName`, you would write:
+In rare cases, you may want to skip output escaping for a specific element. You can do this by using `$unsafe{}` instead of `${}`. For instance, to trust the `userName`, you would write:
 
 ```html
 <div>$unsafe{userName}</div>
 ```
 
-The syntax `$unsafe{}` was picked on purpose. Whenever you use it, you're risking [XSS attacks](https://owasp.org/www-community/attacks/xss/) and you should carefully consider if it really is okay to trust the data you're outputting.
+The syntax `$unsafe{}` was picked on purpose. Whenever you use it, you're risking [XSS attacks](https://owasp.org/www-community/attacks/xss/), and you should carefully consider if it really is okay to trust the data you're outputting.
 
 ### Custom output escaping
 
-It is possible to provide your own implementation of `HtmlTemplateOutput`. Maybe you want to extend the default [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java), or use your own implementation.
+It is possible to provide your own implementation of `HtmlTemplateOutput`. Maybe you want to extend the default [OwaspHtmlTemplateOutput](jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java), or use your implementation.
 
 Before rendering, you'd simply wrap the actual `TemplateOutput` you are using:
 
@@ -455,7 +455,7 @@ TemplateOutput output = new MySecureHtmlOutput(new StringOutput());
 
 ## Raw output
 
-Sometimes it is required to output text as is. The `@raw` keyword can be used to open a raw section, that is unprocessed by jte.
+Sometimes, it is required to output text as is. Use the `@raw` keyword to open a raw section unprocessed by jte.
 
 ```html
 @raw
@@ -470,16 +470,16 @@ Sometimes it is required to output text as is. The `@raw` keyword can be used to
 
 ### For a regular website
 
-When using the `DirectoryCodeResolver` (or the `ResourceCodeResolver` with resources located outside of JAR files), hot reloading is supported out of the box. Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If there is any modification detected, the template is recompiled and the old one discarded to GC.
+Hot reloading is supported out of the box when using the `DirectoryCodeResolver` (or the `ResourceCodeResolver` with resources located outside of JAR files). Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If any modification is detected, the template is recompiled, and the old one is discarded to GC.
 
 > [!WARNING]
-> It makes sense to do this on your local development environment only. When running in production, for maximum performance and security [precompiled templates](#precompiling-templates) are recommended instead.
+> It makes sense to do this in your local development environment only. When running in production, for maximum performance and security, [precompiled templates](#precompiling-templates) are recommended instead.
 
 If you clone this repository, you can launch the [SimpleWebServer](jte/src/test/java/gg/jte/benchmark/SimpleWebServer.java) example's main method. It will fire up a tiny webserver with one page to play with at <http://localhost:8080>.
 
 ### For a statically rendered website
 
-In case you're using jte to pre-render static websites as HTML files, you can also listen to template file changes during development and re-render affected static files. Add the `jte-watcher` module to your project:
+If you're using jte to pre-render static websites as HTML files, you can also listen to template file changes during development and re-render affected static files. Add the `jte-watcher` module to your project:
 
 ```xml
 <dependency>
@@ -504,11 +504,11 @@ if (isDeveloperEnvironment()) {
 
 ### Customizing generated class directory
 
-By default generated sources and classes are outputted into the subdirectory `jte-classes` under the current directory. It is possible to customize this directory when creating the template engine. But in order to have the hot reload feature working, **a custom class directory must not be on the classpath**. If it is on the classpath, generated classes will be visible to the default class loader and once a generated class is loaded, it will not be possible to reload it after recompiling a template, thus making the hot reload effectively non-functional.
+By default, generated sources and classes are outputted into the subdirectory `jte-classes` under the current directory. It is possible to customize this directory when creating the template engine. But to have the hot reload feature working, **a custom class directory must not be on the classpath**. If it is on the classpath, generated classes will be visible to the default class loader, and once a generated class is loaded, it will not be possible to reload it after recompiling a template, thus making the hot reload effectively non-functional.
 
 ## Precompiling Templates
 
-To speed up startup and rendering on your production server, it is possible to precompile all templates during the build. This way, the template engine can load the `.class` file for each template directly, without first compiling it. For security reasons you may not want to run a JDK on production - with precompiled templates this is not needed. The recommended way to setup jte, is to instantiate the engine differently, depending on when you are developing or running on a server.
+To speed up startup and rendering on your production server, it is possible to precompile all templates during the build. This way, the template engine can load each template's `.class` file directly without first compiling it. For security reasons, you may not want to run a JDK on production - with precompiled templates, this is unnecessary. The recommended way to set up jte is to instantiate the engine differently, depending on when you are developing or running on a server.
 
 ```java
 if (isDeveloperMachine()) {
@@ -518,11 +518,11 @@ if (isDeveloperMachine()) {
 }
 ```
 
-To do this, you need to create a `TemplateEngine` with the `createPrecompiled` factory method and specify where compiled template classes are located. Currently there are two options available to do this.
+To do this, you must create a `TemplateEngine` with the `createPrecompiled` factory method and specify where compiled template classes are located. Currently, there are two options available to do this.
 
 ### Using a directory on your server
 
-When using this method you need to deploy the precompiled templates to your server.
+You must deploy the precompiled templates to your server when using this method.
 
 ```java
 Path targetDirectory = Path.of("jte-classes"); // This is the directory where compiled templates are located.
@@ -532,10 +532,10 @@ TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory
 
 #### Maven
 
-There is a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) you can use to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven.
+You can use a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java must match those specified in Maven.
 
 > [!IMPORTANT]
-> It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte maven plugin always matches your jte dependency.
+> Make sure the jte maven plugin version matches the jte dependency version. You can create a `${jte.version}` to sync the versions easily.
 
 ```xml
 <plugin>
@@ -560,10 +560,10 @@ There is a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) yo
 
 #### Gradle
 
-Since 1.6.0 there is a [Gradle plugin](https://plugins.gradle.org/plugin/gg.jte.gradle) you can use to precompile all templates during the Gradle build. Please note that paths specified in Java need to match those specified in Gradle.
+Since 1.6.0 there is a [Gradle plugin](https://plugins.gradle.org/plugin/gg.jte.gradle) you can use to precompile all templates during the Gradle build. Please note that paths specified in Java must match those specified in Gradle.
 
 > [!IMPORTANT]
-> Make sure that the jte gradle plugin version always matches the jte dependency version.
+> Make sure the jte gradle plugin version matches the jte dependency version. You can create a `jteVersion` in `gradle.properties` to sync the versions easily.
 
 <details open>
 <summary>Groovy</summary>
@@ -643,11 +643,11 @@ And init the template engine like this for production builds:
 TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Html);
 ```
 
-This way the templates are loaded from the application class loader. See [this issue](https://github.com/casid/jte/issues/62) for additional information.
+This way, the templates are loaded from the application class loader. See [this issue](https://github.com/casid/jte/issues/62) for additional information.
 
 ### Using the application class loader (since 1.2.0)
 
-When using this method the precompiled templates are bundled within your application jar file. The plugin generates `*.java` files for all jte templates during Maven's `GENERATE_SOURCES` phase. Compilation of the templates is left to the Maven Compiler plugin.
+When using this method, the precompiled templates are bundled within your application jar file. The plugin generates `*.java` files for all jte templates during Maven's `GENERATE_SOURCES` phase. Compilation of the templates is left to the Maven Compiler plugin.
 
 While this provides you with a nice self-containing jar, it has some limitations:
 
@@ -659,10 +659,10 @@ TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Htm
 
 #### Maven
 
-There is a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) you can use to generate all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java need to match those specified in Maven.
+You can use a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) to generate all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java must match those specified in Maven.
 
 > [!IMPORTANT]
-> It is recommended to create a variable like `${jte.version}` in Maven, to ensure that the jte maven plugin always matches your jte dependency.
+> Make sure the jte maven plugin version matches the jte dependency version. You can create a `${jte.version}` to sync the versions easily.
 
 ```xml
 <plugin>
@@ -686,10 +686,10 @@ There is a [Maven plugin](https://github.com/casid/jte-maven-compiler-plugin) yo
 
 #### Gradle
 
-Since 1.6.0 there is a [Gradle plugin](https://plugins.gradle.org/plugin/gg.jte.gradle) you can use to generate all templates during the Gradle build. Please note that paths specified in Java need to match those specified in Gradle.
+Since 1.6.0, you can use a [Gradle plugin](https://plugins.gradle.org/plugin/gg.jte.gradle) to generate all templates during the Gradle build. Please note that paths specified in Java must match those specified in Gradle.
 
 > [!IMPORTANT]
-> Make sure that the jte gradle plugin version always matches the jte dependency version.
+> Make sure the jte gradle plugin version matches the jte dependency version. You can create a `jteVersion` in `gradle.properties` to sync the versions easily.
 
 <details open>
 <summary>Groovy</summary>
@@ -741,18 +741,18 @@ There's an example [gradle test project](https://github.com/casid/jte/blob/main/
 
 ## Binary rendering for max throughput
 
-Most template parts are static content and only few parts of a template are dynamic. It is wasteful to encode those static parts over and over on every request, if your web-framework sends binary UTF-8 content to the user. Since jte 1.7.0 it is possible to encode those static parts at compile time:
+Most template parts are static content, and only a few parts of a template are dynamic. Encoding those static parts repeatedly on every request is wasteful if your web framework sends binary UTF-8 content to the user. Since jte 1.7.0, it is possible to encode those static parts at compile time:
 
 ```java
 templateEngine.setBinaryStaticContent(true);
 ```
 
-This generates a binary content resource for each template at compile time. Those pre-encoded UTF-8 `byte[]` arrays are loaded in memory from the resource file together with the template class. This also implies, that the constant pool is released of holding template strings.
+This generates a binary content resource for each template at compile time. Those pre-encoded UTF-8 `byte[]` arrays are loaded in memory from the resource file together with the template class. This also implies that the constant pool is released from holding template strings.
 
-To fully utilize binary templates you need to use a binary template output, like `Utf8ByteOutput`. This output is heavily optimized to consume as little CPU and memory as possible when using binary templates.
+To fully utilize binary templates, you must use a binary template output, like `Utf8ByteOutput`. This output is heavily optimized to consume as little CPU and memory as possible when using binary templates.
 
 > [!IMPORTANT]
-> You will only see a performance increase if you use `binaryStaticContent` together with a binary output. Other outputs convert the pre-encoded `byte[]` arrays back to Java Strings and defeat this optimization.
+> You will only see a performance increase if you use `binaryStaticContent` with a binary output. Other outputs convert the pre-encoded `byte[]` arrays back to Java Strings, defeating this optimization.
 
 Example usage with `HttpServletResponse`:
 
@@ -772,19 +772,19 @@ try (OutputStream os = response.getOutputStream()) {
 
 There are a few pretty cool things going on here:
 
-- We know about the binary content-length directly after rendering, at no additional cost
-- All static parts are streamed directly to the output stream, without any copying / encoding overhead
+- We know about the binary `Content-Length` directly after rendering, at no additional cost
+- All static parts are streamed directly to the output stream without any copying/encoding overhead
 - Dynamic parts are usually small - and written very efficiently to internal chunks during rendering
 
-With binary content you will be able to render millions of pages per second (in case there's no DB or other external service interaction, heh) - with very little CPU, memory and GC usage.
+With binary content, you can render millions of pages per second (in case there's no DB or other external service interaction) with minimal CPU, memory and GC usage.
 
 ## Localization
 
-jte has no built in keywords for localization. Instead, it provides a flexible interface so that you can easily use the same localization mechanism you're used to in your project. This has several advantages:
+jte has no built-in keywords for localization. Instead, it provides a flexible interface so that you can easily use the same localization mechanism you're used to in your project. This has several advantages:
 
 - No need to learn yet another way to localize things
-- Mo need to reverse engineer another opinionated localization implementation
-- Your users receive the same localization through jte as they do from the rest of your application
+- No need to reverse engineer another opinionated localization implementation
+- Your users receive the exact localization through jte as they do from the rest of your application
 
 Let's implement `gg.jte.support.LocalizationSupport`. There's only one method to implement:
 
@@ -807,7 +807,7 @@ public static class JteLocalizer implements gg.jte.support.LocalizationSupport {
 }
 ```
 
-Now, you can create a `JteLocalizer` whenever you render a page, and pass it to the page template:
+Now, you can create a `JteLocalizer` whenever you render a page and pass it to the page template:
 
 ```html
 @param JteLocalizer localizer
@@ -817,9 +817,9 @@ Now, you can create a `JteLocalizer` whenever you render a page, and pass it to 
 ```
 
 > [!NOTE]
-> Why is the `gg.jte.support.LocalizationSupport` interface even needed? It mainly helps with proper output escaping in HTML mode. Localized texts are considered safe and are not output escaped, but all user provided parameters are! Here are some good examples [in form of unit tests](https://github.com/casid/jte/blob/0daa676174a2ed9f1b303b927f252ce5bc9ef653/jte/src/test/java/gg/jte/TemplateEngine_HtmlOutputEscapingTest.java#L1099).
+> Why is the `gg.jte.support.LocalizationSupport` interface even needed? It mainly helps with proper output escaping in HTML mode. Localized texts are considered safe and are not output escaped, but all user-provided parameters are! Here are some good examples [in the form of unit tests](https://github.com/casid/jte/blob/0daa676174a2ed9f1b303b927f252ce5bc9ef653/jte/src/test/java/gg/jte/TemplateEngine_HtmlOutputEscapingTest.java#L1099).
 
-This works fine, but passing a parameter to every template might feel a little repetitive. In case it does, you could use a `ThreadLocal`, that is filled with the required information before rendering a page and destroyed afterwards.
+This works fine, but passing a parameter to every template might feel repetitive. If it does, you could use a `ThreadLocal`, filled with the required information before rendering a page and destroyed afterwards.
 
 ```java
 public class JteContext {
@@ -863,7 +863,7 @@ Localization in the template is now possible with a simple static method call:
 <p>${localize("my.greetings", user.getName())}</p>
 ```
 
-It really is a matter of taste, if you prefer a parameter or a static method call. The nice thing of both ways is, that everything is under your control and if you want to know what happens under the hood, that is just a click away in your IDE.
+Whether you prefer a parameter or a static method call is a matter of taste. The nice thing about both ways is that everything is under your control, and if you want to know what happens under the hood, that is just a click away in your IDE.
 
 Further reading:
 

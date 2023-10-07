@@ -508,7 +508,7 @@ if (isDeveloperMachine()) {
 
 To do this, you need to create a `TemplateEngine` with the `createPrecompiled` factory method and specify where compiled template classes are located. Currently there are two options available to do this.
 
-### Using a directory on your server (recommended)
+### Using a directory on your server
 
 When using this method you need to deploy the precompiled templates to your server.
 

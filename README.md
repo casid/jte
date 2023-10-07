@@ -122,13 +122,13 @@ jte is available on <a href="http://mvnrepository.com/artifact/gg.jte/jte">Maven
 <dependency>
     <groupId>gg.jte</groupId>
     <artifactId>jte</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
 </dependency>
 ```
 
 ### Gradle
 ```groovy
-implementation group: 'gg.jte', name: 'jte', version: '3.1.1'
+implementation group: 'gg.jte', name: 'jte', version: '3.1.2'
 ```
 
 No further dependencies required! Check out the [syntax documentation](DOCUMENTATION.md) and have fun with jte.

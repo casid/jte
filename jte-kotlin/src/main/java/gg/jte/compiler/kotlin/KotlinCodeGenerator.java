@@ -73,6 +73,13 @@ public class KotlinCodeGenerator implements CodeGenerator {
         }
         kotlinCode.append(paramInfo.name).append(':').append(paramInfo.type);
 
+        // If there is a default value that IS NOT a gg.jte.Content, then add it to the
+        // method definition. gg.jte.Content are excluded because the syntax is not supported
+        // by Kotlin.
+        if (paramInfo.defaultValue != null && !paramInfo.defaultValue.startsWith("@`")) {
+            kotlinCode.append(" = ").append(paramInfo.defaultValue);
+        }
+
         parameters.add(paramInfo);
     }
 

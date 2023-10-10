@@ -729,6 +729,16 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void paramWithDefaultValue() {
+        givenRawTemplate("@param age: Int = 10\nYour age is ${age}");
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, TemplateUtils.toMap(), output);
+
+        assertThat(output.toString()).isEqualTo("Your age is 10");
+    }
+
+    @Test
     void layout() {
         givenLayout("main", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
                 "@param content:gg.jte.Content\n" +

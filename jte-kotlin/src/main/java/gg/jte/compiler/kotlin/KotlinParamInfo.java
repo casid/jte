@@ -78,7 +78,7 @@ public final class KotlinParamInfo {
         if (defaultValueStartIndex == -1) {
             defaultValue = null;
         } else {
-            defaultValue = parameterString.substring(defaultValueStartIndex);
+            defaultValue = parameterString.substring(defaultValueStartIndex).stripTrailing();
         }
 
         return new ParamInfo(type, name, defaultValue, varargs, templateLine);

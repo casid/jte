@@ -15,9 +15,11 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static gg.jte.extension.api.mocks.MockConfig.mockConfig;
 import static gg.jte.extension.api.mocks.MockParamDescription.mockParamDescription;
@@ -181,10 +183,15 @@ public class TestModelExtension {
             assertThat(interfaceFacadeFile.get()).content().contains("fun hello(value: Int = 10): JteModel");
 
             // Implementations should add `override` and NOT include the default value.
-            generatedPaths.stream().filter(path ->
-                DYNAMIC_SOURCE_FILE.matcher(path.toString()).find() ||
-                STATIC_SOURCE_FILE.matcher(path.toString()).find()
-            ).forEach(path -> {
+            List<Path> implementationsPaths = generatedPaths.stream()
+                    .filter(path ->
+                        DYNAMIC_SOURCE_FILE.matcher(path.toString()).find() ||
+                        STATIC_SOURCE_FILE.matcher(path.toString()).find()
+                    )
+                    .collect(Collectors.toList());
+
+            assertThat(implementationsPaths).isNotEmpty();
+            implementationsPaths.forEach(path -> {
                 try {
                     assertThat(Files.readString(path)).contains("override fun hello(value: Int): JteModel");
                 } catch (IOException ex) {

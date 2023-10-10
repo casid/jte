@@ -6,7 +6,7 @@
 @param TemplateDescription template
 
 !{String outputClass = config.contentType() == ContentType.Html ? "HtmlTemplateOutput" : "TemplateOutput";}
-    override fun ${Util.methodName(template)}(${Util.kotlinTypedParams(template)}): JteModel {
+    override fun ${Util.methodName(template)}(${Util.kotlinTypedParams(template, false)}): JteModel {
         return StaticJteModel<${outputClass}>(
             ContentType.${config.contentType()},
             { output, interceptor -> ${template.fullyQualifiedClassName()}.render(output, interceptor${Util.paramNames(template)}) },

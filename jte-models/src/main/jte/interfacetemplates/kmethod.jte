@@ -4,4 +4,4 @@
 @param TemplateDescription template
 
     @JteView("${template.name()}")
-    fun ${Util.methodName(template)}(${Util.kotlinTypedParams(template)}): JteModel
+    fun ${Util.methodName(template)}(${Util.kotlinTypedParams(template, true)}): JteModel

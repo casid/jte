@@ -13,11 +13,11 @@ public class Util {
         return template.params().stream().map(param -> String.format("%s %s", param.type(), param.name())).collect(Collectors.joining(", "));
     }
 
-    public static String kotlinTypedParams(TemplateDescription template) {
+    public static String kotlinTypedParams(TemplateDescription template, boolean includeParamDefaultValue) {
         return template.params().stream().map(param -> {
             StringBuilder formatedParam = new StringBuilder();
             formatedParam.append(param.name()).append(": ").append(param.type());
-            if (param.defaultValue() != null && !param.defaultValue().startsWith("@`")) {
+            if (includeParamDefaultValue && param.defaultValue() != null && !param.defaultValue().startsWith("@`")) {
                 formatedParam.append(" = ").append(param.defaultValue());
             }
             return formatedParam.toString();

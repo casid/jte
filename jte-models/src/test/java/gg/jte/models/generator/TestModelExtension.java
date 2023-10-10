@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static gg.jte.extension.api.mocks.MockConfig.mockConfig;
@@ -84,7 +85,7 @@ public class TestModelExtension {
                 try {
                     String contents = Files.readString(path);
                     assertThat(contents).contains("JteModel hello(java.lang.String message)");
-                } catch(IOException ex) {
+                } catch (IOException ex) {
                     fail("Could not read file " + path, ex);
                 }
             });
@@ -106,6 +107,7 @@ public class TestModelExtension {
 
             return modelExtension;
         }
+
         @Test
         public void generatesKotlinFacades() {
             // Given
@@ -146,7 +148,7 @@ public class TestModelExtension {
             generatedPaths.forEach(path -> {
                 try {
                     assertThat(Files.readString(path)).contains("fun hello(message: java.lang.String): JteModel");
-                } catch(IOException ex) {
+                } catch (IOException ex) {
                     fail("Could not read file " + path, ex);
                 }
             });
@@ -172,10 +174,20 @@ public class TestModelExtension {
             );
 
             // Then
-            generatedPaths.forEach(path -> {
+            Optional<Path> interfaceFacadeFile = generatedPaths.stream()
+                    .filter(path -> INTERFACE_SOURCE_FILE.matcher(path.toString()).find())
+                    .findFirst();
+            assertThat(interfaceFacadeFile).isNotEmpty();
+            assertThat(interfaceFacadeFile.get()).content().contains("fun hello(value: Int = 10): JteModel");
+
+            // Implementations should add `override` and NOT include the default value.
+            generatedPaths.stream().filter(path ->
+                DYNAMIC_SOURCE_FILE.matcher(path.toString()).find() ||
+                STATIC_SOURCE_FILE.matcher(path.toString()).find()
+            ).forEach(path -> {
                 try {
-                    assertThat(Files.readString(path)).contains("fun hello(value: Int = 10): JteModel");
-                } catch(IOException ex) {
+                    assertThat(Files.readString(path)).contains("override fun hello(value: Int): JteModel");
+                } catch (IOException ex) {
                     fail("Could not read file " + path, ex);
                 }
             });
@@ -204,7 +216,7 @@ public class TestModelExtension {
             generatedPaths.forEach(path -> {
                 try {
                     assertThat(Files.readString(path)).contains("fun hello(content: gg.jte.Content): JteModel");
-                } catch(IOException ex) {
+                } catch (IOException ex) {
                     fail("Could not read file " + path, ex);
                 }
             });
@@ -229,7 +241,7 @@ public class TestModelExtension {
             generatedPaths.forEach(path -> {
                 try {
                     assertThat(Files.readString(path)).contains("fun hello(): JteModel");
-                } catch(IOException ex) {
+                } catch (IOException ex) {
                     fail("Could not read file " + path, ex);
                 }
             });
@@ -239,7 +251,7 @@ public class TestModelExtension {
             assertThat(generatedPaths).anySatisfy(path -> {
                 try {
                     assertThat(Files.readString(path)).contains("val paramMap = mapOf<String, Any?>");
-                } catch(IOException ex) {
+                } catch (IOException ex) {
                     fail("Could not read file " + path, ex);
                 }
             });

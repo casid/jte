@@ -571,6 +571,16 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithDefaultContentParam() {
+        givenTag("named", "@param one:Int = 1\n" +
+                          "@param content:gg.jte.Content = @`Some Content`\n" +
+                          "First param = ${one}, Content param = ${content}");
+        givenTemplate("@template.tag.named()");
+
+        thenOutputIs("First param = 1, Content param = Some Content");
+    }
+
+    @Test
     void tagWithDefaultParam_generic() {
         givenTag("named", "@param files: Map<String, ByteArray> = emptyMap()\n" +
                 "${files.size}");
@@ -736,6 +746,16 @@ public class TemplateEngineTest {
         templateEngine.render(templateName, TemplateUtils.toMap(), output);
 
         assertThat(output.toString()).isEqualTo("Your age is 10");
+    }
+
+    @Test
+    void contentParamWithDefaultValue() {
+        givenRawTemplate("@param content:gg.jte.Content = @`Some Content`\nThe default content is ${content}");
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, TemplateUtils.toMap(), output);
+
+        assertThat(output.toString()).isEqualTo("The default content is Some Content");
     }
 
     @Test

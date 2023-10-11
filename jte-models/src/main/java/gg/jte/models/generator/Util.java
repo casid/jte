@@ -15,12 +15,12 @@ public class Util {
 
     public static String kotlinTypedParams(TemplateDescription template, boolean includeParamDefaultValue) {
         return template.params().stream().map(param -> {
-            StringBuilder formatedParam = new StringBuilder();
-            formatedParam.append(param.name()).append(": ").append(param.type());
+            StringBuilder formattedParam = new StringBuilder();
+            formattedParam.append(param.name()).append(": ").append(param.type());
             if (includeParamDefaultValue && param.defaultValue() != null && !param.defaultValue().startsWith("@`")) {
-                formatedParam.append(" = ").append(param.defaultValue());
+                formattedParam.append(" = ").append(param.defaultValue());
             }
-            return formatedParam.toString();
+            return formattedParam.toString();
         }).collect(Collectors.joining(", "));
     }
 

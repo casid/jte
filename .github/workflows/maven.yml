@@ -35,6 +35,10 @@ jobs:
 
   coverage:
 
+    # Do not run coverage for forks since they cannot upload
+    # the results to codecov. For reference, see:
+    # https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution#example-only-run-job-for-specific-repository
+    if: github.repository == 'casid/jte'
     runs-on: ubuntu-latest
     
     steps:

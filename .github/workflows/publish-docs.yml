@@ -1,4 +1,5 @@
 name: Publish Docs
+
 on:
   push:
     tags:

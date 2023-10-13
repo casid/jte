@@ -24,7 +24,7 @@ description: jte is a secure, lightweight, and fast template engine for Java and
 - ==Write plain Java or Kotlin for expressions==. You don't need to learn yet another expression language
 - ==Context-sensitive [HTML escaping](html-rendering.md#html-escaping)== at compile time
 - ==[IntelliJ plugin][intellij-plugin]== with completion and refactoring support
-- ==Hot reloading== of templates during development
+- ==[Hot reloading](hot-reloading.md)== of templates during development
 - ==Blazing fast== execution ([see benchmarks](#performance))
 
 </div>

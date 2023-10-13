@@ -1,0 +1,46 @@
+name: Publish Docs
+on:
+  push:
+    tags:
+      # Only runs for version tags:
+      # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-only-when-a-push-of-specific-tags-occurs
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Fetch all history for all tags and branches.
+          # This is neccessary to later commit on `gh-pages` branches.
+          # https://github.com/actions/checkout#Fetch-all-history-for-all-tags-and-branches
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      # Keep the list of installed pip packages consistent with
+      # the list in validate-docs.yml.
+      - run: pip install mkdocs-material
+      - run: pip install mkdocs-awesome-pages-plugin
+      - run: pip install mkdocs-macros-plugin
+      - run: pip install mkdocs-pom-parser-plugin
+      - run: pip install mike
+      - name: Configure Docs Deploy
+        run: |
+          git config user.email "$(git log --format='%ae' HEAD -1)"
+          git config user.name "$(git log --format='%an' HEAD -1)"
+      - name: Publish new page
+        run: mike deploy --push --update-aliases "${{ github.ref_name }}" latest
+      - name: Latest version as the default
+        run: mike set-default --push latest

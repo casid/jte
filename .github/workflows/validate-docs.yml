@@ -1,6 +1,18 @@
 name: Validate docs
 
-on: [push, pull_request]
+# Only run workflow if the docs are changing.
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
+on:
+    pull_request:
+      paths:
+        - 'mkdocs.yml'
+        - 'main.py'
+        - 'docs/**'
+    push:
+      paths:
+        - 'mkdocs.yml'
+        - 'main.py'
+        - 'docs/**'
 
 jobs:
   deploy:

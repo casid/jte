@@ -1,0 +1,77 @@
+site_name: jte documentation
+site_description: "Documentation for jte (Java Template Engine)"
+repo_url: https://github.com/casid/jte/
+site_url: https://jte.gg/
+theme:
+  icon:
+    repo: fontawesome/brands/github
+  language: en 
+  name: material
+  features:
+    - navigation.top
+    - navigation.footer
+    - navigation.instant
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - content.code.select
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/casid/jte
+
+markdown_extensions:
+  - meta
+  - abbr
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - awesome-pages
+  - search
+  - macros
+  - mkdocs-pom-parser-plugin:
+      path: pom.xml
+
+nav:
+  - "Getting Started": index.md
+  - "Rendering a Template": rendering-a-template.md
+  - "Templates Syntax": syntax.md
+  - "HTML Rendering": html-rendering.md
+  - "Hot Reloading": hot-reloading.md
+  - "Precompiling Templates": pre-compiling.md
+  - "Binary Rendering": binary-rendering.md
+  - "Localization": localization.md
+  - "Migrating to jte": migrating-to-jte.md

@@ -9,6 +9,10 @@ theme:
   name: material
   features:
     - navigation.top
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
     - navigation.footer
     - navigation.instant
     - navigation.instant.progress
@@ -70,12 +74,18 @@ plugins:
       path: pom.xml
 
 nav:
-  - "Getting Started": index.md
-  - "Rendering a Template": rendering-a-template.md
-  - "Templates Syntax": syntax.md
-  - "HTML Rendering": html-rendering.md
-  - "Hot Reloading": hot-reloading.md
-  - "Precompiling Templates": pre-compiling.md
-  - "Binary Rendering": binary-rendering.md
-  - "Localization": localization.md
+  - "Home":
+    - "Getting Started": index.md
+  - "Templates":
+    - "Rendering a Template": rendering-a-template.md
+    - "Templates Syntax": syntax.md
+    - "HTML Rendering": html-rendering.md
+  - "Configurations":
+    - "Hot Reloading": hot-reloading.md
+    - "Precompiling Templates": pre-compiling.md
+    - "Binary Rendering": binary-rendering.md
+    - "Localization": localization.md
+  - "Spring Boot Support":
+    - "Spring Boot Starter 3": spring-boot-starter-3.md
+    - "Spring Boot Starter 2": spring-boot-starter-2.md
   - "Migrating to jte": migrating-to-jte.md

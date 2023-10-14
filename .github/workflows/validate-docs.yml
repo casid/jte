@@ -33,7 +33,6 @@ jobs:
       # the list in publish-docs.yml.
       - run: pip install mkdocs-material
       - run: pip install mkdocs-awesome-pages-plugin
-      - run: pip install mkdocs-macros-plugin
       - run: pip install mkdocs-pom-parser-plugin
       - run: pip install mike
       - name: Build docs

@@ -5,7 +5,9 @@ description: How to use binary rendering for max throughput
 
 # Binary rendering for max throughput
 
-{{ since("1.7.0") }}
+!!! info "Version note"
+
+    Available since jte ^^**1.7.0**^^.
 
 Most template parts are static content, and only a few parts of a template are dynamic. Encoding those static parts repeatedly on every request is wasteful if your web framework sends binary UTF-8 content to the user. jte makes it is possible to encode those static parts at compile time:
 

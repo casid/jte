@@ -59,7 +59,9 @@ You can use a [Maven plugin][jte-maven-compiler-plugin] to precompile all templa
 
 ### Gradle
 
-{{ since("1.6.0") }}
+!!! info "Version note"
+
+    Available since jte ^^**1.6.0**^^.
 
 The [Gradle plugin][jte-gradle-plugin] can precompile all templates during the Gradle build. Please note that paths specified in Java must match those specified in Gradle.
 
@@ -137,7 +139,9 @@ This way, the templates are loaded from the application class loader. See [this 
 
 ### Using the application class loader
 
-{{ since("1.2.0") }}
+!!! info "Version note"
+
+    Available since jte ^^**1.2.0**^^.
 
 When using this method, the precompiled templates are bundled within your application jar file. The plugin generates `*.java` files for all jte templates during Maven's `GENERATE_SOURCES` phase. Compilation of the templates is left to the Maven Compiler plugin.
 
@@ -179,7 +183,9 @@ You can use a [Maven plugin][jte-maven-compiler-plugin] to generate all template
 
 ### Gradle
 
-{{ since("1.6.0") }}
+!!! info "Version note"
+
+    Available since jte ^^**1.6.0**^^.
 
 The [Gradle plugin](https://plugins.gradle.org/plugin/gg.jte.gradle) can generate all templates during the Gradle build. Please note that paths specified in Java must match those specified in Gradle.
 
@@ -223,7 +229,9 @@ The [Gradle plugin](https://plugins.gradle.org/plugin/gg.jte.gradle) can generat
   
 ### GraalVM native-image support
 
-{{ since("1.10.0") }}
+!!! info "Version note"
+
+    Available since jte ^^**1.10.0**^^.
 
 An application jar with generated classes can be built into a native binary using [GraalVM native-image](https://www.graalvm.org/reference-manual/native-image/). To support this, jte can generate the necessary configuration files to tell `native-image` about classes loaded by reflection.
 

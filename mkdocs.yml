@@ -11,6 +11,7 @@ theme:
     - navigation.top
     - navigation.footer
     - navigation.instant
+    - navigation.instant.progress
     - search.highlight
     - content.code.copy
     - content.tabs.link

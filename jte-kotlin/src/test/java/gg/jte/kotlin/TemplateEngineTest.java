@@ -618,6 +618,16 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void templateWithDefaultParam_content() {
+        givenTag("named", "@param one:gg.jte.Content = @`This is`\n" +
+                "@param two:Int = 2\n" +
+                "${one}: ${two}");
+        givenTemplate("@template.tag.named()");
+
+        thenOutputIs("This is: 2");
+    }
+
+    @Test
     void tagWithVarArgs1() {
         givenTag("varargs",
                 "@param vararg values:String\n" +

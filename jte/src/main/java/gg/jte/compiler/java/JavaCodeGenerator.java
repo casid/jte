@@ -116,20 +116,6 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onComplete() {
-        // Line information must be updated before insert, otherwise the line info field is not up-to-date
-        int lineCount = 2;
-        if (!binaryTextParts.isEmpty()) {
-            lineCount += binaryTextParts.size() + 1;
-        }
-        javaCode.fillLines(fieldsMarker, lineCount);
-
-        StringBuilder fields = new StringBuilder();
-        addNameField(fields, classInfo.name);
-        addLineInfoField(fields);
-        writeBinaryTextParts(fields);
-
-        javaCode.insert(fieldsMarker, fields, false);
-
         javaCode.append("\t}\n");
 
         javaCode.append("\tpublic static void renderMap(");
@@ -165,6 +151,20 @@ public class JavaCodeGenerator implements CodeGenerator {
         javaCode.append("\t}\n");
 
         javaCode.append("}\n");
+
+        // Line information must be updated before insert, otherwise the line info field is not up-to-date
+        int lineCount = 2;
+        if (!binaryTextParts.isEmpty()) {
+            lineCount += binaryTextParts.size() + 1;
+        }
+        javaCode.fillLines(fieldsMarker, lineCount);
+
+        StringBuilder fields = new StringBuilder();
+        addNameField(fields, classInfo.name);
+        addLineInfoField(fields);
+        writeBinaryTextParts(fields);
+
+        javaCode.insert(fieldsMarker, fields, false);
 
         this.classInfo.lineInfo = javaCode.getLineInfo();
     }

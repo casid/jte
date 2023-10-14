@@ -616,6 +616,16 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void templateWithDefaultParam_content() {
+        givenTemplate("named.jte", "@param gg.jte.Content one = @`This is`\n" +
+                "@param int two = 2\n" +
+                "${one}: ${two}");
+        givenTemplate("@template.named()");
+
+        thenOutputIs("This is: 2");
+    }
+
+    @Test
     void templateWithVarArgs1() {
         givenTemplate("varargs.jte",
                 "@param String ... values\n" +

@@ -1183,7 +1183,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("template.jte", true, output));
 
-        assertThat(throwable).hasMessage("Failed to compile template.jte, error at line 2: Illegal HTML attribute name @if(disabled)disabled! @if expressions in HTML attribute names are not allowed. In case you're trying to optimize the generated output, smart attributes will do just that: https://github.com/casid/jte/blob/master/DOCUMENTATION.md#smart-attributes");
+        assertThat(throwable).hasMessage("Failed to compile template.jte, error at line 2: Illegal HTML attribute name @if(disabled)disabled! @if expressions in HTML attribute names are not allowed. In case you're trying to optimize the generated output, smart attributes will do just that: https://jte.gg/latest/html-rendering/#smart-attributes");
     }
 
     @Test

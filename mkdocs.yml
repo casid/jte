@@ -88,4 +88,6 @@ nav:
   - "Spring Boot Support":
     - "Spring Boot Starter 3": spring-boot-starter-3.md
     - "Spring Boot Starter 2": spring-boot-starter-2.md
-  - "Migrating to jte": migrating-to-jte.md
+  - "Migrate to jte":
+    - "Migrating to jte": migrating-to-jte.md
+    - "JSP Converter": jsp-converter.md

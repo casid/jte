@@ -80,12 +80,13 @@ nav:
     - "Rendering a Template": rendering-a-template.md
     - "Templates Syntax": syntax.md
     - "HTML Rendering": html-rendering.md
-  - "Configurations":
+  - "How To":
     - "Hot Reloading": hot-reloading.md
     - "Precompiling Templates": pre-compiling.md
     - "Binary Rendering": binary-rendering.md
     - "Localization": localization.md
     - "jte-models Facade Generator": jte-models.md
+    - "Extensions API": jte-extension-api.md
   - "Spring Boot Support":
     - "Spring Boot Starter 3": spring-boot-starter-3.md
     - "Spring Boot Starter 2": spring-boot-starter-2.md

@@ -61,7 +61,7 @@ class TemplateEngineTest {
     @Test
     internal fun paramWithWrongType() {
         val exception = assertThrows<TemplateException> { templateEngine.render("helloWorld.kte", TemplateUtils.toMap("model", "string"), output) }
-        assertTrue(exception.message!!.contains("Failed to render helloWorld.kte, error at helloWorld.kte:0"))
+        assertTrue(exception.message!!.contains("Failed to render helloWorld.kte, error at helloWorld.kte:1"))
     }
 
     private fun whenTemplateIsRendered(templateName: String) {

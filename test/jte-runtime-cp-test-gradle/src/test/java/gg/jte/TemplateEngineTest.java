@@ -64,7 +64,7 @@ public class TemplateEngineTest {
     @Test
     void paramWithWrongType() {
         Throwable throwable = catchThrowable(() -> templateEngine.render("helloWorld.jte", TemplateUtils.toMap("model", "string"), output));
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessageContaining("Failed to render helloWorld.jte, error at helloWorld.jte:0");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessageContaining("Failed to render helloWorld.jte, error at helloWorld.jte:1");
     }
 
     private void whenTemplateIsRendered(String templateName) {

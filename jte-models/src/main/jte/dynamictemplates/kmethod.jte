@@ -3,8 +3,8 @@
 
 @param TemplateDescription template
 
-    override fun ${Util.methodName(template)}(${Util.kotlinTypedParams(template)}): JteModel {
-        val paramMap = mapOf(
+    override fun ${Util.methodName(template)}(${Util.kotlinTypedParams(template, false)}): JteModel {
+        val paramMap = mapOf<String, Any?>(
         @for(ParamDescription param: template.params())
             "${param.name()}" to ${param.name()},@endfor
         )

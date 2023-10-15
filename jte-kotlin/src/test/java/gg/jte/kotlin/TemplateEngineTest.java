@@ -571,6 +571,16 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void tagWithDefaultContentParam() {
+        givenTag("named", "@param one:Int = 1\n" +
+                          "@param content:gg.jte.Content = @`Some Content`\n" +
+                          "First param = ${one}, Content param = ${content}");
+        givenTemplate("@template.tag.named()");
+
+        thenOutputIs("First param = 1, Content param = Some Content");
+    }
+
+    @Test
     void tagWithDefaultParam_generic() {
         givenTag("named", "@param files: Map<String, ByteArray> = emptyMap()\n" +
                 "${files.size}");
@@ -726,6 +736,26 @@ public class TemplateEngineTest {
     void paramWithoutName() {
         givenRawTemplate("@param int\n");
         thenRenderingFailsWithException().hasMessage("Failed to compile test/template.kte, error at line 1: Missing parameter type: '@param int'");
+    }
+
+    @Test
+    void paramWithDefaultValue() {
+        givenRawTemplate("@param age: Int = 10\nYour age is ${age}");
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, TemplateUtils.toMap(), output);
+
+        assertThat(output.toString()).isEqualTo("Your age is 10");
+    }
+
+    @Test
+    void contentParamWithDefaultValue() {
+        givenRawTemplate("@param content:gg.jte.Content = @`Some Content`\nThe default content is ${content}");
+
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, TemplateUtils.toMap(), output);
+
+        assertThat(output.toString()).isEqualTo("The default content is Some Content");
     }
 
     @Test

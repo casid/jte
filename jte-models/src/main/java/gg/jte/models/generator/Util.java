@@ -1,6 +1,5 @@
 package gg.jte.models.generator;
 
-import gg.jte.TemplateEngine;
 import gg.jte.extension.api.ParamDescription;
 import gg.jte.extension.api.TemplateDescription;
 
@@ -14,8 +13,15 @@ public class Util {
         return template.params().stream().map(param -> String.format("%s %s", param.type(), param.name())).collect(Collectors.joining(", "));
     }
 
-    public static String kotlinTypedParams(TemplateDescription template) {
-        return template.params().stream().map(param -> String.format("%s: %s", param.name(), param.type())).collect(Collectors.joining(", "));
+    public static String kotlinTypedParams(TemplateDescription template, boolean includeParamDefaultValue) {
+        return template.params().stream().map(param -> {
+            StringBuilder formattedParam = new StringBuilder();
+            formattedParam.append(param.name()).append(": ").append(param.type());
+            if (includeParamDefaultValue && param.defaultValue() != null && !param.defaultValue().startsWith("@`")) {
+                formattedParam.append(" = ").append(param.defaultValue());
+            }
+            return formattedParam.toString();
+        }).collect(Collectors.joining(", "));
     }
 
     public static String paramNames(TemplateDescription template) {

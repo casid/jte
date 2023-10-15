@@ -85,7 +85,7 @@ User output in HTML attributes is escaped with `gg.jte.html.escape.Escape.htmlAt
 
 With `userName` being `#!html "><script>alert('xss')</script>`, the output would be:
 
-```html
+```html linenums="1"
 <div data-title="Hello &#34;>&lt;script>alert(&#39;xss&#39;)&lt;/script>"></div>
 ```
 
@@ -109,7 +109,7 @@ In case you run a [strict content security policy](https://csp.withgoogle.com/do
 
 === "Java"
 
-    ```java
+    ```java linenums="1"
     public class MyHtmlPolicy extends OwaspHtmlPolicy {
         public MyHtmlPolicy() {
             addPolicy(new PreventInlineEventHandlers());
@@ -119,7 +119,7 @@ In case you run a [strict content security policy](https://csp.withgoogle.com/do
 
 === "Kotlin"
 
-    ```kotlin
+    ```kotlin linenums="1"
     class MyHtmlPolicy : OwaspHtmlPolicy {
         init {
             addPolicy(PreventInlineEventHandlers())

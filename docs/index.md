@@ -20,12 +20,12 @@ description: jte is a secure, lightweight, and fast template engine for Java and
 
 <div class="grid cards" markdown>
 
-- ==Intuitive and easy syntax==, you'll rarely need to check these docs.
-- ==Write plain Java or Kotlin for expressions==. You don't need to learn yet another expression language
-- ==Context-sensitive [HTML escaping](html-rendering.md#html-escaping)== at compile time
-- ==[IntelliJ plugin][intellij-plugin]== with completion and refactoring support
-- ==[Hot reloading](hot-reloading.md)== of templates during development
-- ==Blazing fast== execution ([see benchmarks](#performance))
+- **Intuitive and easy syntax**, you'll rarely need to check these docs.
+- **Write plain Java or Kotlin for expressions**. You don't need to learn yet another expression language
+- **Context-sensitive [HTML escaping](html-rendering.md#html-escaping)** at compile time
+- **[IntelliJ plugin][intellij-plugin]** with completion and refactoring support
+- **[Hot reloading](hot-reloading.md)** of templates during development
+- **Blazing fast** execution ([see benchmarks](#performance))
 
 </div>
 
@@ -110,7 +110,7 @@ To render this template, an instance of `gg.jte.TemplateEngine` is required. Typ
 
 === "Java"
 
-    ```java
+    ```java linenums="1"
     import gg.jte.CodeResolver;
     import gg.jte.TemplateEngine;
     import gg.jte.resolve.DirectoryCodeResolver;
@@ -123,7 +123,7 @@ To render this template, an instance of `gg.jte.TemplateEngine` is required. Typ
 
 === "Kotlin"
 
-    ```kotlin
+    ```kotlin linenums="1"
     import gg.jte.CodeResolver
     import gg.jte.TemplateEngine
     import gg.jte.resolve.DirectoryCodeResolver
@@ -140,7 +140,7 @@ With the `gg.jte.TemplateEngine` ready, templates are rendered like this:
 
 === "Java"
 
-    ```java
+    ```java linenums="1"
     import gg.jte.TemplateOutput;
     import gg.jte.output.StringOutput;
 
@@ -153,7 +153,7 @@ With the `gg.jte.TemplateEngine` ready, templates are rendered like this:
 
 === "Kotlin"
 
-    ```kotlin
+    ```kotlin linenums="1"
     import gg.jte.TemplateOutput
     import gg.jte.output.StringOutput
 

@@ -47,7 +47,7 @@ The starter configures a `org.springframework.web.servlet.ViewResolver` and a jt
 Hello ${model.text}!
 ```
 
-```java
+```java linenums="1"
 @GetMapping("/") 
 public String view(Model model, HttpServletResponse response) {
     model.addAttribute("model", new DemoModel("Hello World"));
@@ -64,7 +64,7 @@ to use [precompiled templates](pre-compiling.md) otherwise the jte [file watcher
 
 Both options can be changed via
 
-```properties
+```properties linenums="1"
 gg.jte.productionProfileName=k8s
 gg.jte.templateLocation=src/main/templates
 ```

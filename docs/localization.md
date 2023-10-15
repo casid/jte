@@ -139,7 +139,7 @@ And the, when rendering the page:
 
 Localization in the template is now possible with a simple static method call:
 
-```html
+```html linenums="1"
 @import static my.JteContext.*
 
 <h1>${localize("my.title")}</h1>

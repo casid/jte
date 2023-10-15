@@ -129,7 +129,6 @@ To use jte-models, set up your build script to include one of these:
         }
          */
     }
-    
     ```
 
 Run the build to generate classes.
@@ -168,7 +167,7 @@ First, construct an instance of `Templates`. If you are using a dependency injec
 
 To use, call a template method to get a `JteModel` object, then call one of its `render` methods. For example:
 
-```java
+```java linenums="1"
 OutputStream output = ...
 Templates templates = new StaticTemplates();
 templates.helloWorld("Hi!").render(output);

@@ -88,13 +88,13 @@ The converter fails if it finds an unknown element during conversion. If you try
 
 Let's assume `#!jsp <my:example/>` uses no other tags. In this case the converter will run and create `tag/my/example.jte`. It will also delete `#!jsp <my:example/>` and replace all usages in your JSP directory with this code:
 
-```jsp
+```jsp linenums="1"
 <my:jte jte="tag/my/example.jte" param1="foo" param2="bar"/>
 ```
 
 This means your application will be fully functional after each conversion. This is why we need to define a bridging tag, so that jte can be embedded in JSP tags. This is highly application specific, so it's not part of the converter project. Here's a working example that takes care of tag bodies and enums passed as Strings (sigh):
 
-```java
+```java linenums="1"
 import gg.jte.Content;
 import gg.jte.TemplateEngine;
 import gg.jte.TemplateOutput;
@@ -247,7 +247,7 @@ Register the bridging tag in your taglib like this:
 
 The above tag writes to the underlying `JspWriter`, so that the jte template contributes to the output of the JSP page it is embedded into. Thus, we need a `gg.jte.TemplateOutput` implementation to support this:
 
-```java
+```java linenums="1"
 import gg.jte.TemplateOutput;
 
 import javax.servlet.jsp.JspWriter;

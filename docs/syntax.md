@@ -176,7 +176,7 @@ Since jte 3.0, it is possible to use `@else` before `@endfor`. The `@else` conte
 
 jte allows you to define comments in your templates.
 
-```xml
+```xml linenums="1"
 <%-- This comment will not be present in the rendered output --%>
 ```
 
@@ -190,7 +190,7 @@ To share common functionality between templates, you can call other templates. A
 
 Here is an example template, located in `my/drawEntry.jte`
 
-```html
+```html linenums="1"
 @import my.Entry
 @param Entry entry
 @param boolean verbose
@@ -203,14 +203,14 @@ Here is an example template, located in `my/drawEntry.jte`
 
 Template calls are similar to regular Java methods.
 
-```html
+```html linenums="1"
 @template.my.drawEntry(model.entry1, true)
 @template.my.drawEntry(model.entry2, false)
 ```
 
 Subdirectories in the jte root directory act like packages in Java. For instance, if the `drawEntry` template was located in `my/entry/drawEntry.jte`, you would call it like this:
 
-```html
+```html linenums="1"
 @template.my.entry.drawEntry(model.entry1, true)
 @template.my.entry.drawEntry(model.entry2, false)
 ```
@@ -219,7 +219,7 @@ Subdirectories in the jte root directory act like packages in Java. For instance
 
 If you don't want to depend on the parameter order, you can explicitly name parameters when calling the template.
 
-```html
+```html linenums="1"
 @template.my.entry.drawEntry(entry = model.entry1, verbose = true)
 @template.my.entry.drawEntry(entry = model.entry2, verbose = false)
 ```
@@ -232,7 +232,7 @@ If you don't want to depend on the parameter order, you can explicitly name para
 
 You can also define default values for all parameters so they only need to be passed when needed.
 
-```html
+```html linenums="1"
 @import my.Entry
 @param Entry entry
 @param boolean verbose = false
@@ -245,7 +245,7 @@ You can also define default values for all parameters so they only need to be pa
 
 The second call could then be simplified to this:
 
-```html
+```html linenums="1"
 @template.my.entry.drawEntry(entry = model.entry1, verbose = true)
 @template.my.entry.drawEntry(entry = model.entry2)
 ```
@@ -254,7 +254,7 @@ The second call could then be simplified to this:
 
 The last parameter of a template can be a varargs parameter. For instance, if you created a tag to wrap elements in a list, you could create a template such as `list.jte`:
 
-```html
+```html linenums="1"
 @param String title
 @param String ... elements
 <h2>${title}</h2>
@@ -267,7 +267,7 @@ The last parameter of a template can be a varargs parameter. For instance, if yo
 
 And call it like this:
 
-```html
+```html linenums="1"
 @template.list(title = "Things to do", "Cook dinner", "Eat", "Netflix and Chill")
 ```
 
@@ -277,7 +277,7 @@ And call it like this:
 
 Here is an example layout with a content block:
 
-```html
+```html linenums="1"
 @import org.example.Page
 @import gg.jte.Content
 
@@ -306,7 +306,7 @@ Here is an example layout with a content block:
 
 The shorthand to create content blocks within jte templates is an `@` followed by two backticks. Let's call the layout we just created and pass a page content and footer:
 
-```html
+```html linenums="1"
 @import org.example.WelcomePage
 @param WelcomePage welcomePage
 
@@ -325,7 +325,7 @@ The shorthand to create content blocks within jte templates is an `@` followed b
 
 Declare local variables like this:
 
-```html
+```html linenums="1"
 !{var innerObject = someObject.get().very().deeply().located().internal().object();}
 
 ${innerObject.a()}

@@ -39,8 +39,6 @@ theme:
         icon: material/lightbulb-outline
         name: Switch to light mode
 extra:
-  version:
-    provider: mike
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/casid/jte

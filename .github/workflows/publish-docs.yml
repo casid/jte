@@ -45,24 +45,14 @@ jobs:
       - run: pip install mkdocs-material
       - run: pip install mkdocs-awesome-pages-plugin
       - run: pip install mkdocs-pom-parser-plugin
-      - run: pip install mike
-      - name: Configure Docs Deploy
-        run: |
-          git config user.email "$(git log --format='%ae' HEAD -1)"
-          git config user.name "$(git log --format='%an' HEAD -1)"
       - name: Create new docs version
-        # We would still have a GitHub Pages branch to store the versions.
-        # `mike deploy --push` creates a commit in the gh-pages branch and
-        # automatically pushes it to the remote.
-        run: mike deploy --push --update-aliases "${{ github.ref_name }}" latest
-      - name: Checkout gh-pages branch
-        run: git checkout gh-pages
+        # `_site` is the default path expected by `actions/upload-pages-artifact` to
+        # find the static assets.
+        run: mkdocs build --site-dir _site
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
-        with:
-          path: ./
 
   deploy:
     environment:

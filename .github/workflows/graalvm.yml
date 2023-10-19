@@ -8,12 +8,10 @@ on:
     paths-ignore:
       - 'docs/**'
       - 'mkdocs.yml'
-      - 'main.py'
   push:
     paths-ignore:
       - 'docs/**'
       - 'mkdocs.yml'
-      - 'main.py'
 
 jobs:
   build:

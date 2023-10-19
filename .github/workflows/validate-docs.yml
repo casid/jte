@@ -6,12 +6,10 @@ on:
     pull_request:
       paths:
         - 'mkdocs.yml'
-        - 'main.py'
         - 'docs/**'
     push:
       paths:
         - 'mkdocs.yml'
-        - 'main.py'
         - 'docs/**'
 
 jobs:
@@ -34,7 +32,6 @@ jobs:
       - run: pip install mkdocs-material
       - run: pip install mkdocs-awesome-pages-plugin
       - run: pip install mkdocs-pom-parser-plugin
-      - run: pip install mike
       - name: Build docs
         # https://www.mkdocs.org/user-guide/cli/#mkdocs-build
         # --strict cause MkDocs to abort the build on any warnings.

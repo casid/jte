@@ -9,10 +9,8 @@ theme:
   name: material
   features:
     - navigation.top
-    - navigation.tabs
     - navigation.sections
     - navigation.expand
-    - navigation.path
     - navigation.footer
     - navigation.instant
     - navigation.instant.progress

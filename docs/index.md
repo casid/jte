@@ -275,7 +275,6 @@ This is the same benchmark as above, but the amount of threads was set to `#!jav
 
 ## Websites rendered with jte
 
-- [The jte website](https://jte.gg) ([Source](https://github.com/casid/jte-website))
 - [Mazebert TD (game website)](https://mazebert.com)
 - [Javalin website example with login and multiple languages](https://github.com/casid/jte-javalin-tutorial)
 - [Mitch Dennett's Blog](https://www.mitchdennett.com/)

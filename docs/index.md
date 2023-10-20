@@ -31,8 +31,6 @@ description: jte is a secure, lightweight, and fast template engine for Java and
 
 ## Getting started
 
-{{ latest-git-tag }}
-
 jte is available on [Maven Central][maven-central]:
 
 === "Maven"

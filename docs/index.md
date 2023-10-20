@@ -3,7 +3,7 @@ title: "jte: Java Template Engine"
 description: jte is a secure, lightweight, and fast template engine for Java and Kotlin.
 ---
 
-# JTE: Java Template Engine
+# jte: Java Template Engine
 
 <img align="left" alt="jte" src="jte.svg" width="128">jte (**J**ava **T**emplate **E**ngine) is a secure and lightweight template engine for Java and Kotlin. jte is designed to introduce as few new keywords as possible and builds upon existing language features, making it straightforward to reason about what a template does. The [IntelliJ plugin][intellij-plugin] offers full completion and refactoring support for Java parts and jte keywords.
 

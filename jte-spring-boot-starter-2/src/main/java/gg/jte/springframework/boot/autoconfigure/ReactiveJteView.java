@@ -43,7 +43,7 @@ public class ReactiveJteView extends AbstractUrlBasedView {
                         return dataBuffer;
                     } catch (IOException ex){
                         DataBufferUtils.release(dataBuffer);
-                        String message = "Could not load JTE template for URL [" + getUrl() + "]";
+                        String message = "Could not load jte template for URL [" + getUrl() + "]";
                         throw new IllegalStateException(message, ex);
                     }catch (Throwable ex) {
                         DataBufferUtils.release(dataBuffer);

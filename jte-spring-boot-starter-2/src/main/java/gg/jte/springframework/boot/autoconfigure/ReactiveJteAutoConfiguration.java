@@ -41,8 +41,8 @@ public class ReactiveJteAutoConfiguration {
             // Templates will need to be compiled by the maven/gradle build task
             return TemplateEngine.createPrecompiled(ContentType.Html);
         } else {
-            // Here, a JTE file watcher will recompile the JTE templates upon file save (the web browser will auto-refresh)
-            // If using IntelliJ, use Ctrl-F9 to trigger an auto-refresh when editing non-JTE files.
+            // Here, a jte file watcher will recompile the jte templates upon file save (the web browser will auto-refresh)
+            // If using IntelliJ, use Ctrl-F9 to trigger an auto-refresh when editing non-jte files.
             String[] split = jteProperties.getTemplateLocation().split("/");
             CodeResolver codeResolver = new DirectoryCodeResolver(FileSystems.getDefault().getPath("", split));
             TemplateEngine templateEngine = TemplateEngine.create(codeResolver, Paths.get("jte-classes"), ContentType.Html, getClass().getClassLoader());

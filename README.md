@@ -1,4 +1,4 @@
-# JTE: Java Template Engine
+# jte: Java Template Engine
 
 <img align="left" alt="jte" src="docs/jte.svg" width="128">jte (**J**ava **T**emplate **E**ngine) is a secure and lightweight template engine for Java and Kotlin. jte is designed to introduce as few new keywords as possible and builds upon existing language features, making it straightforward to reason about what a template does. The [IntelliJ plugin][intellij-plugin] offers full completion and refactoring support for Java parts and jte keywords.
 
@@ -48,6 +48,6 @@ Documentation lives in the [jte webside](https://jte.gg/).
 - [Mitch Dennett's Blog](https://www.mitchdennett.com/)
 - [FlowCrypt Admin Panel](https://flowcrypt.com/docs/business/enterprise-admin-panel.html)
 
-[intellij-plugin]: https://plugins.jetbrains.com/plugin/14521-jte "IntelliJ JTE Plugin"
+[intellij-plugin]: https://plugins.jetbrains.com/plugin/14521-jte "IntelliJ jte Plugin"
 [template-benchmark]: https://github.com/casid/template-benchmark/ "Template Benchmarks"
 [maven-central]: http://mvnrepository.com/artifact/gg.jte/jte "jte in Maven Central"

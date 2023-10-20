@@ -1,7 +1,7 @@
 package gg.jte.gradle;
 
 /**
- * which kind of JTE generation should the plugin be doing.
+ * which kind of jte generation should the plugin be doing.
  *
  * @author edward3h
  * @since 2021-05-03

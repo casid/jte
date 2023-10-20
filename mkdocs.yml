@@ -81,6 +81,7 @@ nav:
     - "Precompiling Templates": pre-compiling.md
     - "Binary Rendering": binary-rendering.md
     - "Localization": localization.md
+  - "Extensions":
     - "jte-models Facade Generator": jte-models.md
     - "Extensions API": jte-extension-api.md
   - "Spring Boot Support":

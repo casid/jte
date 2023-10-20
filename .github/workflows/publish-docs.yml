@@ -1,0 +1,67 @@
+name: Publish Docs
+
+on:
+  # Runs whenever there is a release/tag creation
+  release:
+    types: [ "published" ]
+
+  #  push:
+  #    tags:
+  #      - '[0-9]+.[0-9]+.[0-9]+'
+
+  # Allows to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  # Checkout the project's code
+  contents: read
+  # Allow to deploy to gh-pages
+  pages: write
+  # To verify the deployment originates from an appropriate source
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      # Keep the list of installed pip packages consistent with
+      # the list in validate-docs.yml.
+      - run: pip install mkdocs-material
+      - run: pip install mkdocs-awesome-pages-plugin
+      - run: pip install mkdocs-pom-parser-plugin
+      - name: Create new docs version
+        # `_site` is the default path expected by `actions/upload-pages-artifact` to
+        # find the static assets.
+        run: mkdocs build --site-dir _site
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v2
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

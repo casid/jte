@@ -45,7 +45,7 @@ public final class ClassUtils {
                         throw new TemplateException("Failed to append classpath for " + url, e);
                     }
                 } else if ("jar".equalsIgnoreCase(protocol)) {
-                    throw new TemplateException("For self contained applications jte templates must be precompiled. See https://github.com/casid/jte/blob/master/DOCUMENTATION.md#using-the-application-class-loader-since-120 for more information.");
+                    throw new TemplateException("For self contained applications jte templates must be precompiled. See https://jte.gg/latest/pre-compiling/#using-the-application-class-loader for more information.");
                 }
             }
         }

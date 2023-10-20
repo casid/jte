@@ -10,7 +10,7 @@
     {
       "name": "gg.jte.usePrecompiledTemplates",
       "type": "java.lang.Boolean",
-      "description": "You can precompile the templates for faster startup and rendering. To use this you need to include the Maven or Gradle Plugin: https://github.com/casid/jte/blob/main/DOCUMENTATION.md#precompiling-templates",
+      "description": "You can precompile the templates for faster startup and rendering. To use this you need to include the Maven or Gradle Plugin: https://jte.gg/latest/pre-compiling/",
       "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
     },
     {

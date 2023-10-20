@@ -1,6 +1,17 @@
 name: Test all JDKs on all OSes
 
-on: [push, pull_request]
+# No need to run when only the docs are changing. There is
+# a workflow to validate the docs.
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'mkdocs.yml'
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'mkdocs.yml'
 
 jobs:
   build:

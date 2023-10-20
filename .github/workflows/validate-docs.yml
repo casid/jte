@@ -1,0 +1,40 @@
+name: Validate docs
+
+# Only run workflow if the docs are changing.
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
+on:
+    pull_request:
+      paths:
+        - 'mkdocs.yml'
+        - 'docs/**'
+    push:
+      paths:
+        - 'mkdocs.yml'
+        - 'docs/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      # Keep the list of installed pip packages consistent with
+      # the list in publish-docs.yml.
+      - run: pip install mkdocs-material
+      - run: pip install mkdocs-awesome-pages-plugin
+      - run: pip install mkdocs-pom-parser-plugin
+      - name: Build docs
+        # https://www.mkdocs.org/user-guide/cli/#mkdocs-build
+        # --strict cause MkDocs to abort the build on any warnings.
+        # For example, broken internal links. More about validation
+        # here: https://www.mkdocs.org/user-guide/configuration/#validation.
+        run: mkdocs build --strict

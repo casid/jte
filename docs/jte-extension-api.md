@@ -23,5 +23,5 @@ The jte Maven and Gradle plugins allow configuring extensions.
 ## Examples
 
 * [jte-models](jte-models.md) module is an extension that generates typesafe facades for templates.
-* [test/jte-runtime-cp-test-models](https://github.com/casid/jte/tree/{{ POM_VERSION }}/test/jte-runtime-cp-test-models) uses the Maven plugin to apply the jte-models extension.
-* [test/jte-runtime-cp-test-models-gradle](https://github.com/casid/jte/tree/{{ POM_VERSION }}/test/jte-runtime-cp-test-models-gradle) uses the Gradle plugin to apply the jte-models extension.
+* [test/jte-runtime-cp-test-models](https://github.com/casid/jte/tree/{{ latest-git-tag }}/test/jte-runtime-cp-test-models) uses the Maven plugin to apply the jte-models extension.
+* [test/jte-runtime-cp-test-models-gradle](https://github.com/casid/jte/tree/{{ latest-git-tag }}/test/jte-runtime-cp-test-models-gradle) uses the Gradle plugin to apply the jte-models extension.

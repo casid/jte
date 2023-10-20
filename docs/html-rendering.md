@@ -5,7 +5,7 @@ description: How jte safely renders HTML content.
 
 # HTML Rendering
 
-For rendering HTML documents, [`gg.jte.ContentType.Html`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ POM_VERSION }}/gg.jte.runtime/gg/jte/ContentType.html) is highly recommended for [security](#html-escaping) but also for convenience.
+For rendering HTML documents, [`gg.jte.ContentType.Html`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg.jte.runtime/gg/jte/ContentType.html) is highly recommended for [security](#html-escaping) but also for convenience.
 
 ### Smart Attributes
 
@@ -49,10 +49,10 @@ jte does not render HTML, CSS and JavaScript comments. You can use the natural c
 
 ## HTML Escaping
 
-Output escaping depends on the [`gg.jte.ContentType`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ POM_VERSION }}/gg.jte.runtime/gg/jte/ContentType.html) the engine is created with:
+Output escaping depends on the [`gg.jte.ContentType`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg.jte.runtime/gg/jte/ContentType.html) the engine is created with:
 
 - With `ContentType.Plain`, there is no output escaping.
-- With `ContentType.Html`, the [OwaspHtmlTemplateOutput](https://github.com/casid/jte/blob/{{ POM_VERSION }}/jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java) is used for context sensitive output escaping.
+- With `ContentType.Html`, the [OwaspHtmlTemplateOutput](https://github.com/casid/jte/blob/{{ latest-git-tag }}/jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java) is used for context sensitive output escaping.
 
 In `Html` mode, user content `${}` is automatically escaped, depending on what part of the template it is placed into:
 
@@ -129,7 +129,7 @@ In case you run a [strict content security policy](https://csp.withgoogle.com/do
 
 Then, you set it with `templateEngine.setHtmlPolicy(new MyHtmlPolicy());`.
 
-For more examples, you may want to check out the [`TemplateEngine_HtmlOutputEscapingTest`](https://github.com/casid/jte/blob/{{ POM_VERSION }}/jte/src/test/java/gg/jte/TemplateEngine_HtmlOutputEscapingTest.java).
+For more examples, you may want to check out the [`TemplateEngine_HtmlOutputEscapingTest`](https://github.com/casid/jte/blob/{{ latest-git-tag }}/jte/src/test/java/gg/jte/TemplateEngine_HtmlOutputEscapingTest.java).
 
 ### Unsafe
 
@@ -143,7 +143,7 @@ The syntax `$unsafe{}` was picked on purpose. Whenever you use it, you're riskin
 
 ### Custom output escaping
 
-It is possible to provide your own implementation of `gg.jte.html.HtmlTemplateOutput`. Maybe you want to extend the default [`gg.jte.html.OwaspHtmlTemplateOutput`](https://github.com/casid/jte/blob/{{ POM_VERSION }}/jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java), or use your implementation.
+It is possible to provide your own implementation of `gg.jte.html.HtmlTemplateOutput`. Maybe you want to extend the default [`gg.jte.html.OwaspHtmlTemplateOutput`](https://github.com/casid/jte/blob/{{ latest-git-tag }}/jte-runtime/src/main/java/gg/jte/html/OwaspHtmlTemplateOutput.java), or use your implementation.
 
 Before rendering, you'd simply wrap the actual `gg.jte.TemplateOutput` you are using:
 

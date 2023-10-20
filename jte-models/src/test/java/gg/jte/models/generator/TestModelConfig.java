@@ -65,7 +65,7 @@ public class TestModelConfig {
         });
 
         assertEquals(
-            "JTE ModelExtension 'language' property is not configured correctly (current value is 'Ooops'). Supported values: [Java, Kotlin]",
+            "jte ModelExtension 'language' property is not configured correctly (current value is 'Ooops'). Supported values: [Java, Kotlin]",
             exception.getMessage()
         );
     }

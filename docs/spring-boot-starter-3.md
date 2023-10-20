@@ -15,20 +15,20 @@ This [starter](https://docs.spring.io/spring-boot/docs/3.2.x/reference/htmlsingl
     <dependency>
         <groupId>gg.jte</groupId>
         <artifactId>jte-spring-boot-starter-3</artifactId>
-        <version>{{ POM_VERSION }}</version>
+        <version>{{ latest-git-tag }}</version>
     </dependency>
     <dependency>
         <groupId>gg.jte</groupId>
         <artifactId>jte</artifactId>
-        <version>{{ POM_VERSION }}</version>
+        <version>{{ latest-git-tag }}</version>
     </dependency>
     ```
 
 === "Gradle"
 
     ```groovy linenums="1"
-    implementation "gg.jte:jte-spring-boot-starter-3:{{ POM_VERSION }}"
-    implementation "gg.jte:jte:{{ POM_VERSION }}"
+    implementation "gg.jte:jte-spring-boot-starter-3:{{ latest-git-tag }}"
+    implementation "gg.jte:jte:{{ latest-git-tag }}"
     ```
 
 ## Usage

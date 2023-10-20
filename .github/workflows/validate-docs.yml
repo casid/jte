@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # all history for all branches and tags
       - uses: actions/setup-python@v4
         with:
           python-version: 3.x
@@ -27,11 +29,8 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      # Keep the list of installed pip packages consistent with
-      # the list in publish-docs.yml.
-      - run: pip install mkdocs-material
-      - run: pip install mkdocs-awesome-pages-plugin
-      - run: pip install mkdocs-pom-parser-plugin
+      - name: Setup MkDocs
+        run: .github/scripts/setup-docs-dependencies.sh
       - name: Build docs
         # https://www.mkdocs.org/user-guide/cli/#mkdocs-build
         # --strict cause MkDocs to abort the build on any warnings.

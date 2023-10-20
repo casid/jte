@@ -25,11 +25,11 @@ Most template parts are static content, and only a few parts of a template are d
 
 This generates a binary content resource for each template at compile time. Those pre-encoded UTF-8 `#!java byte[]` arrays are loaded in memory from the resource file together with the template class. This also implies that the constant pool is released from holding template strings.
 
-To fully utilize binary templates, you must use a binary template output, like [`gg.jte.Utf8ByteOutput`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ POM_VERSION}}/gg.jte.runtime/gg/jte/output/Utf8ByteOutput.html). This output is heavily optimized to consume as little CPU and memory as possible when using binary templates.
+To fully utilize binary templates, you must use a binary template output, like [`gg.jte.Utf8ByteOutput`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg.jte.runtime/gg/jte/output/Utf8ByteOutput.html). This output is heavily optimized to consume as little CPU and memory as possible when using binary templates.
 
 !!! info
 
-    You will only see a performance increase if you use [`binaryStaticContent`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ POM_VERSION }}/gg.jte.runtime/gg/jte/TemplateEngine.html) with a binary output. Other outputs convert the pre-encoded `#!java byte[]` arrays back to Java Strings, defeating this optimization.
+    You will only see a performance increase if you use [`binaryStaticContent`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg.jte.runtime/gg/jte/TemplateEngine.html) with a binary output. Other outputs convert the pre-encoded `#!java byte[]` arrays back to Java Strings, defeating this optimization.
 
 Example usage with `HttpServletResponse`:
 

@@ -66,6 +66,7 @@ markdown_extensions:
 plugins:
   - awesome-pages
   - search
+  - latest-git-tag
   - mkdocs-pom-parser-plugin:
       path: pom.xml
 

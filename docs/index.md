@@ -31,6 +31,8 @@ description: jte is a secure, lightweight, and fast template engine for Java and
 
 ## Getting started
 
+{{ latest-git-tag }}
+
 jte is available on [Maven Central][maven-central]:
 
 === "Maven"
@@ -39,14 +41,14 @@ jte is available on [Maven Central][maven-central]:
     <dependency>
         <groupId>{{ POM_GROUP_ID }}</groupId>
         <artifactId>jte</artifactId>
-        <version>{{ POM_VERSION }}</version>
+        <version>{{ latest-git-tag }}</version>
     </dependency>
     ```
 
 === "Gradle"
 
     ```groovy linenums="1" title="in your build.gradle"
-    implementation("{{ POM_GROUP_ID }}:jte:{{ POM_VERSION }}")
+    implementation("{{ POM_GROUP_ID }}:jte:{{ latest-git-tag }}")
     ```
 
 No further dependencies are required! Check out the [syntax documentation](syntax.md) and have fun with jte.

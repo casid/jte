@@ -18,7 +18,7 @@ First you need to add `jte-jsp-converter` as test dependency to your project:
     <dependency>
         <groupId>gg.jte</groupId>
         <artifactId>jte-jsp-converter</artifactId>
-        <version>{{ POM_VERSION }}</version>
+        <version>{{ latest-git-tag }}</version>
         <scope>test</test>
     </dependency>
     ```
@@ -26,7 +26,7 @@ First you need to add `jte-jsp-converter` as test dependency to your project:
 === "Gradle"
 
     ```groovy linenums="1"
-    testImplementation("gg.jte:jte-jsp-converter:{{ POM_VERSION }}")
+    testImplementation("gg.jte:jte-jsp-converter:{{ latest-git-tag }}")
     ```
 
 Then, add a new class in `src/test/java` to the project that you plan to migrate to jte:

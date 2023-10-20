@@ -7,13 +7,13 @@ description: How to use jte hot reloading in development mode.
 
 ## For a regular website
 
-Hot reloading is supported out of the box when using the [`gg.jte.resolve.DirectoryCodeResolver`](https://www.javadoc.io/doc/gg.jte/jte/{{ POM_VERSION }}/gg.jte/gg/jte/resolve/DirectoryCodeResolver.html) (or the [`gt.jte.resolve.ResourceCodeResolver`](https://www.javadoc.io/doc/gg.jte/jte/{{ POM_VERSION }}/gg.jte/gg/jte/resolve/ResourceCodeResolver.html) with resources located outside of JAR files). Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If any modification is detected, the template is recompiled, and the old one is discarded to GC.
+Hot reloading is supported out of the box when using the [`gg.jte.resolve.DirectoryCodeResolver`](https://www.javadoc.io/doc/gg.jte/jte/{{ latest-git-tag }}/gg.jte/gg/jte/resolve/DirectoryCodeResolver.html) (or the [`gt.jte.resolve.ResourceCodeResolver`](https://www.javadoc.io/doc/gg.jte/jte/{{ latest-git-tag }}/gg.jte/gg/jte/resolve/ResourceCodeResolver.html) with resources located outside of JAR files). Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If any modification is detected, the template is recompiled, and the old one is discarded to GC.
 
 !!! warning
 
     It makes sense to do this in your local development environment only. When running in production, for maximum performance and security, [precompiled templates](#precompiling-templates) are recommended instead.
 
-If you clone [jte repository](https://github.com/casid/jte), you can launch the [`gg.jte.benchmark.SimpleWebServer`](https://github.com/casid/jte/blob/{{ POM_VERSION }}/jte/src/test/java/gg/jte/benchmark/SimpleWebServer.java) example's main method. It will fire up a tiny webserver with one page to play with at <http://localhost:8080>.
+If you clone [jte repository](https://github.com/casid/jte), you can launch the [`gg.jte.benchmark.SimpleWebServer`](https://github.com/casid/jte/blob/{{ latest-git-tag }}/jte/src/test/java/gg/jte/benchmark/SimpleWebServer.java) example's main method. It will fire up a tiny webserver with one page to play with at <http://localhost:8080>.
 
 ## For a statically rendered website
 

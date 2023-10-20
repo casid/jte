@@ -41,11 +41,8 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      # Keep the list of installed pip packages consistent with
-      # the list in validate-docs.yml.
-      - run: pip install mkdocs-material
-      - run: pip install mkdocs-awesome-pages-plugin
-      - run: pip install mkdocs-pom-parser-plugin
+      - name: Setup MkDocs
+        run: .github/scripts/setup-docs-dependencies.sh
       - name: Create new docs version
         # `_site` is the default path expected by `actions/upload-pages-artifact` to
         # find the static assets.

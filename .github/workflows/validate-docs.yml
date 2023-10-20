@@ -27,11 +27,8 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      # Keep the list of installed pip packages consistent with
-      # the list in publish-docs.yml.
-      - run: pip install mkdocs-material
-      - run: pip install mkdocs-awesome-pages-plugin
-      - run: pip install mkdocs-pom-parser-plugin
+      - name: Setup MkDocs
+        run: .github/scripts/setup-docs-dependencies.sh
       - name: Build docs
         # https://www.mkdocs.org/user-guide/cli/#mkdocs-build
         # --strict cause MkDocs to abort the build on any warnings.

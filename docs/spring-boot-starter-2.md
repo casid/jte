@@ -1,6 +1,6 @@
 ---
 title: jte Spring Boot 2 Starter
-description: A Spring Boot 2 Starter to swiflty integrate jte
+description: A Spring Boot 2 Starter to swiftly integrate jte
 ---
 
 # Spring Boot 2 Starter

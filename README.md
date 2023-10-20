@@ -26,7 +26,7 @@ jte gives you the same productive, typesafe experience you're used to from writi
 
 ## Documentation
 
-Documentation lives in the [jte webside](https://jte.gg/).
+Documentation lives in the [jte website](https://jte.gg/).
 
 ## Framework integration
 

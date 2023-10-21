@@ -239,5 +239,5 @@ To use this feature, set `#!groovy jteExtension("gg.jte.nativeimage.NativeResour
 
 There's an example [Gradle test project](https://github.com/casid/jte/blob/{{ latest-git-tag }}/test/jte-runtime-cp-test-gradle-convention/build.gradle) using `native-image` compilation.
 
-[jte-maven-compiler-plugin]: https://mvnrepository.com/artifact/gg.jte/jte-maven-plugin
+[jte-maven-compiler-plugin]: https://search.maven.org/artifact/gg.jte/jte-maven-plugin
 [jte-gradle-plugin]: https://plugins.gradle.org/plugin/gg.jte.gradle

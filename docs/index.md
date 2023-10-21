@@ -10,7 +10,7 @@ description: jte is a secure, lightweight, and fast template engine for Java and
 [![Build Status](https://github.com/casid/jte/workflows/Test%20all%20JDKs%20on%20all%20OSes/badge.svg)](https://github.com/casid/jte/actions)
 [![Coverage Status](https://codecov.io/gh/casid/jte/branch/main/graph/badge.svg)](https://codecov.io/gh/casid/jte)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/casid/jte/master/LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/gg.jte/jte.svg)](http://mvnrepository.com/artifact/gg.jte/jte)
+[![Maven Central](https://img.shields.io/maven-central/v/gg.jte/jte.svg)][maven-central]
 
 !!! tip "jte 3 is here!"
 
@@ -283,4 +283,4 @@ This is the same benchmark as above, but the amount of threads was set to `#!jav
 
 [intellij-plugin]: https://plugins.jetbrains.com/plugin/14521-jte "IntelliJ JTE Plugin"
 [template-benchmark]: https://github.com/casid/template-benchmark/ "Template Benchmarks"
-[maven-central]: http://mvnrepository.com/artifact/gg.jte/jte "jte in Maven Central"
+[maven-central]: https://search.maven.org/artifact/gg.jte/jte "jte in Maven Central"

@@ -5,7 +5,7 @@
 [![Build Status](https://github.com/casid/jte/workflows/Test%20all%20JDKs%20on%20all%20OSes/badge.svg)](https://github.com/casid/jte/actions)
 [![Coverage Status](https://codecov.io/gh/casid/jte/branch/main/graph/badge.svg)](https://codecov.io/gh/casid/jte)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/casid/jte/master/LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/gg.jte/jte.svg)](http://mvnrepository.com/artifact/gg.jte/jte)
+[![Maven Central](https://img.shields.io/maven-central/v/gg.jte/jte.svg)](https://mvnrepository.com/artifact/gg.jte/jte)
 
 🚀 jte 3 is here! Check out the [release notes](https://github.com/casid/jte/releases/tag/3.0.0) for exciting new features, improved performance, and streamlined dependencies.
 
@@ -44,8 +44,7 @@ Documentation lives in the [jte website](https://jte.gg/).
 
 - [Mazebert TD (game website)](https://mazebert.com)
 - [Javalin website example with login and multiple languages](https://github.com/casid/jte-javalin-tutorial)
-- [Mitch Dennett's Blog](https://www.mitchdennett.com/)
-- [FlowCrypt Admin Panel](https://flowcrypt.com/docs/business/enterprise-admin-panel.html)
+- [FlowCrypt Admin Panel](https://flowcrypt.com/docs/technical/enterprise-admin-panel/usage/ui-overview.html)
 
 [intellij-plugin]: https://plugins.jetbrains.com/plugin/14521-jte "IntelliJ jte Plugin"
 [template-benchmark]: https://github.com/casid/template-benchmark/ "Template Benchmarks"

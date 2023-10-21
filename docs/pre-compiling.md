@@ -187,7 +187,7 @@ You can use a [Maven plugin][jte-maven-compiler-plugin] to generate all template
 
     Available since jte ^^**1.6.0**^^.
 
-The [Gradle plugin](https://plugins.gradle.org/plugin/gg.jte.gradle) can generate all templates during the Gradle build. Please note that paths specified in Java must match those specified in Gradle.
+The [Gradle plugin][jte-gradle-plugin] can generate all templates during the Gradle build. Please note that paths specified in Java must match those specified in Gradle.
 
 !!! warning
 
@@ -237,7 +237,7 @@ An application jar with generated classes can be built into a native binary usin
 
 To use this feature, set `#!groovy jteExtension("gg.jte.nativeimage.NativeResourcesExtension")` in your Gradle `jte` block. (Docs for Maven TBD)
 
-There's an example [Gradle test project](https://github.com/casid/jte/blob/main/test/jte-runtime-cp-test-gradle-convention/build.gradle) using `native-image` compilation.
+There's an example [Gradle test project](https://github.com/casid/jte/blob/{{ latest-git-tag }}/test/jte-runtime-cp-test-gradle-convention/build.gradle) using `native-image` compilation.
 
-[jte-maven-compiler-plugin]: https://github.com/casid/jte-maven-compiler-plugin
+[jte-maven-compiler-plugin]: https://mvnrepository.com/artifact/gg.jte/jte-maven-plugin
 [jte-gradle-plugin]: https://plugins.gradle.org/plugin/gg.jte.gradle

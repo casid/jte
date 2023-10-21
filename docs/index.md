@@ -279,8 +279,7 @@ This is the same benchmark as above, but the amount of threads was set to `#!jav
 
 - [Mazebert TD (game website)](https://mazebert.com)
 - [Javalin website example with login and multiple languages](https://github.com/casid/jte-javalin-tutorial)
-- [Mitch Dennett's Blog](https://www.mitchdennett.com/)
-- [FlowCrypt Admin Panel](https://flowcrypt.com/docs/business/enterprise-admin-panel.html)
+- [FlowCrypt Admin Panel](https://flowcrypt.com/docs/technical/enterprise-admin-panel/usage/ui-overview.html)
 
 [intellij-plugin]: https://plugins.jetbrains.com/plugin/14521-jte "IntelliJ JTE Plugin"
 [template-benchmark]: https://github.com/casid/template-benchmark/ "Template Benchmarks"

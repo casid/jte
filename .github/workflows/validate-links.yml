@@ -1,0 +1,23 @@
+name: "Validate External Links"
+
+on: [push, pull_request]
+
+jobs:
+  validate-external-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Link Checker
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: '**/*.java **/*.md **/*.xml **/*.html
+            --verbose --no-progress
+            --exclude localhost
+            --exclude "github\.com/casid/jte/blob"
+            --exclude "@template"
+            --exclude test.com
+            --exclude maven.apache.org
+            --exclude w3.org'
+          jobSummary: true
+          format: markdown
+          fail: true

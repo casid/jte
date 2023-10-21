@@ -103,7 +103,7 @@ public final class TemplateEngine {
      * No JDK is required.
      * All templates share one class loader with each other.
      * This is recommended when running templates in production.
-     * How to <a href="https://jte.gg/latest/pre-compiling/">precompile templates</a>.
+     * How to <a href="https://jte.gg/pre-compiling/">precompile templates</a>.
      *
      * @param classDirectory where template class files are located
      * @param contentType the content type of all templates this engine manages
@@ -120,7 +120,7 @@ public final class TemplateEngine {
      * This means all template classes must be bundled in you application JAR file.
      * No JDK is required.
      * This is recommended when running templates in production.
-     * How to <a href="https://jte.gg/latest/pre-compiling/">precompile templates</a>.
+     * How to <a href="https://jte.gg/pre-compiling/">precompile templates</a>.
      *
      * @param contentType the content type of all templates this engine manages
      * @return a fresh TemplateEngine instance
@@ -136,7 +136,7 @@ public final class TemplateEngine {
      * No JDK is required.
      * All templates share one class loader with each other.
      * This is recommended when running templates in production.
-     * How to <a href="https://jte.gg/latest/pre-compiling/">precompile templates</a>.
+     * How to <a href="https://jte.gg/pre-compiling/">precompile templates</a>.
      *
      * @param classDirectory where template class files are located
      * @param contentType the content type of all templates this engine manages
@@ -154,7 +154,7 @@ public final class TemplateEngine {
      * No JDK is required.
      * All templates share one class loader with each other.
      * This is recommended when running templates in production.
-     * How to <a href="https://jte.gg/latest/pre-compiling/">precompile templates</a>.
+     * How to <a href="https://jte.gg/pre-compiling/">precompile templates</a>.
      *
      * @param classDirectory where template class files are located
      * @param contentType the content type of all templates this engine manages

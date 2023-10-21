@@ -1,3 +1,3 @@
 # jte Spring Boot 3 Starter
 
-See official docs: <https://jte.gg/latest/spring-boot-starter-3/>.
+See official docs: <https://jte.gg/spring-boot-starter-3/>.

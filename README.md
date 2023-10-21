@@ -5,7 +5,7 @@
 [![Build Status](https://github.com/casid/jte/workflows/Test%20all%20JDKs%20on%20all%20OSes/badge.svg)](https://github.com/casid/jte/actions)
 [![Coverage Status](https://codecov.io/gh/casid/jte/branch/main/graph/badge.svg)](https://codecov.io/gh/casid/jte)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/casid/jte/master/LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/gg.jte/jte.svg)](http://mvnrepository.com/artifact/gg.jte/jte)
+[![Maven Central](https://img.shields.io/maven-central/v/gg.jte/jte.svg)][maven-central]
 
 🚀 jte 3 is here! Check out the [release notes](https://github.com/casid/jte/releases/tag/3.0.0) for exciting new features, improved performance, and streamlined dependencies.
 
@@ -13,10 +13,10 @@
 
 - Intuitive and easy syntax, you'll rarely need to check the [documentation](https://jte.gg/)
 - Write plain Java or Kotlin for expressions. You don't need to learn yet another expression language
-- Context-sensitive [HTML escaping](https://jte.gg/latest/html-rendering/#html-escaping) at compile time
+- Context-sensitive [HTML escaping](https://jte.gg/html-rendering/#html-escaping) at compile time
 - [IntelliJ plugin][intellij-plugin] with completion and refactoring support
 - Hot reloading of templates during development
-- Blazing fast execution ([see benchmarks](https://jte.gg/latest/#performance))
+- Blazing fast execution ([see benchmarks](https://jte.gg/#performance))
 
 ## tl;dr
 
@@ -44,9 +44,8 @@ Documentation lives in the [jte website](https://jte.gg/).
 
 - [Mazebert TD (game website)](https://mazebert.com)
 - [Javalin website example with login and multiple languages](https://github.com/casid/jte-javalin-tutorial)
-- [Mitch Dennett's Blog](https://www.mitchdennett.com/)
-- [FlowCrypt Admin Panel](https://flowcrypt.com/docs/business/enterprise-admin-panel.html)
+- [FlowCrypt Admin Panel](https://flowcrypt.com/docs/technical/enterprise-admin-panel/usage/ui-overview.html)
 
 [intellij-plugin]: https://plugins.jetbrains.com/plugin/14521-jte "IntelliJ jte Plugin"
 [template-benchmark]: https://github.com/casid/template-benchmark/ "Template Benchmarks"
-[maven-central]: http://mvnrepository.com/artifact/gg.jte/jte "jte in Maven Central"
+[maven-central]: https://search.maven.org/artifact/gg.jte/jte "jte in Maven Central"

@@ -17,6 +17,6 @@ class ClassUtilsTest {
         Throwable throwable = catchThrowable(() -> ClassUtils.resolveClasspathFromClassLoader(classLoader, p -> {
         }));
 
-        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessageContaining("https://jte.gg/latest/pre-compiling/#using-the-application-class-loader");
+        assertThat(throwable).isInstanceOf(TemplateException.class).hasMessageContaining("https://jte.gg/pre-compiling/#using-the-application-class-loader");
     }
 }

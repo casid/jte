@@ -31,7 +31,7 @@ public class PreventOutputInTagsAndAttributes implements HtmlPolicy {
         }
 
         if (htmlAttribute.getName().contains("@if")) {
-            throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! @if expressions in HTML attribute names are not allowed. In case you're trying to optimize the generated output, smart attributes will do just that: https://jte.gg/latest/html-rendering/#smart-attributes");
+            throw new HtmlPolicyException("Illegal HTML attribute name " + htmlAttribute.getName() + "! @if expressions in HTML attribute names are not allowed. In case you're trying to optimize the generated output, smart attributes will do just that: https://jte.gg/html-rendering/#smart-attributes");
         }
 
         if (htmlAttribute.getName().contains("@for")) {

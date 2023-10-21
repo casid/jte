@@ -13,10 +13,10 @@
 
 - Intuitive and easy syntax, you'll rarely need to check the [documentation](https://jte.gg/)
 - Write plain Java or Kotlin for expressions. You don't need to learn yet another expression language
-- Context-sensitive [HTML escaping](https://jte.gg/latest/html-rendering/#html-escaping) at compile time
+- Context-sensitive [HTML escaping](https://jte.gg/html-rendering/#html-escaping) at compile time
 - [IntelliJ plugin][intellij-plugin] with completion and refactoring support
 - Hot reloading of templates during development
-- Blazing fast execution ([see benchmarks](https://jte.gg/latest/#performance))
+- Blazing fast execution ([see benchmarks](https://jte.gg/#performance))
 
 ## tl;dr
 

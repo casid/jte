@@ -33,6 +33,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     private boolean hasWrittenClass;
     private CodeMarker fieldsMarker;
     private int attributeCounter;
+    private int nextForLoopId = 1;
 
     public JavaCodeGenerator(TemplateCompiler compiler, TemplateConfig config, ConcurrentHashMap<String, List<ParamInfo>> paramOrder, ClassInfo classInfo, LinkedHashSet<ClassDefinition> classDefinitions, LinkedHashSet<TemplateDependency> templateDependencies) {
         this.compiler = compiler;
@@ -382,7 +383,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
         CodeMarker inLoop = javaCode.getMarkerOfCurrentPosition();
 
-        forLoopStack.push(new ForLoopStart(beforeLoop, inLoop, depth));
+        forLoopStack.push(new ForLoopStart(beforeLoop, inLoop, depth, nextForLoopId++));
     }
 
     @Override
@@ -390,7 +391,7 @@ public class JavaCodeGenerator implements CodeGenerator {
         ForLoopStart forLoopStart = forLoopStack.peek();
 
         if (forLoopStart != null) {
-            String variableName = "__jte_for_loop_entered_" + forLoopStack.size();
+            String variableName = "__jte_for_loop_entered_" + forLoopStart.id;
 
             StringBuilder variableDeclaration = new StringBuilder();
             writeIndentation(variableDeclaration, forLoopStart.indentation);
@@ -656,5 +657,5 @@ public class JavaCodeGenerator implements CodeGenerator {
         }
     }
 
-    private record ForLoopStart(CodeMarker beforeLoop, CodeMarker inLoop, int indentation) {}
+    private record ForLoopStart(CodeMarker beforeLoop, CodeMarker inLoop, int indentation, int id) {}
 }

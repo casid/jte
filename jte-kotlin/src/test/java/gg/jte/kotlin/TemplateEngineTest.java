@@ -347,6 +347,22 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void loopElse_multiple() {
+        model.array = new int[]{1};
+        givenTemplate("@for (i in model.array)" +
+                "${i}" +
+                "@else" +
+                "Empty" +
+                "@endfor\n" +
+                "@for (i in model.array)" +
+                "${i}" +
+                "@else" +
+                "Empty" +
+                "@endfor");
+        thenOutputIs("1\n1");
+    }
+
+    @Test
     void unsafeInContentBlock() {
         model.array = new int[]{1, 2, 3};
         givenTemplate("${@`$unsafe{\"\" + model.array.size}`}");

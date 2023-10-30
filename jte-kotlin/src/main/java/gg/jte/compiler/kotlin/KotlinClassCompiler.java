@@ -32,6 +32,10 @@ public class KotlinClassCompiler implements ClassCompiler {
 
         compilerArguments.setClasspath(ClassUtils.join(classPath));
 
+        if (config.kotlinCompileArgs != null) {
+            applyCompileArgs(compilerArguments, config.kotlinCompileArgs);
+        }
+
         K2JVMCompiler compiler = new K2JVMCompiler();
 
         SimpleKotlinCompilerMessageCollector messageCollector = new SimpleKotlinCompilerMessageCollector(templateByClassName, config.packageName);
@@ -43,6 +47,15 @@ public class KotlinClassCompiler implements ClassCompiler {
 
         if (messageCollector.hasErrors()) {
             throw new TemplateException(messageCollector.getErrorMessage());
+        }
+    }
+
+    private void applyCompileArgs(K2JVMCompilerArguments compilerArguments, String[] kotlinCompileArgs) {
+        for (int i = 0; i < kotlinCompileArgs.length; i++) {
+            if ("-jvm-target".equals(kotlinCompileArgs[i])) {
+                i++;
+                compilerArguments.setJvmTarget(kotlinCompileArgs[i]);
+            }
         }
     }
 

@@ -1333,6 +1333,13 @@ public class TemplateEngineTest {
                      "</script>\n");
     }
 
+    @Test
+    void kotlinCompileArgs() {
+        templateEngine.setKotlinCompileArgs("-jvm-target", "17");
+        givenRawTemplate("@param model:gg.jte.kotlin.TemplateEngineTest.Model\nHello ${model.x}");
+        thenOutputIs("Hello 42");
+    }
+
     private void givenTag(String name, String code) {
         dummyCodeResolver.givenCode("tag/" + name + ".kte", code);
     }

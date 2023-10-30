@@ -58,6 +58,17 @@ public class PrecompileJteTask extends JteTaskBase {
         setterCalled();
     }
 
+    @Input
+    @Optional
+    public String[] getKotlinCompileArgs() {
+        return extension.getKotlinCompileArgs().getOrNull();
+    }
+
+    public void setKotlinCompileArgs(String[] compileArgs) {
+        extension.getKotlinCompileArgs().set(compileArgs);
+        setterCalled();
+    }
+
     @TaskAction
     public void execute() {
         // Prevent Kotlin compiler to leak file handles, see https://github.com/casid/jte/issues/77
@@ -67,7 +78,7 @@ public class PrecompileJteTask extends JteTaskBase {
         Logger logger = getLogger();
         long start = System.nanoTime();
 
-         Path sourceDirectory = getSourceDirectory();
+        Path sourceDirectory = getSourceDirectory();
         logger.info("Precompiling jte templates found in " + sourceDirectory);
 
         Path targetDirectory = getTargetDirectory();
@@ -85,6 +96,7 @@ public class PrecompileJteTask extends JteTaskBase {
         templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(getHtmlCommentsPreserved()));
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
         templateEngine.setCompileArgs(getCompileArgs());
+        templateEngine.setKotlinCompileArgs(getKotlinCompileArgs());
         templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());
 
         int amount;

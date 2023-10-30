@@ -34,7 +34,7 @@ public class GradleMatrixTest {
     public static Stream<Arguments> runGradleBuild() throws IOException {
         return Files.find(Paths.get(".."), 2, (p, attr) -> p.getFileName().toString().startsWith("settings.gradle"))
                 .map(Path::getParent)
-                .filter(p -> p.getFileName().toString().startsWith("jte-runtime"))
+                .filter(p -> p.getFileName().toString().startsWith("jte-runtime") || p.getFileName().toString().startsWith("kte-runtime"))
                 .flatMap(p -> GRADLE_VERSIONS.stream().map(v -> Arguments.arguments(p, v)));
     }
 

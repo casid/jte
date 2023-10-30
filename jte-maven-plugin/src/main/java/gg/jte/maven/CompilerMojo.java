@@ -92,6 +92,12 @@ public class CompilerMojo extends AbstractMojo {
     public String[] compileArgs;
 
     /**
+     * Sets additional compiler arguments for kte templates.
+     */
+    @Parameter
+    public String[] kotlinCompileArgs;
+
+    /**
      * The package name, where template classes are generated to.
      */
     @Parameter
@@ -131,6 +137,7 @@ public class CompilerMojo extends AbstractMojo {
         templateEngine.setHtmlCommentsPreserved(htmlCommentsPreserved);
         templateEngine.setBinaryStaticContent(binaryStaticContent);
         templateEngine.setCompileArgs(calculateCompileArgs());
+        templateEngine.setCompileArgs(kotlinCompileArgs);
 
         int amount;
         try {

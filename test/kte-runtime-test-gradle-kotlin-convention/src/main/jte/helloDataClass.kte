@@ -1,0 +1,2 @@
+@param model:test.DataClass
+Hello ${model.name}, your id is ${model.id}.

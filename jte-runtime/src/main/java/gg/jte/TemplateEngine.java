@@ -423,6 +423,17 @@ public final class TemplateEngine {
     }
 
     /**
+     * Sets additional compiler arguments for kte templates.
+     * <br>
+     * This is a template compilation setting and has no effect when loading precompiled templates.
+     * Currently, only -jvm-target is supported.
+     * @param compileArgs for instance templateEngine.setCompileArgs("-jvm-target", "17");
+     */
+    public void setKotlinCompileArgs(String ... compileArgs) {
+        config.kotlinCompileArgs = compileArgs;
+    }
+
+    /**
      * Trims control structures, resulting in prettier output.
      * <br>
      * This is a template compilation setting and has no effect when loading precompiled templates.

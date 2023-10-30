@@ -17,6 +17,7 @@ public class TemplateConfig {
     public final ContentType contentType;
     public final String packageName;
     public String[] compileArgs;
+    public String[] kotlinCompileArgs;
     public boolean trimControlStructures;
     public HtmlPolicy htmlPolicy = new OwaspHtmlPolicy();
     public String[] htmlTags;

@@ -125,6 +125,7 @@ public class GradleMatrixTest {
     }
 
     private void deleteDir(Path directoryToDelete) throws IOException {
+        if (Files.notExists(directoryToDelete)) return;
         Files.walkFileTree(directoryToDelete, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {

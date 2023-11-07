@@ -1,8 +1,10 @@
 plugins {
     id('java')
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -15,4 +17,8 @@ dependencies {
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
     systemProperty("gradle.matrix.versions", System.getProperty("gradle.matrix.versions", "DEFAULT"))
+}
+
+testlogger {
+    theme 'standard'
 }

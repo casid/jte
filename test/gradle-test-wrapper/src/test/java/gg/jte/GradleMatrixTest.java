@@ -5,6 +5,7 @@ import org.gradle.testkit.runner.BuildTask;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -23,6 +25,13 @@ import java.util.stream.Stream;
 public class GradleMatrixTest {
     public static final List<String> GRADLE_VERSIONS = getTestGradleVersions();
     public static final String DEFAULT = "DEFAULT";
+
+    // Follows Gradle recommendation:
+    // https://docs.gradle.org/current/userguide/test_kit.html#sub:test-kit-build-cache
+    // Basically, it uses a temporary directory to avoid test runs to polute the build
+    // cache and interfer with each other.
+    @TempDir
+    public Path temporaryBuildCacheDir;
 
     /**
      * Use system property "gradle.matrix.versions" to test multiple versions. Note this may result in downloading those
@@ -51,9 +60,7 @@ public class GradleMatrixTest {
         deleteDir(projectDir.resolve(".gradle/configuration-cache"));
 
         // Then run the task
-        BuildResult result = runner(projectDir, gradleVersion)
-                .withArguments("--configuration-cache", TASK_NAME)
-                .build();
+        BuildResult result = runner(projectDir, gradleVersion, TASK_NAME).build();
 
         // Check task was successful
         BuildTask task = result.task(TASK_NAME);
@@ -74,19 +81,19 @@ public class GradleMatrixTest {
     @ParameterizedTest
     @MethodSource
     public void checkBuildCache(Path projectDir, String gradleVersion) throws IOException {
-        // Populates the cache
-        runner(projectDir, gradleVersion)
-                .withArguments("--build-cache", TASK_NAME)
-                .build();
-
-        // Clean the build directory
+        // Start the test with a clean slate. This ensures that the task outcome
+        // won't be something as `TaskOutcome.UP_TO_DATE`.
         deleteDir(projectDir.resolve("build"));
 
-        // A second run must result in build-cache
-        BuildResult result = runner(projectDir, gradleVersion)
-                .withArguments("--build-cache", TASK_NAME)
-                .withDebug(true)
-                .build();
+        // First run to populate the cache
+        runner(projectDir, gradleVersion, "--build-cache", TASK_NAME).build();
+
+        // Delete the build directory so that the next run uses
+        // will need to use the build cache.
+        deleteDir(projectDir.resolve("build"));
+
+        // The second run must use the build cache.
+        BuildResult result = runner(projectDir, gradleVersion, "--build-cache", TASK_NAME).build();
 
         BuildTask mainTask = result.task(TASK_NAME);
         Assertions.assertNotNull(mainTask, String.format("A task named %s must be part of the build result", TASK_NAME));
@@ -96,27 +103,35 @@ public class GradleMatrixTest {
             String.format("Build failed in %s with Gradle Version %s", projectDir, gradleVersion)
         );
 
-        // Check the outcome for only these tasks since we want to test if they
-        // populate the cache properly.
+        // `generateJte` and `precompileJte` are the cacheable tasks we want to test.
         List<BuildTask> tasks = Stream.of(":generateJte", ":precompileJte")
                 .map(result::task)
-                // When generate is executed, precompile is skipped, and vice versa, then we filter out the
-                // skipped one here.
+                // When `generate` is executed, `precompile` is skipped, and vice versa, then we
+                // filter out the skipped one here.
                 .filter(task -> task != null && task.getOutcome() != TaskOutcome.SKIPPED)
                 .toList();
 
         Assertions.assertFalse(tasks.isEmpty(), "At least one of :generateJte or :precompileJte tasks should be present");
         tasks.forEach(task -> Assertions.assertEquals(
-                TaskOutcome.FROM_CACHE,
-                task.getOutcome(),
-                String.format("Expected outcome for task %s was %s, but got %s. Build output: \n %s", task.getPath(), TaskOutcome.FROM_CACHE, task.getOutcome(), result.getOutput())
+            TaskOutcome.FROM_CACHE,
+            task.getOutcome(),
+            String.format("Expected outcome for task %s was %s, but got %s. Build output: \n %s", task.getPath(), TaskOutcome.FROM_CACHE, task.getOutcome(), result.getOutput())
         ));
     }
 
-    private GradleRunner runner(Path projectDir, String gradleVersion) {
+    private GradleRunner runner(Path projectDir, String gradleVersion, String ... extraArgs) {
+        List<String> arguments = new ArrayList<>(Arrays.asList(extraArgs));
+        arguments.addAll(
+            List.of(
+                "--configuration-cache",
+                "-Dtest.build.cache.dir=" + temporaryBuildCacheDir.toUri()
+            )
+        );
+
         GradleRunner runner = GradleRunner.create()
                 .withProjectDir(projectDir.toFile())
-                .withTestKitDir(Paths.get("build").resolve(projectDir.getFileName()).toAbsolutePath().toFile());
+                .withTestKitDir(Paths.get("build").resolve(projectDir.getFileName()).toAbsolutePath().toFile())
+                .withArguments(arguments);
 
         if (!DEFAULT.equals(gradleVersion)) {
             runner = runner.withGradleVersion(gradleVersion);

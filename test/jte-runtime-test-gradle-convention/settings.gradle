@@ -4,3 +4,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+buildCache {
+    local {
+        directory "${System.getProperty("test.build.cache.dir")}"
+    }
+}

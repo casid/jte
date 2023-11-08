@@ -66,7 +66,14 @@ jobs:
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Run all the Gradle Plugin tests
+        id: gradlePluginTests
         run: cd test/gradle-test-wrapper && ./gradlew --info check
+      - name: Store Gradle plugin test reports
+        if: failure() && steps.gradlePluginTests.outcome == 'failure'
+        uses: actions/upload-artifact@v3
+        with:
+          name: failing-test-report
+          path: test/gradle-test-wrapper/build/reports/tests/test/**/*
 
 
   coverage:

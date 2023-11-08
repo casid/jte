@@ -67,7 +67,10 @@ jobs:
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Run all the Gradle Plugin tests
         id: gradlePluginTests
-        run: cd test/gradle-test-wrapper && ./gradlew --info check
+        run: |
+          cd test/gradle-test-wrapper
+          ./gradlew --info check
+          ./gradlew --stop
       - name: Store Gradle plugin test reports
         if: failure() && steps.gradlePluginTests.outcome == 'failure'
         uses: actions/upload-artifact@v3

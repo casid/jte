@@ -21,9 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         java_version: [17]
-        # Windows builds are failing, looks similar to https://github.com/graalvm/native-build-tools/issues/234
-        # Native build on Mac OS / Java 11 is failing
-        os: [macOS-latest, ubuntu-latest]
+        os: [windows-2022, macOS-latest, ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v4

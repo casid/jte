@@ -10,7 +10,7 @@ jobs:
       - name: Link Checker
         uses: lycheeverse/lychee-action@v1
         with:
-          args: '**/*.java **/*.md **/*.xml **/*.html
+          args: '**/*.java **/*.md **/*.xml **/*.html **/*.yml
             --verbose --no-progress
             --exclude localhost
             --exclude "github\.com/casid/jte/blob"

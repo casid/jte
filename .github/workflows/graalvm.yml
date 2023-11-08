@@ -16,6 +16,9 @@ on:
 jobs:
   build:
 
+    env:
+      MAVEN_OPTS: "-Dmaven.build.cache.enabled=true"
+
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -32,13 +35,35 @@ jobs:
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---maven
+      - name: Cache local Maven
+        id: mavenCache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.m2/build-cache
+          key: ${{ runner.os }}-maven-graalvm-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-graalvm-
+
+      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
+      - name: Cache local Gradle
+        id: gradleCache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-graalvm-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-graalvm-
+
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw install --file pom.xml --batch-mode -DskipTests=true
-        env:
-          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+        run: ./mvnw install --file pom.xml
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Test Gradle Plugin Generate with conventions

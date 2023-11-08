@@ -13,6 +13,9 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
 
+env:
+  MAVEN_OPTS: "-Dmaven.build.cache.enabled=true"
+
 jobs:
   build:
 
@@ -30,13 +33,36 @@ jobs:
         with:
           java-version: ${{ matrix.java_version }}
           distribution: 'temurin'
+
+      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---maven
+      - name: Cache local Maven
+        id: mavenCache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.m2/build-cache
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
+      - name: Cache local Gradle
+        id: gradleCache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw install --file pom.xml --batch-mode
-        env:
-          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+        run: ./mvnw install --file pom.xml
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Run all the Gradle Plugin tests
@@ -44,7 +70,6 @@ jobs:
 
 
   coverage:
-
     # Do not run coverage for forks since they cannot upload
     # the results to codecov. For reference, see:
     # https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution#example-only-run-job-for-specific-repository
@@ -58,17 +83,26 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+
+      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---maven
+      - name: Cache local Maven
+        id: mavenCache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.m2/build-cache
+          key: ${{ runner.os }}-maven-coverage-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-coverage-
+
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw verify --file pom.xml --batch-mode -Pcoverage
-        env:
-          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn  
-      
+        run: ./mvnw verify --file pom.xml -Pcoverage
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
         with:
           file: ./test/jte-test-report/target/site/jacoco-aggregate/jacoco.xml
           fail_ci_if_error: true
-

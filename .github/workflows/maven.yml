@@ -35,8 +35,7 @@ jobs:
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        # `-DskipTests=true` since they run on `coverage` job.
-        run: ./mvnw install --file pom.xml --batch-mode -DskipTests=true
+        run: ./mvnw install --file pom.xml --batch-mode
         env:
           MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
       - name: Build Gradle Plugin

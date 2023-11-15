@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@CacheableTask
 public class PrecompileJteTask extends JteTaskBase {
 
     @Inject
@@ -27,6 +28,7 @@ public class PrecompileJteTask extends JteTaskBase {
     }
 
     @InputFiles
+    @CompileClasspath
     public FileCollection getCompilePath() {
         return extension.getCompilePath();
     }

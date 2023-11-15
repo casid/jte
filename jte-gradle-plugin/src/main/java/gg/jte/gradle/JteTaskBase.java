@@ -2,13 +2,13 @@ package gg.jte.gradle;
 
 import gg.jte.ContentType;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
+import org.gradle.api.tasks.PathSensitive;
+import org.gradle.api.tasks.PathSensitivity;
 
-import java.io.File;
 import java.nio.file.Path;
 
 public abstract class JteTaskBase extends DefaultTask {
@@ -30,6 +30,7 @@ public abstract class JteTaskBase extends DefaultTask {
     }
 
     @InputDirectory
+    @PathSensitive(PathSensitivity.RELATIVE)
     public Path getSourceDirectory() {
         return extension.getSourceDirectory().get();
     }

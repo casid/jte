@@ -52,7 +52,7 @@ jobs:
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Test Gradle Plugin Generate with conventions
-        run: |
-          cd test/jte-runtime-cp-test-gradle-convention
-          ./gradlew check nativeTest
-          ./gradlew --stop
+        run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew check nativeTest
+      - name: Stop Gradle Daemon
+        if: ${{ always() }}
+        run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew --stop

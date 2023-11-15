@@ -15,7 +15,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -53,10 +52,10 @@ jobs:
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Run all the Gradle Plugin tests
         id: gradlePluginTests
-        run: |
-          cd test/gradle-test-wrapper
-          ./gradlew --info check
-          ./gradlew --stop
+        run: cd test/gradle-test-wrapper && ./gradlew --info check
+      - name: Stop Gradle Daemon
+        if: ${{ always() }}
+        run: cd test/gradle-test-wrapper && ./gradlew --stop
       - name: Store Gradle plugin test reports
         if: failure() && steps.gradlePluginTests.outcome == 'failure'
         uses: actions/upload-artifact@v3

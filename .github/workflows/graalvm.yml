@@ -15,10 +15,6 @@ on:
 
 jobs:
   build:
-
-    env:
-      MAVEN_OPTS: "-Dmaven.build.cache.enabled=true"
-
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -34,18 +30,7 @@ jobs:
           java-version: ${{ matrix.java_version }}
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---maven
-      - name: Cache local Maven
-        id: mavenCache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.m2/repository
-            ~/.m2/build-cache
-          key: ${{ runner.os }}-maven-graalvm-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-graalvm-
+          cache: 'maven'
 
       # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
       - name: Cache local Gradle
@@ -63,7 +48,7 @@ jobs:
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw install --file pom.xml -DskipTests=false
+        run: ./mvnw install --file pom.xml -DskipTests=true
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Test Gradle Plugin Generate with conventions

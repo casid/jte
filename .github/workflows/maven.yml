@@ -13,9 +13,6 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
 
-env:
-  MAVEN_OPTS: "-Dmaven.build.cache.enabled=true"
-
 jobs:
   build:
 
@@ -33,18 +30,7 @@ jobs:
         with:
           java-version: ${{ matrix.java_version }}
           distribution: 'temurin'
-
-      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---maven
-      - name: Cache local Maven
-        id: mavenCache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.m2/repository
-            ~/.m2/build-cache
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          cache: 'maven'
 
       # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
       - name: Cache local Gradle
@@ -62,7 +48,7 @@ jobs:
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw install --file pom.xml -DskipTests=false
+        run: ./mvnw install --file pom.xml
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Run all the Gradle Plugin tests
@@ -85,7 +71,6 @@ jobs:
     # https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution#example-only-run-job-for-specific-repository
     if: github.repository == 'casid/jte'
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
@@ -93,19 +78,7 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
-
-      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---maven
-      - name: Cache local Maven
-        id: mavenCache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.m2/repository
-            ~/.m2/build-cache
-          key: ${{ runner.os }}-maven-coverage-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-coverage-
-
+          cache: 'maven'
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw

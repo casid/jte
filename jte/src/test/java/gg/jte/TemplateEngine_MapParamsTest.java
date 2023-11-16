@@ -16,9 +16,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void template() {
-        givenTemplate("page.jte", "@param String firstParam\n" +
-                "@param int secondParam\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTemplate("page.jte", """
+                @param String firstParam
+                @param int secondParam
+                One: ${firstParam}, two: ${secondParam}""");
 
         params.put("firstParam", "Hello");
         params.put("secondParam", 42);
@@ -30,9 +31,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag() {
-        givenTag("card", "@param String firstParam\n" +
-                "@param int secondParam\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param String firstParam
+                @param int secondParam
+                One: ${firstParam}, two: ${secondParam}""");
 
         params.put("firstParam", "Hello");
         params.put("secondParam", 42);
@@ -44,9 +46,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag_defaultParamBoolean() {
-        givenTag("card", "@param boolean firstParam = false\n" +
-                "@param Boolean secondParam = true\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param boolean firstParam = false
+                @param Boolean secondParam = true
+                One: ${firstParam}, two: ${secondParam}""");
 
         whenTemplateIsRendered("tag/card.jte");
 
@@ -55,9 +58,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag_defaultParamInt() {
-        givenTag("card", "@param int firstParam = 1\n" +
-                "@param Integer secondParam = 3\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param int firstParam = 1
+                @param Integer secondParam = 3
+                One: ${firstParam}, two: ${secondParam}""");
 
         whenTemplateIsRendered("tag/card.jte");
 
@@ -66,9 +70,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag_defaultParamLong() {
-        givenTag("card", "@param long firstParam = 1L\n" +
-                "@param Long secondParam = 3L\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param long firstParam = 1L
+                @param Long secondParam = 3L
+                One: ${firstParam}, two: ${secondParam}""");
 
         whenTemplateIsRendered("tag/card.jte");
 
@@ -77,9 +82,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag_defaultParamFloat() {
-        givenTag("card", "@param float firstParam = 1.0f\n" +
-                "@param Float secondParam = 3.0f\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param float firstParam = 1.0f
+                @param Float secondParam = 3.0f
+                One: ${firstParam}, two: ${secondParam}""");
 
         whenTemplateIsRendered("tag/card.jte");
 
@@ -88,9 +94,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag_defaultParamDouble() {
-        givenTag("card", "@param double firstParam = 1.0\n" +
-                "@param Double secondParam = 3.0\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param double firstParam = 1.0
+                @param Double secondParam = 3.0
+                One: ${firstParam}, two: ${secondParam}""");
 
         whenTemplateIsRendered("tag/card.jte");
 
@@ -99,9 +106,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag_defaultParamTypeNeedsCast() {
-        givenTag("card", "@param byte firstParam = (byte)1\n" +
-                "@param Double secondParam = 3.0\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param byte firstParam = (byte)1
+                @param Double secondParam = 3.0
+                One: ${firstParam}, two: ${secondParam}""");
 
         whenTemplateIsRendered("tag/card.jte");
 
@@ -110,9 +118,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag_defaultParamIsExpression() {
-        givenTag("card", "@param int firstParam = Integer.MIN_VALUE\n" +
-                "@param Double secondParam = 3.0\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param int firstParam = Integer.MIN_VALUE
+                @param Double secondParam = 3.0
+                One: ${firstParam}, two: ${secondParam}""");
 
         whenTemplateIsRendered("tag/card.jte");
 
@@ -121,9 +130,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag_defaultParamString() {
-        givenTag("card", "@param java.lang.String firstParam = \"test\"\n" +
-                "@param int secondParam = 3\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param java.lang.String firstParam = "test"
+                @param int secondParam = 3
+                One: ${firstParam}, two: ${secondParam}""");
 
         whenTemplateIsRendered("tag/card.jte");
 
@@ -132,9 +142,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void tag_defaultParamNull() {
-        givenTag("card", "@param String firstParam = null\n" +
-                "@param int secondParam = 3\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param String firstParam = null
+                @param int secondParam = 3
+                One: ${firstParam}, two: ${secondParam}""");
 
         whenTemplateIsRendered("tag/card.jte");
 
@@ -161,10 +172,11 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void layout_oneParamAndTwoDefinitions() {
-        givenLayout("page", "@param String name\n" +
-                        "@param gg.jte.Content content\n" +
-                        "@param gg.jte.Content footer\n" +
-                "Hello ${name} ${content}, ${footer}");
+        givenLayout("page", """
+                @param String name
+                @param gg.jte.Content content
+                @param gg.jte.Content footer
+                Hello ${name} ${content}, ${footer}""");
         params.put("name", "jte");
         params.put("content", (Content) output -> output.writeContent("<p>content</p>"));
         params.put("footer", (Content) output -> output.writeContent("<p>footer</p>"));

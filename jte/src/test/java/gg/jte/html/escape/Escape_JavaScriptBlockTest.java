@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Notes from OWASP Java Encoder:
- *
+ * <br>
  * in <script> blocks, we need to prevent the browser from seeing
  * "</anything>" and "<!--". To do so we escape "/" as "\/" and
  * escape "-" as "\-".  Both could be solved with a hex encoding

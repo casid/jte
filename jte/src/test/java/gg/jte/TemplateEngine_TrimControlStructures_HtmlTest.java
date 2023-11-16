@@ -35,39 +35,44 @@ public class TemplateEngine_TrimControlStructures_HtmlTest {
     @Test
     void whitespacesAtTemplateBegin_variable() {
         givenTemplate(
-                "@import java.time.Instant\n" +
-                "@import java.time.temporal.ChronoUnit\n" +
-                "@param String name\n" +
-                "!{\n" +
-                "    String ts = \"ts\";\n" +
-                "    String message = \"Hello \" + name;\n" +
-                "}\n" +
-                "<!DOCTYPE cXML SYSTEM \"http://example.com/example.dtd\">\n" +
-                "<Issue xml:lang=\"en-US\" timestamp=\"${ts}\" someID=\"${name}@internal.example.com\">\n" +
-                "  <Response><Status code=\"foo\" text=\"bar\">${message}</Status></Response>\n" +
-                "</Issue>");
+                """
+                        @import java.time.Instant
+                        @import java.time.temporal.ChronoUnit
+                        @param String name
+                        !{
+                            String ts = "ts";
+                            String message = "Hello " + name;
+                        }
+                        <!DOCTYPE cXML SYSTEM "https://example.com/example.dtd">
+                        <Issue xml:lang="en-US" timestamp="${ts}" someID="${name}@internal.example.com">
+                          <Response><Status code="foo" text="bar">${message}</Status></Response>
+                        </Issue>""");
 
-        thenOutputIs("<!DOCTYPE cXML SYSTEM \"http://example.com/example.dtd\">\n" +
-                "<Issue xml:lang=\"en-US\" timestamp=\"ts\" someID=\"@internal.example.com\">\n" +
-                "  <Response><Status code=\"foo\" text=\"bar\">Hello null</Status></Response>\n" +
-                "</Issue>");
+        thenOutputIs("""
+                <!DOCTYPE cXML SYSTEM "https://example.com/example.dtd">
+                <Issue xml:lang="en-US" timestamp="ts" someID="@internal.example.com">
+                  <Response><Status code="foo" text="bar">Hello null</Status></Response>
+                </Issue>""");
     }
 
     @Test
     void attributes() {
-        givenTemplate("@if(true)\n" +
-                "    <a href=\"${\"url\"}\" class=\"nav-item@if(true) is-active@endif\">foo</a>\n" +
-                "@endif");
+        givenTemplate("""
+                @if(true)
+                    <a href="${"url"}" class="nav-item@if(true) is-active@endif">foo</a>
+                @endif""");
         thenOutputIs("<a href=\"url\" class=\"nav-item is-active\">foo</a>\n");
     }
 
     @Test
     void ifStatement() {
         givenTemplate(
-                "@if(true)\n" +
-                "    Yay,\n" +
-                "    it's true!\n" +
-                "@endif\n");
+                """
+                        @if(true)
+                            Yay,
+                            it's true!
+                        @endif
+                        """);
         thenOutputIs("Yay,\nit's true!\n");
     }
 
@@ -80,214 +85,246 @@ public class TemplateEngine_TrimControlStructures_HtmlTest {
     @Test
     void ifStatement_varyingIndentations1() {
         givenTemplate(
-                "@if(true)\n" +
-                "    Yay,\n" +
-                "  it's true!\n" +
-                "@endif\n");
+                """
+                        @if(true)
+                            Yay,
+                          it's true!
+                        @endif
+                        """);
         thenOutputIs("Yay,\nit's true!\n");
     }
 
     @Test
     void ifStatement_varyingIndentations2() {
         givenTemplate(
-                "@if(true)\n" +
-                "  Yay,\n" +
-                "    it's true!\n" +
-                "@endif\n");
+                """
+                        @if(true)
+                          Yay,
+                            it's true!
+                        @endif
+                        """);
         thenOutputIs("Yay,\n  it's true!\n");
     }
 
     @Test
     void ifStatementNested() {
         givenTemplate(
-                "@if(true)\n" +
-                "    @if(true)\n" +
-                "        Yay,\n" +
-                "        it's double true!\n" +
-                "    @endif\n" +
-                "@endif\n");
+                """
+                        @if(true)
+                            @if(true)
+                                Yay,
+                                it's double true!
+                            @endif
+                        @endif
+                        """);
         thenOutputIs("Yay,\nit's double true!\n");
     }
 
     @Test
     void ifStatementNestedDiv() {
         givenTemplate(
-                "<div>\n" +
-                "    @if(true)\n" +
-                "        @if(true)\n" +
-                "            Yay,\n" +
-                "            it's double true!\n" +
-                "        @endif\n" +
-                "    @endif\n" +
-                "</div>\n");
+                """
+                        <div>
+                            @if(true)
+                                @if(true)
+                                    Yay,
+                                    it's double true!
+                                @endif
+                            @endif
+                        </div>
+                        """);
 
         thenOutputIs(
-                "<div>\n" +
-                "    Yay,\n" +
-                "    it's double true!\n" +
-                "</div>\n");
+                """
+                        <div>
+                            Yay,
+                            it's double true!
+                        </div>
+                        """);
     }
 
     @Test
     void ifStatementNestedDiv_tabs() {
         givenTemplate(
-                "<div>\n" +
-                "\t@if(true)\n" +
-                "\t\t@if(true)\n" +
-                "\t\t\tYay,\n" +
-                "\t\t\tit's double true!\n" +
-                "\t\t@endif\n" +
-                "\t@endif\n" +
-                "</div>\n");
+                """
+                        <div>
+                        \t@if(true)
+                        \t\t@if(true)
+                        \t\t\tYay,
+                        \t\t\tit's double true!
+                        \t\t@endif
+                        \t@endif
+                        </div>
+                        """);
 
         thenOutputIs(
-                "<div>\n" +
-                "\tYay,\n" +
-                "\tit's double true!\n" +
-                "</div>\n");
+                """
+                        <div>
+                        \tYay,
+                        \tit's double true!
+                        </div>
+                        """);
     }
 
     @Test
     void ifStatementNestedDiv_tabs_windowsLineEndings() {
         givenTemplate(
-                "<div>\r\n" +
-                "\t@if(true)\r\n" +
-                "\t\t@if(true)\r\n" +
-                "\t\t\tYay,\r\n" +
-                "\t\t\tit's double true!\r\n" +
-                "\t\t@endif\r\n" +
-                "\t@endif\r\n" +
-                "</div>\r\n");
+                """
+                        <div>\r
+                        \t@if(true)\r
+                        \t\t@if(true)\r
+                        \t\t\tYay,\r
+                        \t\t\tit's double true!\r
+                        \t\t@endif\r
+                        \t@endif\r
+                        </div>\r
+                        """);
 
         thenOutputIs(
-                "<div>\r\n" +
-                "\tYay,\r\n" +
-                "\tit's double true!\r\n" +
-                "</div>\r\n");
+                """
+                        <div>\r
+                        \tYay,\r
+                        \tit's double true!\r
+                        </div>\r
+                        """);
     }
 
     @Test
     void ifElseStatementNestedDiv() {
         givenTemplate(
-                "<div>\n" +
-                "    @if(true)\n" +
-                "        @if(false)\n" +
-                "            Yay,\n" +
-                "            it's double true!\n" +
-                "        @else\n" +
-                "            <p>\n" +
-                "                It's not ${true}, that's for sure\n" +
-                "            </p>\n" +
-                "        @endif\n" +
-                "    @endif\n" +
-                "</div>\n");
+                """
+                        <div>
+                            @if(true)
+                                @if(false)
+                                    Yay,
+                                    it's double true!
+                                @else
+                                    <p>
+                                        It's not ${true}, that's for sure
+                                    </p>
+                                @endif
+                            @endif
+                        </div>
+                        """);
 
         thenOutputIs(
-                "<div>\n" +
-                "    <p>\n" +
-                "        It's not true, that's for sure\n" +
-                "    </p>\n" +
-                "</div>\n");
+                """
+                        <div>
+                            <p>
+                                It's not true, that's for sure
+                            </p>
+                        </div>
+                        """);
     }
 
     @Test
     void ifElseIfStatementNestedDiv() {
         givenTemplate(
-                "<div>\n" +
-                "    @if(true)\n" +
-                "        @if(false)\n" +
-                "            Yay,\n" +
-                "            it's double true!\n" +
-                "        @elseif(true)\n" +
-                "            <p>\n" +
-                "                It's not ${true}, that's for sure\n" +
-                "            </p>\n" +
-                "        @endif\n" +
-                "    @endif\n" +
-                "</div>\n");
+                """
+                        <div>
+                            @if(true)
+                                @if(false)
+                                    Yay,
+                                    it's double true!
+                                @elseif(true)
+                                    <p>
+                                        It's not ${true}, that's for sure
+                                    </p>
+                                @endif
+                            @endif
+                        </div>
+                        """);
 
         thenOutputIs(
-                "<div>\n" +
-                "    <p>\n" +
-                "        It's not true, that's for sure\n" +
-                "    </p>\n" +
-                "</div>\n");
+                """
+                        <div>
+                            <p>
+                                It's not true, that's for sure
+                            </p>
+                        </div>
+                        """);
     }
 
     @Test
     void forEachNestedDiv() {
         givenTemplate(
-                "<div>\n" +
-                "    @if(true)\n" +
-                "        @for(int i = 0; i < 3; ++i)\n" +
-                "            @if(false)\n" +
-                "                Yay,\n" +
-                "                it's double true!\n" +
-                "            @elseif(true)\n" +
-                "                <p>\n" +
-                "                    It's not ${true}, that's for sure\n" +
-                "                </p>\n" +
-                "            @endif\n" +
-                "        @endfor\n" +
-                "    @endif\n" +
-                "</div>\n");
+                """
+                        <div>
+                            @if(true)
+                                @for(int i = 0; i < 3; ++i)
+                                    @if(false)
+                                        Yay,
+                                        it's double true!
+                                    @elseif(true)
+                                        <p>
+                                            It's not ${true}, that's for sure
+                                        </p>
+                                    @endif
+                                @endfor
+                            @endif
+                        </div>
+                        """);
 
         thenOutputIs(
-                "<div>\n" +
-                "    <p>\n" +
-                "        It's not true, that's for sure\n" +
-                "    </p>\n" +
-                "    <p>\n" +
-                "        It's not true, that's for sure\n" +
-                "    </p>\n" +
-                "    <p>\n" +
-                "        It's not true, that's for sure\n" +
-                "    </p>\n" +
-                "</div>\n");
+                """
+                        <div>
+                            <p>
+                                It's not true, that's for sure
+                            </p>
+                            <p>
+                                It's not true, that's for sure
+                            </p>
+                            <p>
+                                It's not true, that's for sure
+                            </p>
+                        </div>
+                        """);
     }
 
     @Test
     void formWithLoop() {
-        givenTemplate("@param gg.jte.TemplateEngine_HtmlInterceptorTest.Controller controller\n" +
-                "<body>\n" +
-                "   <h1>Hello</h1>\n" +
-                "\n" +
-                "   <form action=\"${controller.getUrl()}\" method=\"POST\">\n" +
-                "\n" +
-                "      <label>\n" +
-                "         Food option:\n" +
-                "         <select name=\"foodOption\">\n" +
-                "            <option value=\"\">-</option>\n" +
-                "            @for(String foodOption : controller.getFoodOptions())\n" +
-                "               <option value=\"${foodOption}\">${foodOption}</option>\n" +
-                "            @endfor\n" +
-                "         </select>\n" +
-                "      </label>\n" +
-                "\n" +
-                "      <button type=\"submit\">Submit</button>\n" +
-                "   </form>\n" +
-                "</body>");
+        givenTemplate("""
+                @param gg.jte.TemplateEngine_HtmlInterceptorTest.Controller controller
+                <body>
+                   <h1>Hello</h1>
+
+                   <form action="${controller.getUrl()}" method="POST">
+
+                      <label>
+                         Food option:
+                         <select name="foodOption">
+                            <option value="">-</option>
+                            @for(String foodOption : controller.getFoodOptions())
+                               <option value="${foodOption}">${foodOption}</option>
+                            @endfor
+                         </select>
+                      </label>
+
+                      <button type="submit">Submit</button>
+                   </form>
+                </body>""");
 
         params.put("controller", new TemplateEngine_HtmlInterceptorTest.Controller());
 
-        thenOutputIs("<body>\n" +
-                "   <h1>Hello</h1>\n" +
-                "\n" +
-                "   <form action=\"hello.htm\" method=\"POST\">\n" +
-                "\n" +
-                "      <label>\n" +
-                "         Food option:\n" +
-                "         <select name=\"foodOption\">\n" +
-                "            <option value=\"\">-</option>\n" +
-                "            <option value=\"Cheese\">Cheese</option>\n" +
-                "            <option value=\"Onion\">Onion</option>\n" +
-                "            <option value=\"Chili\">Chili</option>\n" +
-                "         </select>\n" +
-                "      </label>\n" +
-                "\n" +
-                "      <button type=\"submit\">Submit</button>\n" +
-                "   </form>\n" +
-                "</body>");
+        thenOutputIs("""
+                <body>
+                   <h1>Hello</h1>
+
+                   <form action="hello.htm" method="POST">
+
+                      <label>
+                         Food option:
+                         <select name="foodOption">
+                            <option value="">-</option>
+                            <option value="Cheese">Cheese</option>
+                            <option value="Onion">Onion</option>
+                            <option value="Chili">Chili</option>
+                         </select>
+                      </label>
+
+                      <button type="submit">Submit</button>
+                   </form>
+                </body>""");
     }
 
     @Test
@@ -304,26 +341,30 @@ public class TemplateEngine_TrimControlStructures_HtmlTest {
 
     @Test
     void raw() {
-        givenTemplate("@if(true)\n" +
-                    "  @raw\n" +
-                    "    @template(foo, bar) => ${something}\n" +
-                    "  @endraw\n" +
-                    "@endif");
+        givenTemplate("""
+                @if(true)
+                  @raw
+                    @template(foo, bar) => ${something}
+                  @endraw
+                @endif""");
         thenOutputIs("@template(foo, bar) => ${something}\n");
     }
 
     @Test
     void raw_divs() {
-        givenTemplate("@if(true)\n" +
-                "  @raw\n" +
-                "    <div>\n" +
-                "      <b>foo</b>\n" +
-                "    </div>\n" +
-                "  @endraw\n" +
-                "@endif");
-        thenOutputIs("<div>\n" +
-                "  <b>foo</b>\n" +
-                "</div>\n");
+        givenTemplate("""
+                @if(true)
+                  @raw
+                    <div>
+                      <b>foo</b>
+                    </div>
+                  @endraw
+                @endif""");
+        thenOutputIs("""
+                <div>
+                  <b>foo</b>
+                </div>
+                """);
     }
 
     @Test
@@ -335,10 +376,12 @@ public class TemplateEngine_TrimControlStructures_HtmlTest {
     @Test
     void variable() {
         givenTemplate(
-                "!{int x = 1;}\n" +
-                "!{int y = 2;}\n" +
-                "${x + y}\n" +
-                "done..\n"
+                """
+                        !{int x = 1;}
+                        !{int y = 2;}
+                        ${x + y}
+                        done..
+                        """
         );
         thenOutputIs("3\ndone..\n");
     }
@@ -346,10 +389,12 @@ public class TemplateEngine_TrimControlStructures_HtmlTest {
     @Test
     void variable_unsafe() {
         givenTemplate(
-                "!{String x = \"1\";}\n" +
-                "!{String y = \"2\";}\n" +
-                "$unsafe{x + y}\n" +
-                "done..\n"
+                """
+                        !{String x = "1";}
+                        !{String y = "2";}
+                        $unsafe{x + y}
+                        done..
+                        """
         );
         thenOutputIs("12\ndone..\n");
     }
@@ -358,52 +403,59 @@ public class TemplateEngine_TrimControlStructures_HtmlTest {
     void tag() {
         givenTag("my.jte", "hello..");
         givenTemplate(
-                "@if(true)\n" +
-                "    @template.tag.my()\n" +
-                "@endif\n" +
-                "Next line");
+                """
+                        @if(true)
+                            @template.tag.my()
+                        @endif
+                        Next line""");
         thenOutputIs("hello..\nNext line");
     }
 
     @Test
     void layout() {
         givenLayout("my.jte",
-                "@param gg.jte.Content data\n" +
-                "@if(data != null)\n" +
-                "    <div>\n" +
-                "        ${data}\n" +
-                "    </div>\n" +
-                "@endif\n"
+                """
+                        @param gg.jte.Content data
+                        @if(data != null)
+                            <div>
+                                ${data}
+                            </div>
+                        @endif
+                        """
         );
         givenTemplate(
-                "@if(true)\n" +
-                "    @template.layout.my(@`Here is some data: ${42} that's nice.`)\n" +
-                "@endif\n" +
-                "Next line");
+                """
+                        @if(true)
+                            @template.layout.my(@`Here is some data: ${42} that's nice.`)
+                        @endif
+                        Next line""");
 
         thenOutputIs(
-                "<div>\n" +
-                "    Here is some data: 42 that's nice.\n" +
-                "</div>\n" +
-                "\n" +
-                "Next line");
+                """
+                        <div>
+                            Here is some data: 42 that's nice.
+                        </div>
+
+                        Next line""");
     }
 
     @Test
     void indentationsArePopped() {
         givenTemplate(
-                "<head>\n" +
-                "    @if(true)\n" +
-                "        <span>foo</span>\n" +
-                "        foo@endif\n" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
-                "</head>");
+                """
+                        <head>
+                            @if(true)
+                                <span>foo</span>
+                                foo@endif
+                            <meta name="viewport" content="width=device-width, initial-scale=1">
+                        </head>""");
         thenOutputIs(
-                "<head>\n" +
-                "    <span>foo</span>\n" +
-                "    foo\n" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
-                "</head>");
+                """
+                        <head>
+                            <span>foo</span>
+                            foo
+                            <meta name="viewport" content="width=device-width, initial-scale=1">
+                        </head>""");
     }
 
     private void givenTag(String name, String code) {

@@ -1,6 +1,5 @@
 package gg.jte.compiler;
 
-import gg.jte.CodeResolver;
 import gg.jte.ContentType;
 import gg.jte.TemplateConfig;
 import gg.jte.html.HtmlPolicy;

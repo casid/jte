@@ -35,10 +35,12 @@ public class TemplateEngine_TrimControlStructures_PlainTest {
     @Test
     void ifStatement() {
         givenTemplate(
-                "@if(true)\n" +
-                "    Yay,\n" +
-                "    it's true!\n" +
-                "@endif\n");
+                """
+                        @if(true)
+                            Yay,
+                            it's true!
+                        @endif
+                        """);
         thenOutputIs("Yay,\nit's true!\n");
     }
 
@@ -51,52 +53,62 @@ public class TemplateEngine_TrimControlStructures_PlainTest {
     @Test
     void ifStatement_varyingIndentations1() {
         givenTemplate(
-                "@if(true)\n" +
-                "    Yay,\n" +
-                "  it's true!\n" +
-                "@endif\n");
+                """
+                        @if(true)
+                            Yay,
+                          it's true!
+                        @endif
+                        """);
         thenOutputIs("Yay,\nit's true!\n");
     }
 
     @Test
     void ifStatement_varyingIndentations2() {
         givenTemplate(
-                "@if(true)\n" +
-                "  Yay,\n" +
-                "    it's true!\n" +
-                "@endif\n");
+                """
+                        @if(true)
+                          Yay,
+                            it's true!
+                        @endif
+                        """);
         thenOutputIs("Yay,\n  it's true!\n");
     }
 
     @Test
     void ifStatementNested() {
         givenTemplate(
-                "@if(true)\n" +
-                "    @if(true)\n" +
-                "        Yay,\n" +
-                "        it's double true!\n" +
-                "    @endif\n" +
-                "@endif\n");
+                """
+                        @if(true)
+                            @if(true)
+                                Yay,
+                                it's double true!
+                            @endif
+                        @endif
+                        """);
         thenOutputIs("Yay,\nit's double true!\n");
     }
 
     @Test
     void ifStatementNestedDiv() {
         givenTemplate(
-                "<div>\n" +
-                "    @if(true)\n" +
-                "        @if(true)\n" +
-                "            Yay,\n" +
-                "            it's double true!\n" +
-                "        @endif\n" +
-                "    @endif\n" +
-                "</div>\n");
+                """
+                        <div>
+                            @if(true)
+                                @if(true)
+                                    Yay,
+                                    it's double true!
+                                @endif
+                            @endif
+                        </div>
+                        """);
 
         thenOutputIs(
-                "<div>\n" +
-                "    Yay,\n" +
-                "    it's double true!\n" +
-                "</div>\n");
+                """
+                        <div>
+                            Yay,
+                            it's double true!
+                        </div>
+                        """);
     }
 
     @Test
@@ -107,11 +119,12 @@ public class TemplateEngine_TrimControlStructures_PlainTest {
 
     @Test
     void raw() {
-        givenTemplate("@if(true)\n" +
-                    "  @raw\n" +
-                    "    @template(foo, bar) => ${something}\n" +
-                    "  @endraw\n" +
-                    "@endif");
+        givenTemplate("""
+                @if(true)
+                  @raw
+                    @template(foo, bar) => ${something}
+                  @endraw
+                @endif""");
         thenOutputIs("@template(foo, bar) => ${something}\n");
     }
 
@@ -124,10 +137,12 @@ public class TemplateEngine_TrimControlStructures_PlainTest {
     @Test
     void variable() {
         givenTemplate(
-                "!{int x = 1;}\n" +
-                "!{int y = 2;}\n" +
-                "${x + y}\n" +
-                "done..\n"
+                """
+                        !{int x = 1;}
+                        !{int y = 2;}
+                        ${x + y}
+                        done..
+                        """
         );
         thenOutputIs("3\ndone..\n");
     }
@@ -136,10 +151,11 @@ public class TemplateEngine_TrimControlStructures_PlainTest {
     void template() {
         givenTag("my.jte", "hello..");
         givenTemplate(
-                "@if(true)\n" +
-                "    @template.tag.my()\n" +
-                "@endif\n" +
-                "Next line");
+                """
+                        @if(true)
+                            @template.tag.my()
+                        @endif
+                        Next line""");
         thenOutputIs("hello..\nNext line");
     }
 

@@ -3,7 +3,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
     id 'java'
     id 'gg.jte.gradle' version '3.1.5-SNAPSHOT'
-    id 'org.graalvm.buildtools.native' version '0.9.20'
+    id 'org.graalvm.buildtools.native' version '0.9.28'
 }
 
 repositories {

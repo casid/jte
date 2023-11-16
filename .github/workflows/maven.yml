@@ -15,62 +15,76 @@ on:
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         java_version: [17]
-        os: [windows-2019, macOS-latest, ubuntu-latest]
+        os: [windows-2022, macOS-latest, ubuntu-latest]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.java_version }}
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java_version }}
           distribution: 'temurin'
+          cache: 'maven'
+
+      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
+      - name: Cache local Gradle
+        id: gradleCache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw install --file pom.xml --batch-mode
-        env:
-          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+        run: ./mvnw install --file pom.xml
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Run all the Gradle Plugin tests
+        id: gradlePluginTests
         run: cd test/gradle-test-wrapper && ./gradlew --info check
+      - name: Stop Gradle Daemon
+        if: ${{ always() }}
+        run: cd test/gradle-test-wrapper && ./gradlew --stop
+      - name: Store Gradle plugin test reports
+        if: failure() && steps.gradlePluginTests.outcome == 'failure'
+        uses: actions/upload-artifact@v3
+        with:
+          name: failing-test-report
+          path: test/gradle-test-wrapper/build/reports/tests/test/**/*
 
 
   coverage:
-
     # Do not run coverage for forks since they cannot upload
     # the results to codecov. For reference, see:
     # https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution#example-only-run-job-for-specific-repository
     if: github.repository == 'casid/jte'
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'temurin'
+          cache: 'maven'
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw verify --file pom.xml --batch-mode -Pcoverage
-        env:
-          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn  
-      
+        run: ./mvnw verify --file pom.xml -Pcoverage
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
         with:
           file: ./test/jte-test-report/target/site/jacoco-aggregate/jacoco.xml
           fail_ci_if_error: true
-

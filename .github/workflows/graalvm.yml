@@ -15,34 +15,44 @@ on:
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         java_version: [17]
-        # Windows builds are failing, looks similar to https://github.com/graalvm/native-build-tools/issues/234
-        # Native build on Mac OS / Java 11 is failing
-        os: [macOS-latest, ubuntu-latest]
+        os: [windows-2022, macOS-latest, ubuntu-latest]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: graalvm/setup-graalvm@v1
         with:
           distribution: 'graalvm'
           java-version: ${{ matrix.java_version }}
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: 'maven'
+
+      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
+      - name: Cache local Gradle
+        id: gradleCache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-graalvm-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-graalvm-
 
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw install --file pom.xml --batch-mode -DskipTests=true
-        env:
-          MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+        run: ./mvnw install --file pom.xml -DskipTests=true
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Test Gradle Plugin Generate with conventions
         run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew check nativeTest
+      - name: Stop Gradle Daemon
+        if: ${{ always() }}
+        run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew --stop

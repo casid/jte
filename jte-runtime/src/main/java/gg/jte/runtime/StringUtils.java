@@ -21,7 +21,7 @@ public final class StringUtils {
             }
         }
 
-        return true;
+        return j == prefix.length();
     }
 
     public static boolean isAllUpperCase(String string) {

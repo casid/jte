@@ -81,7 +81,7 @@ public class TemplateCompiler extends TemplateLoader {
     @Override
     public List<String> generateAll() {
         LinkedHashSet<ClassDefinition> classDefinitions = generate(codeResolver.resolveAllTemplateNames(), false);
-        return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
+        return classDefinitions.stream().map(ClassDefinition::getSourceFileName).toList();
     }
 
     @Override
@@ -127,7 +127,7 @@ public class TemplateCompiler extends TemplateLoader {
             javaCompiler.compile(javaFiles, javaCompilerClassPath, config, classDirectory, templateByClassName);
         }
 
-        return classDefinitions.stream().map(ClassDefinition::getSourceFileName).collect(Collectors.toList());
+        return classDefinitions.stream().map(ClassDefinition::getSourceFileName).toList();
     }
 
     private List<String> getClassPath() {
@@ -205,7 +205,7 @@ public class TemplateCompiler extends TemplateLoader {
 
         List<JteExtension> generatorExtensions = config.extensionClasses.entrySet().stream()
                 .map(this::loadExtension)
-                .collect(Collectors.toList());
+                .toList();
         if (DEBUG) {
             System.out.printf("extensionClasses=%s generatorExtensions=%s%n", config.extensionClasses, generatorExtensions);
         }

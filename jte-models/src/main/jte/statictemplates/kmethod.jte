@@ -6,12 +6,10 @@
 @param TemplateDescription template
 
 !{String outputClass = config.contentType() == ContentType.Html ? "HtmlTemplateOutput" : "TemplateOutput";}
-    override fun ${Util.methodName(template)}(${Util.kotlinTypedParams(template, false)}): JteModel {
-        return StaticJteModel<${outputClass}>(
-            ContentType.${config.contentType()},
-            { output, interceptor -> ${template.fullyQualifiedClassName()}.render(output, interceptor${Util.paramNames(template)}) },
-            "${template.name()}",
-            "${template.packageName()}",
-            ${template.fullyQualifiedClassName()}.JTE_LINE_INFO
-        );
-    }
+    override fun ${Util.methodName(template)}(${Util.kotlinTypedParams(template, false)}): JteModel = StaticJteModel<${outputClass}>(
+        ContentType.${config.contentType()},
+        { output, interceptor -> ${template.className()}.render(output, interceptor${Util.paramNames(template)}) },
+        "${template.name()}",
+        "${template.packageName()}",
+        ${template.className()}.JTE_LINE_INFO
+    )

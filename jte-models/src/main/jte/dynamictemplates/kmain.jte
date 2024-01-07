@@ -15,7 +15,7 @@ package ${config.packageName()}
 import gg.jte.TemplateEngine
 import gg.jte.models.runtime.*
 @for(String imp: imports)
-    import ${imp}
+import ${imp}
 @endfor
 
 ${modelConfig.implementationAnnotation()}

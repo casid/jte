@@ -6,6 +6,7 @@ import gg.jte.extension.api.TemplateDescription;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Mock implementation to help with testing extensions.
@@ -81,5 +82,25 @@ public class MockTemplateDescription implements TemplateDescription {
     @Override
     public List<String> imports() {
         return imports;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MockTemplateDescription that = (MockTemplateDescription) o;
+
+        if (!Objects.equals(name, that.name)) return false;
+        if (!Objects.equals(packageName, that.packageName)) return false;
+			return Objects.equals(className, that.className);
+		}
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
+        result = 31 * result + (className != null ? className.hashCode() : 0);
+        return result;
     }
 }

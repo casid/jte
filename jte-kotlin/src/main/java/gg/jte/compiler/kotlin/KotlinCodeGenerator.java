@@ -48,6 +48,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public void onImport(String importClass) {
         writePackageIfRequired();
+        imports.add(importClass);
         kotlinCode.append("import ").append(importClass).append("\n");
     }
 

@@ -48,6 +48,6 @@ public class ModelExtension implements JteExtension {
                 new ModelGenerator(engine, "statictemplates", "StaticTemplates", "Templates", language),
                 new ModelGenerator(engine, "dynamictemplates", "DynamicTemplates", "Templates", language)
         ).map(g -> g.generate(config, templateDescriptionsFiltered, modelConfig))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

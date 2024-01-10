@@ -60,4 +60,4 @@ jobs:
       # This prevents local published artifacts from be added to GH Actions cache
       - name: Clean local artifacts
         if: ${{ always() }}
-        run: rm -rvf ~/.m2/repository/gg/jte/
+        run: rm -r -f ~/.m2/repository/gg/jte

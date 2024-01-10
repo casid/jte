@@ -26,6 +26,14 @@ class ExtensionTemplateDescriptionTest {
                 new ClassDefinition("OtherStub", "kt"),
                 new ClassInfo("Message", "my.app")
         );
+        var d = new ExtensionTemplateDescription(
+                null,
+                new ClassInfo("Message", "my.app")
+        );
+        var e = new ExtensionTemplateDescription(
+                new ClassDefinition("OtherStub", "kt"),
+                null
+        );
 
         assertThat(a1).isEqualTo(a2);
         assertThat(a1).hasSameHashCodeAs(a2);
@@ -35,5 +43,11 @@ class ExtensionTemplateDescriptionTest {
 
         assertThat(a1).isNotEqualTo(c);
         assertThat(a1).doesNotHaveSameHashCodeAs(c);
+
+        assertThat(a1).isNotEqualTo(d);
+        assertThat(a1).doesNotHaveSameHashCodeAs(d);
+
+        assertThat(a1).isNotEqualTo(e);
+        assertThat(a1).doesNotHaveSameHashCodeAs(e);
     }
 }

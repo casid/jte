@@ -34,4 +34,19 @@ public final class ClassInfo {
         }
         fullName = packageName + "." + className;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ClassInfo classInfo = (ClassInfo) o;
+
+        return fullName.equals(classInfo.fullName);
+    }
+
+    @Override
+    public int hashCode() {
+        return fullName.hashCode();
+    }
 }

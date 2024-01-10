@@ -93,14 +93,11 @@ public class MockTemplateDescription implements TemplateDescription {
 
         if (!Objects.equals(name, that.name)) return false;
         if (!Objects.equals(packageName, that.packageName)) return false;
-			return Objects.equals(className, that.className);
-		}
+        return Objects.equals(className, that.className);
+    }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
-        result = 31 * result + (className != null ? className.hashCode() : 0);
-        return result;
+        return Objects.hash(name, packageName, className);
     }
 }

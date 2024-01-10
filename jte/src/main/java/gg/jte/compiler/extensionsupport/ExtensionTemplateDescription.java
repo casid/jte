@@ -7,6 +7,7 @@ import gg.jte.runtime.ClassInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ExtensionTemplateDescription implements TemplateDescription {
     private final ClassDefinition classDefinition;
@@ -51,12 +52,10 @@ public class ExtensionTemplateDescription implements TemplateDescription {
 
         if (!classDefinition.equals(that.classDefinition)) return false;
         return classInfo.equals(that.classInfo);
-		}
+    }
 
     @Override
     public int hashCode() {
-        int result = classDefinition.hashCode();
-        result = 31 * result + classInfo.hashCode();
-        return result;
+        return Objects.hash(classDefinition, classInfo);
     }
 }

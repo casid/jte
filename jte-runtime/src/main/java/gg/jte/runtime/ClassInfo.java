@@ -43,7 +43,7 @@ public final class ClassInfo {
         ClassInfo classInfo = (ClassInfo) o;
 
         return fullName.equals(classInfo.fullName);
-		}
+    }
 
     @Override
     public int hashCode() {

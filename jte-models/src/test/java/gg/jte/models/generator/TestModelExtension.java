@@ -219,13 +219,70 @@ public class TestModelExtension {
             );
 
             // Then
-            generatedPaths.forEach(path -> {
-                try {
-                    assertThat(Files.readString(path)).contains("fun hello(content: gg.jte.Content): JteModel");
-                } catch (IOException ex) {
-                    fail("Could not read file " + path, ex);
+            var actual = generatedPaths.stream().collect(Collectors.toMap(
+                path -> path.getFileName().toString(),
+                path -> {
+                    try {
+                        return Files.readString(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            });
+            ));
+            var expected = Map.of(
+                "Templates.kt", """
+                    @file:Suppress("ktlint")
+                    package test.myktemplates
+
+                    import gg.jte.models.runtime.*
+
+                    interface Templates {
+                       \s
+                        @JteView("hello.kte")
+                        fun hello(content: gg.jte.Content): JteModel
+
+                    }""",
+                "StaticTemplates.kt", """
+                    @file:Suppress("ktlint")
+                    package test.myktemplates
+
+                    import gg.jte.models.runtime.*
+                    import gg.jte.ContentType
+                    import gg.jte.html.HtmlTemplateOutput
+
+                    class StaticTemplates : Templates {
+                       \s
+                        override fun hello(content: gg.jte.Content): JteModel = StaticJteModel<TemplateOutput>(
+                            ContentType.Plain,
+                            { output, interceptor -> JtehelloGenerated.render(output, interceptor, content) },
+                            "hello.kte",
+                            "test.myktemplates",
+                            JtehelloGenerated.JTE_LINE_INFO
+                        )
+
+                    }""",
+                "DynamicTemplates.kt", """
+                    @file:Suppress("ktlint")
+                    package test.myktemplates
+                                         
+                    import gg.jte.TemplateEngine
+                    import gg.jte.models.runtime.*
+                                         
+                    class DynamicTemplates(private val engine: TemplateEngine) : Templates {
+                       \s
+                        override fun hello(content: gg.jte.Content): JteModel {
+                           \s
+                            val paramMap = buildMap<String, Any?> {
+                           \s
+                                put("content", content)
+                            }
+                           \s
+                            return DynamicJteModel(engine, "hello.kte", paramMap)
+                        }
+                                         
+                    }"""
+            );
+            assertThat(actual).containsExactlyInAnyOrderEntriesOf(expected);
         }
 
         @Test
@@ -244,23 +301,67 @@ public class TestModelExtension {
             );
 
             // Then
-            generatedPaths.forEach(path -> {
-                try {
-                    assertThat(Files.readString(path)).contains("fun hello(): JteModel");
-                } catch (IOException ex) {
-                    fail("Could not read file " + path, ex);
+            var actual = generatedPaths.stream().collect(Collectors.toMap(
+                path -> path.getFileName().toString(),
+                path -> {
+                    try {
+                        return Files.readString(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            });
+            ));
+            var expected = Map.of(
+                "Templates.kt", """
+                    @file:Suppress("ktlint")
+                    package test.myktemplates
+                                         
+                    import gg.jte.models.runtime.*
+                                         
+                    interface Templates {
+                       \s
+                        @JteView("hello.kte")
+                        fun hello(): JteModel
+                                         
+                    }""",
+                "StaticTemplates.kt", """
+                    @file:Suppress("ktlint")
+                    package test.myktemplates
 
-            // Dynamic has a map with explicit generics types declared.
-            // This is relevant for empty maps (templates with no params).
-            assertThat(generatedPaths).anySatisfy(path -> {
-                try {
-                    assertThat(Files.readString(path)).contains("val paramMap = mapOf<String, Any?>");
-                } catch (IOException ex) {
-                    fail("Could not read file " + path, ex);
-                }
-            });
+                    import gg.jte.models.runtime.*
+                    import gg.jte.ContentType
+                    import gg.jte.html.HtmlTemplateOutput
+
+                    class StaticTemplates : Templates {
+                       \s
+                        override fun hello(): JteModel = StaticJteModel<TemplateOutput>(
+                            ContentType.Plain,
+                            { output, interceptor -> JtehelloGenerated.render(output, interceptor) },
+                            "hello.kte",
+                            "test.myktemplates",
+                            JtehelloGenerated.JTE_LINE_INFO
+                        )
+
+                    }""",
+                "DynamicTemplates.kt", """
+                    @file:Suppress("ktlint")
+                    package test.myktemplates
+                                    
+                    import gg.jte.TemplateEngine
+                    import gg.jte.models.runtime.*
+                                    
+                    class DynamicTemplates(private val engine: TemplateEngine) : Templates {
+                       \s
+                        override fun hello(): JteModel {
+                           \s
+                            val paramMap = emptyMap<String, Any?>()
+                           \s
+                            return DynamicJteModel(engine, "hello.kte", paramMap)
+                        }
+
+                    }"""
+            );
+            assertThat(actual).containsExactlyInAnyOrderEntriesOf(expected);
         }
     }
 }

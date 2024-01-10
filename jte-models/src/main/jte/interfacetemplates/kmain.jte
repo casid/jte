@@ -7,7 +7,6 @@
 @param Set<TemplateDescription> templates
 @param Iterable<String> imports
 @param ModelConfig modelConfig
-
 @file:Suppress("ktlint")
 package ${config.packageName()}
 

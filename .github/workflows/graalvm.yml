@@ -56,3 +56,8 @@ jobs:
       - name: Stop Gradle Daemon
         if: ${{ always() }}
         run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew --stop
+
+      # This prevents local published artifacts from be added to GH Actions cache
+      - name: Clean local artifacts
+        if: ${{ always() }}
+        run: rm -rvf ~/.m2/repository/gg/jte/

@@ -56,3 +56,14 @@ jobs:
       - name: Stop Gradle Daemon
         if: ${{ always() }}
         run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew --stop
+
+      # This prevents local published artifacts from be added to GH Actions cache
+      - name: Clean local artifacts
+        if: contains(matrix.os, 'win') == false
+        run: rm -rvf ~/.m2/repository/gg/jte
+
+      # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
+      # is ambiguous (possible matches include: -Filter -Force).
+      - name: "[Windows]: Clean local artifacts"
+        if: contains(matrix.os, 'win')
+        run: rm -r -Force ~/.m2/repository/gg/jte

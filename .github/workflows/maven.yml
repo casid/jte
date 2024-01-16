@@ -63,6 +63,17 @@ jobs:
           name: failing-test-report
           path: test/gradle-test-wrapper/build/reports/tests/test/**/*
 
+      # This prevents local published artifacts from be added to GH Actions cache
+      - name: Clean local artifacts
+        if: contains(matrix.os, 'win') == false
+        run: rm -rvf ~/.m2/repository/gg/jte
+
+      # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
+      # is ambiguous (possible matches include: -Filter -Force).
+      - name: "[Windows]: Clean local artifacts"
+        if: contains(matrix.os, 'win')
+        run: rm -r -Force ~/.m2/repository/gg/jte
+
 
   coverage:
     # Do not run coverage for forks since they cannot upload

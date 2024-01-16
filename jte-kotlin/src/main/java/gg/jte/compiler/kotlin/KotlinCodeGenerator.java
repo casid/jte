@@ -134,7 +134,6 @@ public class KotlinCodeGenerator implements CodeGenerator {
     public void onComplete() {
         kotlinCode.append("\t}\n");
 
-        // HERE
         kotlinCode.append("\t@JvmStatic fun renderMap(");
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
@@ -145,7 +144,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
                 continue;
             }
 
-            renderParameterDeclaration(parameter);
+            writeParameterDeclaration(parameter);
         }
         kotlinCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
 
@@ -179,7 +178,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         this.classInfo.lineInfo = kotlinCode.getLineInfo();
     }
 
-    private void renderParameterDeclaration(ParamInfo parameter) {
+    private void writeParameterDeclaration(ParamInfo parameter) {
         var nonNullDefaultValue = parameter.defaultValue != null && !parameter.defaultValue.equals("null");
 
         kotlinCode.setCurrentTemplateLine(parameter.templateLine);

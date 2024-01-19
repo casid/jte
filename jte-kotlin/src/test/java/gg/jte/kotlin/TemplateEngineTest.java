@@ -7,6 +7,10 @@ import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -762,6 +766,41 @@ public class TemplateEngineTest {
         templateEngine.render(templateName, TemplateUtils.toMap(), output);
 
         assertThat(output.toString()).isEqualTo("Your age is 10");
+    }
+
+    @Test
+    void nullableParamsShouldNotHaveDoubleQuestionMarks() throws IOException {
+        givenRawTemplate("@param age: Int? = 10\nYour age is ${age}");
+
+        List<String> compiledPaths = templateEngine.precompileAll();
+        Path classDirectory = Paths.get("jte-classes");
+        var templateContent = Files.readString(classDirectory.resolve(compiledPaths.get(0)));
+
+        assertThat(templateContent).contains("val age = params[\"age\"] as Int?");
+        assertThat(templateContent).doesNotContain("val age = params[\"age\"] as Int??");
+    }
+
+    @Test
+    void nullableParamsWithNonNullDefaultValuesShouldFallbackToTheDefault() throws IOException {
+        givenRawTemplate("@param age: Int? = 10\nYour age is ${age}");
+
+        List<String> compiledPaths = templateEngine.precompileAll();
+        Path classDirectory = Paths.get("jte-classes");
+        var templateContent = Files.readString(classDirectory.resolve(compiledPaths.get(0)));
+
+        assertThat(templateContent).contains("val age = params[\"age\"] as Int? ?: 10");
+    }
+
+    @Test
+    void nullableParamsWithNullDefaultValuesShouldNotUseElvisOperator() throws IOException {
+        givenRawTemplate("@param age: Int? = null\nYour age is ${age}");
+
+        List<String> compiledPaths = templateEngine.precompileAll();
+        Path classDirectory = Paths.get("jte-classes");
+        var templateContent = Files.readString(classDirectory.resolve(compiledPaths.get(0)));
+
+        assertThat(templateContent).contains("val age = params[\"age\"] as Int?");
+        assertThat(templateContent).doesNotContain("val age = params[\"age\"] as Int? ?: null");
     }
 
     @Test

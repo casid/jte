@@ -144,13 +144,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
                 continue;
             }
 
-            kotlinCode.setCurrentTemplateLine(parameter.templateLine);
-            kotlinCode.append("\t\tval ").append(parameter.name).append(" = params[\"").append(parameter.name).append("\"] as ").append(parameter.type);
-            if (parameter.defaultValue != null) {
-                kotlinCode.append("? ?: ");
-                writeCodeWithContentSupport(0, parameter.defaultValue);
-            }
-            kotlinCode.append('\n');
+            writeParameterDeclaration(parameter);
         }
         kotlinCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
 
@@ -182,6 +176,29 @@ public class KotlinCodeGenerator implements CodeGenerator {
         kotlinCode.insert(fieldsMarker, fields, false);
 
         this.classInfo.lineInfo = kotlinCode.getLineInfo();
+    }
+
+    private void writeParameterDeclaration(ParamInfo parameter) {
+        var nonNullDefaultValue = parameter.defaultValue != null && !parameter.defaultValue.equals("null");
+
+        kotlinCode.setCurrentTemplateLine(parameter.templateLine);
+        kotlinCode.append("\t\tval ").append(parameter.name).append(" = params[\"").append(parameter.name).append("\"] as ");
+        if (nonNullDefaultValue) {
+            kotlinCode.append(asNullableType(parameter.type));
+            kotlinCode.append(" ?: ");
+            writeCodeWithContentSupport(0, parameter.defaultValue);
+        } else {
+            kotlinCode.append(parameter.type);
+        }
+        kotlinCode.append('\n');
+    }
+
+    private String asNullableType(String type) {
+        if (type.endsWith("?")) {
+            return type;
+        } else {
+            return type + "?";
+        }
     }
 
     private void addNameField(StringBuilder fields, String name) {

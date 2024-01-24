@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static gg.jte.extension.api.mocks.MockConfig.mockConfig;
 import static gg.jte.extension.api.mocks.MockParamDescription.mockParamDescription;

@@ -231,7 +231,7 @@ public class TestModelExtension {
                 }
             ));
             var expected = Map.of(
-                "Templates.kt", """
+                "Templates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
                     package test.myktemplates
 
@@ -242,8 +242,8 @@ public class TestModelExtension {
                         @JteView("hello.kte")
                         fun hello(content: gg.jte.Content): JteModel
 
-                    }""",
-                "StaticTemplates.kt", """
+                    }"""),
+                "StaticTemplates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
                     package test.myktemplates
 
@@ -262,8 +262,8 @@ public class TestModelExtension {
                             JtehelloGenerated.JTE_LINE_INFO
                         )
 
-                    }""",
-                "DynamicTemplates.kt", """
+                    }"""),
+                "DynamicTemplates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
                     package test.myktemplates
                                          
@@ -282,7 +282,7 @@ public class TestModelExtension {
                             return DynamicJteModel(engine, "hello.kte", paramMap)
                         }
                                          
-                    }"""
+                    }""")
             );
             assertThat(actual).containsExactlyInAnyOrderEntriesOf(expected);
         }
@@ -314,7 +314,7 @@ public class TestModelExtension {
                 }
             ));
             var expected = Map.of(
-                "Templates.kt", """
+                "Templates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
                     package test.myktemplates
                                          
@@ -325,8 +325,8 @@ public class TestModelExtension {
                         @JteView("hello.kte")
                         fun hello(): JteModel
                                          
-                    }""",
-                "StaticTemplates.kt", """
+                    }"""),
+                "StaticTemplates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
                     package test.myktemplates
 
@@ -345,8 +345,8 @@ public class TestModelExtension {
                             JtehelloGenerated.JTE_LINE_INFO
                         )
 
-                    }""",
-                "DynamicTemplates.kt", """
+                    }"""),
+                "DynamicTemplates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
                     package test.myktemplates
                                     
@@ -362,9 +362,13 @@ public class TestModelExtension {
                             return DynamicJteModel(engine, "hello.kte", paramMap)
                         }
 
-                    }"""
+                    }""")
             );
             assertThat(actual).containsExactlyInAnyOrderEntriesOf(expected);
         }
+    }
+
+    private static String withSystemLineEndings(String content) {
+        return content.replaceAll("\n", System.lineSeparator());
     }
 }

@@ -175,6 +175,6 @@ templates.helloWorld("Hi!").render(output);
 
 ### Static vs. Dynamic
 
-`StaticTemplates` is built so that it calls directly to jte generated render classes, with no reflection used. **This is good for a production build**.
+`StaticTemplates` is built so that it calls directly to jte generated render classes, with no reflection used. **This is good for a production build**. It builds on the outputs of [precompiled templates](pre-compiling.md).
 
 `DynamicTemplates` delegates to a `TemplateEngine`, so it can be set up to hot-reload templates. **This is good for development**. You will still have to rerun the build if @params of a template are changed.

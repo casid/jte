@@ -137,7 +137,7 @@ TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Htm
 
 This way, the templates are loaded from the application class loader. See [this issue](https://github.com/casid/jte/issues/62) for additional information.
 
-### Using the application class loader
+## Using the application class loader
 
 !!! info "Version note"
 
@@ -227,7 +227,7 @@ The [Gradle plugin][jte-gradle-plugin] can generate all templates during the Gra
     }
     ```
   
-### GraalVM native-image support
+## GraalVM native-image support
 
 !!! info "Version note"
 
@@ -239,5 +239,27 @@ To use this feature, set `#!groovy jteExtension("gg.jte.nativeimage.NativeResour
 
 There's an example [Gradle test project](https://github.com/casid/jte/blob/{{ latest-git-tag }}/test/jte-runtime-cp-test-gradle-convention/build.gradle) using `native-image` compilation.
 
+## Binary encoding
+Use [binary encoding] for maximum performance! To activate it with precompiled templates, modify your build file.
+
+=== "Maven"
+
+    ```xml linenums="1"
+    <plugin>
+        <artifactId>jte-maven-plugin</artifactId>
+        <configuration>
+            <binaryStaticContent>true</binaryStaticContent>
+            ...
+    ```
+
+=== "Gradle"
+
+    ```groovy linenums="1"
+    jte {
+        binaryStaticContent = true
+    }
+    ```
+
 [jte-maven-compiler-plugin]: https://search.maven.org/artifact/gg.jte/jte-maven-plugin
 [jte-gradle-plugin]: https://plugins.gradle.org/plugin/gg.jte.gradle
+[binary encoding]: binary-rendering.md

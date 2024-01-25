@@ -4,9 +4,13 @@
 @param TemplateDescription template
 
     override fun ${Util.methodName(template)}(${Util.kotlinTypedParams(template, false)}): JteModel {
-        val paramMap = mapOf<String, Any?>(
+        @if(template.params().isEmpty())
+        val paramMap = emptyMap<String, Any?>()
+        @else
+        val paramMap = buildMap<String, Any?> {
         @for(ParamDescription param: template.params())
-            "${param.name()}" to ${param.name()},@endfor
-        )
-        return DynamicJteModel(engine, "${template.name()}", paramMap);
+            put("${param.name()}", ${param.name()})@endfor
+        }
+        @endif
+        return DynamicJteModel(engine, "${template.name()}", paramMap)
     }

@@ -8,17 +8,15 @@
 @param Set<TemplateDescription> templates
 @param Iterable<String> imports
 @param ModelConfig modelConfig
-
 @file:Suppress("ktlint")
 package ${config.packageName()}
 
 import gg.jte.models.runtime.*
 import gg.jte.ContentType
 import gg.jte.TemplateOutput
-import gg.jte.html.HtmlInterceptor
 import gg.jte.html.HtmlTemplateOutput
 @for(String imp: imports)
-    import ${imp}
+import ${imp}
 @endfor
 
 ${modelConfig.implementationAnnotation()}

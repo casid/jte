@@ -1,0 +1,4 @@
+@param content: gg.jte.Content
+Header
+${content}
+Footer

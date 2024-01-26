@@ -256,10 +256,10 @@ public class TestModelExtension {
                        \s
                         override fun hello(content: gg.jte.Content): JteModel = StaticJteModel<TemplateOutput>(
                             ContentType.Plain,
-                            { output, interceptor -> JtehelloGenerated.render(output, interceptor, content) },
+                            { output, interceptor -> test.myktemplates.JtehelloGenerated.render(output, interceptor, content) },
                             "hello.kte",
                             "test.myktemplates",
-                            JtehelloGenerated.JTE_LINE_INFO
+                            test.myktemplates.JtehelloGenerated.JTE_LINE_INFO
                         )
 
                     }"""),
@@ -339,10 +339,10 @@ public class TestModelExtension {
                        \s
                         override fun hello(): JteModel = StaticJteModel<TemplateOutput>(
                             ContentType.Plain,
-                            { output, interceptor -> JtehelloGenerated.render(output, interceptor) },
+                            { output, interceptor -> test.myktemplates.JtehelloGenerated.render(output, interceptor) },
                             "hello.kte",
                             "test.myktemplates",
-                            JtehelloGenerated.JTE_LINE_INFO
+                            test.myktemplates.JtehelloGenerated.JTE_LINE_INFO
                         )
 
                     }"""),

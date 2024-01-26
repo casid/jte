@@ -232,7 +232,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
         fields.append("\t@JvmStatic val BINARY_CONTENT = gg.jte.runtime.BinaryContent.load(")
                 .append(classInfo.className)
-                .append(".javaClass, \"")
+                .append("::class.java, \"")
                 .append(contentFileName)
                 .append("\", ");
 

@@ -46,7 +46,7 @@ public class TemplateEngineTest {
     void exceptionLineNumber1() {
         thenRenderingFailsWithException("exceptionLineNumber1.jte")
                 .hasCauseInstanceOf(NullPointerException.class)
-                .hasMessage("Failed to render exceptionLineNumber1.kte, error at exceptionLineNumber1.kte:5");
+                .hasMessage("Failed to render exceptionLineNumber1.jte, error at exceptionLineNumber1.jte:5");
     }
 
     @Test

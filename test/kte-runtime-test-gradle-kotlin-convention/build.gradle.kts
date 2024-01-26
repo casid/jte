@@ -1,7 +1,7 @@
 
 plugins {
     kotlin("jvm") version "1.9.10"
-    id("gg.jte.gradle") version("3.1.7-SNAPSHOT")
+    id("gg.jte.gradle") version("3.1.7")
 }
 
 repositories {
@@ -16,7 +16,7 @@ tasks.test {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.junit.jupiter:junit-jupiter:5.9.2")
-    implementation("gg.jte:jte-runtime:3.1.7-SNAPSHOT")
+    implementation("gg.jte:jte-runtime:3.1.7")
 }
 
 jte {

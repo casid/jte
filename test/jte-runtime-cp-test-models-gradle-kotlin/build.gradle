@@ -1,0 +1,38 @@
+plugins {
+    id("org.jetbrains.kotlin.jvm") version "1.9.22"
+    id("gg.jte.gradle") version("3.1.8-SNAPSHOT")
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+group = "gg.jte.testgroup"
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation("gg.jte:jte-runtime:3.1.8-SNAPSHOT")
+    implementation("gg.jte:jte-kotlin:3.1.8-SNAPSHOT")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22")
+
+    testImplementation("org.assertj:assertj-core:3.23.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.6.2"
+    jteGenerate "gg.jte:jte-models:3.1.8-SNAPSHOT"
+}
+
+jte {
+    generate()
+    binaryStaticContent = true
+    jteExtension("gg.jte.models.generator.ModelExtension") {
+        language = "Kotlin"
+        implementationAnnotation = "@test.Dummy"
+        includePattern = ".*"
+        excludePattern = ".*Excluded.*"
+    }
+}

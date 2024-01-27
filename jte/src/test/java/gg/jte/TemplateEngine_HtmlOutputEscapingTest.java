@@ -633,6 +633,21 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void htmlComment_inContentBlock() {
+        codeResolver.givenCode("template.jte", """
+        !{var content = @`
+            <!-- test comment (breaks) -->
+            <div class="test"></div>
+        `;}
+        ${content}
+        """);
+
+        templateEngine.render("template.jte", null, output);
+
+        assertThat(output.toString()).isEqualToIgnoringWhitespace("<div class=\"test\"></div>");
+    }
+
+    @Test
     void jsComment() {
         codeResolver.givenCode("template.jte", "@param String hello\n<script>// hello\nvar x = 'hello';</script>${hello}");
 

@@ -148,9 +148,7 @@ public final class TemplateParser {
             } else if (currentMode == Mode.Comment) {
                 if (regionMatches("--%>")) {
                     pop();
-                    if (currentMode == Mode.Text) {
-                        lastIndex = i + 1;
-                    }
+                    lastIndex = i + 1;
                 }
             } else if (currentMode == Mode.HtmlComment) {
                 if (regionMatches("-->")) {
@@ -405,7 +403,7 @@ public final class TemplateParser {
     }
 
     private boolean isCommentAllowed() {
-        return currentMode == Mode.Text || currentMode == Mode.Content;
+        return currentMode == Mode.Text;
     }
 
     private boolean isParamOrImportAllowed() {
@@ -623,9 +621,7 @@ public final class TemplateParser {
 
     private void extractComment(Mode mode, int startIndex) {
         if (paramsComplete || areParamsComplete(startIndex)) {
-            if (currentMode == Mode.Text) {
-                extractTextPart(startIndex, mode);
-            }
+            extractTextPart(startIndex, mode);
         }
         push(mode);
     }

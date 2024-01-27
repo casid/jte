@@ -43,10 +43,6 @@ public abstract class ContentProcessor {
             push(Mode.Raw);
          } else if (regionMatches("@endraw") && currentMode == Mode.Raw) {
             pop();
-         } else if (regionMatches("<%--") && currentMode == Mode.Content) {
-            push(Mode.Comment);
-         } else if (regionMatches("--%>") && currentMode == Mode.Comment) {
-            pop();
          }
       }
 
@@ -83,7 +79,6 @@ public abstract class ContentProcessor {
       Code,
       Content,
       Raw,
-      Comment,
       ;
 
       boolean isContentBlockAllowed() {

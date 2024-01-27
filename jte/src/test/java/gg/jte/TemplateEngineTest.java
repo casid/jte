@@ -792,18 +792,6 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void commentWithBacktickInContentBlock() {
-        givenTemplate("""
-              !{var content = @`<%--`--%>Hello there!`;}
-              ${content}
-              """);
-        thenOutputIs("""
-              
-              Hello there!
-              """);
-    }
-
-    @Test
     void importInCss() {
         givenTemplate("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
                 "    @import url(\"https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap\"); /* <--- Right here */");

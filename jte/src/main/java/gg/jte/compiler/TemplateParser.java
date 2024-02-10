@@ -38,6 +38,7 @@ public final class TemplateParser {
     private int lastIndex = 0;
     private int lastLineIndex = 0;
     private int lastTrimmedIndex = -1;
+    private int backslashEscapes = 0;
 
     private char previousChar;
     private char currentChar;
@@ -103,6 +104,9 @@ public final class TemplateParser {
         for (i = startIndex; i < endIndex; ++i) {
             previousChar = currentChar;
             currentChar = templateCode.charAt(i);
+
+            if (currentChar == '\\' && previousChar == '\\')
+                ++backslashEscapes;
 
             if (!currentMode.isComment() && regionMatches("@import") && isParamOrImportAllowed()) {
                 push(Mode.Import);
@@ -190,7 +194,7 @@ public final class TemplateParser {
                 }
             } else if (currentChar == '"' && currentMode.isTrackStrings()) {
                 push(Mode.JavaCodeString);
-            } else if (currentChar == '"' && currentMode == Mode.JavaCodeString && previousChar != '\\') {
+            } else if (currentChar == '"' && currentMode == Mode.JavaCodeString && (previousChar != '\\' || backslashEscapes % 2 == 1)) {
                 pop();
             } else if (currentChar == '}' && currentMode == Mode.Code) {
                 pop();

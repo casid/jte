@@ -1036,6 +1036,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void backslashAndDoubleQuoteInString() {
+        givenTemplate("${\"\\\\\\\"\\\\\"}");
+        thenOutputIs("\\\"\\");
+    }
+
+    @Test
     void npe_internal() {
         givenTemplate("This is ${model.getThatThrows()} world");
 

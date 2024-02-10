@@ -364,6 +364,7 @@ public final class TemplateParser {
         }
     }
 
+    @SuppressWarnings("SameParameterValue")
     private int countBefore(char c) {
         int count = 0;
         for (int j = i - 1; j >= 0; --j) {
@@ -968,11 +969,11 @@ public final class TemplateParser {
         }
     }
 
-    interface VisitorCallback {
+    public interface VisitorCallback {
         void accept(int depth, String content);
     }
 
-    interface Mode {
+    public interface Mode {
         Mode Import = new StatelessMode("Import");
         Mode Param = new StatelessMode("Param");
         Mode Text = new StatelessMode("Text");

@@ -376,14 +376,6 @@ public final class TemplateParser {
         return count;
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private char previousChar(int offset) {
-        if (i - offset < 0) {
-            return 0;
-        }
-        return templateCode.charAt(i - offset);
-    }
-
     private char nextChar() {
         if (i + 1 >= templateCode.length()) {
             return 0;

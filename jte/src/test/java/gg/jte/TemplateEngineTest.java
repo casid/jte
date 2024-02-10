@@ -1031,8 +1031,8 @@ public class TemplateEngineTest {
 
     @Test
     void backslashInString() {
-        givenTemplate("${\"\\\\\"}");
-        thenOutputIs("\\");
+        givenTemplate("${\"\\\\\\\"\\\\\"}");
+        thenOutputIs("\\\"\\");
     }
 
     @Test

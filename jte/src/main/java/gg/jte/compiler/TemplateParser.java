@@ -190,7 +190,7 @@ public final class TemplateParser {
                 }
             } else if (currentChar == '"' && currentMode.isTrackStrings()) {
                 push(Mode.JavaCodeString);
-            } else if (currentChar == '"' && currentMode == Mode.JavaCodeString && previousChar != '\\') {
+            } else if (currentChar == '"' && currentMode == Mode.JavaCodeString && (previousChar != '\\' || previousChar(2) == '\\')) {
                 pop();
             } else if (currentChar == '}' && currentMode == Mode.Code) {
                 pop();
@@ -362,6 +362,14 @@ public final class TemplateParser {
             completeParamsIfRequired();
             visitor.onComplete();
         }
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private char previousChar(int offset) {
+        if (i - offset < 0) {
+            return 0;
+        }
+        return templateCode.charAt(i - offset);
     }
 
     private char nextChar() {

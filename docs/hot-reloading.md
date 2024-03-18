@@ -11,7 +11,7 @@ Hot reloading is supported out of the box when using the [`gg.jte.resolve.Direct
 
 !!! warning
 
-    It makes sense to do this in your local development environment only. When running in production, for maximum performance and security, [precompiled templates](#precompiling-templates) are recommended instead.
+    It makes sense to do this in your local development environment only. When running in production, for maximum performance and security, [precompiled templates](pre-compiling.md) are recommended instead.
 
 If you clone [jte repository](https://github.com/casid/jte), you can launch the [`gg.jte.benchmark.SimpleWebServer`](https://github.com/casid/jte/blob/{{ latest-git-tag }}/jte/src/test/java/gg/jte/benchmark/SimpleWebServer.java) example's main method. It will fire up a tiny webserver with one page to play with at <http://localhost:8080>.
 

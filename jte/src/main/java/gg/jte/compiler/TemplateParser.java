@@ -754,10 +754,21 @@ public final class TemplateParser {
                     visitor.onError("Unclosed tag <" + currentHtmlTag.name + ">, expected " + "</" + currentHtmlTag.name + ">, got </" + tagName + ">.");
                 }
                 tagClosed = true;
-            } else if (!currentHtmlTag.attributesProcessed && !Character.isWhitespace(currentChar) && currentChar != '/' && currentHtmlTag.isCurrentAttributeComplete()) {
+            } else if (!currentHtmlTag.attributesProcessed && !Character.isWhitespace(currentChar) && currentChar != '/' && currentChar != '=' && currentHtmlTag.isCurrentAttributeComplete()) {
                 HtmlAttribute attribute = parseHtmlAttribute();
                 if (attribute != null) {
                     htmlPolicy.validateHtmlAttribute(currentHtmlTag, attribute);
+
+                    if (attribute.name.startsWith("$unsafe{")) {
+                        i += "$unsafe".length() - 1;
+                        outputPrevented = false;
+                        return;
+                    }
+
+                    if (attribute.name.startsWith("${")) {
+                        outputPrevented = false;
+                        return;
+                    }
 
                     currentHtmlTag.attributes.add(attribute);
 

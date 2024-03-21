@@ -1704,6 +1704,24 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
             assertThat(output.toString()).isEqualTo("<div data-controller=\"hello\">\n<input data-hello-target=\"name\"/></div>");
         }
+
+        @Test
+        void attributes_dynamicAttributesForHtmx() {
+            codeResolver.givenCode("template.jte", "@param String htmx\n<div ${htmx}/>");
+
+            templateEngine.render("template.jte", TemplateUtils.toMap("htmx", "hx-get=/helloWorld hx-swap=outerHTML"), output);
+
+            assertThat(output.toString()).isEqualTo("<div hx-get=/helloWorld hx-swap=outerHTML/>");
+        }
+
+        @Test
+        void attributes_dynamicAttributesForHtmx_unsafe() {
+            codeResolver.givenCode("template.jte", "@param String htmx\n<div $unsafe{htmx}/>");
+
+            templateEngine.render("template.jte", TemplateUtils.toMap("htmx", "hx-get=/helloWorld hx-swap=outerHTML"), output);
+
+            assertThat(output.toString()).isEqualTo("<div hx-get=/helloWorld hx-swap=outerHTML/>");
+        }
     }
 
     @SuppressWarnings("unused")

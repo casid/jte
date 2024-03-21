@@ -754,20 +754,22 @@ public final class TemplateParser {
                     visitor.onError("Unclosed tag <" + currentHtmlTag.name + ">, expected " + "</" + currentHtmlTag.name + ">, got </" + tagName + ">.");
                 }
                 tagClosed = true;
-            } else if (!currentHtmlTag.attributesProcessed && !Character.isWhitespace(currentChar) && currentChar != '/' && currentChar != '=' && currentHtmlTag.isCurrentAttributeComplete()) {
+            } else if (!currentHtmlTag.attributesProcessed && !Character.isWhitespace(currentChar) && currentChar != '/' && currentHtmlTag.isCurrentAttributeComplete()) {
                 HtmlAttribute attribute = parseHtmlAttribute();
                 if (attribute != null) {
                     htmlPolicy.validateHtmlAttribute(currentHtmlTag, attribute);
 
-                    if (attribute.name.startsWith("$unsafe{")) {
-                        i += "$unsafe".length() - 1;
-                        outputPrevented = false;
-                        return;
-                    }
+                    if (!attribute.hasValue) {
+                        if (attribute.name.startsWith("$unsafe{")) {
+                            i += "$unsafe".length() - 1;
+                            outputPrevented = false;
+                            return;
+                        }
 
-                    if (attribute.name.startsWith("${")) {
-                        outputPrevented = false;
-                        return;
+                        if (attribute.name.startsWith("${")) {
+                            outputPrevented = false;
+                            return;
+                        }
                     }
 
                     currentHtmlTag.attributes.add(attribute);
@@ -853,10 +855,12 @@ public final class TemplateParser {
     private HtmlAttribute parseHtmlAttribute() {
         int nameEndIndex = -1;
         char quotes = 0;
+        boolean hasValue = false;
         for (int j = i; j < endIndex; ++j) {
             char c = templateCode.charAt(j);
 
             if (c == '=') {
+                hasValue = true;
                 quotes = parseHtmlAttributeQuotes(j + 1);
             }
 
@@ -873,7 +877,7 @@ public final class TemplateParser {
             return null;
         }
 
-        return new HtmlAttribute(templateCode.substring(i, nameEndIndex), quotes, i, isHtmlAttributeSingleOutput(nameEndIndex, quotes));
+        return new HtmlAttribute(templateCode.substring(i, nameEndIndex), quotes, i, isHtmlAttributeSingleOutput(nameEndIndex, quotes), hasValue);
     }
 
     private char parseHtmlAttributeQuotes(int index) {
@@ -1208,18 +1212,20 @@ public final class TemplateParser {
         public final int startIndex;
         public final boolean containsSingleOutput;
         public final boolean bool;
+        public final boolean hasValue;
         public String value;
         public String variableName;
 
         public int quoteCount;
         public int valueStartIndex;
 
-        private HtmlAttribute(String name, char quotes, int startIndex, boolean containsSingleOutput) {
+        private HtmlAttribute(String name, char quotes, int startIndex, boolean containsSingleOutput, boolean hasValue) {
             this.name = name;
             this.quotes = quotes;
             this.startIndex = startIndex;
             this.containsSingleOutput = containsSingleOutput;
             this.bool = BOOLEAN_HTML_ATTRIBUTES.contains(name);
+            this.hasValue = hasValue;
         }
 
         @Override

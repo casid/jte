@@ -9,7 +9,7 @@ description: How to use binary rendering for max throughput
 
     Available since jte ^^**1.7.0**^^.
 
-Most template parts are static content, and only a few parts of a template are dynamic. Encoding those static parts repeatedly on every request is wasteful if your web framework sends binary UTF-8 content to the user. jte makes it is possible to encode those static parts when the template is compiled:
+Most template parts are static content, and only a few parts of a template are dynamic. Encoding those static parts repeatedly on every request is wasteful if your web framework sends binary UTF-8 content to the user. jte makes it possible to encode those static parts when the template is compiled:
 
 === "Java (Application run time)"
 
@@ -29,7 +29,7 @@ Most template parts are static content, and only a few parts of a template are d
 
 This generates a binary content resource for each template. Those pre-encoded UTF-8 `#!java byte[]` arrays are loaded in memory from the resource file together with the template class. This also implies that the constant pool is released from holding template strings.
 
-To fully utilize binary templates, you must use a binary template output, like [`gg.jte.Utf8ByteOutput`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg.jte.runtime/gg/jte/output/Utf8ByteOutput.html). This output is heavily optimized to consume as little CPU and memory as possible when using binary templates.
+To fully benefit from binary templates, you must use a binary template output, like [`gg.jte.Utf8ByteOutput`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg.jte.runtime/gg/jte/output/Utf8ByteOutput.html). This output is heavily optimized to consume as little CPU and memory as possible when using binary templates.
 
 !!! info
 

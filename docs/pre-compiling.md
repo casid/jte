@@ -28,7 +28,7 @@ TemplateEngine templateEngine = TemplateEngine.createPrecompiled(targetDirectory
 
 ### Maven
 
-You can use a [Maven plugin][jte-maven-compiler-plugin] to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java must match those specified in Maven.
+You can use a [Maven plugin](maven-plugin.md#precompile-goal) to precompile all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java must match those specified in Maven.
 
 !!! warning
 
@@ -41,9 +41,9 @@ You can use a [Maven plugin][jte-maven-compiler-plugin] to precompile all templa
     <version>${jte.version}</version>
     <configuration>
         <!-- This is the directory where your .jte files are located. -->
-        <sourceDirectory>src/main/jte</sourceDirectory>
+        <sourceDirectory>${project.basedir}/src/main/jte</sourceDirectory>
         <!-- This is the directory where compiled templates are located. -->
-        <targetDirectory>jte-classes</targetDirectory>
+        <targetDirectory>${project.build.directory}/jte-classes</targetDirectory>
         <contentType>Html</contentType>
     </configuration>
     <executions>
@@ -69,7 +69,7 @@ The [Gradle plugin][jte-gradle-plugin] can precompile all templates during the G
 
     Make sure the jte gradle plugin version matches the jte dependency version. You can create a `jteVersion` in `gradle.properties` to sync the versions easily.
 
-=== "Grovy"
+=== "Groovy"
 
     ```groovy linenums="1"
     plugins {
@@ -155,7 +155,7 @@ TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Htm
 
 ### Maven
 
-You can use a [Maven plugin][jte-maven-compiler-plugin] to generate all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java must match those specified in Maven.
+You can use a [Maven plugin](maven-plugin.md#generate-goal) to generate all templates during the Maven build. You would need to put this in build / plugins of your projects' `pom.xml`. Please note that paths specified in Java must match those specified in Maven.
 
 !!! warning
 
@@ -167,7 +167,8 @@ You can use a [Maven plugin][jte-maven-compiler-plugin] to generate all template
     <artifactId>jte-maven-plugin</artifactId>
     <version>${jte.version}</version>
     <configuration>
-        <sourceDirectory>${basedir}/src/main/jte</sourceDirectory> <!-- This is the directory where your .jte files are located. -->
+        <!-- This is the directory where your .jte files are located. -->
+        <sourceDirectory>${project.basedir}/src/main/jte</sourceDirectory>
         <contentType>Html</contentType>
     </configuration>
     <executions>
@@ -224,6 +225,7 @@ The [Gradle plugin][jte-gradle-plugin] can generate all templates during the Gra
 
     jte {
         generate()
+        generate()
     }
     ```
   
@@ -235,11 +237,14 @@ The [Gradle plugin][jte-gradle-plugin] can generate all templates during the Gra
 
 An application jar with generated classes can be built into a native binary using [GraalVM native-image](https://www.graalvm.org/reference-manual/native-image/). To support this, jte can generate the necessary configuration files to tell `native-image` about classes loaded by reflection.
 
-To use this feature, set `#!groovy jteExtension("gg.jte.nativeimage.NativeResourcesExtension")` in your Gradle `jte` block. (Docs for Maven TBD)
+To see how to use this feature in a Maven project, check out the [Maven plugin documentation](maven-plugin.md#ggjtenativeimagenativeresourcesextension).
+
+To use this feature, set `#!groovy jteExtension("gg.jte.nativeimage.NativeResourcesExtension")` in your Gradle `jte` block. 
 
 There's an example [Gradle test project](https://github.com/casid/jte/blob/{{ latest-git-tag }}/test/jte-runtime-cp-test-gradle-convention/build.gradle) using `native-image` compilation.
 
 ## Binary encoding
+
 Use [binary encoding] for maximum performance! To activate it with precompiled templates, modify your build file.
 
 === "Maven"
@@ -260,6 +265,6 @@ Use [binary encoding] for maximum performance! To activate it with precompiled t
     }
     ```
 
-[jte-maven-compiler-plugin]: https://search.maven.org/artifact/gg.jte/jte-maven-plugin
+[jte-maven-compiler-plugin]: maven-plugin.md
 [jte-gradle-plugin]: https://plugins.gradle.org/plugin/gg.jte.gradle
 [binary encoding]: binary-rendering.md

@@ -137,7 +137,7 @@ public class CompilerMojo extends AbstractMojo {
         templateEngine.setHtmlCommentsPreserved(htmlCommentsPreserved);
         templateEngine.setBinaryStaticContent(binaryStaticContent);
         templateEngine.setCompileArgs(calculateCompileArgs());
-        templateEngine.setCompileArgs(kotlinCompileArgs);
+        templateEngine.setKotlinCompileArgs(kotlinCompileArgs);
 
         int amount;
         try {

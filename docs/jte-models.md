@@ -117,7 +117,7 @@ Run the build to generate classes.
 
 !!! tip "Maven configuration"
 
-    See details about how to fully configure the extension in the [Maven plugin documentation](maven-plugin.md#ggjtemodelsgeneratormodelextension).
+    See details about how to fully configure the extension in the [Maven plugin documentation](maven-plugin.md#model-extension).
 
 ## Output
 

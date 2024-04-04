@@ -229,7 +229,7 @@ The [Gradle plugin][jte-gradle-plugin] can generate all templates during the Gra
     }
     ```
   
-## GraalVM native-image support
+## GraalVM native-image support { #graalvm-native-image-support }
 
 !!! info "Version note"
 
@@ -237,7 +237,7 @@ The [Gradle plugin][jte-gradle-plugin] can generate all templates during the Gra
 
 An application jar with generated classes can be built into a native binary using [GraalVM native-image](https://www.graalvm.org/reference-manual/native-image/). To support this, jte can generate the necessary configuration files to tell `native-image` about classes loaded by reflection.
 
-To see how to use this feature in a Maven project, check out the [Maven plugin documentation](maven-plugin.md#ggjtenativeimagenativeresourcesextension).
+To see how to use this feature in a Maven project, check out the [Maven plugin documentation](maven-plugin.md#native-resources-extension).
 
 To use this feature, set `#!groovy jteExtension("gg.jte.nativeimage.NativeResourcesExtension")` in your Gradle `jte` block. 
 

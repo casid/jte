@@ -11,7 +11,7 @@ jte provides a [Maven Plugin][jte-maven-compiler-plugin] that you can integrate 
 
 The plugin provides two goals:
 
-## `precompile` goal
+## `precompile` goal { #precompile-goal }
 
 See [Precompiling Templates](pre-compiling.md) for more information. To use and configure this goal, you would use:
 
@@ -36,7 +36,7 @@ See [Precompiling Templates](pre-compiling.md) for more information. To use and 
 </plugin>
 ```
 
-### Configurations
+### Configurations { #precompile-configurations }
 
 The default phase for this goal is `process-classes`, and it accepts the following configuration options:
 
@@ -91,7 +91,7 @@ The default phase for this goal is `process-classes`, and it accepts the followi
 
     The `precompile` goal cleans the directory containing the compiled template classes every time it runs. In your local development environment, it may make more sense to use [hot reloading](hot-reloading.md).
 
-## `generate` goal
+## `generate` goal { #generate-goal }
 
 This goal generates all template classes in a sources directory. This only generates `.java` files, not `.class` files.
 
@@ -115,7 +115,7 @@ This goal generates all template classes in a sources directory. This only gener
 </plugin>
 ```
 
-### Configurations
+### Configurations { #generate-configurations }
 
 The default phase for this goal is `generate-sources`, and it accepts the following configuration options:
 
@@ -132,15 +132,15 @@ The default phase for this goal is `generate-sources`, and it accepts the follow
 | `targetResourceDirectory` | Directory in which to generate non-java files (resources)                         | None                                                           |
 | `extensions`              | Extensions this template engine should load                                       | None                                                           |
 
-### Extensions
+### Extensions { #generate-extensions }
 
 Currently, the following extensions exist:
 
-#### `gg.jte.models.generator.ModelExtension`
+#### `gg.jte.models.generator.ModelExtension` { #model-extension }
 
 See details about it in the [jte-models documentation](jte-models.md).
 
-##### Parameters
+##### Parameters { #model-extension-parameters }
 
 The following parameters are available for this extension:
 
@@ -152,7 +152,7 @@ The following parameters are available for this extension:
 | `includePattern`           | A regular expression to only include certain templates                    | None    |
 | `excludePattern`           | A regular expression to exclude certain templates                         | None    |
 
-##### Example
+##### Example { #model-extension-example }
 
 ```xml linenums="1"
 <plugin>
@@ -186,11 +186,11 @@ The following parameters are available for this extension:
 </plugin>
 ```
 
-#### `gg.jte.nativeimage.NativeResourcesExtension`
+#### `gg.jte.nativeimage.NativeResourcesExtension` { #native-resources-extension }
 
 See details about it in the [native-image documentation](pre-compiling.md#graalvm-native-image-support). This extension requires no parameters.
 
-##### Example
+##### Example { #native-resources-extension-example }
 
 ```xml linenums="1"
 <plugin>

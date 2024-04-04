@@ -14,7 +14,7 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <jacoco.version>0.8.10</jacoco.version>
-        <kotlin.version>1.4.30</kotlin.version>
+        <kotlin.version>1.9.10</kotlin.version>
     </properties>
 
     <dependencies>
@@ -96,6 +96,10 @@
                     <sourceDirectory>${basedir}/src/main/jte</sourceDirectory>
                     <targetDirectory>${basedir}/jte-classes</targetDirectory>
                     <contentType>Html</contentType>
+                    <kotlinCompileArgs>
+                        <kotlinCompileArg>-jvm-target</kotlinCompileArg>
+                        <kotlinCompileArg>${java.version}</kotlinCompileArg>
+                    </kotlinCompileArgs>
                 </configuration>
                 <executions>
                     <execution>

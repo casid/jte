@@ -265,6 +265,5 @@ Use [binary encoding] for maximum performance! To activate it with precompiled t
     }
     ```
 
-[jte-maven-compiler-plugin]: maven-plugin.md
 [jte-gradle-plugin]: https://plugins.gradle.org/plugin/gg.jte.gradle
 [binary encoding]: binary-rendering.md

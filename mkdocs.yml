@@ -79,6 +79,7 @@ nav:
     - "HTML Rendering": html-rendering.md
   - "Build Tools":
     - "Maven Plugin": maven-plugin.md
+    - "Gradle Plugin": gradle-plugin.md
   - "How To":
     - "Hot Reloading": hot-reloading.md
     - "Precompiling Templates": pre-compiling.md

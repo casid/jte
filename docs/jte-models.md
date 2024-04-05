@@ -61,21 +61,6 @@ To use jte-models, set up your build script to include one of these:
         generate()
         binaryStaticContent = true
         jteExtension 'gg.jte.models.generator.ModelExtension'
-        // or to configure the generator
-        /*
-        jteExtension('gg.jte.models.generator.ModelExtension') {
-            // Target language ("Java" and "Kotlin" are supported). "Java" is the default.
-            language = 'Java'
-    
-            // Annotations to add to generated interfaces and classes
-            interfaceAnnotation = '@foo.bar.MyAnnotation'
-            implementationAnnotation = '@foo.bar.MyAnnotation'
-    
-            // Patterns to include (or exclude) certain templates
-            includePattern = '\.pages\..*'
-            excludePattern = '\.components\..*'
-        }
-         */
     }
     ```
 
@@ -95,29 +80,17 @@ To use jte-models, set up your build script to include one of these:
         generate()
         binaryStaticContent.set(true)
         jteExtension("gg.jte.models.generator.ModelExtension")
-        // or to configure the generator:
-        /*
-        jteExtension("gg.jte.models.generator.ModelExtension") {
-            // Target language ("Java" and "Kotlin" are supported). "Java" is the default.
-            property("language", "Java")
-    
-            // Annotations to add to generated interfaces and classes
-            property("interfaceAnnotation", "@foo.bar.MyAnnotation")
-            property("implementationAnnotation", "@foo.bar.MyAnnotation")
-    
-            // Patterns to include (or exclude) certain templates
-            property("includePattern", "\.pages\..*")
-            property("excludePattern", '\.components\..*")
-        }
-         */
     }
     ```
 
 Run the build to generate classes.
 
-!!! tip "Maven configuration"
+!!! info "Full configuration"
 
-    See details about how to fully configure the extension in the [Maven plugin documentation](maven-plugin.md#model-extension).
+    See details about how to fully configure the extension:
+
+    - [Maven plugin documentation](maven-plugin.md#model-extension)
+    - [Gradle plugin documentation](gradle-plugin.md#model-extension)
 
 ## Output
 

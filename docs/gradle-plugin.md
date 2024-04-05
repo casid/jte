@@ -54,20 +54,20 @@ See [Precompiling Templates](pre-compiling.md) for more information. To use and 
 
 The follow inputs will be picked by the `precompileJte` task:
 
-| Parameter                  | Description                                                                       | Default                                                        |
-|----------------------------|-----------------------------------------------------------------------------------|----------------------------------------------------------------|
-| `sourceDirectory`          | The directory where template files are located                                    | None. Required configuration.                                  |
-| `targetDirectory`          | The directory where compiled classes should be written to                         | None. Required configuration.                                  |
-| `compilePath`              | The compile-classpath to use                                                      | `sourceSets.main.compileClasspath`                             |
-| `contentType`              | The content type of all templates. Either `Plain` or `Html`                       | None. Required configuration                                   |
-| `trimControlStructures`    | Trims control structures, resulting in prettier output                            | `false`                                                        |
-| `htmlTags`                 | Intercepts the given html tags during template compilation                        | None                                                           |
-| `htmlPolicyClass`          | An [`HtmlPolicy`][html-policy] used to check the parsed HTML at compile time      | None                                                           |
-| `htmlCommentsPreserved`    | If HTML comments should be preserved in the output                                | `false`                                                        |
-| `binaryStaticContent`      | If to generate a [binary content](binary-rendering.md) resource for each template | `false`                                                        |
-| `compileArgs`              | Sets additional compiler arguments for `jte` templates.                           | None                                                           |
-| `kotlinCompileArgs`        | Sets additional compiler arguments for `kte` templates                            | None                                                           |
-| `packageName`              | The package name, where template classes are generated to                         | [`Constants.PACKAGE_NAME_PRECOMPILED`][constants-package-name] |
+| Parameter               | Description                                                                       | Default                                                        |
+|-------------------------|-----------------------------------------------------------------------------------|----------------------------------------------------------------|
+| `sourceDirectory`       | The directory where template files are located                                    | `src/main/jte`                                                 |
+| `targetDirectory`       | The directory where compiled classes should be written to                         | `jte-classes`                                                  |
+| `compilePath`           | The compile-classpath to use                                                      | `sourceSets.main.runtimeClasspath`                             |
+| `contentType`           | The content type of all templates. Either `Plain` or `Html`                       | `Html`                                                         |
+| `trimControlStructures` | Trims control structures, resulting in prettier output                            | `false`                                                        |
+| `htmlTags`              | Intercepts the given html tags during template compilation                        | None                                                           |
+| `htmlPolicyClass`       | An [`HtmlPolicy`][html-policy] used to check the parsed HTML at compile time      | None                                                           |
+| `htmlCommentsPreserved` | If HTML comments should be preserved in the output                                | `false`                                                        |
+| `binaryStaticContent`   | If to generate a [binary content](binary-rendering.md) resource for each template | `false`                                                        |
+| `compileArgs`           | Sets additional compiler arguments for `jte` templates.                           | None                                                           |
+| `kotlinCompileArgs`     | Sets additional compiler arguments for `kte` templates                            | None                                                           |
+| `packageName`           | The package name, where template classes are generated to                         | [`Constants.PACKAGE_NAME_PRECOMPILED`][constants-package-name] |
 
 !!! info "About `htmlPolicyClass`"
 
@@ -121,9 +121,9 @@ The follow inputs will be picked by the `generateJte` task:
 
 | Parameter                 | Description                                                                       | Default                                                        |
 |---------------------------|-----------------------------------------------------------------------------------|----------------------------------------------------------------|
-| `sourceDirectory`         | The directory where template files are located                                    | None. Required configuration.                                  |
+| `sourceDirectory`         | The directory where template files are located                                    | `src/main/jte`                                                 |
 | `targetDirectory`         | Destination directory to store generated templates.                               | `${project.build.directory}/generated-sources/jte`             |
-| `contentType`             | The content type of all templates. Either `Plain` or `Html`                       | None. Required configuration                                   |
+| `contentType`             | The content type of all templates. Either `Plain` or `Html`                       | `Html`                                                         |
 | `trimControlStructures`   | Trims control structures, resulting in prettier output                            | `false`                                                        |
 | `htmlTags`                | Intercepts the given html tags during template compilation                        | None                                                           |
 | `htmlCommentsPreserved`   | If HTML comments should be preserved in the output                                | `false`                                                        |

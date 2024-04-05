@@ -9,9 +9,8 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
   push:
-    paths-ignore:
-      - 'docs/**'
-      - 'mkdocs.yml'
+    branches:
+      - main
 
 jobs:
   build:

@@ -8,7 +8,7 @@ jte provides a [Gradle Plugin][jte-gradle-plugin] that you can integrate in your
 
 !!! tip "Versions alignment"
 
-    Make sure the jte gradle plugin version matches the jte dependency version. You can create a `jteVersion` in `gradle.properties` to sync the versions easily.
+    Make sure the jte gradle plugin version matches the jte dependency version. You can create a `jteVersion` property in `gradle.properties` to sync the versions easily.
 
 The plugin provides two tasks:
 
@@ -79,7 +79,7 @@ The follow inputs will be picked by the `precompileJte` task:
 
 ## `generateJte` task { #generate-task }
 
-This task generates all template classes in a sources directory. This only generates `.java`/`.kt` files, not `.class` files.
+This task generates all template classes in a sources directory. This only generates `.java`/`.kt` files, but does not compile them to `.class` files.
 
 === "Groovy"
 

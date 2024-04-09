@@ -7,7 +7,7 @@ jte provides a [Maven Plugin][jte-maven-compiler-plugin] that you can integrate 
 
 !!! tip "Versions alignment"
 
-    Make sure the jte maven plugin version matches the jte dependency version. You can create a `${jte.version}` to sync the versions easily.
+    Make sure the jte maven plugin version matches the jte dependency version. You can create a `${jte.version}` property to sync the versions easily.
 
 The plugin provides two goals:
 
@@ -93,7 +93,7 @@ The default phase for this goal is `process-classes`, and it accepts the followi
 
 ## `generate` goal { #generate-goal }
 
-This goal generates all template classes in a sources directory. This only generates `.java` files, not `.class` files.
+This goal generates all template classes in a source directory. This only generates `.java` files, but does not compile them to `.class` files.
 
 ```xml linenums="1"
 <plugin>

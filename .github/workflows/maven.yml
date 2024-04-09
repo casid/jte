@@ -95,6 +95,8 @@ jobs:
         run: ./mvnw verify --file pom.xml -Pcoverage
       - name: Upload coverage report
         uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           file: ./test/jte-test-report/target/site/jacoco-aggregate/jacoco.xml
           fail_ci_if_error: true

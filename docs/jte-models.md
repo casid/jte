@@ -5,7 +5,7 @@ description: A generator extension for jte which creates a typesafe facade for r
 
 # jte-models Facade Generator
 
-jte-models is a generator extension for jte which creates a typesafe facade for rendering templates.
+jte-models is a generator extension for jte that creates a typesafe facade for rendering templates.
 
 ## Setup
 
@@ -19,29 +19,11 @@ To use jte-models, set up your build script to include one of these:
         <artifactId>jte-maven-plugin</artifactId>
         <version>${jte.version}</version>
         <configuration>
-            <sourceDirectory>${basedir}/src/main/jte</sourceDirectory>
+            <sourceDirectory>${project.basedir}/src/main/jte</sourceDirectory>
             <contentType>Html</contentType>
             <extensions>
                 <extension>
                     <className>gg.jte.models.generator.ModelExtension</className>
-                    <!-- optional settings to configure the target language ("Java" and "Kotlin" are supported):
-                    <settings>
-                        <language>Java</language>
-                    </settings>
-                    -->
-                    <!-- optional settings to include annotations on generated classes:
-                    <settings>
-                        <interfaceAnnotation>@foo.bar.MyAnnotation</interfaceAnnotation>
-                        <implementationAnnotation>@foo.bar.MyAnnotation</implementationAnnotation>
-                    </settings>
-                    -->
-                    <!-- optional settings to include (or exclude) certain templates.
-                    The value is a regular expression matched against the class name of the generated JTE class.
-                    <settings>
-                        <includePattern>\.pages\..*</includePattern>
-                        <excludePattern>\.components\..*</excludePattern>
-                    </settings>
-                    -->
                 </extension>
             </extensions>
         </configuration>
@@ -133,7 +115,12 @@ To use jte-models, set up your build script to include one of these:
 
 Run the build to generate classes.
 
+!!! tip "Maven configuration"
+
+    See details about how to fully configure the extension in the [Maven plugin documentation](maven-plugin.md#model-extension).
+
 ## Output
+
 Additional generated classes will include a facade interface named `gg.jte.generated.precompiled.Templates`, with implementations:
 
 - `gg.jte.generated.precompiled.StaticTemplates`

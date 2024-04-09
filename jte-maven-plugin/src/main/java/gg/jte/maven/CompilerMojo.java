@@ -79,7 +79,7 @@ public class CompilerMojo extends AbstractMojo {
     public boolean htmlCommentsPreserved;
 
     /**
-     * Setting, that UTF-8 encodes all static template parts at compile time.
+     * Setting that UTF-8 encodes all static template parts at compile time.
      * Only makes sense if you use a binary output, like {@link gg.jte.output.Utf8ByteOutput}.
      */
     @Parameter

@@ -47,7 +47,7 @@ Will render this HTML:
 
 jte does not render HTML, CSS and JavaScript comments. You can use the natural comment syntax without worrying about leaking information/data to the outside.
 
-## HTML Escaping
+## HTML Escaping { #html-escaping }
 
 Output escaping depends on the [`gg.jte.ContentType`](https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg.jte.runtime/gg/jte/ContentType.html) the engine is created with:
 

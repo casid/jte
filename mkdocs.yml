@@ -5,7 +5,7 @@ site_url: https://jte.gg/
 theme:
   icon:
     repo: fontawesome/brands/github
-  language: en 
+  language: en
   name: material
   features:
     - navigation.top
@@ -77,6 +77,8 @@ nav:
     - "Rendering a Template": rendering-a-template.md
     - "Templates Syntax": syntax.md
     - "HTML Rendering": html-rendering.md
+  - "Build Tools":
+    - "Maven Plugin": maven-plugin.md
   - "How To":
     - "Hot Reloading": hot-reloading.md
     - "Precompiling Templates": pre-compiling.md

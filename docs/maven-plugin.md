@@ -188,7 +188,11 @@ The following parameters are available for this extension:
 
 #### `gg.jte.nativeimage.NativeResourcesExtension` { #native-resources-extension }
 
-See details about it in the [native-image documentation](pre-compiling.md#graalvm-native-image-support). This extension requires no parameters.
+!!! info "Version note"
+
+    Available since jte ^^**1.10.0**^^.
+
+An application jar with generated classes can be built into a native binary using [GraalVM native-image](https://www.graalvm.org/reference-manual/native-image/). To support this, this extension generates the necessary configuration files to tell `native-image` about classes loaded by reflection.
 
 ##### Example { #native-resources-extension-example }
 

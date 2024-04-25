@@ -5,8 +5,8 @@ description: Details specific to Kotlin usage
 
 # Kotlin Details
 
-Kotlin has entails a few differences. The `jte-kotlin` dependency is needed to enable `.kte` templates that contain 
-Kotlin code. Keep in mind that Kotlin application code can use either Java (`.jte`) or Kotlin (`.ket`) templates. `.kte` 
+Kotlin entails a few differences. The `jte-kotlin` dependency is needed to enable `.kte` templates that contain 
+Kotlin code. Keep in mind that Kotlin application code can use either Java (`.jte`) or Kotlin (`.kte`) templates. `.kte` 
 files are only needed for Kotlin based templates. 
 
 ## Add required dependencies

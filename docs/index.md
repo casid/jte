@@ -59,7 +59,7 @@ jte gives you the same productive, typesafe experience you're used to from writi
 
 ## 5 minutes example
 
-Here is a small jte template `example.jte`:
+Here is a small jte template `example.jte` (or `example.kte` if using Kotlin):
 
 === "Java"
 

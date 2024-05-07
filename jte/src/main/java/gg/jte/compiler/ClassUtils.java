@@ -34,8 +34,8 @@ public final class ClassUtils {
             }
         }
 
-        if (classLoader instanceof URLClassLoader) {
-            for (URL url : ((URLClassLoader) classLoader).getURLs()) {
+        if (classLoader instanceof URLClassLoader loader) {
+            for (URL url : loader.getURLs()) {
                 String protocol = url.getProtocol();
 
                 if ("file".equalsIgnoreCase(protocol)) {

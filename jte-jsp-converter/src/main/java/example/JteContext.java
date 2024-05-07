@@ -17,14 +17,14 @@ public class JteContext {
     public static boolean isEmpty(Object obj) {
         if (obj == null) {
             return true;
-        } else if (obj instanceof String) {
-            return ((String) obj).length() == 0;
-        } else if (obj instanceof Object[]) {
-            return ((Object[]) obj).length == 0;
-        } else if (obj instanceof Collection) {
-            return ((Collection<?>) obj).isEmpty();
+        } else if (obj instanceof String string) {
+            return string.isEmpty();
+        } else if (obj instanceof Object[] objects) {
+            return objects.length == 0;
+        } else if (obj instanceof Collection<?> collection) {
+            return collection.isEmpty();
         } else {
-            return obj instanceof Map && ((Map<?, ?>) obj).isEmpty();
+            return obj instanceof Map<?, ?> m && m.isEmpty();
         }
     }
 

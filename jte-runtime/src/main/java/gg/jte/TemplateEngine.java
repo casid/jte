@@ -241,8 +241,8 @@ public final class TemplateEngine {
     }
 
     private TemplateException handleRenderException(String name, Template template, Throwable e) {
-        if (e instanceof TemplateException) {
-            return (TemplateException)e;
+        if (e instanceof TemplateException exception) {
+            return exception;
         }
 
         ClassLoader classLoader = template.getClassLoader();

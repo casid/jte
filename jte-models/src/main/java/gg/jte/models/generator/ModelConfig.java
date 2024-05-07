@@ -26,7 +26,7 @@ public class ModelConfig {
         } catch (IllegalArgumentException ex) {
             String supportedValues = Arrays.toString(Language.values());
             throw new IllegalArgumentException(
-                String.format("jte ModelExtension 'language' property is not configured correctly (current value is '%s'). Supported values: %s", configuredLanguage, supportedValues),
+                    "jte ModelExtension 'language' property is not configured correctly (current value is '%s'). Supported values: %s".formatted(configuredLanguage, supportedValues),
                 ex
             );
         }

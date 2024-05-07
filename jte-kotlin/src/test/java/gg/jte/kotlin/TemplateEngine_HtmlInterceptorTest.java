@@ -32,9 +32,11 @@ public class TemplateEngine_HtmlInterceptorTest {
 
     @Test
     void noFields_additionalFieldWritten() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<form action=\"${url}\">\n" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <form action="${url}">
+                </form>\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
@@ -43,77 +45,95 @@ public class TemplateEngine_HtmlInterceptorTest {
 
     @Test
     void formInIf() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "@if(true)\n" +
-                "    <form action=\"${url}\">\n" +
-                "        <input name=\"x\"/>\n" +
-                "    </form>" +
-                "@endif");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                @if(true)
+                    <form action="${url}">
+                        <input name="x"/>
+                    </form>\
+                @endif\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "    <input name=\"x\" value=\"?\"/>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:x\">\n" +
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                    <input name="x" value="?"/>
+                <input name="__fp" value="a:hello.htm, p:x">
+                </form>\
+                """);
     }
 
     @Test
     void input() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<form action=\"${url}\">\n" +
-                "<input name=\"param1\">\n" +
-                "<input name=\"param2\">\n" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <form action="${url}">
+                <input name="param1">
+                <input name="param2">
+                </form>\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"param1\" value=\"?\">\n" +
-                "<input name=\"param2\" value=\"?\">\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\">\n" +
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <input name="param1" value="?">
+                <input name="param2" value="?">
+                <input name="__fp" value="a:hello.htm, p:param1,param2">
+                </form>\
+                """);
     }
 
     @Test
     void input_int() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<form action=\"${url}\">\n" +
-                "<input name=\"age\" value=\"${23}\">\n" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <form action="${url}">
+                <input name="age" value="${23}">
+                </form>\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"age\" value=\"23\">\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:age\">\n" +
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <input name="age" value="23">
+                <input name="__fp" value="a:hello.htm, p:age">
+                </form>\
+                """);
     }
 
     @Test
     void input_closed1() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<form action=\"${url}\">\n" +
-                "<input name=\"param1\"/>\n" +
-                "<input name=\"param2\"/>\n" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <form action="${url}">
+                <input name="param1"/>
+                <input name="param2"/>
+                </form>\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"param1\" value=\"?\"/>\n" +
-                "<input name=\"param2\" value=\"?\"/>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\">\n" +
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <input name="param1" value="?"/>
+                <input name="param2" value="?"/>
+                <input name="__fp" value="a:hello.htm, p:param1,param2">
+                </form>\
+                """);
     }
 
     @Test
     void input_closedWrongly() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<form action=\"${url}\">\n" +
-                "<input name=\"param1\"></input>\n" +
-                "<input name=\"param2\"></input>\n" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <form action="${url}">
+                <input name="param1"></input>
+                <input name="param2"></input>
+                </form>\
+                """);
 
         Throwable throwable = catchThrowable(() -> templateEngine.render("page.kte", "hello.htm", output));
 
@@ -122,8 +142,10 @@ public class TemplateEngine_HtmlInterceptorTest {
 
     @Test
     void input_noAttributes() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<input>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <input>\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
@@ -132,164 +154,196 @@ public class TemplateEngine_HtmlInterceptorTest {
 
     @Test
     void input_disabled() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<form action=\"${url}\">\n" +
-                "<input name=\"param1\" disabled>\n" +
-                "<input name=\"param2\">\n" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <form action="${url}">
+                <input name="param1" disabled>
+                <input name="param2">
+                </form>\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"param1\" disabled value=\"?\">\n" +
-                "<input name=\"param2\" value=\"?\">\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param2\">\n" + // No param1 here
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <input name="param1" disabled value="?">
+                <input name="param2" value="?">
+                <input name="__fp" value="a:hello.htm, p:param2">
+                </form>\
+                """);
     }
 
     @Test
     void select() {
-        dummyCodeResolver.givenCode("page.kte", "@param controller:gg.jte.kotlin.TemplateEngine_HtmlInterceptorTest.Controller\n" +
-                "<form action=\"${controller.url}\">\n" +
-                "<select name=\"foodOption\">\n" +
-                "@for(foodOption in controller.foodOptions)" +
-                "<option value=\"${foodOption}\">Mmmh, ${foodOption}</option>\n" +
-                "@endfor" +
-                "</select>\n" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param controller:gg.jte.kotlin.TemplateEngine_HtmlInterceptorTest.Controller
+                <form action="${controller.url}">
+                <select name="foodOption">
+                @for(foodOption in controller.foodOptions)\
+                <option value="${foodOption}">Mmmh, ${foodOption}</option>
+                @endfor\
+                </select>
+                </form>\
+                """);
 
         controller.setFoodOption("Onion");
         templateEngine.render("page.kte", controller, output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<select name=\"foodOption\">\n" +
-                "<option value=\"Cheese\">Mmmh, Cheese</option>\n" +
-                "<option value=\"Onion\" selected>Mmmh, Onion</option>\n" +
-                "<option value=\"Chili\">Mmmh, Chili</option>\n" +
-                "</select>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:foodOption\">\n" +
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <select name="foodOption">
+                <option value="Cheese">Mmmh, Cheese</option>
+                <option value="Onion" selected>Mmmh, Onion</option>
+                <option value="Chili">Mmmh, Chili</option>
+                </select>
+                <input name="__fp" value="a:hello.htm, p:foodOption">
+                </form>\
+                """);
     }
 
     @Test
     void tag() {
         dummyCodeResolver.givenCode("tag/formContent.kte",
-                "<input name=\"param1\"></input>\n" +
-                "<input name=\"param2\"></input>\n");
+                """
+                <input name="param1"></input>
+                <input name="param2"></input>
+                """);
 
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<form action=\"${url}\">\n" +
-                "@template.tag.formContent()" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <form action="${url}">
+                @template.tag.formContent()\
+                </form>\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"param1\" value=\"?\"></input>\n" +
-                "<input name=\"param2\" value=\"?\"></input>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\">\n" +
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <input name="param1" value="?"></input>
+                <input name="param2" value="?"></input>
+                <input name="__fp" value="a:hello.htm, p:param1,param2">
+                </form>\
+                """);
     }
 
     @Test
     void layout() {
         dummyCodeResolver.givenCode("layout/formContent.kte",
-                        "@param url:String\n" +
-                        "@param content:gg.jte.Content\n" +
-                        "<form action=\"${url}\">\n" +
-                        "${content}" +
-                        "</form>");
+                        """
+                        @param url:String
+                        @param content:gg.jte.Content
+                        <form action="${url}">
+                        ${content}\
+                        </form>\
+                        """);
 
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "@template.layout.formContent(url, content = @`" +
-                "<input name=\"param1\"></input>\n" +
-                "<input name=\"param2\"></input>\n" +
-                "`)");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                @template.layout.formContent(url, content = @`\
+                <input name="param1"></input>
+                <input name="param2"></input>
+                `)\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"param1\" value=\"?\"></input>\n" +
-                "<input name=\"param2\" value=\"?\"></input>\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param1,param2\">\n" +
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <input name="param1" value="?"></input>
+                <input name="param2" value="?"></input>
+                <input name="__fp" value="a:hello.htm, p:param1,param2">
+                </form>\
+                """);
     }
 
     @Test
     void form() {
-        dummyCodeResolver.givenCode("page.kte", "@param controller:gg.jte.kotlin.TemplateEngine_HtmlInterceptorTest.Controller\n"
-              + "<body>\n"
-              + "   <h1>Hello</h1>\n"
-              + "\n"
-              + "   <form action=\"${controller.getUrl()}\" method=\"POST\">\n"
-              + "\n"
-              + "      <label>\n"
-              + "         Food option:\n"
-              + "         <select name=\"foodOption\">\n"
-              + "            <option value=\"\">-</option>\n"
-              + "            @for(foodOption in controller.getFoodOptions())\n"
-              + "               <option value=\"${foodOption}\">${foodOption}</option>\n"
-              + "            @endfor\n"
-              + "         </select>\n"
-              + "      </label>\n"
-              + "\n"
-              + "      <button type=\"submit\">Submit</button>\n"
-              + "   </form>\n"
-              + "</body>");
+        dummyCodeResolver.givenCode("page.kte", """
+              @param controller:gg.jte.kotlin.TemplateEngine_HtmlInterceptorTest.Controller
+              <body>
+                 <h1>Hello</h1>
+              
+                 <form action="${controller.getUrl()}" method="POST">
+              
+                    <label>
+                       Food option:
+                       <select name="foodOption">
+                          <option value="">-</option>
+                          @for(foodOption in controller.getFoodOptions())
+                             <option value="${foodOption}">${foodOption}</option>
+                          @endfor
+                       </select>
+                    </label>
+              
+                    <button type="submit">Submit</button>
+                 </form>
+              </body>\
+              """);
 
         templateEngine.render("page.kte", controller, output);
 
-        assertThat(output.toString()).isEqualTo("<body>\n"
-              + "   <h1>Hello</h1>\n"
-              + "\n"
-              + "   <form action=\"hello.htm\" method=\"POST\" data-form=\"x\">\n"
-              + "\n"
-              + "      <label>\n"
-              + "         Food option:\n"
-              + "         <select name=\"foodOption\">\n"
-              + "            <option value=\"\">-</option>\n"
-              + "            <option value=\"Cheese\">Cheese</option>\n"
-              + "            <option value=\"Onion\">Onion</option>\n"
-              + "            <option value=\"Chili\">Chili</option>\n"
-              + "         </select>\n"
-              + "      </label>\n"
-              + "\n"
-              + "      <button type=\"submit\">Submit</button>\n"
-              + "   <input name=\"__fp\" value=\"a:hello.htm, p:foodOption\">\n"
-              + "</form>\n"
-              + "</body>");
+        assertThat(output.toString()).isEqualTo("""
+              <body>
+                 <h1>Hello</h1>
+              
+                 <form action="hello.htm" method="POST" data-form="x">
+              
+                    <label>
+                       Food option:
+                       <select name="foodOption">
+                          <option value="">-</option>
+                          <option value="Cheese">Cheese</option>
+                          <option value="Onion">Onion</option>
+                          <option value="Chili">Chili</option>
+                       </select>
+                    </label>
+              
+                    <button type="submit">Submit</button>
+                 <input name="__fp" value="a:hello.htm, p:foodOption">
+              </form>
+              </body>\
+              """);
     }
 
     @Test
     void errorClass() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<form action=\"${url}\">\n" +
-                "<input name=\"error\" class=\"foo\">\n" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <form action="${url}">
+                <input name="error" class="foo">
+                </form>\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"error\" class=\"foo\" value=\"?\" data-error=\"1\">\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:error\">\n" +
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <input name="error" class="foo" value="?" data-error="1">
+                <input name="__fp" value="a:hello.htm, p:error">
+                </form>\
+                """);
     }
 
     @Test
     void errorClass_indentation() {
-        dummyCodeResolver.givenCode("page.kte", "@param url:String\n" +
-                "<form action=\"${url}\">\n" +
-                "@if(true)\n" +
-                "    <input name=\"error\" class=\"foo\">\n" +
-                "@endif\n" +
-                "</form>");
+        dummyCodeResolver.givenCode("page.kte", """
+                @param url:String
+                <form action="${url}">
+                @if(true)
+                    <input name="error" class="foo">
+                @endif
+                </form>\
+                """);
 
         templateEngine.render("page.kte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"error\" class=\"foo\" value=\"?\" data-error=\"1\">\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:error\">\n" +
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <input name="error" class="foo" value="?" data-error="1">
+                <input name="__fp" value="a:hello.htm, p:error">
+                </form>\
+                """);
     }
 
     @Test

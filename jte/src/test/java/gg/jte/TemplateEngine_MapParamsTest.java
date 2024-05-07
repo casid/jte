@@ -161,8 +161,10 @@ public class TemplateEngine_MapParamsTest {
 
     @Test
     void layout_noParamsAndOneDefinition() {
-        givenLayout("page", "@param gg.jte.Content content\n" +
-                "Hello ${content}!!");
+        givenLayout("page", """
+                @param gg.jte.Content content
+                Hello ${content}!!\
+                """);
         params.put("content", (Content) output -> output.writeContent("<p>world</p>"));
 
         whenTemplateIsRendered("layout/page.jte");

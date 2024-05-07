@@ -10,7 +10,7 @@ public class Util {
     }
 
     public static String typedParams(TemplateDescription template) {
-        return template.params().stream().map(param -> String.format("%s %s", param.type(), param.name())).collect(Collectors.joining(", "));
+        return template.params().stream().map(param -> "%s %s".formatted(param.type(), param.name())).collect(Collectors.joining(", "));
     }
 
     public static String kotlinTypedParams(TemplateDescription template, boolean includeParamDefaultValue) {

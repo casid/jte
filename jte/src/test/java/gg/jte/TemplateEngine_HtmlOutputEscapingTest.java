@@ -416,8 +416,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", "dummy", output);
 
-        assertThat(output.toString()).isEqualTo("<input id=\"login-email\" type=\"text\" placeholder=\"dummy\" required>\n" +
-                "<input id=\"login-password\" type=\"password\" placeholder=\"Savecode\" required>");
+        assertThat(output.toString()).isEqualTo("""
+                <input id="login-email" type="text" placeholder="dummy" required>
+                <input id="login-password" type="password" placeholder="Savecode" required>\
+                """);
     }
 
     @Test
@@ -1116,8 +1118,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", TemplateUtils.toMap("url", "https://jte.gg"), output);
 
-        assertThat(output.toString()).isEqualTo("\n" +
-                "<span data-content=\"&lt;a href=&#34;https://jte.gg&#34; class=&#34;foo&#34;>Hello&lt;/a>\"><a href=\"https://jte.gg\" class=\"foo\">Hello</a></span>");
+        assertThat(output.toString()).isEqualTo("""
+                
+                <span data-content="&lt;a href=&#34;https://jte.gg&#34; class=&#34;foo&#34;>Hello&lt;/a>"><a href="https://jte.gg" class="foo">Hello</a></span>\
+                """);
     }
 
     @Test
@@ -1278,8 +1282,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_notFound_noParams() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>${localizer.localize(\"unknown\")}</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>${localizer.localize("unknown")}</span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1288,8 +1294,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_notFound_withParams() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>${localizer.localize(\"unknown\", 1)}</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>${localizer.localize("unknown", 1)}</span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1298,8 +1306,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_emptyString_noParams() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>${localizer.localize(\"empty\")}</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>${localizer.localize("empty")}</span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1308,8 +1318,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_emptyString_withParams() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>${localizer.localize(\"empty\", 1)}</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>${localizer.localize("empty", 1)}</span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1318,8 +1330,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_emptyString_resultsInNullContent() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>@if(localizer.localize(\"empty\") == null)nothing is here@endif</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>@if(localizer.localize("empty") == null)nothing is here@endif</span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1328,8 +1342,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_emptyString_resultsInNullContent_withParams() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>@if(localizer.localize(\"empty\", 1) == null)nothing is here@endif</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>@if(localizer.localize("empty", 1) == null)nothing is here@endif</span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1338,8 +1354,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_noParams() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span alt=\"${localizer.localize(\"no-params\")}\">${localizer.localize(\"no-params\")}</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span alt="${localizer.localize("no-params")}">${localizer.localize("no-params")}</span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1348,8 +1366,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_html() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>${localizer.localize(\"no-params-html\")}</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>${localizer.localize("no-params-html")}</span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1394,8 +1414,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_quotesInAttribute() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span data-title=\"${localizer.localize(\"quotes\")}\"></span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span data-title="${localizer.localize("quotes")}"></span>\
+                """);
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer), output);
 
@@ -1478,8 +1500,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_primitives() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>${localizer.localize(\"all-primitives\", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>${localizer.localize("all-primitives", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}</span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1488,8 +1512,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_primitives_inAttribute() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span alt=\"${localizer.localize(\"all-primitives\", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}\"></span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span alt="${localizer.localize("all-primitives", false, (byte)1, (short)2, 3, 4L, 5.0f, 6.0, 'c')}"></span>\
+                """);
 
         templateEngine.render("template.jte", localizer, output);
 
@@ -1534,8 +1560,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag() {
-        codeResolver.givenCode("tag/card.jte", "@param gg.jte.Content content\n" +
-                    "<span>${content}</span>");
+        codeResolver.givenCode("tag/card.jte", """
+                    @param gg.jte.Content content
+                    <span>${content}</span>\
+                    """);
         codeResolver.givenCode("template.jte", """
                 @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
                 @param String name
@@ -1548,8 +1576,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag2() {
-        codeResolver.givenCode("tag/card.jte", "@param gg.jte.Content content\n" +
-                "<span>${content}</span>");
+        codeResolver.givenCode("tag/card.jte", """
+                @param gg.jte.Content content
+                <span>${content}</span>\
+                """);
         codeResolver.givenCode("template.jte", """
                 @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
                 @param String name
@@ -1562,8 +1592,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag3() {
-        codeResolver.givenCode("tag/card.jte", "@param gg.jte.Content content\n" +
-                "<span>${content}</span>");
+        codeResolver.givenCode("tag/card.jte", """
+                @param gg.jte.Content content
+                <span>${content}</span>\
+                """);
         codeResolver.givenCode("template.jte", """
                 @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
                 @param String name
@@ -1576,8 +1608,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag4() {
-        codeResolver.givenCode("tag/card.jte", "@param gg.jte.Content content\n" +
-                "<span>${content}</span>");
+        codeResolver.givenCode("tag/card.jte", """
+                @param gg.jte.Content content
+                <span>${content}</span>\
+                """);
         codeResolver.givenCode("template.jte", """
                 @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
                 @param String name
@@ -1590,8 +1624,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag5() {
-        codeResolver.givenCode("tag/card.jte", "@param gg.jte.Content content\n" +
-                "<span>${content}</span>");
+        codeResolver.givenCode("tag/card.jte", """
+                @param gg.jte.Content content
+                <span>${content}</span>\
+                """);
         codeResolver.givenCode("template.jte", """
                 @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
                 @param String name
@@ -1604,8 +1640,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag6() {
-        codeResolver.givenCode("tag/card.jte", "@param gg.jte.Content content\n" +
-                "<span>${content}</span>");
+        codeResolver.givenCode("tag/card.jte", """
+                @param gg.jte.Content content
+                <span>${content}</span>\
+                """);
         codeResolver.givenCode("template.jte", """
                 @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
                 @param String name
@@ -1618,8 +1656,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag7() {
-        codeResolver.givenCode("tag/card.jte", "@param gg.jte.Content content\n" +
-                "<span>${content}</span>");
+        codeResolver.givenCode("tag/card.jte", """
+                @param gg.jte.Content content
+                <span>${content}</span>\
+                """);
         codeResolver.givenCode("template.jte", """
                 @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
                 @param String name
@@ -1632,8 +1672,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag8() {
-        codeResolver.givenCode("tag/card.jte", "@param gg.jte.Content content = @`My default is ${42}`\n" +
-                "<span>${content}</span>");
+        codeResolver.givenCode("tag/card.jte", """
+                @param gg.jte.Content content = @`My default is ${42}`
+                <span>${content}</span>\
+                """);
         codeResolver.givenCode("template.jte", "@template.tag.card()");
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
@@ -1643,8 +1685,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_contentParams() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>${localizer.localize(\"link\", @`<a href=\"${\"foo\"}\">`, @`</a>`)}</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>${localizer.localize("link", @`<a href="${"foo"}">`, @`</a>`)}</span>\
+                """);
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer), output);
 
@@ -1653,8 +1697,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_contentParams2() {
-        codeResolver.givenCode("template.jte", "@param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer\n" +
-                "<span>${localizer.localize(\"link\", @`<a style=\"color: ${\"foo\"};\">`, @`</a>`)}</span>");
+        codeResolver.givenCode("template.jte", """
+                @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer
+                <span>${localizer.localize("link", @`<a style="color: ${"foo"};">`, @`</a>`)}</span>\
+                """);
 
         templateEngine.render("template.jte", TemplateUtils.toMap("localizer", localizer), output);
 

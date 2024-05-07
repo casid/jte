@@ -56,28 +56,28 @@ public interface LocalizationSupport {
             }
 
             private void writeParam(TemplateOutput output, Object param) {
-                if (param instanceof String) {
-                    output.writeUserContent((String) param);
-                } else if (param instanceof Content) {
-                    output.writeUserContent((Content) param);
-                } else if (param instanceof Enum) {
-                    output.writeUserContent((Enum<?>) param);
-                } else if (param instanceof Boolean) {
-                    output.writeUserContent((boolean) param);
-                } else if (param instanceof Byte) {
-                    output.writeUserContent((byte) param);
-                } else if (param instanceof Short) {
-                    output.writeUserContent((short) param);
-                } else if (param instanceof Integer) {
-                    output.writeUserContent((int) param);
-                } else if (param instanceof Long) {
-                    output.writeUserContent((long) param);
-                } else if (param instanceof Float) {
-                    output.writeUserContent((float) param);
-                } else if (param instanceof Double) {
-                    output.writeUserContent((double) param);
-                } else if (param instanceof Character) {
-                    output.writeUserContent((char) param);
+                if (param instanceof String string) {
+                    output.writeUserContent(string);
+                } else if (param instanceof Content content) {
+                    output.writeUserContent(content);
+                } else if (param instanceof Enum<?> enum1) {
+                    output.writeUserContent(enum1);
+                } else if (param instanceof Boolean boolean1) {
+                    output.writeUserContent(boolean1);
+                } else if (param instanceof Byte byte1) {
+                    output.writeUserContent(byte1);
+                } else if (param instanceof Short short1) {
+                    output.writeUserContent(short1);
+                } else if (param instanceof Integer integer) {
+                    output.writeUserContent(integer);
+                } else if (param instanceof Long long1) {
+                    output.writeUserContent(long1);
+                } else if (param instanceof Float float1) {
+                    output.writeUserContent(float1);
+                } else if (param instanceof Double double1) {
+                    output.writeUserContent(double1);
+                } else if (param instanceof Character character) {
+                    output.writeUserContent(character);
                 }
             }
         };

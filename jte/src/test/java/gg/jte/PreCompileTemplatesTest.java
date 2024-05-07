@@ -55,7 +55,7 @@ public class PreCompileTemplatesTest {
 
         String classPath = System.getProperty("java.class.path");
         if (classPath != null) {
-            result.addAll(Arrays.asList(classPath.split(File.pathSeparator)));
+            result.addAll(List.of(classPath.split(File.pathSeparator)));
         }
 
         return result;

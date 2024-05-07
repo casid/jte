@@ -404,10 +404,7 @@ public final class TemplateEngine {
         TemplateEngine engine = createPrecompiled(classDirectory, contentType, parentClassLoader, config.packageName);
         engine.setHtmlInterceptor(htmlInterceptor);
 
-        Set<String> templates = new HashSet<>(templateCache.keySet());
-        for (String templateName : templates) {
-            engine.prepareForRendering(templateName);
-        }
+        templateCache.keySet().forEach(engine::prepareForRendering);
 
         return engine;
     }

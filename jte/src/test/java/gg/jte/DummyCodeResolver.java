@@ -24,6 +24,6 @@ public class DummyCodeResolver implements CodeResolver {
 
     @Override
     public List<String> resolveAllTemplateNames() {
-        return new ArrayList<>(codeLookup.keySet());
+        return List.copyOf(codeLookup.keySet());
     }
 }

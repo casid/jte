@@ -1122,7 +1122,7 @@ public final class TemplateParser {
     public static class HtmlTag implements gg.jte.html.HtmlTag {
 
         // See https://www.lifewire.com/html-singleton-tags-3468620
-        private static final Set<String> VOID_HTML_TAGS = new HashSet<>(Arrays.asList("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr"));
+        private static final Set<String> VOID_HTML_TAGS = Set.of("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
 
         public final String name;
         public final boolean intercepted;
@@ -1205,7 +1205,7 @@ public final class TemplateParser {
     public static class HtmlAttribute implements gg.jte.html.HtmlAttribute {
         // See https://meiert.com/en/blog/boolean-attributes-of-html/
         @SuppressWarnings("SpellCheckingInspection")
-        private static final Set<String> BOOLEAN_HTML_ATTRIBUTES = new HashSet<>(Arrays.asList("allowfullscreen", "allowpaymentrequest", "async", "autofocus", "autoplay", "checked", "controls", "default", "disabled", "formnovalidate", "hidden", "ismap", "itemscope", "loop", "multiple", "muted", "nomodule", "novalidate", "open", "playsinline", "readonly", "required", "reversed", "selected", "truespeed"));
+        private static final Set<String> BOOLEAN_HTML_ATTRIBUTES = Set.of("allowfullscreen", "allowpaymentrequest", "async", "autofocus", "autoplay", "checked", "controls", "default", "defer", "disabled", "formnovalidate", "hidden", "inert", "ismap", "itemscope", "loop", "multiple", "muted", "nomodule", "novalidate", "open", "playsinline", "readonly", "required", "reversed", "selected", "truespeed");
 
         public final String name;
         public final char quotes;

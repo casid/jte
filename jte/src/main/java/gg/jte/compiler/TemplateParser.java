@@ -408,8 +408,8 @@ public final class TemplateParser {
     }
 
     private int getCurrentTemplateLine() {
-        if (visitor instanceof CodeGenerator) {
-            return ((CodeGenerator)visitor).getCurrentTemplateLine();
+        if (visitor instanceof CodeGenerator generator) {
+            return generator.getCurrentTemplateLine();
         }
 
         return 0;

@@ -13,10 +13,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -61,7 +61,7 @@ public class TestModelExtension {
             // When
             Collection<Path> generatedPaths = modelExtension.generate(
                     config(Paths.get("target/generated-test-sources"), TEST_PACKAGE),
-                    Collections.singleton(templateDescription)
+                    Set.of(templateDescription)
             );
 
             // Then
@@ -125,7 +125,7 @@ public class TestModelExtension {
             // When
             Collection<Path> generatedPaths = modelExtension.generate(
                     config(Paths.get("target/generated-test-sources"), TEST_PACKAGE),
-                    Collections.singleton(templateDescription)
+                    Set.of(templateDescription)
             );
 
             // Then
@@ -172,7 +172,7 @@ public class TestModelExtension {
             // When
             Collection<Path> generatedPaths = modelExtension.generate(
                     config(Paths.get("target/generated-test-sources"), TEST_PACKAGE),
-                    Collections.singleton(templateDescription)
+                    Set.of(templateDescription)
             );
 
             // Then
@@ -216,7 +216,7 @@ public class TestModelExtension {
             // When
             Collection<Path> generatedPaths = modelExtension.generate(
                     config(Paths.get("target/generated-test-sources"), TEST_PACKAGE),
-                    Collections.singleton(templateDescription)
+                    Set.of(templateDescription)
             );
 
             // Then
@@ -266,10 +266,10 @@ public class TestModelExtension {
                 "DynamicTemplates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
                     package test.myktemplates
-                                         
+                    
                     import gg.jte.TemplateEngine
                     import gg.jte.models.runtime.*
-                                         
+                    
                     class DynamicTemplates(private val engine: TemplateEngine) : Templates {
                        \s
                         override fun hello(content: gg.jte.Content): JteModel {
@@ -281,7 +281,7 @@ public class TestModelExtension {
                            \s
                             return DynamicJteModel(engine, "hello.kte", paramMap)
                         }
-                                         
+                    
                     }""")
             );
             assertThat(actual).containsExactlyInAnyOrderEntriesOf(expected);
@@ -299,7 +299,7 @@ public class TestModelExtension {
             // When
             Collection<Path> generatedPaths = modelExtension.generate(
                     config(Paths.get("target/generated-test-sources"), TEST_PACKAGE),
-                    Collections.singleton(templateDescription)
+                    Set.of(templateDescription)
             );
 
             // Then
@@ -317,14 +317,14 @@ public class TestModelExtension {
                 "Templates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
                     package test.myktemplates
-                                         
+                    
                     import gg.jte.models.runtime.*
-                                         
+                    
                     interface Templates {
                        \s
                         @JteView("hello.kte")
                         fun hello(): JteModel
-                                         
+                    
                     }"""),
                 "StaticTemplates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
@@ -349,10 +349,10 @@ public class TestModelExtension {
                 "DynamicTemplates.kt", withSystemLineEndings("""
                     @file:Suppress("ktlint")
                     package test.myktemplates
-                                    
+                    
                     import gg.jte.TemplateEngine
                     import gg.jte.models.runtime.*
-                                    
+                    
                     class DynamicTemplates(private val engine: TemplateEngine) : Templates {
                        \s
                         override fun hello(): JteModel {

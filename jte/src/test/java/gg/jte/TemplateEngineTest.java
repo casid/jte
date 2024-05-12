@@ -157,11 +157,13 @@ public class TemplateEngineTest {
 
     @Test
     void condition_else() {
-        givenTemplate("@if (model.x == 42)" +
-                "Bingo" +
-                "@else" +
-                "Bongo" +
-                "@endif");
+        givenTemplate("""
+                @if (model.x == 42)\
+                Bingo\
+                @else\
+                Bongo\
+                @endif\
+                """);
 
         model.x = 42;
         thenOutputIs("Bingo");
@@ -171,11 +173,13 @@ public class TemplateEngineTest {
 
     @Test
     void condition_elseif() {
-        givenTemplate("@if (model.x == 42)" +
-                "Bingo" +
-                "@elseif (model.x == 43)" +
-                "Bongo" +
-                "@endif!");
+        givenTemplate("""
+                @if (model.x == 42)\
+                Bingo\
+                @elseif (model.x == 43)\
+                Bongo\
+                @endif!\
+                """);
 
         model.x = 42;
         thenOutputIs("Bingo!");
@@ -204,13 +208,15 @@ public class TemplateEngineTest {
     @Test
     void conditionInContentBlock() {
         model.x = 0;
-        givenTemplate("x is ${@`@if (model.x > 0)" +
-                "positive!" +
-                "@elseif(model.x < 0)" +
-                "negative!" +
-                "@else" +
-                "zero!" +
-                "@endif`}");
+        givenTemplate("""
+                x is ${@`@if (model.x > 0)\
+                positive!\
+                @elseif(model.x < 0)\
+                negative!\
+                @else\
+                zero!\
+                @endif`}\
+                """);
         thenOutputIs("x is zero!");
     }
 
@@ -226,73 +232,87 @@ public class TemplateEngineTest {
     @Test
     void loop() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("@for (int i : model.array)" +
-                "${i}" +
-                "@endfor");
+        givenTemplate("""
+                @for (int i : model.array)\
+                ${i}\
+                @endfor\
+                """);
         thenOutputIs("123");
     }
 
     @Test
     void loopWithCondition() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("@for (int i : model.array)" +
-                "@if (i > 1)" +
-                "${i}" +
-                "@endif" +
-                "@endfor");
+        givenTemplate("""
+                @for (int i : model.array)\
+                @if (i > 1)\
+                ${i}\
+                @endif\
+                @endfor\
+                """);
         thenOutputIs("23");
     }
 
     @Test
     void classicLoop() {
         model.array = new int[]{10, 20, 30};
-        givenTemplate("@for (int i = 0; i < model.array.length; ++i)" +
-                "Index ${i} is ${model.array[i]}" +
-                "@if (i < model.array.length - 1)" +
-                "<br>" +
-                "@endif" +
-                "@endfor");
+        givenTemplate("""
+                @for (int i = 0; i < model.array.length; ++i)\
+                Index ${i} is ${model.array[i]}\
+                @if (i < model.array.length - 1)\
+                <br>\
+                @endif\
+                @endfor\
+                """);
         thenOutputIs("Index 0 is 10<br>Index 1 is 20<br>Index 2 is 30");
     }
 
     @Test
     void loopWithVariable() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("@for (int i : model.array)" +
-                "!{int y = i + 1;}" +
-                "${y}" +
-                "@endfor");
+        givenTemplate("""
+                @for (int i : model.array)\
+                !{int y = i + 1;}\
+                ${y}\
+                @endfor\
+                """);
         thenOutputIs("234");
     }
 
     @Test
     void loopInContentBlock() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("${@`@for (int i : model.array)" +
-                "${i}" +
-                "@endfor`}");
+        givenTemplate("""
+                ${@`@for (int i : model.array)\
+                ${i}\
+                @endfor`}\
+                """);
         thenOutputIs("123");
     }
 
     @Test
     void loopElse_empty() {
         model.array = new int[]{};
-        givenTemplate("@for (int i : model.array)" +
-                "${i}" +
-                "@else" +
-                "Empty" +
-                "@endfor");
+        givenTemplate("""
+                @for (int i : model.array)\
+                ${i}\
+                @else\
+                Empty\
+                @endfor\
+                """);
         thenOutputIs("Empty");
     }
 
     @Test
     void loopElse_notEmpty() {
         model.array = new int[]{1};
-        givenTemplate("@for (int i : model.array)" +
-                "${i}" +
-                "@else" +
-                "Empty" +
-                "@endfor");
+        givenTemplate("""
+                @for (int i : model.array)\
+                ${i}\
+                @else\
+                Empty\
+                @endfor\
+                """);
         thenOutputIs("1");
     }
 
@@ -336,11 +356,13 @@ public class TemplateEngineTest {
     @Test
     void loopElse_if() {
         model.array = new int[]{};
-        givenTemplate("@for (int i : model.array)" +
-                "@if(i > 0)${i}@else@endif" +
-                "@else" +
-                "Empty" +
-                "@endfor");
+        givenTemplate("""
+                @for (int i : model.array)\
+                @if(i > 0)${i}@else@endif\
+                @else\
+                Empty\
+                @endfor\
+                """);
         thenOutputIs("Empty");
     }
 
@@ -369,16 +391,18 @@ public class TemplateEngineTest {
     @Test
     void loopElse_multiple() {
         model.array = new int[]{1};
-        givenTemplate("@for (int i : model.array)" +
-                "${i}" +
-                "@else" +
-                "Empty" +
-                "@endfor\n" +
-                "@for (int i : model.array)" +
-                "${i}" +
-                "@else" +
-                "Empty" +
-                "@endfor");
+        givenTemplate("""
+                @for (int i : model.array)\
+                ${i}\
+                @else\
+                Empty\
+                @endfor
+                @for (int i : model.array)\
+                ${i}\
+                @else\
+                Empty\
+                @endfor\
+                """);
         thenOutputIs("1\n1");
     }
 
@@ -483,24 +507,30 @@ public class TemplateEngineTest {
 
     @Test
     void template_content() {
-        givenTemplate("card.jte", "@param gg.jte.Content content\n" +
-                "<span>${content}</span>");
+        givenTemplate("card.jte", """
+                @param gg.jte.Content content
+                <span>${content}</span>\
+                """);
         givenTemplate("@template.card(@`<b>${model.hello}</b>`), That was a tag!");
         thenOutputIs("<span><b>Hello</b></span>, That was a tag!");
     }
 
     @Test
     void template_content_comma() {
-        givenTemplate("card.jte", "@param gg.jte.Content content\n" +
-                "<span>${content}</span>");
+        givenTemplate("card.jte", """
+                @param gg.jte.Content content
+                <span>${content}</span>\
+                """);
         givenTemplate("@template.card(@`<b>Hello, ${model.hello}</b>`), That was a tag!");
         thenOutputIs("<span><b>Hello, Hello</b></span>, That was a tag!");
     }
 
     @Test
     void templateWithGenericParam() {
-        givenTemplate("entry.jte", "@param java.util.Map.Entry<String, java.util.List<String>> entry\n" +
-                "${entry.getKey()}: ${entry.getValue().toString()}");
+        givenTemplate("entry.jte", """
+                @param java.util.Map.Entry<String, java.util.List<String>> entry
+                ${entry.getKey()}: ${entry.getValue().toString()}\
+                """);
         givenRawTemplate("""
                 @param java.util.Map<String, java.util.List<String>> map
                 @for(java.util.Map.Entry entry : map.entrySet())@template.entry(entry)
@@ -528,8 +558,10 @@ public class TemplateEngineTest {
 
     @Test
     void templateInTemplate() {
-        givenTemplate("divTwo.jte", "@param int amount\n" +
-                "Divided by two is ${amount / 2}!");
+        givenTemplate("divTwo.jte", """
+                @param int amount
+                Divided by two is ${amount / 2}!\
+                """);
         givenTemplate("card.jte", """
                 @param java.lang.String firstParam
                 @param int secondParam
@@ -540,19 +572,23 @@ public class TemplateEngineTest {
 
     @Test
     void sameTemplateReused() {
-        givenTemplate("divTwo.jte", "@param int amount\n" +
-                "${amount / 2}!");
+        givenTemplate("divTwo.jte", """
+                @param int amount
+                ${amount / 2}!\
+                """);
         givenTemplate("@template.divTwo(model.x),@template.divTwo(2 * model.x)");
         thenOutputIs("21!,42!");
     }
 
     @Test
     void templateRecursion() {
-        givenTemplate("recursion.jte", "@param int amount\n" +
-                "${amount}" +
-                "@if (amount > 0)" +
-                "@template.recursion(amount - 1)" +
-                "@endif"
+        givenTemplate("recursion.jte", """
+                @param int amount
+                ${amount}\
+                @if (amount > 0)\
+                @template.recursion(amount - 1)\
+                @endif\
+                """
         );
         givenTemplate("@template.recursion(5)");
         thenOutputIs("543210");
@@ -661,8 +697,10 @@ public class TemplateEngineTest {
     @Test
     void templateWithVarArgs1() {
         givenTemplate("varargs.jte",
-                "@param String ... values\n" +
-                        "@for(String value : values)${value} @endfor");
+                """
+                @param String ... values
+                @for(String value : values)${value} @endfor\
+                """);
         givenTemplate("@template.varargs(\"Hello\")");
         thenOutputIs("Hello ");
     }
@@ -670,8 +708,10 @@ public class TemplateEngineTest {
     @Test
     void templateWithVarArgs2() {
         givenTemplate("varargs.jte",
-                "@param String ... values\n" +
-                        "@for(String value : values)${value} @endfor");
+                """
+                @param String ... values
+                @for(String value : values)${value} @endfor\
+                """);
         givenTemplate("@template.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
     }
@@ -740,9 +780,11 @@ public class TemplateEngineTest {
 
     @Test
     void comment() {
-        givenTemplate("<%--This is a comment" +
-                " ${model.hello} everything in here is omitted--%>" +
-                "This is visible...");
+        givenTemplate("""
+                <%--This is a comment\
+                 ${model.hello} everything in here is omitted--%>\
+                This is visible...\
+                """);
         thenOutputIs("This is visible...");
     }
 
@@ -793,10 +835,14 @@ public class TemplateEngineTest {
 
     @Test
     void importInCss() {
-        givenTemplate("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
-                "    @import url(\"https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap\"); /* <--- Right here */");
-        thenOutputIs("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
-                "    @import url(\"https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap\"); /* <--- Right here */");
+        givenTemplate("""
+                <style type="text/css" rel="stylesheet" media="all">
+                    @import url("https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap"); /* <--- Right here */\
+                """);
+        thenOutputIs("""
+                <style type="text/css" rel="stylesheet" media="all">
+                    @import url("https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap"); /* <--- Right here */\
+                """);
     }
 
     @Test
@@ -884,22 +930,26 @@ public class TemplateEngineTest {
                         @param gg.jte.Content contentSuffix = null
                         @param gg.jte.Content footer = null
                         @template.layout.main(header = header, content = @`@if(contentPrefix != null)${contentPrefix}@endif<b>${content}</b>@if(contentSuffix != null)${contentSuffix}@endif`, footer = footer)""");
-        givenTemplate("@template.layout.mainExtended(" +
-                "header = @`" +
-                "this is the header" +
-                "`," +
-                "contentPrefix = @`" +
-                "<content-prefix>" +
-                "`," +
-                "content = @`" +
-                "this is the content" +
-                "`, " +
-                "contentSuffix=@`" +
-                "<content-suffix>" +
-                "`)");
+        givenTemplate("""
+                @template.layout.mainExtended(\
+                header = @`\
+                this is the header\
+                `,\
+                contentPrefix = @`\
+                <content-prefix>\
+                `,\
+                content = @`\
+                this is the content\
+                `, \
+                contentSuffix=@`\
+                <content-suffix>\
+                `)\
+                """);
 
-        thenOutputIs("<header>this is the header</header>" +
-                "<content><content-prefix><b>this is the content</b><content-suffix></content>");
+        thenOutputIs("""
+                <header>this is the header</header>\
+                <content><content-prefix><b>this is the content</b><content-suffix></content>\
+                """);
     }
 
     @Test
@@ -911,8 +961,10 @@ public class TemplateEngineTest {
                         @param gg.jte.Content content
                         Hello, ${content} your status is ${status}, the duration is ${duration}""");
 
-        givenTemplate("@template.layout.main(content = @`" +
-                "Sir`)");
+        givenTemplate("""
+                @template.layout.main(content = @`\
+                Sir`)\
+                """);
 
         thenOutputIs("Hello, Sir your status is 5, the duration is -1");
     }
@@ -934,8 +986,10 @@ public class TemplateEngineTest {
     @Test
     void layoutWithVarArgs() {
         givenTemplate("layout/varargs.jte",
-                "@param String ... values\n" +
-                        "@for(String value : values)${value} @endfor");
+                """
+                @param String ... values
+                @for(String value : values)${value} @endfor\
+                """);
         givenTemplate("@template.layout.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
     }
@@ -1156,9 +1210,9 @@ public class TemplateEngineTest {
     void exceptionLineNumber7() {
         givenTemplate("my/model.jte", """
                 @import gg.jte.TemplateEngineTest.Model
-                                
+                
                 @param Model model
-                                
+                
                 ${model.getThatThrows()}
                 """);
 
@@ -1172,8 +1226,10 @@ public class TemplateEngineTest {
 
     @Test
     void curlyBracesAreTracked() {
-        givenRawTemplate("!{java.util.Optional<String> name = java.util.Optional.ofNullable(null);}" +
-                "${name.map((n) -> { return \"name: \" + n; }).orElse(\"empty\")}");
+        givenRawTemplate("""
+                !{java.util.Optional<String> name = java.util.Optional.ofNullable(null);}\
+                ${name.map((n) -> { return "name: " + n; }).orElse("empty")}\
+                """);
 
         StringOutput output = new StringOutput();
         templateEngine.render(templateName, null, output);
@@ -1183,8 +1239,10 @@ public class TemplateEngineTest {
 
     @Test
     void curlyBracesAreTracked_unsafe() {
-        givenRawTemplate("!{java.util.Optional<String> name = java.util.Optional.ofNullable(null);}" +
-                "$unsafe{name.map((n) -> { return \"name: \" + n; }).orElse(\"empty\")}");
+        givenRawTemplate("""
+                !{java.util.Optional<String> name = java.util.Optional.ofNullable(null);}\
+                $unsafe{name.map((n) -> { return "name: " + n; }).orElse("empty")}\
+                """);
 
         StringOutput output = new StringOutput();
         templateEngine.render(templateName, null, output);
@@ -1194,8 +1252,10 @@ public class TemplateEngineTest {
 
     @Test
     void curlyBracesAreTracked_statement() {
-        givenRawTemplate("!{String name = java.util.Optional.ofNullable(null).map((n) -> { return \"name: \" + n; }).orElse(\"empty\");}" +
-                "${name}");
+        givenRawTemplate("""
+                !{String name = java.util.Optional.ofNullable(null).map((n) -> { return "name: " + n; }).orElse("empty");}\
+                ${name}\
+                """);
 
         StringOutput output = new StringOutput();
         templateEngine.render(templateName, null, output);
@@ -1399,8 +1459,10 @@ public class TemplateEngineTest {
 
     @Test
     void compileError6() {
-        givenTemplate("test.jte", "@param gg.jte.TemplateEngineTest.Model model\n" +
-                "test");
+        givenTemplate("test.jte", """
+                @param gg.jte.TemplateEngineTest.Model model
+                test\
+                """);
         givenTemplate("""
                 @template.test(
                 model = model,

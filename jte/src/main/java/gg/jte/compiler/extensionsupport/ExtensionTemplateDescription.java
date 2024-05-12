@@ -35,7 +35,7 @@ public class ExtensionTemplateDescription implements TemplateDescription {
 
     @Override
     public List<ParamDescription> params() {
-        return new ArrayList<>(classDefinition.getParams());
+        return List.copyOf(classDefinition.getParams());
     }
 
     @Override

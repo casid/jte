@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.List;
 
 final class LineInfo {
-    private static final List<TemplateParser.Mode> ConditionEndModes = Arrays.asList(TemplateParser.Mode.Condition, TemplateParser.Mode.Text);
-    private static final List<TemplateParser.Mode> ForLoopEndModes = Arrays.asList(TemplateParser.Mode.ForLoop, TemplateParser.Mode.Text);
-    private static final List<TemplateParser.Mode> RawEndModes = Collections.singletonList(TemplateParser.Mode.Raw);
+    private static final List<TemplateParser.Mode> ConditionEndModes = List.of(TemplateParser.Mode.Condition, TemplateParser.Mode.Text);
+    private static final List<TemplateParser.Mode> ForLoopEndModes = List.of(TemplateParser.Mode.ForLoop, TemplateParser.Mode.Text);
+    private static final List<TemplateParser.Mode> RawEndModes = List.of(TemplateParser.Mode.Raw);
 
     private LineInfo() {
     }

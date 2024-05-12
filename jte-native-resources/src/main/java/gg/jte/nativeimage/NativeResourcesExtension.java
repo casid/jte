@@ -46,7 +46,7 @@ public class NativeResourcesExtension implements JteExtension {
             writeFile(resourceRoot.resolve("reflection-config.json"),
                     templateDescriptions.stream()
                             .map(TemplateDescription::fullyQualifiedClassName)
-                            .map(className -> String.format("{\"name\":\"%s\", \"allDeclaredMethods\":true, \"allDeclaredFields\":true}", className))
+                            .map("{\"name\":\"%s\", \"allDeclaredMethods\":true, \"allDeclaredFields\":true}"::formatted)
                             .collect(Collectors.joining(",\n", "[\n", "\n]\n"))
             )
         );

@@ -130,8 +130,10 @@ public class TemplateEngine_HtmlInterceptorTest {
 
     @Test
     void input_noAttributes() {
-        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
-                "<input>");
+        dummyCodeResolver.givenCode("page.jte", """
+                @param String url
+                <input>\
+                """);
 
         templateEngine.render("page.jte", "hello.htm", output);
 
@@ -140,8 +142,10 @@ public class TemplateEngine_HtmlInterceptorTest {
 
     @Test
     void input_withRegex() {
-        dummyCodeResolver.givenCode("page.jte", "@param String url\n" +
-                "<input required pattern=\"\\w+\">");
+        dummyCodeResolver.givenCode("page.jte", """
+                @param String url
+                <input required pattern="\\w+">\
+                """);
 
         templateEngine.render("page.jte", "hello.htm", output);
 
@@ -150,8 +154,10 @@ public class TemplateEngine_HtmlInterceptorTest {
 
     @Test
     void input_nullAttribute() {
-        dummyCodeResolver.givenCode("page.jte", "@param String css\n" +
-                "<input type=\"checkbox\" class=\"${css}\">");
+        dummyCodeResolver.givenCode("page.jte", """
+                @param String css
+                <input type="checkbox" class="${css}">\
+                """);
 
         templateEngine.render("page.jte", (String)null, output);
 
@@ -169,11 +175,13 @@ public class TemplateEngine_HtmlInterceptorTest {
 
         templateEngine.render("page.jte", "hello.htm", output);
 
-        assertThat(output.toString()).isEqualTo("<form action=\"hello.htm\" data-form=\"x\">\n" +
-                "<input name=\"param1\" disabled value=\"?\">\n" +
-                "<input name=\"param2\" value=\"?\">\n" +
-                "<input name=\"__fp\" value=\"a:hello.htm, p:param2\">\n" + // No param1 here
-                "</form>");
+        assertThat(output.toString()).isEqualTo("""
+                <form action="hello.htm" data-form="x">
+                <input name="param1" disabled value="?">
+                <input name="param2" value="?">
+                <input name="__fp" value="a:hello.htm, p:param2">
+                </form>\
+                """);
     }
 
     @Test

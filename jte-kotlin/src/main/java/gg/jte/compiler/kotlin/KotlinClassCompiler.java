@@ -91,7 +91,7 @@ public class KotlinClassCompiler implements ClassCompiler {
                         line = location.getLine();
                     }
 
-                    errors.add(String.format("%s%n%s:%d:%d%nReason: %s", location.getLineContent(), location.getPath(),
+                    errors.add("%s%n%s:%d:%d%nReason: %s".formatted(location.getLineContent(), location.getPath(),
                             location.getLine(),
                             location.getColumn(), s));
                 } else {

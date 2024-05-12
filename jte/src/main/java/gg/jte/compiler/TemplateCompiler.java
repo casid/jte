@@ -47,13 +47,13 @@ public class TemplateCompiler extends TemplateLoader {
 
     @Override
     public Template load(String name) {
-        precompile(Collections.singletonList(name));
+        precompile(List.of(name));
         return super.load(name);
     }
 
     @Override
     public Template hotReload(String name) {
-        LinkedHashSet<ClassDefinition> classDefinitions = generate(Collections.singletonList(name), true);
+        LinkedHashSet<ClassDefinition> classDefinitions = generate(List.of(name), true);
         classDefinitions.removeIf(c -> !c.isChanged());
 
         if (!classDefinitions.isEmpty()) {
@@ -320,11 +320,11 @@ public class TemplateCompiler extends TemplateLoader {
         TemplateDependency dependency = new TemplateDependency(name, 0);
 
         List<String> result = new ArrayList<>();
-        for (Map.Entry<String, LinkedHashSet<TemplateDependency>> dependencies : templateDependencies.entrySet()) {
-            if (dependencies.getValue().contains(dependency)) {
-                result.add(dependencies.getKey());
+        templateDependencies.forEach((key, value) -> {
+            if (value.contains(dependency)) {
+                result.add(key);
             }
-        }
+        });
 
         return result;
     }

@@ -122,8 +122,10 @@ public class Utf8ByteOutputTest extends AbstractTemplateOutputTest<Utf8ByteOutpu
 
     @Test
     void utf8_japanese_katakana() {
-        String str = "イロハニホヘト チリヌルヲ ワカヨタレソ ツネナラム\n" +
-                "  ウヰノオクヤマ ケフコエテ アサキユメミシ ヱヒモセスン";
+        String str = """
+                イロハニホヘト チリヌルヲ ワカヨタレソ ツネナラム
+                  ウヰノオクヤマ ケフコエテ アサキユメミシ ヱヒモセスン\
+                """;
 
         output.writeContent(str);
         thenOutputIs(str);

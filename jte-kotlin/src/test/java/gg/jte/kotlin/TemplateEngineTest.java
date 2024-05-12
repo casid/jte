@@ -149,11 +149,13 @@ public class TemplateEngineTest {
 
     @Test
     void condition_else() {
-        givenTemplate("@if (model.x == 42)" +
-                "Bingo" +
-                "@else" +
-                "Bongo" +
-                "@endif");
+        givenTemplate("""
+                @if (model.x == 42)\
+                Bingo\
+                @else\
+                Bongo\
+                @endif\
+                """);
 
         model.x = 42;
         thenOutputIs("Bingo");
@@ -163,11 +165,13 @@ public class TemplateEngineTest {
 
     @Test
     void condition_elseif() {
-        givenTemplate("@if (model.x == 42)" +
-                "Bingo" +
-                "@elseif (model.x == 43)" +
-                "Bongo" +
-                "@endif!");
+        givenTemplate("""
+                @if (model.x == 42)\
+                Bingo\
+                @elseif (model.x == 43)\
+                Bongo\
+                @endif!\
+                """);
 
         model.x = 42;
         thenOutputIs("Bingo!");
@@ -196,64 +200,76 @@ public class TemplateEngineTest {
     @Test
     void conditionInContentBlock() {
         model.x = 0;
-        givenTemplate("x is ${@`@if (model.x > 0)" +
-                "positive!" +
-                "@elseif(model.x < 0)" +
-                "negative!" +
-                "@else" +
-                "zero!" +
-                "@endif`}");
+        givenTemplate("""
+                x is ${@`@if (model.x > 0)\
+                positive!\
+                @elseif(model.x < 0)\
+                negative!\
+                @else\
+                zero!\
+                @endif`}\
+                """);
         thenOutputIs("x is zero!");
     }
 
     @Test
     void loop() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("@for (i in model.array)" +
-                "${i}" +
-                "@endfor");
+        givenTemplate("""
+                @for (i in model.array)\
+                ${i}\
+                @endfor\
+                """);
         thenOutputIs("123");
     }
 
     @Test
     void loopWithCondition() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("@for (i in model.array)" +
-                "@if (i > 1)" +
-                "${i}" +
-                "@endif" +
-                "@endfor");
+        givenTemplate("""
+                @for (i in model.array)\
+                @if (i > 1)\
+                ${i}\
+                @endif\
+                @endfor\
+                """);
         thenOutputIs("23");
     }
 
     @Test
     void classicLoop() {
         model.array = new int[]{10, 20, 30};
-        givenTemplate("@for (i in model.array.indices)" +
-                "Index ${i} is ${model.array[i]}" +
-                "@if (i < model.array.size - 1)" +
-                "<br>" +
-                "@endif" +
-                "@endfor");
+        givenTemplate("""
+                @for (i in model.array.indices)\
+                Index ${i} is ${model.array[i]}\
+                @if (i < model.array.size - 1)\
+                <br>\
+                @endif\
+                @endfor\
+                """);
         thenOutputIs("Index 0 is 10<br>Index 1 is 20<br>Index 2 is 30");
     }
 
     @Test
     void loopWithVariable() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("@for (i in model.array)" +
-                "!{var y = i + 1}" +
-                "${y}" +
-                "@endfor");
+        givenTemplate("""
+                @for (i in model.array)\
+                !{var y = i + 1}\
+                ${y}\
+                @endfor\
+                """);
         thenOutputIs("234");
     }
 
     @Test
     void loopInContentBlock() {
         model.array = new int[]{1, 2, 3};
-        givenTemplate("${@`@for (i in model.array)" +
-                "${i}" +
-                "@endfor`}");
+        givenTemplate("""
+                ${@`@for (i in model.array)\
+                ${i}\
+                @endfor`}\
+                """);
         thenOutputIs("123");
     }
 
@@ -261,22 +277,26 @@ public class TemplateEngineTest {
     @Test
     void loopElse_empty() {
         model.array = new int[]{};
-        givenTemplate("@for (i in model.array)" +
-                "${i}" +
-                "@else" +
-                "Empty" +
-                "@endfor");
+        givenTemplate("""
+                @for (i in model.array)\
+                ${i}\
+                @else\
+                Empty\
+                @endfor\
+                """);
         thenOutputIs("Empty");
     }
 
     @Test
     void loopElse_notEmpty() {
         model.array = new int[]{1};
-        givenTemplate("@for (i in model.array)" +
-                "${i}" +
-                "@else" +
-                "Empty" +
-                "@endfor");
+        givenTemplate("""
+                @for (i in model.array)\
+                ${i}\
+                @else\
+                Empty\
+                @endfor\
+                """);
         thenOutputIs("1");
     }
 
@@ -320,11 +340,13 @@ public class TemplateEngineTest {
     @Test
     void loopElse_if() {
         model.array = new int[]{};
-        givenTemplate("@for (i in model.array)" +
-                "@if(i > 0)${i}@else@endif" +
-                "@else" +
-                "Empty" +
-                "@endfor");
+        givenTemplate("""
+                @for (i in model.array)\
+                @if(i > 0)${i}@else@endif\
+                @else\
+                Empty\
+                @endfor\
+                """);
         thenOutputIs("Empty");
     }
 
@@ -353,16 +375,18 @@ public class TemplateEngineTest {
     @Test
     void loopElse_multiple() {
         model.array = new int[]{1};
-        givenTemplate("@for (i in model.array)" +
-                "${i}" +
-                "@else" +
-                "Empty" +
-                "@endfor\n" +
-                "@for (i in model.array)" +
-                "${i}" +
-                "@else" +
-                "Empty" +
-                "@endfor");
+        givenTemplate("""
+                @for (i in model.array)\
+                ${i}\
+                @else\
+                Empty\
+                @endfor
+                @for (i in model.array)\
+                ${i}\
+                @else\
+                Empty\
+                @endfor\
+                """);
         thenOutputIs("1\n1");
     }
 
@@ -393,24 +417,29 @@ public class TemplateEngineTest {
 
     @Test
     void jsStringInterpolationInContentBlock() {
-        givenTemplate("!{var content = @`\n"
-              + "    <p>Hello World!</p>\n"
-              + "    @raw\n"
-              + "    <script>\n"
-              + "        const hello = \"Hello!\"\n"
-              + "        console.log(`${hello}`)\n"
-              + "    </script>\n"
-              + "    @endraw\n"
-              + "`}\n"
-              + "${content}");
-        thenOutputIs("\n\n"
-              + "    <p>Hello World!</p>\n"
-              + "    \n"
-              + "    <script>\n"
-              + "        const hello = \"Hello!\"\n"
-              + "        console.log(`${hello}`)\n"
-              + "    </script>\n"
-              + "    \n");
+        givenTemplate("""
+              !{var content = @`
+                  <p>Hello World!</p>
+                  @raw
+                  <script>
+                      const hello = "Hello!"
+                      console.log(`${hello}`)
+                  </script>
+                  @endraw
+              `}
+              ${content}\
+              """);
+        thenOutputIs("""
+              
+              
+                  <p>Hello World!</p>
+                 \s
+                  <script>
+                      const hello = "Hello!"
+                      console.log(`${hello}`)
+                  </script>
+                 \s
+              """);
     }
 
     @Test
@@ -447,36 +476,46 @@ public class TemplateEngineTest {
 
     @Test
     void tag() {
-        givenTag("card", "@param firstParam:String\n" +
-                "@param secondParam:Int\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param firstParam:String
+                @param secondParam:Int
+                One: ${firstParam}, two: ${secondParam}\
+                """);
         givenTemplate("@template.tag.card(model.hello, model.x), That was a tag!");
         thenOutputIs("One: Hello, two: 42, That was a tag!");
     }
 
     @Test
     void tag_content() {
-        givenTag("card", "@param content:gg.jte.Content\n" +
-                "<span>${content}</span>");
+        givenTag("card", """
+                @param content:gg.jte.Content
+                <span>${content}</span>\
+                """);
         givenTemplate("@template.tag.card(@`<b>${model.hello}</b>`), That was a tag!");
         thenOutputIs("<span><b>Hello</b></span>, That was a tag!");
     }
 
     @Test
     void tag_content_comma() {
-        givenTag("card", "@param content:gg.jte.Content\n" +
-                "<span>${content}</span>");
+        givenTag("card", """
+                @param content:gg.jte.Content
+                <span>${content}</span>\
+                """);
         givenTemplate("@template.tag.card(@`<b>Hello, ${model.hello}</b>`), That was a tag!");
         thenOutputIs("<span><b>Hello, Hello</b></span>, That was a tag!");
     }
 
     @Test
     void tagWithGenericParam() {
-        givenTag("entry", "@param list:List<String>?\n" +
-                "${list.toString()}");
-        givenRawTemplate("@param map:Map<String, List<String>>\n" +
-                "@template.tag.entry(map[\"one\"])\n" +
-                "@template.tag.entry(map[\"two\"])\n");
+        givenTag("entry", """
+                @param list:List<String>?
+                ${list.toString()}\
+                """);
+        givenRawTemplate("""
+                @param map:Map<String, List<String>>
+                @template.tag.entry(map["one"])
+                @template.tag.entry(map["two"])
+                """);
 
         Map<String, List<String>> model = new TreeMap<>();
         model.put("one", Arrays.asList("1", "2"));
@@ -490,39 +529,49 @@ public class TemplateEngineTest {
 
     @Test
     void tagWithMethodCallForParam() {
-        givenTag("card", "@param firstParam:String\n" +
-                "@param secondParam:Int\n" +
-                "One: ${firstParam}, two: ${secondParam}");
+        givenTag("card", """
+                @param firstParam:String
+                @param secondParam:Int
+                One: ${firstParam}, two: ${secondParam}\
+                """);
         givenTemplate("@template.tag.card(model.anotherWorld, model.x), That was a tag!");
         thenOutputIs("One: Another World, two: 42, That was a tag!");
     }
 
     @Test
     void tagInTag() {
-        givenTag("divTwo", "@param amount:Int\n" +
-                "Divided by two is ${amount / 2}!");
-        givenTag("card", "@param firstParam:String\n" +
-                "@param secondParam:Int\n" +
-                "${firstParam}, @template.tag.divTwo(secondParam)");
+        givenTag("divTwo", """
+                @param amount:Int
+                Divided by two is ${amount / 2}!\
+                """);
+        givenTag("card", """
+                @param firstParam:String
+                @param secondParam:Int
+                ${firstParam}, @template.tag.divTwo(secondParam)\
+                """);
         givenTemplate("@template.tag.card (model.hello, model.x) That was a tag in a tag!");
         thenOutputIs("Hello, Divided by two is 21! That was a tag in a tag!");
     }
 
     @Test
     void sameTagReused() {
-        givenTag("divTwo", "@param amount:Int\n" +
-                "${amount / 2}!");
+        givenTag("divTwo", """
+                @param amount:Int
+                ${amount / 2}!\
+                """);
         givenTemplate("@template.tag.divTwo(model.x),@template.tag.divTwo(2 * model.x)");
         thenOutputIs("21!,42!");
     }
 
     @Test
     void tagRecursion() {
-        givenTag("recursion", "@param amount:Int\n" +
-                "${amount}" +
-                "@if (amount > 0)" +
-                "@template.tag.recursion(amount - 1)" +
-                "@endif"
+        givenTag("recursion", """
+                @param amount:Int
+                ${amount}\
+                @if (amount > 0)\
+                @template.tag.recursion(amount - 1)\
+                @endif\
+                """
         );
         givenTemplate("@template.tag.recursion(5)");
         thenOutputIs("543210");
@@ -551,40 +600,50 @@ public class TemplateEngineTest {
 
     @Test
     void tagWithNamedParam() {
-        givenTag("named", "@param one:Int\n" +
-                "@param two:Int\n" +
-                "${one}, ${two}");
+        givenTag("named", """
+                @param one:Int
+                @param two:Int
+                ${one}, ${two}\
+                """);
         givenTemplate("@template.tag.named(two = 2, one = 1)");
         thenOutputIs("1, 2");
     }
 
     @Test
     void tagWithNamedParamString() {
-        givenTag("named", "@param one:Int\n" +
-                "@param two:Int\n" +
-                "@param three:String\n" +
-                "${one}, ${two}, ${three}");
-        givenTemplate("@template.tag.named(\n" +
-                "two = 2,\n" +
-                "three = \"Hello, there ;-)\",\n" +
-                "one = 1)");
+        givenTag("named", """
+                @param one:Int
+                @param two:Int
+                @param three:String
+                ${one}, ${two}, ${three}\
+                """);
+        givenTemplate("""
+                @template.tag.named(
+                two = 2,
+                three = "Hello, there ;-)",
+                one = 1)\
+                """);
         thenOutputIs("1, 2, Hello, there ;-)");
     }
 
     @Test
     void tagWithNamedParam_ternary() {
-        givenTag("named", "@param one:Int\n" +
-                "@param two:Int\n" +
-                "${one}, ${two}");
+        givenTag("named", """
+                @param one:Int
+                @param two:Int
+                ${one}, ${two}\
+                """);
         givenTemplate("@template.tag.named(two = if(1 == 2) 1 else 0, one = 1)");
         thenOutputIs("1, 0");
     }
 
     @Test
     void tagWithDefaultParam() {
-        givenTag("named", "@param one:Int = 1\n" +
-                "@param two:Int = 2\n" +
-                "${one}, ${two}");
+        givenTag("named", """
+                @param one:Int = 1
+                @param two:Int = 2
+                ${one}, ${two}\
+                """);
         givenTemplate("@template.tag.named()");
 
         thenOutputIs("1, 2");
@@ -592,9 +651,11 @@ public class TemplateEngineTest {
 
     @Test
     void tagWithDefaultContentParam() {
-        givenTag("named", "@param one:Int = 1\n" +
-                          "@param content:gg.jte.Content = @`Some Content`\n" +
-                          "First param = ${one}, Content param = ${content}");
+        givenTag("named", """
+                          @param one:Int = 1
+                          @param content:gg.jte.Content = @`Some Content`
+                          First param = ${one}, Content param = ${content}\
+                          """);
         givenTemplate("@template.tag.named()");
 
         thenOutputIs("First param = 1, Content param = Some Content");
@@ -602,8 +663,10 @@ public class TemplateEngineTest {
 
     @Test
     void tagWithDefaultParam_generic() {
-        givenTag("named", "@param files: Map<String, ByteArray> = emptyMap()\n" +
-                "${files.size}");
+        givenTag("named", """
+                @param files: Map<String, ByteArray> = emptyMap()
+                ${files.size}\
+                """);
         givenTemplate("@template.tag.named()");
 
         thenOutputIs("0");
@@ -611,8 +674,10 @@ public class TemplateEngineTest {
 
     @Test
     void tagWithDefaultParam_generic_nullDefault() {
-        givenTag("named", "@param files: Map<String, ByteArray>? = null\n" +
-                "${files?.size}");
+        givenTag("named", """
+                @param files: Map<String, ByteArray>? = null
+                ${files?.size}\
+                """);
         givenTemplate("@template.tag.named()");
 
         thenOutputIs("");
@@ -620,8 +685,10 @@ public class TemplateEngineTest {
 
     @Test
     void tagWithDefaultParam_generic_nullDefault_withValue() {
-        givenTag("named", "@param files: Map<String, ByteArray>? = null\n" +
-                "${files?.size}");
+        givenTag("named", """
+                @param files: Map<String, ByteArray>? = null
+                ${files?.size}\
+                """);
         givenTemplate("@template.tag.named(mapOf(\"foo\" to ByteArray(1)))");
 
         thenOutputIs("1");
@@ -629,9 +696,11 @@ public class TemplateEngineTest {
 
     @Test
     void tagWithDefaultParam_firstSet() {
-        givenTag("named", "@param one:Int = 1\n" +
-                "@param two:Int = 2\n" +
-                "${one}, ${two}");
+        givenTag("named", """
+                @param one:Int = 1
+                @param two:Int = 2
+                ${one}, ${two}\
+                """);
         givenTemplate("@template.tag.named(one = 6)");
 
         thenOutputIs("6, 2");
@@ -639,9 +708,11 @@ public class TemplateEngineTest {
 
     @Test
     void tagWithDefaultParam_secondSet() {
-        givenTag("named", "@param one:Int = 1\n" +
-                "@param two:Int = 2\n" +
-                "${one}, ${two}");
+        givenTag("named", """
+                @param one:Int = 1
+                @param two:Int = 2
+                ${one}, ${two}\
+                """);
         givenTemplate("@template.tag.named(two= 5)");
 
         thenOutputIs("1, 5");
@@ -649,9 +720,11 @@ public class TemplateEngineTest {
 
     @Test
     void templateWithDefaultParam_content() {
-        givenTag("named", "@param one:gg.jte.Content = @`This is`\n" +
-                "@param two:Int = 2\n" +
-                "${one}: ${two}");
+        givenTag("named", """
+                @param one:gg.jte.Content = @`This is`
+                @param two:Int = 2
+                ${one}: ${two}\
+                """);
         givenTemplate("@template.tag.named()");
 
         thenOutputIs("This is: 2");
@@ -660,8 +733,10 @@ public class TemplateEngineTest {
     @Test
     void tagWithVarArgs1() {
         givenTag("varargs",
-                "@param vararg values:String\n" +
-                "@for(value in values)${value} @endfor");
+                """
+                @param vararg values:String
+                @for(value in values)${value} @endfor\
+                """);
         givenTemplate("@template.tag.varargs(\"Hello\")");
         thenOutputIs("Hello ");
     }
@@ -669,8 +744,10 @@ public class TemplateEngineTest {
     @Test
     void tagWithVarArgs2() {
         givenTag("varargs",
-                "@param vararg values:String\n" +
-                "@for(value in values)${value} @endfor");
+                """
+                @param vararg values:String
+                @for(value in values)${value} @endfor\
+                """);
         givenTemplate("@template.tag.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
     }
@@ -678,24 +755,31 @@ public class TemplateEngineTest {
     @Test
     void tagWithVarArgs3() {
         givenTag("localize",
-                "@param key:String\n" +
-                "@param vararg values:String\n" +
-                "${key} with @for(value in values)${value} @endfor");
+                """
+                @param key:String
+                @param vararg values:String
+                ${key} with @for(value in values)${value} @endfor\
+                """);
         givenTemplate("@template.tag.localize(key = \"test.key\", \"Hello\", \"World\")");
         thenOutputIs("test.key with Hello World ");
     }
 
     @Test
     void comment() {
-        givenTemplate("<%--This is a comment" +
-                " ${model.hello} everything in here is omitted--%>" +
-                "This is visible...");
+        givenTemplate("""
+                <%--This is a comment\
+                 ${model.hello} everything in here is omitted--%>\
+                This is visible...\
+                """);
         thenOutputIs("This is visible...");
     }
 
     @Test
     void commentBeforeImports() {
-        givenRawTemplate("<%--This is a comment--%>@import gg.jte.kotlin.TemplateEngineTest.Model\n@param model:Model\n" + "!{model.setX(12)}${model.x}");
+        givenRawTemplate("""
+                <%--This is a comment--%>@import gg.jte.kotlin.TemplateEngineTest.Model
+                @param model:Model
+                !{model.setX(12)}${model.x}""");
         thenOutputIs("12");
     }
 
@@ -731,19 +815,28 @@ public class TemplateEngineTest {
 
     @Test
     void importInCss() {
-        givenTemplate("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
-                "    @import url(\"https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap\"); /* <--- Right here */");
-        thenOutputIs("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
-                "    @import url(\"https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap\"); /* <--- Right here */");
+        givenTemplate("""
+                <style type="text/css" rel="stylesheet" media="all">
+                    @import url("https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap"); /* <--- Right here */\
+                """);
+        thenOutputIs("""
+                <style type="text/css" rel="stylesheet" media="all">
+                    @import url("https://fonts.googleapis.com/css?family=Nunito+Sans:400,700&display=swap"); /* <--- Right here */\
+                """);
     }
 
     @Test
     void importInCss2() {
-        givenTemplate("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
-                "xxx@if(model.hello != null)    @import url(\"${model.hello}\");\n@endif</style>");
-        thenOutputIs("<style type=\"text/css\" rel=\"stylesheet\" media=\"all\">\n" +
-                "xxx    @import url(\"Hello\");\n" +
-                "</style>");
+        givenTemplate("""
+                <style type="text/css" rel="stylesheet" media="all">
+                xxx@if(model.hello != null)    @import url("${model.hello}");
+                @endif</style>\
+                """);
+        thenOutputIs("""
+                <style type="text/css" rel="stylesheet" media="all">
+                xxx    @import url("Hello");
+                </style>\
+                """);
     }
 
     @Test
@@ -815,94 +908,112 @@ public class TemplateEngineTest {
 
     @Test
     void layout() {
-        givenLayout("main", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                "@param content:gg.jte.Content\n" +
-                "@param footer:gg.jte.Content\n" +
-                "<body>\n" +
-                "<b>Welcome to my site - you are on page ${model.x}</b>\n" +
-                "\n" +
-                "<div class=\"content\">\n" +
-                "    ${content}\n" +
-                "</div>\n" +
-                "\n" +
-                "<div class=\"footer\">\n" +
-                "    ${footer}\n" +
-                "</div>\n" +
-                "</body>");
+        givenLayout("main", """
+                @param model:gg.jte.kotlin.TemplateEngineTest.Model
+                @param content:gg.jte.Content
+                @param footer:gg.jte.Content
+                <body>
+                <b>Welcome to my site - you are on page ${model.x}</b>
+                
+                <div class="content">
+                    ${content}
+                </div>
+                
+                <div class="footer">
+                    ${footer}
+                </div>
+                </body>\
+                """);
 
-        givenTemplate("@template.layout.main(model, content = @`\n" +
-                "        ${model.hello}, enjoy this great content\n" +
-                "    `,\n" +
-                "    footer = @`\n" +
-                "        Come again!\n" +
-                "    `)");
+        givenTemplate("""
+                @template.layout.main(model, content = @`
+                        ${model.hello}, enjoy this great content
+                    `,
+                    footer = @`
+                        Come again!
+                    `)\
+                """);
 
         thenOutputIs(
-                "<body>\n" +
-                "<b>Welcome to my site - you are on page 42</b>\n" +
-                "\n" +
-                "<div class=\"content\">\n" +
-                "    \n" +
-                "        Hello, enjoy this great content\n" +
-                "    \n" +
-                "</div>\n" +
-                "\n" +
-                "<div class=\"footer\">\n" +
-                "    \n" +
-                "        Come again!\n" +
-                "    \n" +
-                "</div>\n" +
-                "</body>");
+                """
+                <body>
+                <b>Welcome to my site - you are on page 42</b>
+                
+                <div class="content">
+                   \s
+                        Hello, enjoy this great content
+                   \s
+                </div>
+                
+                <div class="footer">
+                   \s
+                        Come again!
+                   \s
+                </div>
+                </body>\
+                """);
     }
 
     @Test
     void nestedLayouts() {
         givenLayout("main",
-                "@param header:gg.jte.Content? = null\n" +
-                "@param content:gg.jte.Content\n" +
-                "@param footer:gg.jte.Content? = null\n" +
-                "@if(header != null)<header>${header}</header>@endif" +
-                "<content>${content}</content>" +
-                "@if(footer != null)<footer>${footer}</footer>@endif");
+                """
+                @param header:gg.jte.Content? = null
+                @param content:gg.jte.Content
+                @param footer:gg.jte.Content? = null
+                @if(header != null)<header>${header}</header>@endif\
+                <content>${content}</content>\
+                @if(footer != null)<footer>${footer}</footer>@endif\
+                """);
         givenLayout("mainExtended",
-                "@param header:gg.jte.Content? = null\n" +
-                "@param contentPrefix:gg.jte.Content? = null\n" +
-                "@param content:gg.jte.Content\n" +
-                "@param contentSuffix:gg.jte.Content? = null\n" +
-                "@param footer:gg.jte.Content? = null\n" +
-                "@template.layout.main(header = header, content = @`" +
-                "@if(contentPrefix != null)${contentPrefix}@endif" +
-                "<b>${content}</b>" +
-                "@if(contentSuffix != null)${contentSuffix}@endif" +
-                "`, footer = footer)");
-        givenTemplate("@template.layout.mainExtended(" +
-                "header = @`" +
-                "this is the header" +
-                "`," +
-                "contentPrefix = @`" +
-                "<content-prefix>" +
-                "`," +
-                "content = @`" +
-                "this is the content" +
-                "`, " +
-                "contentSuffix=@`" +
-                "<content-suffix>" +
-                "`)");
+                """
+                @param header:gg.jte.Content? = null
+                @param contentPrefix:gg.jte.Content? = null
+                @param content:gg.jte.Content
+                @param contentSuffix:gg.jte.Content? = null
+                @param footer:gg.jte.Content? = null
+                @template.layout.main(header = header, content = @`\
+                @if(contentPrefix != null)${contentPrefix}@endif\
+                <b>${content}</b>\
+                @if(contentSuffix != null)${contentSuffix}@endif\
+                `, footer = footer)\
+                """);
+        givenTemplate("""
+                @template.layout.mainExtended(\
+                header = @`\
+                this is the header\
+                `,\
+                contentPrefix = @`\
+                <content-prefix>\
+                `,\
+                content = @`\
+                this is the content\
+                `, \
+                contentSuffix=@`\
+                <content-suffix>\
+                `)\
+                """);
 
-        thenOutputIs("<header>this is the header</header>" +
-                "<content><content-prefix><b>this is the content</b><content-suffix></content>");
+        thenOutputIs("""
+                <header>this is the header</header>\
+                <content><content-prefix><b>this is the content</b><content-suffix></content>\
+                """);
     }
 
     @Test
     void layoutWithNamedParams() {
         givenLayout("main",
-                "@param status:Int = 5\n" +
-                "@param duration:Int = -1\n" +
-                "@param content:gg.jte.Content\n" +
-                "Hello, ${content} your status is ${status}, the duration is ${duration}");
+                """
+                @param status:Int = 5
+                @param duration:Int = -1
+                @param content:gg.jte.Content
+                Hello, ${content} your status is ${status}, the duration is ${duration}\
+                """);
 
-        givenTemplate("@template.layout.main(content = @`" +
-                "Sir`)");
+        givenTemplate("""
+                @template.layout.main(content = @`\
+                Sir`)\
+                """);
 
         thenOutputIs("Hello, Sir your status is 5, the duration is -1");
     }
@@ -910,10 +1021,12 @@ public class TemplateEngineTest {
     @Test
     void layoutWithNamedParams_noNames() {
         givenLayout("main",
-                "@param status:Int = 5\n" +
-                "@param duration:Int = -1\n" +
-                "@param content:gg.jte.Content\n" +
-                "Hello, ${content} your status is ${status}, the duration is ${duration}");
+                """
+                @param status:Int = 5
+                @param duration:Int = -1
+                @param content:gg.jte.Content
+                Hello, ${content} your status is ${status}, the duration is ${duration}\
+                """);
 
         givenTemplate("@template.layout.main(42, 10, @`Sir`)");
 
@@ -923,8 +1036,10 @@ public class TemplateEngineTest {
     @Test
     void layoutWithVarArgs() {
         givenLayout("varargs",
-                "@param vararg values:String\n" +
-                        "@for(value in values)${value} @endfor");
+                """
+                @param vararg values:String
+                @for(value in values)${value} @endfor\
+                """);
         givenTemplate("@template.layout.varargs(\"Hello\", \"World\")");
         thenOutputIs("Hello World ");
     }
@@ -932,14 +1047,16 @@ public class TemplateEngineTest {
     @Test
     void enumCheck() {
         givenRawTemplate(
-                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                        "@import gg.jte.kotlin.TemplateEngineTest.ModelType\n" +
-                        "@param model:Model\n" +
-                        "@if (model.type == ModelType.One)" +
-                        "one" +
-                        "@else" +
-                        "not one" +
-                        "@endif");
+                """
+                @import gg.jte.kotlin.TemplateEngineTest.Model
+                @import gg.jte.kotlin.TemplateEngineTest.ModelType
+                @param model:Model
+                @if (model.type == ModelType.One)\
+                one\
+                @else\
+                not one\
+                @endif\
+                """);
 
         model.type = ModelType.One;
         thenOutputIs("one");
@@ -957,27 +1074,31 @@ public class TemplateEngineTest {
 
     @Test
     void nestedJavascript() {
-        givenTemplate("@if (model.isCaseA() && model.isCaseB())\n" +
-                "        <meta name=\"robots\" content=\"a, b\">\n" +
-                "        @elseif (model.isCaseB())\n" +
-                "        <meta name=\"robots\" content=\"b\">\n" +
-                "        @elseif (model.isCaseA())\n" +
-                "        <meta name=\"robots\" content=\"a\">\n" +
-                "        @endif" +
-                "@if (model.x > 0)\n" +
-                "        <meta name=\"description\" content=\"${model.x}\">\n" +
-                "        @endif\n" +
-                "\n" +
-                "        <script>\n" +
-                "            function readCookie(name) {");
-        thenOutputIs("\n" +
-                "        <meta name=\"robots\" content=\"a\">\n" +
-                "        \n" +
-                "        <meta name=\"description\" content=\"42\">\n" +
-                "        \n" +
-                "\n" +
-                "        <script>\n" +
-                "            function readCookie(name) {");
+        givenTemplate("""
+                @if (model.isCaseA() && model.isCaseB())
+                        <meta name="robots" content="a, b">
+                        @elseif (model.isCaseB())
+                        <meta name="robots" content="b">
+                        @elseif (model.isCaseA())
+                        <meta name="robots" content="a">
+                        @endif\
+                @if (model.x > 0)
+                        <meta name="description" content="${model.x}">
+                        @endif
+                
+                        <script>
+                            function readCookie(name) {\
+                """);
+        thenOutputIs("""
+                
+                        <meta name="robots" content="a">
+                       \s
+                        <meta name="description" content="42">
+                       \s
+                
+                        <script>
+                            function readCookie(name) {\
+                """);
     }
 
     @Test
@@ -1010,11 +1131,13 @@ public class TemplateEngineTest {
     @Test
     void exceptionLineNumber1() {
         givenRawTemplate(
-                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                "\n" +
-                "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                "\n" +
-                "${model.getThatThrows()}\n"
+                """
+                @import gg.jte.kotlin.TemplateEngineTest.Model
+                
+                @param model:gg.jte.kotlin.TemplateEngineTest.Model
+                
+                ${model.getThatThrows()}
+                """
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
@@ -1025,11 +1148,15 @@ public class TemplateEngineTest {
     @Test
     void exceptionLineNumber2() {
         givenRawTemplate(
-                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                        "\n\n\n" +
-                        "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                        "\n" +
-                        "${model.getThatThrows()}\n"
+                """
+                @import gg.jte.kotlin.TemplateEngineTest.Model
+                
+                
+                
+                @param model:gg.jte.kotlin.TemplateEngineTest.Model
+                
+                ${model.getThatThrows()}
+                """
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
@@ -1039,11 +1166,13 @@ public class TemplateEngineTest {
     @Test
     void exceptionLineNumber3() {
         givenRawTemplate(
-                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                        "\n" +
-                        "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                        "\n" +
-                        "${model.hello} ${model.getThatThrows()}\n"
+                """
+                @import gg.jte.kotlin.TemplateEngineTest.Model
+                
+                @param model:gg.jte.kotlin.TemplateEngineTest.Model
+                
+                ${model.hello} ${model.getThatThrows()}
+                """
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
@@ -1053,15 +1182,17 @@ public class TemplateEngineTest {
     @Test
     void exceptionLineNumber4() {
         givenRawTemplate(
-                "@import gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                        "\n" +
-                        "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                        "\n" +
-                        "${model.hello}\n" +
-                        "@for(i in 1..3)\n" +
-                        "\t${i}\n" +
-                        "\t${model.getThatThrows()}\n" +
-                        "@endfor\n"
+                """
+                @import gg.jte.kotlin.TemplateEngineTest.Model
+                
+                @param model:gg.jte.kotlin.TemplateEngineTest.Model
+                
+                ${model.hello}
+                @for(i in 1..3)
+                	${i}
+                	${model.getThatThrows()}
+                @endfor
+                """
         );
         thenRenderingFailsWithException()
                 .hasCauseInstanceOf(NullPointerException.class)
@@ -1070,10 +1201,12 @@ public class TemplateEngineTest {
 
     @Test
     void exceptionLineNumber5() {
-        givenTag("model", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                "@param i:Int = 0\n" +
-                "i is: ${i}\n" +
-                "${model.getThatThrows()}");
+        givenTag("model", """
+                @param model:gg.jte.kotlin.TemplateEngineTest.Model
+                @param i:Int = 0
+                i is: ${i}
+                ${model.getThatThrows()}\
+                """);
         givenTemplate("@template.tag.model(model)");
 
         thenRenderingFailsWithException()
@@ -1085,12 +1218,13 @@ public class TemplateEngineTest {
 
     @Test
     void exceptionLineNumber6() {
-        givenTag("model", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                "@param i:Int = 0\n" +
-                "i is: ${i}\n" +
-                "${model.getThatThrows()}");
+        givenTag("model", """
+                @param model:gg.jte.kotlin.TemplateEngineTest.Model
+                @param i:Int = 0
+                i is: ${i}
+                ${model.getThatThrows()}\
+                """);
 
-        @SuppressWarnings("resource")
         StringOutput output = new StringOutput();
         Throwable throwable = catchThrowable(() -> templateEngine.render("tag/model.kte", TemplateUtils.toMap("model", model, "i", 1L), output));
 
@@ -1142,9 +1276,11 @@ public class TemplateEngineTest {
 
     @Test
     void compileError3() {
-        givenTemplate("${model.hello}\n" +
-                "${model.hello}\n" +
-                "${model.helloUnknown}");
+        givenTemplate("""
+                ${model.hello}
+                ${model.hello}
+                ${model.helloUnknown}\
+                """);
 
         thenRenderingFailsWithException()
                 .hasMessageStartingWith("Failed to compile template, error at test/template.kte:4\n")
@@ -1164,11 +1300,15 @@ public class TemplateEngineTest {
 
     @Test
     void compileError5() {
-        givenTag("test", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\n" +
-                "${\n" +
-                "@`\n" +
-                "This will not compile!\n${model.helloUnknown}\n!!\n" +
-                "`}");
+        givenTag("test", """
+                @param model:gg.jte.kotlin.TemplateEngineTest.Model
+                ${
+                @`
+                This will not compile!
+                ${model.helloUnknown}
+                !!
+                `}\
+                """);
         givenTemplate("@template.tag.test(model)");
         thenRenderingFailsWithException()
                 .hasMessageStartingWith("Failed to compile template, error at tag/test.kte:5\n")
@@ -1178,11 +1318,15 @@ public class TemplateEngineTest {
 
     @Test
     void compileError6() {
-        givenTag("test", "@param model:gg.jte.TemplateEngineTest.Model\n" +
-                "test");
-        givenTemplate("@template.tag.test(\n" +
-                "model = model,\n" +
-                "param2 = \"foo\")");
+        givenTag("test", """
+                @param model:gg.jte.TemplateEngineTest.Model
+                test\
+                """);
+        givenTemplate("""
+                @template.tag.test(
+                model = model,
+                param2 = "foo")\
+                """);
         thenRenderingFailsWithException()
                 .hasMessage("Failed to compile template, error at test/template.kte:3. No parameter with name param2 is defined in tag/test.kte");
     }
@@ -1304,11 +1448,13 @@ public class TemplateEngineTest {
 
     @Test
     void nestedKotlinStringTemplates() {
-        givenRawTemplate("@import java.time.format.DateTimeFormatter\n" +
-                "@import java.time.LocalDateTime\n" +
-                "@param now: LocalDateTime\n" +
-                "@param datePattern: String\n" +
-                "println(\"Today is ${now.format(DateTimeFormatter.ofPattern(\"${datePattern} HH:mm\"))}\")");
+        givenRawTemplate("""
+                @import java.time.format.DateTimeFormatter
+                @import java.time.LocalDateTime
+                @param now: LocalDateTime
+                @param datePattern: String
+                println("Today is ${now.format(DateTimeFormatter.ofPattern("${datePattern} HH:mm"))}")\
+                """);
 
         LocalDateTime now = LocalDateTime.of(2021, 8, 21, 7, 50);
 
@@ -1320,11 +1466,13 @@ public class TemplateEngineTest {
 
     @Test
     void nestedKotlinStringTemplates_unsafe() {
-        givenRawTemplate("@import java.time.format.DateTimeFormatter\n" +
-                "@import java.time.LocalDateTime\n" +
-                "@param now: LocalDateTime\n" +
-                "@param datePattern: String\n" +
-                "println(\"Today is $unsafe{now.format(DateTimeFormatter.ofPattern(\"${datePattern} HH:mm\"))}\")");
+        givenRawTemplate("""
+                @import java.time.format.DateTimeFormatter
+                @import java.time.LocalDateTime
+                @param now: LocalDateTime
+                @param datePattern: String
+                println("Today is $unsafe{now.format(DateTimeFormatter.ofPattern("${datePattern} HH:mm"))}")\
+                """);
 
         LocalDateTime now = LocalDateTime.of(2021, 8, 21, 7, 50);
 
@@ -1336,12 +1484,14 @@ public class TemplateEngineTest {
 
     @Test
     void nestedKotlinStringTemplates_variable() {
-        givenRawTemplate("@import java.time.format.DateTimeFormatter\n" +
-                "@import java.time.LocalDateTime\n" +
-                "@param now: LocalDateTime\n" +
-                "@param datePattern: String\n" +
-                "!{val variable = now.format(DateTimeFormatter.ofPattern(\"${datePattern} HH:mm\"))}" +
-                "println(\"Today is ${variable}\")");
+        givenRawTemplate("""
+                @import java.time.format.DateTimeFormatter
+                @import java.time.LocalDateTime
+                @param now: LocalDateTime
+                @param datePattern: String
+                !{val variable = now.format(DateTimeFormatter.ofPattern("${datePattern} HH:mm"))}\
+                println("Today is ${variable}")\
+                """);
 
         LocalDateTime now = LocalDateTime.of(2021, 8, 21, 7, 50);
 
@@ -1359,17 +1509,21 @@ public class TemplateEngineTest {
 
     @Test
     void rawWithJavaScript() {
-        givenTemplate("@raw\n" +
-                      "<script>\n" +
-                      "  const foo = \"foo\";\n" +
-                      "  console.log(`This is ${foo}`);\n" +
-                      "</script>\n" +
-                      "@endraw");
-        thenOutputIs("\n" +
-                     "<script>\n" +
-                     "  const foo = \"foo\";\n" +
-                     "  console.log(`This is ${foo}`);\n" +
-                     "</script>\n");
+        givenTemplate("""
+                      @raw
+                      <script>
+                        const foo = "foo";
+                        console.log(`This is ${foo}`);
+                      </script>
+                      @endraw\
+                      """);
+        thenOutputIs("""
+                     
+                     <script>
+                       const foo = "foo";
+                       console.log(`This is ${foo}`);
+                     </script>
+                     """);
     }
 
     @Test

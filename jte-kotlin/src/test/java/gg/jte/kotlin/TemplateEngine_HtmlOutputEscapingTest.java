@@ -32,9 +32,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void outputEscaping() {
         codeResolver.givenCode("template.kte",
-                "@param url:String\n" +
-                "@param title:String\n" +
-                "Look at <a href=\"${url}\">${title}</a>");
+                """
+                @param url:String
+                @param title:String
+                Look at <a href="${url}">${title}</a>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("url", "https://www.test.com?param1=1&param2=2", "title", "<script>alert('hello');</script>"), output);
 
@@ -398,8 +400,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.kte", "dummy", output);
 
-        assertThat(output.toString()).isEqualTo("<input id=\"login-email\" type=\"text\" placeholder=\"dummy\" required>\n" +
-                "<input id=\"login-password\" type=\"password\" placeholder=\"Savecode\" required>");
+        assertThat(output.toString()).isEqualTo("""
+                <input id="login-email" type="text" placeholder="dummy" required>
+                <input id="login-password" type="password" placeholder="Savecode" required>\
+                """);
     }
 
     @Test
@@ -777,47 +781,51 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void script4() {
-        codeResolver.givenCode("template.kte", "<div class=\"container\">\n" +
-                "    <script>\n" +
-                "        $(document).ready(function() {\n" +
-                "            var orderId = getUrlParameter('orderId');\n" +
-                "            $.get('shop/order?orderId=' + orderId, {}, function (data) {\n" +
-                "                var address = data.deliveryAddress.firstName + ' ' + data.deliveryAddress.lastName + '<br/>';\n" +
-                "                address += data.deliveryAddress.street + '<br/>';\n" +
-                "                if (data.deliveryAddress.company !== null && data.deliveryAddress.company.length > 0) {\n" +
-                "                    address += data.deliveryAddress.company + '<br/>';\n" +
-                "                }\n" +
-                "                address += data.deliveryAddress.postCode + '<br/>';\n" +
-                "                address += data.deliveryAddress.city + '<br/>';\n" +
-                "                address += data.deliveryAddress.country + '<br/>';\n" +
-                "                $('#shipping-address').html(address);\n" +
-                "                $('.physical-item').html(data.physicalItemName);\n" +
-                "            });\n" +
-                "        });\n" +
-                "    </script>\n" +
-                "</div>");
+        codeResolver.givenCode("template.kte", """
+                <div class="container">
+                    <script>
+                        $(document).ready(function() {
+                            var orderId = getUrlParameter('orderId');
+                            $.get('shop/order?orderId=' + orderId, {}, function (data) {
+                                var address = data.deliveryAddress.firstName + ' ' + data.deliveryAddress.lastName + '<br/>';
+                                address += data.deliveryAddress.street + '<br/>';
+                                if (data.deliveryAddress.company !== null && data.deliveryAddress.company.length > 0) {
+                                    address += data.deliveryAddress.company + '<br/>';
+                                }
+                                address += data.deliveryAddress.postCode + '<br/>';
+                                address += data.deliveryAddress.city + '<br/>';
+                                address += data.deliveryAddress.country + '<br/>';
+                                $('#shipping-address').html(address);
+                                $('.physical-item').html(data.physicalItemName);
+                            });
+                        });
+                    </script>
+                </div>\
+                """);
 
         templateEngine.render("template.kte", (Object)null, output);
 
-        assertThat(output.toString()).isEqualTo("<div class=\"container\">\n" +
-                "    <script>\n" +
-                "        $(document).ready(function() {\n" +
-                "            var orderId = getUrlParameter('orderId');\n" +
-                "            $.get('shop/order?orderId=' + orderId, {}, function (data) {\n" +
-                "                var address = data.deliveryAddress.firstName + ' ' + data.deliveryAddress.lastName + '<br/>';\n" +
-                "                address += data.deliveryAddress.street + '<br/>';\n" +
-                "                if (data.deliveryAddress.company !== null && data.deliveryAddress.company.length > 0) {\n" +
-                "                    address += data.deliveryAddress.company + '<br/>';\n" +
-                "                }\n" +
-                "                address += data.deliveryAddress.postCode + '<br/>';\n" +
-                "                address += data.deliveryAddress.city + '<br/>';\n" +
-                "                address += data.deliveryAddress.country + '<br/>';\n" +
-                "                $('#shipping-address').html(address);\n" +
-                "                $('.physical-item').html(data.physicalItemName);\n" +
-                "            });\n" +
-                "        });\n" +
-                "    </script>\n" +
-                "</div>");
+        assertThat(output.toString()).isEqualTo("""
+                <div class="container">
+                    <script>
+                        $(document).ready(function() {
+                            var orderId = getUrlParameter('orderId');
+                            $.get('shop/order?orderId=' + orderId, {}, function (data) {
+                                var address = data.deliveryAddress.firstName + ' ' + data.deliveryAddress.lastName + '<br/>';
+                                address += data.deliveryAddress.street + '<br/>';
+                                if (data.deliveryAddress.company !== null && data.deliveryAddress.company.length > 0) {
+                                    address += data.deliveryAddress.company + '<br/>';
+                                }
+                                address += data.deliveryAddress.postCode + '<br/>';
+                                address += data.deliveryAddress.city + '<br/>';
+                                address += data.deliveryAddress.country + '<br/>';
+                                $('#shipping-address').html(address);
+                                $('.physical-item').html(data.physicalItemName);
+                            });
+                        });
+                    </script>
+                </div>\
+                """);
     }
 
     @Test
@@ -843,35 +851,39 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void css() {
-        codeResolver.givenCode("template.kte", "<style type=\"text/css\">\n" +
-                "/*<![CDATA[*/\n" +
-                "body {\n" +
-                "\tcolor: #333333;\n" +
-                "\tline-height: 150%;\n" +
-                "}\n" +
-                "\n" +
-                "thead {\n" +
-                "\tfont-weight: bold;\n" +
-                "\tbackground-color: #CCCCCC;\n" +
-                "}\n" +
-                "/*]]>*/\n" +
-                "</style>");
+        codeResolver.givenCode("template.kte", """
+                <style type="text/css">
+                /*<![CDATA[*/
+                body {
+                	color: #333333;
+                	line-height: 150%;
+                }
+                
+                thead {
+                	font-weight: bold;
+                	background-color: #CCCCCC;
+                }
+                /*]]>*/
+                </style>\
+                """);
 
         templateEngine.render("template.kte", (Object)null, output);
 
-        assertThat(output.toString()).isEqualTo("<style type=\"text/css\">\n" +
-                "\n" +
-                "body {\n" +
-                "\tcolor: #333333;\n" +
-                "\tline-height: 150%;\n" +
-                "}\n" +
-                "\n" +
-                "thead {\n" +
-                "\tfont-weight: bold;\n" +
-                "\tbackground-color: #CCCCCC;\n" +
-                "}\n" +
-                "\n" +
-                "</style>");
+        assertThat(output.toString()).isEqualTo("""
+                <style type="text/css">
+                
+                body {
+                	color: #333333;
+                	line-height: 150%;
+                }
+                
+                thead {
+                	font-weight: bold;
+                	background-color: #CCCCCC;
+                }
+                
+                </style>\
+                """);
     }
 
     @Test
@@ -1021,9 +1033,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void contentBlockInAttribute3() {
         codeResolver.givenCode("template.kte",
-                "@param url:String\n" +
-                "!{val content = @`<a href=\"${url}\" class=\"foo\">Hello</a>`}\n" +
-                "${content}");
+                """
+                @param url:String
+                !{val content = @`<a href="${url}" class="foo">Hello</a>`}
+                ${content}\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("url", "https://jte.gg"), output);
 
@@ -1033,14 +1047,18 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Test
     void contentBlockInAttribute4() {
         codeResolver.givenCode("template.kte",
-                "@param url:String\n" +
-                        "!{val content = @`<a href=\"${url}\" class=\"foo\">Hello</a>`;}\n" +
-                        "<span data-content=\"${content}\">${content}</span>");
+                """
+                @param url:String
+                !{val content = @`<a href="${url}" class="foo">Hello</a>`;}
+                <span data-content="${content}">${content}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("url", "https://jte.gg"), output);
 
-        assertThat(output.toString()).isEqualTo("\n" +
-                "<span data-content=\"&lt;a href=&#34;https://jte.gg&#34; class=&#34;foo&#34;>Hello&lt;/a>\"><a href=\"https://jte.gg\" class=\"foo\">Hello</a></span>");
+        assertThat(output.toString()).isEqualTo("""
+                
+                <span data-content="&lt;a href=&#34;https://jte.gg&#34; class=&#34;foo&#34;>Hello&lt;/a>"><a href="https://jte.gg" class="foo">Hello</a></span>\
+                """);
     }
 
     @Test
@@ -1101,8 +1119,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_notFound_noParams() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span>${localizer.localize(\"unknown\")}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                <span>${localizer.localize("unknown")}</span>\
+                """);
 
         templateEngine.render("template.kte", localizer, output);
 
@@ -1111,8 +1131,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_notFound_withParams() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span>${localizer.localize(\"unknown\", 1)}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                <span>${localizer.localize("unknown", 1)}</span>\
+                """);
 
         templateEngine.render("template.kte", localizer, output);
 
@@ -1121,8 +1143,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_noParams() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span alt=\"${localizer.localize(\"no-params\")}\">${localizer.localize(\"no-params\")}</span>${localizer.localize(\"no-params\")}");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                <span alt="${localizer.localize("no-params")}">${localizer.localize("no-params")}</span>${localizer.localize("no-params")}\
+                """);
 
         templateEngine.render("template.kte", localizer, output);
 
@@ -1131,8 +1155,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_html() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span>${localizer.localize(\"no-params-html\")}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                <span>${localizer.localize("no-params-html")}</span>\
+                """);
 
         templateEngine.render("template.kte", localizer, output);
 
@@ -1141,9 +1167,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_oneParam() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param param:String\n" +
-                "<span>${localizer.localize(\"one-param\", param)}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param param:String
+                <span>${localizer.localize("one-param", param)}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
@@ -1152,9 +1180,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_html_oneParam() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param param:String\n" +
-                "<span>${localizer.localize(\"one-param-html\", param)}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param param:String
+                <span>${localizer.localize("one-param-html", param)}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
@@ -1163,9 +1193,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_inception() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param param:String\n" +
-                "<span>${localizer.localize(\"one-param-html\", localizer.localize(\"one-param-html\", param))}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param param:String
+                <span>${localizer.localize("one-param-html", localizer.localize("one-param-html", param))}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
@@ -1174,8 +1206,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_quotesInAttribute() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span data-title=\"${localizer.localize(\"quotes\")}\"></span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                <span data-title="${localizer.localize("quotes")}"></span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer), output);
 
@@ -1184,11 +1218,13 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_quotesInAttributeWithParams() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param p1:String\n" +
-                "@param p2:String\n" +
-                "@param p3:String\n" +
-                "<span data-title=\"${localizer.localize(\"quotes-params\", p1, p2, p3)}\"></span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param p1:String
+                @param p2:String
+                @param p3:String
+                <span data-title="${localizer.localize("quotes-params", p1, p2, p3)}"></span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "p1", "<script>evil()</script>", "p2", "p2", "p3", "p3"), output);
 
@@ -1197,9 +1233,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_manyParams_noneSet() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param param:String\n" +
-                "<span>${localizer.localize(\"many-params-html\")}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param param:String
+                <span>${localizer.localize("many-params-html")}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
@@ -1208,9 +1246,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_manyParams_primitives() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param param:String?\n" +
-                "<span>${localizer.localize(\"many-params-html\")}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param param:String?
+                <span>${localizer.localize("many-params-html")}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "p1", true, "p2", 1, "p3", 2), output);
 
@@ -1219,9 +1259,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_manyParams_oneSet() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param param:String\n" +
-                "<span>${localizer.localize(\"many-params-html\", param)}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param param:String
+                <span>${localizer.localize("many-params-html", param)}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
@@ -1230,9 +1272,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_manyParams_allSame() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param param:String\n" +
-                "<span>${localizer.localize(\"many-params-html\", param, param, param)}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param param:String
+                <span>${localizer.localize("many-params-html", param, param, param)}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
@@ -1241,9 +1285,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_badPattern() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param param:String\n" +
-                "<span>${localizer.localize(\"bad-pattern\", param)}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param param:String
+                <span>${localizer.localize("bad-pattern", param)}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "param", "<script>evil()</script>"), output);
 
@@ -1252,8 +1298,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_primitives() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span>${localizer.localize(\"all-primitives\", false, 1.toByte(), 2.toShort(), 3, 4L, 5.0f, 6.0, 'c')}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                <span>${localizer.localize("all-primitives", false, 1.toByte(), 2.toShort(), 3, 4L, 5.0f, 6.0, 'c')}</span>\
+                """);
 
         templateEngine.render("template.kte", localizer, output);
 
@@ -1262,8 +1310,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_primitives_inAttribute() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span alt=\"${localizer.localize(\"all-primitives\", false, 1.toByte(), 2.toShort(), 3, 4L, 5.0f, 6.0, 'c')}\"></span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                <span alt="${localizer.localize("all-primitives", false, 1.toByte(), 2.toShort(), 3, 4L, 5.0f, 6.0, 'c')}"></span>\
+                """);
 
         templateEngine.render("template.kte", localizer, output);
 
@@ -1272,9 +1322,11 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_enum() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param contentType:gg.jte.ContentType\n" +
-                "<span alt=\"${localizer.localize(\"enum\", contentType)}\">${localizer.localize(\"enum\", contentType)}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param contentType:gg.jte.ContentType
+                <span alt="${localizer.localize("enum", contentType)}">${localizer.localize("enum", contentType)}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "contentType", ContentType.Html), output);
 
@@ -1283,11 +1335,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag() {
-        codeResolver.givenCode("tag/card.kte", "@param content:gg.jte.Content\n" +
-                    "<span>${content}</span>");
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param name:String\n" +
-                "@template.tag.card(content = @`<b>${localizer.localize(\"one-param\", name)}</b>`)");
+        codeResolver.givenCode("tag/card.kte", """
+                    @param content:gg.jte.Content
+                    <span>${content}</span>\
+                    """);
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param name:String
+                @template.tag.card(content = @`<b>${localizer.localize("one-param", name)}</b>`)\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1296,11 +1352,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag2() {
-        codeResolver.givenCode("tag/card.kte", "@param content:gg.jte.Content\n" +
-                "<span>${content}</span>");
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param name:String\n" +
-                "@template.tag.card(content = localizer.localize(\"one-param\", name))");
+        codeResolver.givenCode("tag/card.kte", """
+                @param content:gg.jte.Content
+                <span>${content}</span>\
+                """);
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param name:String
+                @template.tag.card(content = localizer.localize("one-param", name))\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1309,11 +1369,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag3() {
-        codeResolver.givenCode("tag/card.kte", "@param content:gg.jte.Content\n" +
-                "<span>${content}</span>");
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param name:String\n" +
-                "@template.tag.card(content = localizer.localize(\"one-param\", @`<b>${name}</b>`))");
+        codeResolver.givenCode("tag/card.kte", """
+                @param content:gg.jte.Content
+                <span>${content}</span>\
+                """);
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param name:String
+                @template.tag.card(content = localizer.localize("one-param", @`<b>${name}</b>`))\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1322,11 +1386,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag4() {
-        codeResolver.givenCode("tag/card.kte", "@param content:gg.jte.Content\n" +
-                "<span>${content}</span>");
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param name:String\n" +
-                "@template.tag.card(content = localizer.localize(\"many-params-html\", @`<span>${name}</span>`, @`<span>${name}</span>`, @`<span>${name}</span>`))");
+        codeResolver.givenCode("tag/card.kte", """
+                @param content:gg.jte.Content
+                <span>${content}</span>\
+                """);
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param name:String
+                @template.tag.card(content = localizer.localize("many-params-html", @`<span>${name}</span>`, @`<span>${name}</span>`, @`<span>${name}</span>`))\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1335,13 +1403,17 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag5() {
-        codeResolver.givenCode("tag/card.kte", "@param content:gg.jte.Content\n" +
-                "<span>${content}</span>");
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param name:String\n" +
-                "@template.tag.card(content = localizer.localize(\"one-param\", @`<b>" +
-                    "${localizer.localize(\"one-param-html\", @`<i>${name}</i>`)}" +
-                "</b>`))");
+        codeResolver.givenCode("tag/card.kte", """
+                @param content:gg.jte.Content
+                <span>${content}</span>\
+                """);
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param name:String
+                @template.tag.card(content = localizer.localize("one-param", @`<b>\
+                ${localizer.localize("one-param-html", @`<i>${name}</i>`)}\
+                </b>`))\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1350,13 +1422,17 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag6() {
-        codeResolver.givenCode("tag/card.kte", "@param content:gg.jte.Content\n" +
-                "<span>${content}</span>");
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param name:String\n" +
-                "@template.tag.card(content = localizer.localize(\"one-param\", @`<b>" +
-                    "@template.tag.card(content = localizer.localize(\"one-param-html\", @`<i>${name}</i>`))" +
-                "</b>`))");
+        codeResolver.givenCode("tag/card.kte", """
+                @param content:gg.jte.Content
+                <span>${content}</span>\
+                """);
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param name:String
+                @template.tag.card(content = localizer.localize("one-param", @`<b>\
+                @template.tag.card(content = localizer.localize("one-param-html", @`<i>${name}</i>`))\
+                </b>`))\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1365,14 +1441,18 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag7() {
-        codeResolver.givenCode("tag/card.kte", "@param content:gg.jte.Content\n" +
-                "<span>${content}</span>");
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "@param name:String\n" +
-                "!{var content = localizer.localize(\"one-param\", @`<b>" +
-                "${localizer.localize(\"one-param-html\", @`<i>${name}</i>`)}" +
-                "</b>`);}" +
-                "@template.tag.card(content = content)");
+        codeResolver.givenCode("tag/card.kte", """
+                @param content:gg.jte.Content
+                <span>${content}</span>\
+                """);
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                @param name:String
+                !{var content = localizer.localize("one-param", @`<b>\
+                ${localizer.localize("one-param-html", @`<i>${name}</i>`)}\
+                </b>`);}\
+                @template.tag.card(content = content)\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
 
@@ -1381,8 +1461,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_tag8() {
-        codeResolver.givenCode("tag/card.kte", "@param content:gg.jte.Content = @`My default is ${42}`\n" +
-                "<span>${content}</span>");
+        codeResolver.givenCode("tag/card.kte", """
+                @param content:gg.jte.Content = @`My default is ${42}`
+                <span>${content}</span>\
+                """);
         codeResolver.givenCode("template.kte", "@template.tag.card()");
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer, "name", "<script>"), output);
@@ -1392,8 +1474,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_contentParams() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span>${localizer.localize(\"link\", @`<a href=\"${\"foo\"}\">`, @`</a>`)}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                <span>${localizer.localize("link", @`<a href="${"foo"}">`, @`</a>`)}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer), output);
 
@@ -1402,8 +1486,10 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
     @Test
     void localization_contentParams2() {
-        codeResolver.givenCode("template.kte", "@param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer\n" +
-                "<span>${localizer.localize(\"link\", @`<a style=\"color: ${\"foo\"};\">`, @`</a>`)}</span>");
+        codeResolver.givenCode("template.kte", """
+                @param localizer:gg.jte.kotlin.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer
+                <span>${localizer.localize("link", @`<a style="color: ${"foo"};">`, @`</a>`)}</span>\
+                """);
 
         templateEngine.render("template.kte", TemplateUtils.toMap("localizer", localizer), output);
 

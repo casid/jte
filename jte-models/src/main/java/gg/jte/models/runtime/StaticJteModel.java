@@ -40,8 +40,8 @@ public class StaticJteModel<OUTPUT extends TemplateOutput> implements JteModel {
     }
 
     private TemplateException handleException(Exception e) {
-        if (e instanceof TemplateException) {
-            return (TemplateException) e;
+        if (e instanceof TemplateException exception) {
+            return exception;
         }
         StackTraceElement[] stackTrace = e.getStackTrace();
 

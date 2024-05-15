@@ -88,8 +88,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                 </configuration>
             </plugin>
 
@@ -111,7 +110,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <source>${java.version}</source>
+                    <release>${java.version}</release>
                     <detectJavaApiLink>false</detectJavaApiLink>
                     <doclint>all,-missing</doclint>
                 </configuration>

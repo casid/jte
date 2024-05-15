@@ -2,7 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
     id 'java'
-    id 'gg.jte.gradle' version '3.1.11'
+    id 'gg.jte.gradle' version '3.1.12-SNAPSHOT'
     id 'org.graalvm.buildtools.native' version '0.9.28'
 }
 
@@ -18,13 +18,13 @@ test {
 }
 
 dependencies {
-    implementation('gg.jte:jte-runtime:3.1.11')
+    implementation('gg.jte:jte-runtime:3.1.12-SNAPSHOT')
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testImplementation('org.assertj:assertj-core:3.23.1')
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
     implementation 'info.picocli:picocli:4.6.1'
     annotationProcessor 'info.picocli:picocli-codegen:4.6.1'
-    jteGenerate('gg.jte:jte-native-resources:3.1.11')
+    jteGenerate('gg.jte:jte-native-resources:3.1.12-SNAPSHOT')
 }
 
 jte {

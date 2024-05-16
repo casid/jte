@@ -135,16 +135,16 @@ public final class TemplateParser {
 
                     visitor.onRawEnd(depth);
                 }
-            } else if (isCommentAllowed() && regionMatches("<%--")) {
-                extractComment(Mode.Comment, i - 3);
-            } else if (isCommentAllowed() && regionMatches("<!--") && isHtmlCommentAllowed()) {
-                extractComment(Mode.HtmlComment, i - 3);
-            } else if (isCommentAllowed() && regionMatches("/*") && isCssCommentAllowed()) {
-                extractComment(Mode.CssComment, i - 1);
-            } else if (isCommentAllowed() && regionMatches("//") && isJsCommentAllowed()) {
-                extractComment(Mode.JsComment, i - 1);
-            } else if (isCommentAllowed() && regionMatches("/*") && isJsCommentAllowed()) {
-                extractComment(Mode.JsBlockComment, i - 1);
+            } else if (isCommentAllowed() && lookAheadRegionMatches("<%--")) {
+                extractComment(Mode.Comment, i);
+            } else if (isCommentAllowed() && lookAheadRegionMatches("<!--") && isHtmlCommentAllowed()) {
+                extractComment(Mode.HtmlComment, i);
+            } else if (isCommentAllowed() && lookAheadRegionMatches("/*") && isCssCommentAllowed()) {
+                extractComment(Mode.CssComment, i);
+            } else if (isCommentAllowed() && lookAheadRegionMatches("//") && isJsCommentAllowed()) {
+                extractComment(Mode.JsComment, i);
+            } else if (isCommentAllowed() && lookAheadRegionMatches("/*") && isJsCommentAllowed()) {
+                extractComment(Mode.JsBlockComment, i);
             } else if (currentMode == Mode.Comment) {
                 if (regionMatches("--%>")) {
                     pop();
@@ -706,7 +706,7 @@ public final class TemplateParser {
                     currentAttribute.value = templateCode.substring(currentAttribute.valueStartIndex, i);
 
                     if (currentAttribute.isSmartAttribute()) {
-                        extractTextPart(getLastWhitespaceIndex(currentAttribute.startIndex - 1), Mode.Code);
+                        extractTextPart(currentAttribute.startIndex - 1, Mode.Text);
                         lastIndex = i + 1;
 
                         visitor.onHtmlAttributeOutput(depth, currentHtmlTag, currentAttribute);
@@ -915,16 +915,6 @@ public final class TemplateParser {
         }
 
         return false;
-    }
-
-    private int getLastWhitespaceIndex(int index) {
-        for (; index >= 0; --index) {
-            if (!Character.isWhitespace(templateCode.charAt(index))) {
-                ++index;
-                break;
-            }
-        }
-        return index;
     }
 
     private boolean isHtmlTagIntercepted(String name) {

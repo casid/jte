@@ -525,6 +525,39 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void commentBetweenAttributes() {
+        templateEngine.setTrimControlStructures(true);
+        codeResolver.givenCode("template.jte", """
+                @param String url
+                <form hx-post="${url}" <%-- (1) --%>
+                      hx-target="${url}" <%-- (2) --%>
+                      hx-swap="outerHTML"> <%-- (2) --%>
+                    <select>
+                        @for(var i = 0; i < 3; i++) <%-- (3) --%>
+                            <option value="${i}">${i}</option>
+                        @endfor
+                    </select>
+                    <button type="submit">Add User to group</button>
+                </form>
+                """);
+
+        templateEngine.render("template.jte", "https://jte.gg", output);
+
+        assertThat(output.toString()).isEqualTo("""
+                <form hx-post="https://jte.gg"\s
+                      hx-target="https://jte.gg"\s
+                      hx-swap="outerHTML">\s
+                    <select>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                    <button type="submit">Add User to group</button>
+                </form>
+                """);
+    }
+
+    @Test
     void htmlComment() {
         codeResolver.givenCode("template.jte", "@param String url\n<!-- html comment --><a href=\"${url}\">Click me!</a>");
 

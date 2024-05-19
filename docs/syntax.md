@@ -54,6 +54,15 @@ If your model class would look like this:
 
 The output of the above template would be `Hello jte!`.
 
+`${}` can be used to output the following types:
+
+- `String`
+- `Enum`
+- `boolean`, `byte`, `short`, `int`, `long`, `float`, `double`, `char`
+- Any class implementing `gg.jte.Content`
+
+For security reasons there is no automatic `.toString()` conversion. Unsupported types produce a compilation error.
+
 ## Control structures
 
 jte provides convenient shortcuts for common Java control structures, such as conditional statements and loops. These shortcuts provide a clean, terse way of working with control structures while remaining familiar to their Java counterparts.

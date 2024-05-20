@@ -78,11 +78,11 @@ This works fine, but passing a parameter to every template might feel repetitive
         private static final ThreadLocal<JteLocalizer> context = new ThreadLocal<>();
 
         public static Content localize(String key) {
-            context.get().localize(key);
+            return context.get().localize(key);
         }
 
         public static Content localize(String key, Object... params) {
-            context.get().localize(key, params);
+            return context.get().localize(key, params);
         }
 
         static void init(JteLocalizer localizer) {

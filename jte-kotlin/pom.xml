@@ -49,4 +49,13 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>kotlin-2.0</id>
+            <properties>
+                <kotlin.version>2.0.0</kotlin.version>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>

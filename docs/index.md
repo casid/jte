@@ -281,4 +281,4 @@ This is the same benchmark as above, but the amount of threads was set to `#!jav
 
 [intellij-plugin]: https://plugins.jetbrains.com/plugin/14521-jte "IntelliJ JTE Plugin"
 [template-benchmark]: https://github.com/casid/template-benchmark/ "Template Benchmarks"
-[maven-central]: https://search.maven.org/artifact/gg.jte/jte "jte in Maven Central"
+[maven-central]: https://central.sonatype.com/artifact/gg.jte/jte "jte in Maven Central"

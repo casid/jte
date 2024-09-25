@@ -221,6 +221,6 @@ An application jar with generated classes can be built into a native binary usin
 </plugin>
 ```
 
-[jte-maven-compiler-plugin]: https://search.maven.org/artifact/gg.jte/jte-maven-plugin
+[jte-maven-compiler-plugin]: https://central.sonatype.com/artifact/gg.jte/jte-maven-plugin
 [html-policy]: https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg.jte.runtime/gg/jte/html/HtmlPolicy.html
 [constants-package-name]: https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg/jte.runtime/gg/jte/Constants.html#PACKAGE_NAME_PRECOMPILED

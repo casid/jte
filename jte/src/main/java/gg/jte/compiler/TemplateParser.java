@@ -1111,7 +1111,7 @@ public final class TemplateParser {
 
     public static class HtmlTag implements gg.jte.html.HtmlTag {
 
-        // See https://www.lifewire.com/html-singleton-tags-3468620
+        // See https://developer.mozilla.org/en-US/docs/Glossary/Void_element
         private static final Set<String> VOID_HTML_TAGS = Set.of("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
 
         public final String name;

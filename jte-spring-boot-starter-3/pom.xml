@@ -56,7 +56,6 @@
             <groupId>gg.jte</groupId>
             <artifactId>jte</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 

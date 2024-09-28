@@ -8,6 +8,7 @@ public class JteProperties {
     private boolean developmentMode = false;
     private String templateLocation = "src/main/jte";
     private String templateSuffix = ".jte";
+    private boolean exposeRequestAttributes = false;
 
     public String getTemplateSuffix() {
         return templateSuffix;
@@ -40,4 +41,21 @@ public class JteProperties {
     public void setDevelopmentMode(boolean developmentMode) {
         this.developmentMode = developmentMode;
     }
+
+	public boolean isUsePrecompiledTemplates() {
+		return usePrecompiledTemplates;
+	}
+
+	public void setUsePrecompiledTemplates(boolean usePrecompiledTemplates) {
+		this.usePrecompiledTemplates = usePrecompiledTemplates;
+	}
+
+	public boolean isExposeRequestAttributes() {
+		return exposeRequestAttributes;
+	}
+
+	public void setExposeRequestAttributes(boolean exposeRequestAttributes) {
+		this.exposeRequestAttributes = exposeRequestAttributes;
+	}
+    
 }

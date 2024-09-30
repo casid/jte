@@ -16,7 +16,7 @@
     <name>jte-spring-boot-starter-2</name>
 
     <properties>
-        <spring-boot.version>2.7.8</spring-boot.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
     </properties>
 
     <dependencyManagement>

@@ -8,25 +8,25 @@
   ],
   "properties": [
     {
-      "name": "gg.jte.usePrecompiledTemplates",
+      "name": "gg.jte.use-precompiled-templates",
       "type": "java.lang.Boolean",
       "description": "You can precompile the templates for faster startup and rendering. To use this you need to include the Maven or Gradle Plugin: https://jte.gg/pre-compiling/",
       "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
     },
     {
-      "name": "gg.jte.developmentMode",
+      "name": "gg.jte.development-mode",
       "type": "java.lang.Boolean",
-      "description": "You can enable developmentMode so that the jte file watcher will watch for changes in templates and recompile them.",
+      "description": "You can enable development mode so that the jte file watcher will watch for changes in templates and recompile them.",
       "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
     },
     {
-      "name": "gg.jte.templateLocation",
+      "name": "gg.jte.template-location",
       "type": "java.lang.String",
       "description": "You can change the location where jte expects the templates to compile",
       "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
     },
     {
-      "name": "gg.jte.templateSuffix",
+      "name": "gg.jte.template-suffix",
       "type": "java.lang.String",
       "description": "You can configure the file suffix of jte templates the compiler resolves",
       "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"

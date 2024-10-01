@@ -16,7 +16,7 @@
     <name>jte-spring-boot-starter-3</name>
 
     <properties>
-        <spring-boot.version>3.0.2</spring-boot.version>
+        <spring-boot.version>3.3.4</spring-boot.version>
     </properties>
 
     <dependencyManagement>

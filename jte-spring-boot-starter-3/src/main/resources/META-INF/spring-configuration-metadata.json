@@ -32,7 +32,7 @@
       "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"
     },
     {
-      "name": "gg.jte.exposeRequestAttributes",
+      "name": "gg.jte.expose-request-attributes",
       "type": "java.lang.Boolean",
       "description": "Set whether all request attributes should be added to the model prior to merging with the template",
       "sourceType": "gg.jte.springframework.boot.autoconfigure.JteProperties"

@@ -271,7 +271,7 @@ This is the same benchmark as above, but the amount of threads was set to `#!jav
 - [Micronaut](https://micronaut-projects.github.io/micronaut-views/latest/guide/#jte)
 - [Quarkus](https://github.com/renannprado/quarkus-jte-extension/)
 - [Severell](https://github.com/severell/severell-jte-plugin)
-- [http4k](https://www.http4k.org/guide/reference/templating)
+- [http4k](https://github.com/http4k/http4k/tree/master/http4k-template/jte)
 
 ## Websites rendered with jte
 

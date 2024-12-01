@@ -52,8 +52,8 @@ Now, you can create a `JteLocalizer` whenever you render a page and pass it to t
     ```html linenums="1"
     @param JteLocalizer localizer
 
-    <h1>${localizer.localize("my.title")}</h1>
-    <p>${localizer.localize("my.greetings", user.getName())}</p>
+    <h1>${localizer.lookup("my.title")}</h1>
+    <p>${localizer.lookup("my.greetings", user.getName())}</p>
     ```
 
 === "Kotlin"
@@ -61,8 +61,8 @@ Now, you can create a `JteLocalizer` whenever you render a page and pass it to t
     ```html linenums="1"
     @param localizer: JteLocalizer
 
-    <h1>${localizer.localize("my.title")}</h1>
-    <p>${localizer.localize("my.greetings", user.name)}</p>
+    <h1>${localizer.lookup("my.title")}</h1>
+    <p>${localizer.lookup("my.greetings", user.name)}</p>
     ```
 
 !!! note

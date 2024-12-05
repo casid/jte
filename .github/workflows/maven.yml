@@ -55,7 +55,7 @@ jobs:
 
   test-gradle-plugin:
     runs-on: ${{ matrix.os }}
-    needs: build-matrix
+    needs: build
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}

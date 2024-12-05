@@ -11,14 +11,54 @@ on:
   push:
 
 jobs:
+  # From https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/evaluate-expressions-in-workflows-and-actions#example-returning-a-json-object
+  build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          echo "matrix={ \"os\": [\"windows-2022\", \"macOS-latest\", \"ubuntu-latest\"], \"java_version\": [17] }" >> $GITHUB_OUTPUT
+
   build:
     runs-on: ${{ matrix.os }}
+    needs: build-matrix
     strategy:
       fail-fast: false
-      matrix:
-        java_version: [17]
-        os: [windows-2022, macOS-latest, ubuntu-latest]
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{ matrix.java_version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java_version }}
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Make Maven Wrapper executable
+        if: contains(matrix.os, 'win') == false
+        run: chmod +x ./mvnw
+      - name: Build with Maven
+        run: ./mvnw install --file pom.xml
+
+      # This prevents local published artifacts from be added to GH Actions cache
+      - name: Clean local artifacts
+        if: contains(matrix.os, 'win') == false
+        run: rm -rvf ~/.m2/repository/gg/jte
+
+      # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
+      # is ambiguous (possible matches include: -Filter -Force).
+      - name: "[Windows]: Clean local artifacts"
+        if: contains(matrix.os, 'win')
+        run: rm -r -Force ~/.m2/repository/gg/jte
+
+  test-gradle-plugin:
+    runs-on: ${{ matrix.os }}
+    needs: build-matrix
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.java_version }}
@@ -44,7 +84,7 @@ jobs:
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw install --file pom.xml
+        run: ./mvnw install --file pom.xml -DskipTests=true
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Run all the Gradle Plugin tests
@@ -111,7 +151,9 @@ jobs:
     # https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution#example-only-run-job-for-specific-repository
     if: github.repository == 'casid/jte'
     runs-on: ubuntu-latest
-    needs: test-kotlin
+    needs:
+      - test-kotlin
+      - test-gradle-plugin
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK

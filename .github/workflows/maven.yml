@@ -41,18 +41,7 @@ jobs:
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw install --file pom.xml
-
-      # This prevents local published artifacts from be added to GH Actions cache
-      - name: Clean local artifacts
-        if: contains(matrix.os, 'win') == false
-        run: rm -rvf ~/.m2/repository/gg/jte
-
-      # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
-      # is ambiguous (possible matches include: -Filter -Force).
-      - name: "[Windows]: Clean local artifacts"
-        if: contains(matrix.os, 'win')
-        run: rm -r -Force ~/.m2/repository/gg/jte
+        run: ./mvnw verify --file pom.xml
 
   test-gradle-plugin:
     name: JDK ${{ matrix.java_version }} / ${{ matrix.os }}
@@ -103,17 +92,7 @@ jobs:
         with:
           name: failing-test-report
           path: test/gradle-test-wrapper/build/reports/tests/test/**/*
-
-      # This prevents local published artifacts from be added to GH Actions cache
-      - name: Clean local artifacts
-        if: contains(matrix.os, 'win') == false
-        run: rm -rvf ~/.m2/repository/gg/jte
-
-      # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
-      # is ambiguous (possible matches include: -Filter -Force).
-      - name: "[Windows]: Clean local artifacts"
-        if: contains(matrix.os, 'win')
-        run: rm -r -Force ~/.m2/repository/gg/jte
+      - uses: ./.github/prepare-cache-action
 
   test-graal:
     name: JDK ${{ matrix.java_version }} / ${{ matrix.os }}
@@ -159,17 +138,7 @@ jobs:
       - name: Stop Gradle Daemon
         if: ${{ always() }}
         run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew --stop
-
-      # This prevents local published artifacts from be added to GH Actions cache
-      - name: Clean local artifacts
-        if: contains(matrix.os, 'win') == false
-        run: rm -rvf ~/.m2/repository/gg/jte
-
-      # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
-      # is ambiguous (possible matches include: -Filter -Force).
-      - name: "[Windows]: Clean local artifacts"
-        if: contains(matrix.os, 'win')
-        run: rm -r -Force ~/.m2/repository/gg/jte
+      - uses: ./.github/prepare-cache-action
 
   test-kotlin:
     name: Profile ${{ matrix.kotlin-profile }}
@@ -189,23 +158,12 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Make Maven Wrapper executable
-        if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
         run: ./mvnw install --file pom.xml -DskipTests=true
       - name: Test Kotlin Profile ${{ matrix.kotlin-profile }}
         run: ./mvnw test --file pom.xml --projects jte-kotlin --also-make --activate-profiles ${{ matrix.kotlin-profile }}
-
-      # This prevents local published artifacts from be added to GH Actions cache
-      - name: Clean local artifacts
-        if: contains(matrix.os, 'win') == false
-        run: rm -rvf ~/.m2/repository/gg/jte
-
-      # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
-      # is ambiguous (possible matches include: -Filter -Force).
-      - name: "[Windows]: Clean local artifacts"
-        if: contains(matrix.os, 'win')
-        run: rm -r -Force ~/.m2/repository/gg/jte
+      - uses: ./.github/prepare-cache-action
 
   coverage:
     # Do not run coverage for forks since they cannot upload

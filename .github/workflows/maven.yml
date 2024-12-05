@@ -22,7 +22,7 @@ jobs:
           echo "matrix={ \"os\": [\"windows-2022\", \"macOS-latest\", \"ubuntu-latest\"], \"java_version\": [17] }" >> $GITHUB_OUTPUT
 
   build:
-    name: JDK ${{ matrix.java_version }} / ${{ matrix.os }}
+    name: Build / JDK ${{ matrix.java_version }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     needs: build-matrix
     strategy:
@@ -44,7 +44,7 @@ jobs:
         run: ./mvnw verify --file pom.xml
 
   test-gradle-plugin:
-    name: JDK ${{ matrix.java_version }} / ${{ matrix.os }}
+    name: Test / Gradle / JDK ${{ matrix.java_version }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     needs:
       - build-matrix
@@ -95,7 +95,7 @@ jobs:
       - uses: ./.github/prepare-cache-action
 
   test-graal:
-    name: JDK ${{ matrix.java_version }} / ${{ matrix.os }}
+    name: Test / Graal / JDK ${{ matrix.java_version }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     needs:
       - build-matrix
@@ -141,7 +141,7 @@ jobs:
       - uses: ./.github/prepare-cache-action
 
   test-kotlin:
-    name: Profile ${{ matrix.kotlin-profile }}
+    name: Test / Kotlin / ${{ matrix.kotlin-profile }}
     runs-on: ubuntu-latest
     needs:
       - build
@@ -166,6 +166,7 @@ jobs:
       - uses: ./.github/prepare-cache-action
 
   coverage:
+    name: Test / Coverage
     # Do not run coverage for forks since they cannot upload
     # the results to codecov. For reference, see:
     # https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution#example-only-run-job-for-specific-repository

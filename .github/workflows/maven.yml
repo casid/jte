@@ -9,8 +9,6 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
   push:
-    branches:
-      - main
 
 jobs:
   build:
@@ -47,8 +45,6 @@ jobs:
         run: chmod +x ./mvnw
       - name: Build with Maven
         run: ./mvnw install --file pom.xml
-      - name: Test Kotlin 2.0
-        run: ./mvnw test --file pom.xml --projects jte-kotlin --also-make --activate-profiles kotlin-2.0
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Run all the Gradle Plugin tests
@@ -75,6 +71,39 @@ jobs:
         if: contains(matrix.os, 'win')
         run: rm -r -Force ~/.m2/repository/gg/jte
 
+  test-kotlin:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        kotlin-profile: ["kotlin-1.9", "kotlin-2.0"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Make Maven Wrapper executable
+        if: contains(matrix.os, 'win') == false
+        run: chmod +x ./mvnw
+      - name: Build with Maven
+        run: ./mvnw install --file pom.xml -DskipTests=true
+      - name: Test Kotlin Profile ${{ matrix.kotlin-profile }}
+        run: ./mvnw test --file pom.xml --projects jte-kotlin --also-make --activate-profiles ${{ matrix.kotlin-profile }}
+
+      # This prevents local published artifacts from be added to GH Actions cache
+      - name: Clean local artifacts
+        if: contains(matrix.os, 'win') == false
+        run: rm -rvf ~/.m2/repository/gg/jte
+
+      # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
+      # is ambiguous (possible matches include: -Filter -Force).
+      - name: "[Windows]: Clean local artifacts"
+        if: contains(matrix.os, 'win')
+        run: rm -r -Force ~/.m2/repository/gg/jte
 
   coverage:
     # Do not run coverage for forks since they cannot upload
@@ -82,6 +111,7 @@ jobs:
     # https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution#example-only-run-job-for-specific-repository
     if: github.repository == 'casid/jte'
     runs-on: ubuntu-latest
+    needs: test-kotlin
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK

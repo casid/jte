@@ -9,6 +9,8 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
   push:
+    branches:
+      - main
 
 jobs:
   # From https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/evaluate-expressions-in-workflows-and-actions#example-returning-a-json-object

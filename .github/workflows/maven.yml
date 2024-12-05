@@ -130,7 +130,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kotlin-profile: ["kotlin-1.9", "kotlin-2.0"]
+        kotlin-profile: ["kotlin-1.9", "kotlin-2.0", "kotlin-2.1"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17

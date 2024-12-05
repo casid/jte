@@ -64,6 +64,12 @@
                 <kotlin.version>2.0.20</kotlin.version>
             </properties>
         </profile>
+         <profile>
+            <id>kotlin-2.1</id>
+            <properties>
+                <kotlin.version>2.1.0</kotlin.version>
+            </properties>
+        </profile>
     </profiles>
 
 </project>

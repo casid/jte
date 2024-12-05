@@ -60,19 +60,9 @@ jobs:
           java-version: ${{ matrix.java_version }}
           distribution: 'temurin'
           cache: 'maven'
-
-      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
-      - name: Cache local Gradle
-        id: gradleCache
-        uses: actions/cache@v4
+      - uses: ./.github/gradle-cache
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
+          key: "gradle"
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
@@ -113,19 +103,9 @@ jobs:
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           cache: 'maven'
-
-      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
-      - name: Cache local Gradle
-        id: gradleCache
-        uses: actions/cache@v4
+      - uses: ./.github/gradle-cache
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-graalvm-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-graalvm-
-
+          key: "gradle-graalvm"
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw

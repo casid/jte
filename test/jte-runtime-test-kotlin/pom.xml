@@ -14,7 +14,6 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <jacoco.version>0.8.10</jacoco.version>
-        <kotlin.version>1.9.10</kotlin.version>
     </properties>
 
     <dependencies>
@@ -68,6 +67,22 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <!-- Kotlin versions -->
+        <profile>
+            <id>kotlin-1.9</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <kotlin.version>1.9.10</kotlin.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>kotlin-2.0</id>
+            <properties>
+                <kotlin.version>2.0.20</kotlin.version>
+            </properties>
         </profile>
     </profiles>
 

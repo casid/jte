@@ -1,0 +1,21 @@
+name: "Gradle Cache Action"
+description: "Sets up Gradle Cache"
+
+inputs:
+  key:
+    required: true
+    description: "The cache key"
+
+runs:
+  using: composite
+  steps:
+    # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
+    - name: Cache Gradle local repository
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-${{ inputs.key }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ inputs.key }}-

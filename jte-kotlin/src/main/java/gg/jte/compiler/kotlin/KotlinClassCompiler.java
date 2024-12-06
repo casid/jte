@@ -39,7 +39,7 @@ public class KotlinClassCompiler implements ClassCompiler {
         K2JVMCompiler compiler = new K2JVMCompiler();
 
         SimpleKotlinCompilerMessageCollector messageCollector = new SimpleKotlinCompilerMessageCollector(templateByClassName, config.packageName);
-        ExitCode exitCode = compiler.exec(messageCollector, new Services.Builder().build(), compilerArguments);
+        ExitCode exitCode = compiler.exec(messageCollector, Services.EMPTY, compilerArguments);
 
         if (exitCode != ExitCode.OK && exitCode != ExitCode.COMPILATION_ERROR) {
             throw new TemplateException(messageCollector.getErrorMessage());

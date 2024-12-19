@@ -33,6 +33,14 @@ public final class ClassUtils {
                 pathConsumer.accept(path);
             }
         }
+        String modulePath = System.getProperty("jdk.module.path");
+
+        if (!StringUtils.isBlank(modulePath)) {
+            String[] paths = modulePath.split(separator);
+            for (String path : paths) {
+                pathConsumer.accept(path);
+            }
+        }
 
         if (classLoader instanceof URLClassLoader loader) {
             for (URL url : loader.getURLs()) {

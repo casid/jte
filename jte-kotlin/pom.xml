@@ -16,7 +16,6 @@
     <properties>
         <maven.deploy.skip>false</maven.deploy.skip>
         <skipNexusStagingDeployMojo>false</skipNexusStagingDeployMojo>
-        <kotlin.version>1.9.10</kotlin.version>
     </properties>
 
     <dependencies>
@@ -50,6 +49,15 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>kotlin-1.9</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <kotlin.version>1.9.10</kotlin.version>
+            </properties>
+        </profile>
         <profile>
             <id>kotlin-2.0</id>
             <properties>

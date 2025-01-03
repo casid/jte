@@ -1,0 +1,17 @@
+name: "Prepare Cache Action"
+description: "Prevents local published artifacts from be added to GH Actions cache"
+
+runs:
+  using: composite
+  steps:
+    - name: "Clean local artifacts"
+      if: contains(runner.os, 'win') == false
+      run: rm -rvf ~/.m2/repository/gg/jte
+      shell: bash
+
+    # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
+    # is ambiguous (possible matches include: -Filter -Force).
+    - name: "[Windows]: Clean local artifacts"
+      if: contains(runner.os, 'win')
+      run: rm -r -Force ~/.m2/repository/gg/jte
+      shell: pwsh

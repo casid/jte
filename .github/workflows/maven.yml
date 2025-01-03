@@ -13,13 +13,23 @@ on:
       - main
 
 jobs:
+  # From https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/evaluate-expressions-in-workflows-and-actions#example-returning-a-json-object
+  build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          echo "matrix={ \"os\": [\"windows-2022\", \"macOS-latest\", \"ubuntu-latest\"], \"java_version\": [17] }" >> $GITHUB_OUTPUT
+
   build:
+    name: Build / JDK ${{ matrix.java_version }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    needs: build-matrix
     strategy:
       fail-fast: false
-      matrix:
-        java_version: [17]
-        os: [windows-2022, macOS-latest, ubuntu-latest]
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -29,26 +39,37 @@ jobs:
           java-version: ${{ matrix.java_version }}
           distribution: 'temurin'
           cache: 'maven'
-
-      # Adapted from https://github.com/actions/cache/blob/v3/examples.md#java---gradle
-      - name: Cache local Gradle
-        id: gradleCache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
       - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw install --file pom.xml
-      - name: Test Kotlin 2.0
-        run: ./mvnw test --file pom.xml --projects jte-kotlin --also-make --activate-profiles kotlin-2.0
+        run: ./mvnw verify --file pom.xml
+
+  test-gradle-plugin:
+    name: Test / Gradle / JDK ${{ matrix.java_version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs:
+      - build-matrix
+      - build
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{ matrix.java_version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java_version }}
+          distribution: 'temurin'
+          cache: 'maven'
+      - uses: ./.github/gradle-cache
+        with:
+          key: "gradle"
+      - name: Make Maven Wrapper executable
+        if: contains(matrix.os, 'win') == false
+        run: chmod +x ./mvnw
+      - name: Build with Maven
+        run: ./mvnw install --file pom.xml -DskipTests=true
       - name: Build Gradle Plugin
         run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
       - name: Run all the Gradle Plugin tests
@@ -63,25 +84,80 @@ jobs:
         with:
           name: failing-test-report
           path: test/gradle-test-wrapper/build/reports/tests/test/**/*
+      - uses: ./.github/prepare-cache-action
 
-      # This prevents local published artifacts from be added to GH Actions cache
-      - name: Clean local artifacts
+  test-graal:
+    name: Test / Graal / JDK ${{ matrix.java_version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs:
+      - build-matrix
+      - build
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'graalvm'
+          java-version: ${{ matrix.java_version }}
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: 'maven'
+      - uses: ./.github/gradle-cache
+        with:
+          key: "gradle-graalvm"
+      - name: Make Maven Wrapper executable
         if: contains(matrix.os, 'win') == false
-        run: rm -rvf ~/.m2/repository/gg/jte
+        run: chmod +x ./mvnw
+      - name: Build with Maven
+        run: ./mvnw install --file pom.xml -DskipTests=true
+      - name: Build Gradle Plugin
+        run: cd jte-gradle-plugin && ./gradlew publishToMavenLocal
+      - name: Test Gradle Plugin Generate with conventions
+        run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew check nativeTest
+      - name: Stop Gradle Daemon
+        if: ${{ always() }}
+        run: cd test/jte-runtime-cp-test-gradle-convention && ./gradlew --stop
+      - uses: ./.github/prepare-cache-action
 
-      # `rm` syntax for Windows is different. Needs to use `-Force` since `-f`
-      # is ambiguous (possible matches include: -Filter -Force).
-      - name: "[Windows]: Clean local artifacts"
-        if: contains(matrix.os, 'win')
-        run: rm -r -Force ~/.m2/repository/gg/jte
-
+  test-kotlin:
+    name: Test / Kotlin / ${{ matrix.kotlin-profile }}
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    strategy:
+      fail-fast: false
+      matrix:
+        kotlin-profile: ["kotlin-1.9", "kotlin-2.0"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Make Maven Wrapper executable
+        run: chmod +x ./mvnw
+      - name: Build with Maven
+        run: ./mvnw install --file pom.xml -DskipTests=true
+      - name: Test Kotlin Profile ${{ matrix.kotlin-profile }}
+        run: ./mvnw test --file pom.xml --projects jte-kotlin --also-make --activate-profiles ${{ matrix.kotlin-profile }}
+      - uses: ./.github/prepare-cache-action
 
   coverage:
+    name: Test / Coverage
     # Do not run coverage for forks since they cannot upload
     # the results to codecov. For reference, see:
     # https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution#example-only-run-job-for-specific-repository
     if: github.repository == 'casid/jte'
     runs-on: ubuntu-latest
+    needs:
+      - test-gradle-plugin
+      - test-kotlin
+      - test-graal
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
@@ -94,7 +170,7 @@ jobs:
         if: contains(matrix.os, 'win') == false
         run: chmod +x ./mvnw
       - name: Build with Maven
-        run: ./mvnw verify --file pom.xml -Pcoverage
+        run: ./mvnw verify --file pom.xml -Pcoverage,kotlin-1.9
       - name: Upload coverage report
         uses: codecov/codecov-action@v4
         env:

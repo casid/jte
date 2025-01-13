@@ -1314,6 +1314,88 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void templateStringInJavaScriptBlock_backtick() {
+        codeResolver.givenCode("template.jte", """
+                @param String someMessage
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <title>XSS Test</title>
+                    <script>window.someVariable = `${someMessage}`;</script>
+                </head>
+                <body>
+                <h1>XSS Test</h1>
+                </body>
+                </html>
+                """);
+
+        templateEngine.render("template.jte", "` + alert(`xss`) + `", output);
+
+        assertThat(output.toString()).isEqualTo("""
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <title>XSS Test</title>
+                    <script>window.someVariable = `\\` + alert(\\`xss\\`) + \\``;</script>
+                </head>
+                <body>
+                <h1>XSS Test</h1>
+                </body>
+                </html>
+                """);
+    }
+
+    @Test
+    void templateStringInJavaScriptBlock_dollar() {
+        codeResolver.givenCode("template.jte", """
+                @param String someMessage
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <title>XSS Test</title>
+                    <script>window.someVariable = `${someMessage}`;</script>
+                </head>
+                <body>
+                <h1>XSS Test</h1>
+                </body>
+                </html>
+                """);
+
+        templateEngine.render("template.jte", "${secret}", output);
+
+        assertThat(output.toString()).isEqualTo("""
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <title>XSS Test</title>
+                    <script>window.someVariable = `\\${secret}`;</script>
+                </head>
+                <body>
+                <h1>XSS Test</h1>
+                </body>
+                </html>
+                """);
+    }
+
+    @Test
+    void templateStringInJavaScriptAttribute_backtick() {
+        codeResolver.givenCode("template.jte", "@param String p\n<span onClick=\"console.log(`${p}`)\">foo</span>");
+
+        templateEngine.render("template.jte", "` + alert(`xss`) + `", output);
+
+        assertThat(output.toString()).isEqualTo("<span onClick=\"console.log(`\\x60 + alert(\\x60xss\\x60) + \\x60`)\">foo</span>");
+    }
+
+    @Test
+    void templateStringInJavaScriptAttribute_dollar() {
+        codeResolver.givenCode("template.jte", "@param String p\n<span onClick=\"console.log(`${p}`)\">foo</span>");
+
+        templateEngine.render("template.jte", "${secret}", output);
+
+        assertThat(output.toString()).isEqualTo("<span onClick=\"console.log(`\\x24{secret}`)\">foo</span>");
+    }
+
+    @Test
     void localization_notFound_noParams() {
         codeResolver.givenCode("template.jte", """
                 @param gg.jte.TemplateEngine_HtmlOutputEscapingTest.MyLocalizer localizer

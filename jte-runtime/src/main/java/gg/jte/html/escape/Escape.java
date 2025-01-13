@@ -49,6 +49,8 @@ public class Escape {
             switch (c) {
                 case '\'' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\'", output);
                 case '"' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\\"", output);
+                case '`' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\`", output);
+                case '$' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\$", output);
                 case '/' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\/", output);
                 case '-' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\-", output);
                 case '\\' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\\\", output);
@@ -73,6 +75,8 @@ public class Escape {
             switch (c) {
                 case '\'' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\x27", output);
                 case '"' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\x22", output);
+                case '`' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\x60", output);
+                case '$' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\x24", output);
                 case '\\' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\\\", output);
                 case '\n' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\n", output);
                 case '\t' -> lastIndex = flushAndEscape(value, lastIndex, i, "\\t", output);

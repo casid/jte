@@ -123,14 +123,10 @@ jobs:
       - uses: ./.github/prepare-cache-action
 
   test-kotlin:
-    name: Test / Kotlin / ${{ matrix.kotlin-profile }}
+    name: Test / Kotlin
     runs-on: ubuntu-latest
     needs:
       - build
-    strategy:
-      fail-fast: false
-      matrix:
-        kotlin-profile: ["kotlin-1.9", "kotlin-2.0"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -143,8 +139,8 @@ jobs:
         run: chmod +x ./mvnw
       - name: Build with Maven
         run: ./mvnw install --file pom.xml -DskipTests=true
-      - name: Test Kotlin Profile ${{ matrix.kotlin-profile }}
-        run: ./mvnw test --file pom.xml --projects jte-kotlin --also-make --activate-profiles ${{ matrix.kotlin-profile }}
+      - name: Test Kotlin
+        run: ./mvnw test --file pom.xml --projects jte-kotlin --also-make
       - uses: ./.github/prepare-cache-action
 
   coverage:

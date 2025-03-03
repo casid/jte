@@ -31,6 +31,13 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void helloWorldWithDeprecatedMethodCall() {
+        givenRawTemplate("@param gg.jte.TemplateEngineTest.Model model\n${model.getAnotherWorld()} ${model.deprecatedMethod()}");
+        thenOutputIs("Another World true");
+    }
+
+
+    @Test
     void templateWithoutParameters() {
         givenRawTemplate("Hello World!");
         thenOutputIs("Hello World!");
@@ -1579,6 +1586,8 @@ public class TemplateEngineTest {
         Throwable throwable = catchThrowable(() -> thenOutputIs("ignored"));
         return assertThat(throwable).isInstanceOf(TemplateException.class);
     }
+
+
 
     @SuppressWarnings("SameParameterValue")
     private void thenRenderingFailsWithExceptionCausedBy(Class<? extends Throwable> clazz) {

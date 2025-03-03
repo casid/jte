@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JavaClassCompiler implements ClassCompiler {
     @Override
@@ -53,13 +55,15 @@ public class JavaClassCompiler implements ClassCompiler {
     private static String getErrorMessage(String errors, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         try {
             String absolutePath = classDirectory.toAbsolutePath().toString();
-            int classBeginIndex = errors.indexOf(absolutePath) + absolutePath.length() + 1;
-            int classEndIndex = errors.indexOf(".java:");
-            String className = errors.substring(classBeginIndex, classEndIndex).replace(File.separatorChar, '.');
+            //Pattern matches '<absolutePath><separatorChar><relativeTemplatePath>.java:<Line>: error'
+            Pattern pattern = Pattern.compile("^\\Q%s%s\\E(?<ClassName>.*?)\\.java:(?<LineNumber>\\d+?): error".formatted(absolutePath, File.separatorChar), Pattern.MULTILINE);
+            Matcher matcher = pattern.matcher(errors);
+            if (!matcher.find()) {
+                return "Failed to compile template, error at\n" + errors;
+            }
 
-            int lineStartIndex = classEndIndex + 6;
-            int lineEndIndex = errors.indexOf(':', lineStartIndex);
-            int javaLine = Integer.parseInt(errors.substring(lineStartIndex, lineEndIndex));
+            String className = matcher.group("ClassName").replace(File.separatorChar, '.');
+            int javaLine = Integer.parseInt(matcher.group("LineNumber"));
 
             ClassInfo templateInfo = templateByClassName.get(className);
             int templateLine = templateInfo.lineInfo[javaLine - 1] + 1;

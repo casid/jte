@@ -31,6 +31,13 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void helloWorldWithDeprecatedMethodCall() {
+        givenRawTemplate("@param gg.jte.TemplateEngineTest.Model model\n${model.getAnotherWorld()} ${model.deprecatedMethod()}");
+        thenOutputIs("Another World true");
+    }
+
+
+    @Test
     void templateWithoutParameters() {
         givenRawTemplate("Hello World!");
         thenOutputIs("Hello World!");
@@ -1472,6 +1479,17 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void compileErrorWithWarning() {
+        givenTemplate("test.jte", "@param gg.jte.TemplateEngineTest.Model model\n${model.deprecatedMethod()}\nThis will not compile!\n${model.helloUnknown}\n!!");
+        givenTemplate("@template.test(model)");
+        thenRenderingFailsWithException()
+                .hasMessageStartingWith("Failed to compile template, error at test.jte:4\n")
+                .hasMessageContaining("cannot find symbol")
+                .hasMessageContaining("model.helloUnknown")
+                .hasMessageContaining("has been deprecated");
+    }
+
+    @Test
     void calledWithWrongParam1() {
         givenRawTemplate("@param String hello\n${hello}");
         thenRenderingFailsWithException().hasMessage("Failed to render test/template.jte, type mismatch for parameter: Expected java.lang.String, got gg.jte.TemplateEngineTest$Model");
@@ -1569,6 +1587,8 @@ public class TemplateEngineTest {
         return assertThat(throwable).isInstanceOf(TemplateException.class);
     }
 
+
+
     @SuppressWarnings("SameParameterValue")
     private void thenRenderingFailsWithExceptionCausedBy(Class<? extends Throwable> clazz) {
         thenRenderingFailsWithException().hasCauseInstanceOf(clazz);
@@ -1624,5 +1644,8 @@ public class TemplateEngineTest {
         public String getThatThrows() {
             throw new NullPointerException("Oops");
         }
+
+        @Deprecated(forRemoval = true)
+        public boolean deprecatedMethod() { return true; }
     }
 }

@@ -15,6 +15,7 @@ buildNumber.properties
 ### Gradle ###
 build/
 .gradle/
+.kotlin/
 
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm

@@ -1,6 +1,6 @@
 
 plugins {
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm") version "2.1.10"
     id("gg.jte.gradle") version("3.1.17-SNAPSHOT")
 }
 

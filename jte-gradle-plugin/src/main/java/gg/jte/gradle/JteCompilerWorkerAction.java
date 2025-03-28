@@ -1,6 +1,6 @@
 package gg.jte.gradle;
 
-import gg.jte.TemplateGenerator;
+import gg.jte.compiler.TemplateCompiler;
 import org.gradle.workers.WorkAction;
 import org.gradle.workers.WorkParameters;
 
@@ -10,7 +10,7 @@ public abstract class JteCompilerWorkerAction implements WorkAction<JteCompilerW
         JteCompilerWorkerParameters parameters = getParameters();
         
         try {
-            new TemplateGenerator(
+            new TemplateCompiler(
                 parameters.getSourceDirectory().getAsFile().get().toPath(),
                 parameters.getTargetDirectory().getAsFile().get().toPath(),
                 parameters.getContentType().get(),

@@ -38,25 +38,32 @@ public abstract class GenerateJteTask extends JteTaskBase {
 
     @TaskAction
     public void execute() {
-        // use worker api so the classpath can be modified
-        WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
+        WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec -> {
+            spec.getClasspath().from(getClasspath());
+            spec.getClasspath().from(getProject().getConfigurations().getByName("jteCompilerClasspath"));
+        });
 
-        workQueue.submit(GenerateJteWorker.class, this::buildParams);
+        workQueue.submit(JteCompilerWorkerAction.class, parameters -> {
+            parameters.getSourceDirectory().fileValue(getSourceDirectory().toFile());
+            parameters.getTargetDirectory().fileValue(getTargetDirectory().toFile());
+            parameters.getContentType().set(getContentType());
+            parameters.getPackageName().set(getPackageName());
+            parameters.getTrimControlStructures().set(getTrimControlStructures());
+            parameters.getHtmlTags().set(getHtmlTags());
+            parameters.getHtmlCommentsPreserved().set(getHtmlCommentsPreserved());
+            parameters.getBinaryStaticContent().set(getBinaryStaticContent());
+            parameters.getTargetResourceDirectory().fileValue(getTargetResourceDirectory().toFile());
+            parameters.getProjectNamespace().set(extension.getProjectNamespace());
+            parameters.getJteExtensions().set(getProject().provider(() -> 
+                extension.getJteExtensions().get().stream()
+                    .collect(Collectors.toMap(
+                        e -> e.getClassName().get(),
+                        e -> e.getProperties().get()
+                    ))
+            ));
+        });
+        
         workQueue.await();
-    }
-
-    private void buildParams(GenerateJteParams params) {
-        params.getSourceDirectory().fileValue(getSourceDirectory().toFile());
-        params.getTargetDirectory().fileValue(getTargetDirectory().toFile());
-        params.getContentType().value(getContentType());
-        params.getPackageName().value(getPackageName());
-        params.getTrimControlStructures().value(getTrimControlStructures());
-        params.getHtmlTags().value(getHtmlTags());
-        params.getHtmlCommentsPreserved().value(getHtmlCommentsPreserved());
-        params.getBinaryStaticContent().value(getBinaryStaticContent());
-        params.getTargetResourceDirectory().fileValue(getTargetResourceDirectory().toFile());
-        params.getProjectNamespace().value(extension.getProjectNamespace());
-        extension.getJteExtensions().get().forEach(e -> params.getJteExtensions().put(e.getClassName().get(), e.getProperties().get()));
     }
 
 }

@@ -13,6 +13,17 @@ repositories {
 dependencies {
     implementation('gg.jte:jte:3.2.1-SNAPSHOT')
     implementation('gg.jte:jte-kotlin:3.2.1-SNAPSHOT')
+    
+    // Kotlin compiler dependency for compilation only
+    compileOnly('org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.20')
+}
+
+configurations {
+    jteCompilerClasspath
+}
+
+dependencies {
+    jteCompilerClasspath('org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.20')
 }
 
 group = 'gg.jte'

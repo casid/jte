@@ -4,7 +4,7 @@
 
     <groupId>gg.jte</groupId>
     <artifactId>jte-runtime-test-kotlin</artifactId>
-    <version>3.1.17-SNAPSHOT</version>
+    <version>3.2.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>gg.jte</groupId>
             <artifactId>jte-runtime</artifactId>
-            <version>3.1.17-SNAPSHOT</version>
+            <version>3.2.0</version>
         </dependency>
 
         <dependency>
@@ -89,7 +89,7 @@
             <plugin>
                 <groupId>gg.jte</groupId>
                 <artifactId>jte-maven-plugin</artifactId>
-                <version>3.1.17-SNAPSHOT</version>
+                <version>3.2.0</version>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/jte</sourceDirectory>
                     <targetDirectory>${basedir}/jte-classes</targetDirectory>

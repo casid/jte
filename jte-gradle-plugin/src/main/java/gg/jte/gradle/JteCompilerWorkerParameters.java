@@ -1,5 +1,6 @@
 package gg.jte.gradle;
 
+import gg.jte.ContentType;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
@@ -10,10 +11,10 @@ import java.util.Map;
 public interface JteCompilerWorkerParameters extends WorkParameters {
     RegularFileProperty getSourceDirectory();
     RegularFileProperty getTargetDirectory();
-    Property<String> getContentType();
+    Property<ContentType> getContentType();
     Property<String> getPackageName();
     Property<Boolean> getTrimControlStructures();
-    Property<String> getHtmlTags();
+    Property<String[]> getHtmlTags();
     Property<Boolean> getHtmlCommentsPreserved();
     Property<Boolean> getBinaryStaticContent();
     RegularFileProperty getTargetResourceDirectory();

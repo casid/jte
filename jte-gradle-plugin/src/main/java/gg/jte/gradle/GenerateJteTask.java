@@ -10,6 +10,7 @@ import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 @CacheableTask
 public abstract class GenerateJteTask extends JteTaskBase {

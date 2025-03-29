@@ -1,30 +1,29 @@
 package gg.jte.gradle;
 
-import gg.jte.TemplateEngine;
 import gg.jte.html.HtmlPolicy;
-import gg.jte.resolve.DirectoryCodeResolver;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.*;
+import org.gradle.workers.WorkQueue;
+import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
-@CacheableTask
 public class PrecompileJteTask extends JteTaskBase {
+    {
+        getOutputs().cacheIf(task -> true); // Enable caching based on outputs
+    }
 
     @Inject
-    public PrecompileJteTask(JteExtension extension)
+    public PrecompileJteTask(JteExtension extension, WorkerExecutor workerExecutor)
     {
         super(extension, JteStage.PRECOMPILE);
+        this.workerExecutor = workerExecutor;
     }
 
     @InputFiles
@@ -71,50 +70,29 @@ public class PrecompileJteTask extends JteTaskBase {
         setterCalled();
     }
 
+    private final WorkerExecutor workerExecutor;
+
     @TaskAction
     public void execute() {
-        // Prevent Kotlin compiler to leak file handles, see https://github.com/casid/jte/issues/77
-        // Use String literal as KOTLIN_COMPILER_ENVIRONMENT_KEEPALIVE_PROPERTY constant isn't available
-        System.setProperty("kotlin.environment.keepalive", "false");
-
-        Logger logger = getLogger();
-        long start = System.nanoTime();
-
-        Path sourceDirectory = getSourceDirectory();
-        logger.info("Precompiling jte templates found in " + sourceDirectory);
-
-        Path targetDirectory = getTargetDirectory();
-        TemplateEngine templateEngine = TemplateEngine.create(
-                new DirectoryCodeResolver(sourceDirectory),
-                targetDirectory,
-                getContentType(),
-                null,
-                getPackageName());
-        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(getTrimControlStructures()));
-        templateEngine.setHtmlTags(getHtmlTags());
-        if (extension.getHtmlPolicyClass().isPresent()) {
-            templateEngine.setHtmlPolicy(createHtmlPolicy(getHtmlPolicyClass()));
-        }
-        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(getHtmlCommentsPreserved()));
-        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(getBinaryStaticContent()));
-        templateEngine.setCompileArgs(getCompileArgs());
-        templateEngine.setKotlinCompileArgs(getKotlinCompileArgs());
-        templateEngine.setTargetResourceDirectory(getTargetResourceDirectory());
-
-        int amount;
-        try {
-            templateEngine.cleanAll();
-            List<String> compilePathFiles = getCompilePath().getFiles().stream().map(File::getAbsolutePath).collect(Collectors.toList());
-            amount = templateEngine.precompileAll(compilePathFiles).size();
-        } catch (Exception e) {
-            logger.error("Failed to precompile templates.", e);
-
-            throw e;
-        }
-
-        long end = System.nanoTime();
-        long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
-        logger.info("Successfully precompiled " + amount + " jte file" + (amount == 1 ? "" : "s") + " in " + duration + "s to " + targetDirectory);
+        WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec ->
+            spec.getClasspath().from(getCompilePath())
+        );
+        
+        workQueue.submit(PrecompileJteWorker.class, params -> {
+            params.getSourceDirectory().set(getSourceDirectory().toFile());
+            params.getTargetDirectory().set(getTargetDirectory().toFile());
+            params.getContentType().set(getContentType());
+            params.getPackageName().set(getPackageName());
+            params.getTrimControlStructures().set(getTrimControlStructures());
+            params.getHtmlTags().set(getHtmlTags());
+            params.getHtmlPolicyClass().set(getHtmlPolicyClass());
+            params.getHtmlCommentsPreserved().set(getHtmlCommentsPreserved());
+            params.getBinaryStaticContent().set(getBinaryStaticContent());
+            params.getCompileArgs().set(getCompileArgs());
+            params.getKotlinCompileArgs().set(getKotlinCompileArgs());
+            params.getTargetResourceDirectory().set(getTargetResourceDirectory().toFile());
+            params.getCompilePath().from(getCompilePath());
+        });
     }
 
     private HtmlPolicy createHtmlPolicy(String htmlPolicyClass) {

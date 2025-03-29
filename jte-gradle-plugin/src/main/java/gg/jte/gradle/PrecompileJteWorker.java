@@ -59,7 +59,7 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
                 null,
                 params.getPackageName().get());
 
-        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(params.getTrimControlStructures().getOrNull()));
+        templateEngine.setTrimControlStructures(params.getTrimControlStructures().orElse(false));
         templateEngine.setHtmlTags(params.getHtmlTags().getOrNull());
         
         String htmlPolicyClass = params.getHtmlPolicyClass().getOrNull();

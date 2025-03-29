@@ -18,8 +18,8 @@ group = "gg.jte"
 version = "3.2.1-SNAPSHOT"
 
 tasks.withType<JavaCompile> {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
 }
 
 gradlePlugin {

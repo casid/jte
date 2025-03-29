@@ -15,15 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrecompileJteTask extends JteTaskBase {
-    {
-        getOutputs().cacheIf(task -> true); // Enable caching based on outputs
-    }
-
     @Inject
-    public PrecompileJteTask(JteExtension extension, WorkerExecutor workerExecutor)
-    {
+    public PrecompileJteTask(JteExtension extension, WorkerExecutor workerExecutor) {
         super(extension, JteStage.PRECOMPILE);
         this.workerExecutor = workerExecutor;
+        getOutputs().cacheIf(task -> true); // Enable caching based on outputs
     }
 
     @InputFiles
@@ -75,9 +71,9 @@ public class PrecompileJteTask extends JteTaskBase {
     @TaskAction
     public void execute() {
         WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec ->
-            spec.getClasspath().from(getCompilePath())
+                spec.getClasspath().from(getCompilePath())
         );
-        
+
         workQueue.submit(PrecompileJteWorker.class, params -> {
             params.getSourceDirectory().set(getSourceDirectory().toFile());
             params.getTargetDirectory().set(getTargetDirectory().toFile());

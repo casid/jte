@@ -3,9 +3,9 @@ package gg.jte.gradle;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.workers.WorkAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.gradle.workers.WorkAction;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;

@@ -25,17 +25,29 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
 
     interface Parameters extends WorkParameters {
         RegularFileProperty getSourceDirectory();
+
         RegularFileProperty getTargetDirectory();
+
         Property<gg.jte.ContentType> getContentType();
+
         Property<String> getPackageName();
+
         Property<Boolean> getTrimControlStructures();
+
         Property<String[]> getHtmlTags();
+
         Property<String> getHtmlPolicyClass();
+
         Property<Boolean> getHtmlCommentsPreserved();
+
         Property<Boolean> getBinaryStaticContent();
+
         Property<String[]> getCompileArgs();
+
         Property<String[]> getKotlinCompileArgs();
+
         RegularFileProperty getTargetResourceDirectory();
+
         ConfigurableFileCollection getCompilePath();
     }
 
@@ -50,7 +62,7 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
         Path sourceDirectory = params.getSourceDirectory().get().getAsFile().toPath();
         Path targetDirectory = params.getTargetDirectory().get().getAsFile().toPath();
 
-        logger.info("Precompiling jte templates found in " + sourceDirectory);
+        logger.info("Precompiling jte templates found in {}", sourceDirectory);
 
         TemplateEngine templateEngine = TemplateEngine.create(
                 new DirectoryCodeResolver(sourceDirectory),
@@ -59,9 +71,9 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
                 null,
                 params.getPackageName().get());
 
-        templateEngine.setTrimControlStructures(params.getTrimControlStructures().orElse(false));
+        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(params.getTrimControlStructures().getOrNull()));
         templateEngine.setHtmlTags(params.getHtmlTags().getOrNull());
-        
+
         String htmlPolicyClass = params.getHtmlPolicyClass().getOrNull();
         if (htmlPolicyClass != null) {
             templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass, params.getCompilePath()));
@@ -71,7 +83,7 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
         templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(params.getBinaryStaticContent().getOrNull()));
         templateEngine.setCompileArgs(params.getCompileArgs().getOrNull());
         templateEngine.setKotlinCompileArgs(params.getKotlinCompileArgs().getOrNull());
-        
+
         File targetResourceDir = params.getTargetResourceDirectory().getAsFile().getOrNull();
         if (targetResourceDir != null) {
             templateEngine.setTargetResourceDirectory(targetResourceDir.toPath());
@@ -81,8 +93,8 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
         try {
             templateEngine.cleanAll();
             List<String> compilePathFiles = params.getCompilePath().getFiles().stream()
-                .map(File::getAbsolutePath)
-                .collect(Collectors.toList());
+                    .map(File::getAbsolutePath)
+                    .collect(Collectors.toList());
             amount = templateEngine.precompileAll(compilePathFiles).size();
         } catch (Exception e) {
             logger.error("Failed to precompile templates.", e);
@@ -91,12 +103,11 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
 
         long end = System.nanoTime();
         long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
-        logger.info("Successfully precompiled " + amount + " jte file" + (amount == 1 ? "" : "s") + " in " + duration + "s to " + targetDirectory);
+        logger.info("Successfully precompiled {} jte file{} in {}s to {}", amount, amount == 1 ? "" : "s", duration, targetDirectory);
     }
 
     private HtmlPolicy createHtmlPolicy(String htmlPolicyClass, ConfigurableFileCollection compilePath) {
-        try {
-            URLClassLoader projectClassLoader = createProjectClassLoader(compilePath);
+        try (URLClassLoader projectClassLoader = createProjectClassLoader(compilePath)) {
             Class<?> clazz = projectClassLoader.loadClass(htmlPolicyClass);
             return (HtmlPolicy) clazz.getConstructor().newInstance();
         } catch (Exception e) {

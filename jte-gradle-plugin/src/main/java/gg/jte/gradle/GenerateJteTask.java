@@ -11,15 +11,14 @@ import org.gradle.workers.WorkerExecutor;
 import javax.inject.Inject;
 import java.nio.file.Path;
 
-@CacheableTask
 public abstract class GenerateJteTask extends JteTaskBase {
-
     private final WorkerExecutor workerExecutor;
 
     @Inject
     public GenerateJteTask(JteExtension extension, WorkerExecutor workerExecutor) {
         super(extension, JteStage.GENERATE);
         this.workerExecutor = workerExecutor;
+        getOutputs().cacheIf(task -> true); // Enable caching based on outputs
     }
 
     @Override
@@ -38,11 +37,14 @@ public abstract class GenerateJteTask extends JteTaskBase {
 
     @TaskAction
     public void execute() {
-        // use worker api so the classpath can be modified
-        WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
+        // Use worker API with classloader isolation to avoid compiler symbol conflicts
+        WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec -> {
+            spec.getClasspath().from(getClasspath());
+            // Ensure compiler classes are loaded in isolated classloader
+            spec.getClasspath().from(extension.getCompilePath());
+        });
 
         workQueue.submit(GenerateJteWorker.class, this::buildParams);
-        workQueue.await();
     }
 
     private void buildParams(GenerateJteParams params) {

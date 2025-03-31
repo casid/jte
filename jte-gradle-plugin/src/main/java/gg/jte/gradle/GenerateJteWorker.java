@@ -4,8 +4,8 @@ import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.workers.WorkAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams> {
     @Override
     public void execute() {
-        Logger logger = LoggerFactory.getLogger(GenerateJteWorker.class);
+        Logger logger = Logging.getLogger(GenerateJteWorker.class);
         long start = System.nanoTime();
 
         GenerateJteParams params = getParameters();

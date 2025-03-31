@@ -59,51 +59,62 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
         long start = System.nanoTime();
         Parameters params = getParameters();
 
-        Path sourceDirectory = params.getSourceDirectory().get().getAsFile().toPath();
-        Path targetDirectory = params.getTargetDirectory().get().getAsFile().toPath();
+        // Load compiler in isolated classloader
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try (URLClassLoader compilerClassLoader = createProjectClassLoader(params.getCompilePath())) {
+            Thread.currentThread().setContextClassLoader(compilerClassLoader);
 
-        logger.info("Precompiling jte templates found in {}", sourceDirectory);
+            Path sourceDirectory = params.getSourceDirectory().get().getAsFile().toPath();
+            Path targetDirectory = params.getTargetDirectory().get().getAsFile().toPath();
 
-        TemplateEngine templateEngine = TemplateEngine.create(
-                new DirectoryCodeResolver(sourceDirectory),
-                targetDirectory,
-                params.getContentType().get(),
-                null,
-                params.getPackageName().get());
+            logger.info("Precompiling jte templates found in {}", sourceDirectory);
 
-        templateEngine.setTrimControlStructures(Boolean.TRUE.equals(params.getTrimControlStructures().getOrNull()));
-        templateEngine.setHtmlTags(params.getHtmlTags().getOrNull());
+            TemplateEngine templateEngine = TemplateEngine.create(
+                    new DirectoryCodeResolver(sourceDirectory),
+                    targetDirectory,
+                    params.getContentType().get(),
+                    null,
+                    params.getPackageName().get());
 
-        String htmlPolicyClass = params.getHtmlPolicyClass().getOrNull();
-        if (htmlPolicyClass != null) {
-            templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass, params.getCompilePath()));
-        }
+            templateEngine.setTrimControlStructures(Boolean.TRUE.equals(params.getTrimControlStructures().getOrNull()));
+            templateEngine.setHtmlTags(params.getHtmlTags().getOrNull());
 
-        templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(params.getHtmlCommentsPreserved().getOrNull()));
-        templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(params.getBinaryStaticContent().getOrNull()));
-        templateEngine.setCompileArgs(params.getCompileArgs().getOrNull());
-        templateEngine.setKotlinCompileArgs(params.getKotlinCompileArgs().getOrNull());
+            String htmlPolicyClass = params.getHtmlPolicyClass().getOrNull();
 
-        File targetResourceDir = params.getTargetResourceDirectory().getAsFile().getOrNull();
-        if (targetResourceDir != null) {
-            templateEngine.setTargetResourceDirectory(targetResourceDir.toPath());
-        }
+            if (htmlPolicyClass != null) {
+                templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass, params.getCompilePath()));
+            }
 
-        int amount;
-        try {
-            templateEngine.cleanAll();
-            List<String> compilePathFiles = params.getCompilePath().getFiles().stream()
-                    .map(File::getAbsolutePath)
-                    .collect(Collectors.toList());
-            amount = templateEngine.precompileAll(compilePathFiles).size();
+            templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(params.getHtmlCommentsPreserved().getOrNull()));
+            templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(params.getBinaryStaticContent().getOrNull()));
+            templateEngine.setCompileArgs(params.getCompileArgs().getOrNull());
+            templateEngine.setKotlinCompileArgs(params.getKotlinCompileArgs().getOrNull());
+
+            File targetResourceDir = params.getTargetResourceDirectory().getAsFile().getOrNull();
+            if (targetResourceDir != null) {
+                templateEngine.setTargetResourceDirectory(targetResourceDir.toPath());
+            }
+
+            int amount;
+            try {
+                templateEngine.cleanAll();
+                List<String> compilePathFiles = params.getCompilePath().getFiles().stream()
+                        .map(File::getAbsolutePath)
+                        .collect(Collectors.toList());
+                amount = templateEngine.precompileAll(compilePathFiles).size();
+            } catch (Exception e) {
+                logger.error("Failed to precompile templates.", e);
+                throw e;
+            }
+
+            long end = System.nanoTime();
+            long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
+            logger.info("Successfully precompiled {} jte file{} in {}s to {}", amount, amount == 1 ? "" : "s", duration, targetDirectory);
         } catch (Exception e) {
-            logger.error("Failed to precompile templates.", e);
-            throw e;
+            throw new RuntimeException("Failed to execute template precompilation", e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
-
-        long end = System.nanoTime();
-        long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
-        logger.info("Successfully precompiled {} jte file{} in {}s to {}", amount, amount == 1 ? "" : "s", duration, targetDirectory);
     }
 
     private HtmlPolicy createHtmlPolicy(String htmlPolicyClass, ConfigurableFileCollection compilePath) {

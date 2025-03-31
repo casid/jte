@@ -21,7 +21,7 @@ public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams>
         Path sourceDirectory = path(params.getSourceDirectory());
         Path targetDirectory = path(params.getTargetDirectory());
 
-        logger.info("Generating jte templates found in " + sourceDirectory);
+        logger.info("Generating jte templates found in {}", sourceDirectory);
 
         TemplateEngine templateEngine = TemplateEngine.create(
                 new DirectoryCodeResolver(sourceDirectory),
@@ -48,7 +48,7 @@ public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams>
 
         long end = System.nanoTime();
         long duration = TimeUnit.NANOSECONDS.toSeconds(end - start);
-        logger.info("Successfully generated " + amount + " jte file" + (amount == 1 ? "" : "s") + " in " + duration + "s to " + targetDirectory);
+        logger.info("Successfully generated {} jte file{} in {}s to {}", amount, amount == 1 ? "" : "s", duration, targetDirectory);
     }
 
     private static Path path(RegularFileProperty property) {

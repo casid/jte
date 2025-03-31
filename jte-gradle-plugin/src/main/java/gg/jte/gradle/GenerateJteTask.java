@@ -39,12 +39,27 @@ public abstract class GenerateJteTask extends JteTaskBase {
     public void execute() {
         // Use worker API with classloader isolation to avoid compiler symbol conflicts
         WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec -> {
+            // Include both application and compiler classpath in isolation
             spec.getClasspath().from(getClasspath());
-            // Ensure compiler classes are loaded in isolated classloader
             spec.getClasspath().from(extension.getCompilePath());
         });
 
-        workQueue.submit(GenerateJteWorker.class, this::buildParams);
+        workQueue.submit(GenerateJteWorker.class, params -> {
+            params.getSourceDirectory().fileValue(getSourceDirectory().toFile());
+            params.getTargetDirectory().fileValue(getTargetDirectory().toFile());
+            params.getContentType().value(getContentType());
+            params.getPackageName().value(getPackageName());
+            params.getTrimControlStructures().value(getTrimControlStructures());
+            params.getHtmlTags().value(getHtmlTags());
+            params.getHtmlCommentsPreserved().value(getHtmlCommentsPreserved());
+            params.getBinaryStaticContent().value(getBinaryStaticContent());
+            params.getTargetResourceDirectory().fileValue(getTargetResourceDirectory().toFile());
+            params.getProjectNamespace().value(extension.getProjectNamespace());
+            params.getCompilerClasspath().from(extension.getCompilePath());
+            extension.getJteExtensions().get().forEach(e -> 
+                params.getJteExtensions().put(e.getClassName().get(), e.getProperties().get())
+            );
+        });
     }
 
     private void buildParams(GenerateJteParams params) {

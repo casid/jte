@@ -12,10 +12,8 @@ import org.gradle.workers.WorkAction;
 import org.gradle.workers.WorkParameters;
 
 import java.io.File;
-import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -61,7 +59,7 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
 
         // Load compiler in isolated classloader
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try (URLClassLoader compilerClassLoader = createProjectClassLoader(params.getCompilePath())) {
+        try (URLClassLoader compilerClassLoader = ClassLoaderUtils.createCompilerClassLoader(params.getCompilePath())) {
             Thread.currentThread().setContextClassLoader(compilerClassLoader);
 
             Path sourceDirectory = params.getSourceDirectory().get().getAsFile().toPath();
@@ -118,24 +116,12 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
     }
 
     private HtmlPolicy createHtmlPolicy(String htmlPolicyClass, ConfigurableFileCollection compilePath) {
-        try (URLClassLoader projectClassLoader = createProjectClassLoader(compilePath)) {
-            Class<?> clazz = projectClassLoader.loadClass(htmlPolicyClass);
+        try (URLClassLoader compilerClassLoader = ClassLoaderUtils.createCompilerClassLoader(compilePath)) {
+            Class<?> clazz = compilerClassLoader.loadClass(htmlPolicyClass);
             return (HtmlPolicy) clazz.getConstructor().newInstance();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to instantiate custom HtmlPolicy " + htmlPolicyClass, e);
         }
     }
 
-    private URLClassLoader createProjectClassLoader(ConfigurableFileCollection compilePath) {
-        try {
-            List<File> files = new ArrayList<>(compilePath.getFiles());
-            URL[] runtimeUrls = new URL[files.size()];
-            for (int i = 0; i < files.size(); i++) {
-                runtimeUrls[i] = files.get(i).toURI().toURL();
-            }
-            return new URLClassLoader(runtimeUrls, Thread.currentThread().getContextClassLoader());
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to create project classloader", e);
-        }
-    }
 }

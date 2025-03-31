@@ -1,7 +1,6 @@
 package gg.jte.gradle;
 
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.TaskAction;
@@ -22,10 +21,8 @@ public abstract class GenerateJteTask extends JteTaskBase {
     }
 
     @Override
-    public Path getTargetDirectory()
-    {
-        if (!extension.getStage().isPresent())
-        {
+    public Path getTargetDirectory() {
+        if (!extension.getStage().isPresent()) {
             extension.getStage().set(JteStage.GENERATE);
         }
         return super.getTargetDirectory();
@@ -56,24 +53,9 @@ public abstract class GenerateJteTask extends JteTaskBase {
             params.getTargetResourceDirectory().fileValue(getTargetResourceDirectory().toFile());
             params.getProjectNamespace().value(extension.getProjectNamespace());
             params.getCompilerClasspath().from(extension.getCompilePath());
-            extension.getJteExtensions().get().forEach(e -> 
-                params.getJteExtensions().put(e.getClassName().get(), e.getProperties().get())
+            extension.getJteExtensions().get().forEach(e ->
+                    params.getJteExtensions().put(e.getClassName().get(), e.getProperties().get())
             );
         });
     }
-
-    private void buildParams(GenerateJteParams params) {
-        params.getSourceDirectory().fileValue(getSourceDirectory().toFile());
-        params.getTargetDirectory().fileValue(getTargetDirectory().toFile());
-        params.getContentType().value(getContentType());
-        params.getPackageName().value(getPackageName());
-        params.getTrimControlStructures().value(getTrimControlStructures());
-        params.getHtmlTags().value(getHtmlTags());
-        params.getHtmlCommentsPreserved().value(getHtmlCommentsPreserved());
-        params.getBinaryStaticContent().value(getBinaryStaticContent());
-        params.getTargetResourceDirectory().fileValue(getTargetResourceDirectory().toFile());
-        params.getProjectNamespace().value(extension.getProjectNamespace());
-        extension.getJteExtensions().get().forEach(e -> params.getJteExtensions().put(e.getClassName().get(), e.getProperties().get()));
-    }
-
 }

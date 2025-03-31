@@ -2,18 +2,13 @@ package gg.jte.gradle;
 
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
-import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.workers.WorkAction;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
-import java.io.File;
-import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams> {
@@ -26,7 +21,7 @@ public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams>
 
         // Load compiler in isolated classloader
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try (URLClassLoader compilerClassLoader = createCompilerClassLoader(params.getCompilerClasspath())) {
+        try (URLClassLoader compilerClassLoader = ClassLoaderUtils.createCompilerClassLoader(params.getCompilerClasspath())) {
             Thread.currentThread().setContextClassLoader(compilerClassLoader);
 
             Path sourceDirectory = path(params.getSourceDirectory());
@@ -67,17 +62,6 @@ public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams>
         }
     }
 
-    private URLClassLoader createCompilerClassLoader(ConfigurableFileCollection compilerClasspath) {
-        try {
-            List<URL> urls = new ArrayList<>();
-            for (File file : compilerClasspath.getFiles()) {
-                urls.add(file.toURI().toURL());
-            }
-            return new URLClassLoader(urls.toArray(new URL[0]), getClass().getClassLoader());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create compiler classloader", e);
-        }
-    }
 
     private static Path path(RegularFileProperty property) {
         return property.getAsFile().get().toPath();

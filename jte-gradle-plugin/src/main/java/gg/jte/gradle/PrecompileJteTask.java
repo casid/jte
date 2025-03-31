@@ -1,18 +1,11 @@
 package gg.jte.gradle;
 
-import gg.jte.html.HtmlPolicy;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.*;
 import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PrecompileJteTask extends JteTaskBase {
     @Inject
@@ -89,26 +82,5 @@ public class PrecompileJteTask extends JteTaskBase {
             params.getTargetResourceDirectory().set(getTargetResourceDirectory().toFile());
             params.getCompilePath().from(getCompilePath());
         });
-    }
-
-    private HtmlPolicy createHtmlPolicy(String htmlPolicyClass) {
-        try {
-            URLClassLoader projectClassLoader = createProjectClassLoader();
-            Class<?> clazz = projectClassLoader.loadClass(htmlPolicyClass);
-            return (HtmlPolicy) clazz.getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to instantiate custom HtmlPolicy " + htmlPolicyClass, e);
-        }
-    }
-
-    private URLClassLoader createProjectClassLoader() throws IOException {
-        List<File> files = new ArrayList<>(getCompilePath().getFiles());
-
-        URL[] runtimeUrls = new URL[files.size()];
-        for (int i = 0; i < files.size(); i++) {
-            File element = files.get(i);
-            runtimeUrls[i] = element.toURI().toURL();
-        }
-        return new URLClassLoader(runtimeUrls, Thread.currentThread().getContextClassLoader());
     }
 }

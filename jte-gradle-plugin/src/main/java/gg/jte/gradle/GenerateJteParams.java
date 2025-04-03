@@ -84,20 +84,5 @@ public interface GenerateJteParams extends WorkParameters {
      * The classpath to use for compilation, including any compiler dependencies
      */
     ConfigurableFileCollection getCompilerClasspath();
-
-    /**
-     * The HTML policy class name to use for compilation
-     */
-    Property<String> getHtmlPolicyClass();
-
-    /**
-     * Additional compilation arguments for Java
-     */
-    Property<String[]> getCompileArgs();
-
-    /**
-     * Additional compilation arguments for Kotlin
-     */
-    Property<String[]> getKotlinCompileArgs();
 }
 

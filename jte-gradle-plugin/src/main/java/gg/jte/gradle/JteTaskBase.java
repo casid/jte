@@ -8,37 +8,21 @@ import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
-import org.gradle.workers.WorkerExecutor;
 
-import javax.inject.Inject;
 import java.nio.file.Path;
 
 public abstract class JteTaskBase extends DefaultTask {
-    private final JteStage stage;
-    protected final JteExtension extension;
-    protected final WorkerExecutor workerExecutor;
 
-    @Inject
-    public JteTaskBase(JteExtension extension, JteStage stage, WorkerExecutor workerExecutor) {
+    public JteTaskBase(JteExtension extension, JteStage stage)
+    {
         this.extension = extension;
         this.stage = stage;
-        this.workerExecutor = workerExecutor;
-        
+
         onlyIf(t -> extension.getStage().getOrNull() == stage);
-        getOutputs().cacheIf(task -> true); // Enable caching based on outputs
     }
 
-    protected void configureWorkerParams(GenerateJteParams params) {
-        params.getSourceDirectory().set(getSourceDirectory().toFile());
-        params.getTargetDirectory().set(getTargetDirectory().toFile());
-        params.getContentType().set(getContentType());
-        params.getPackageName().set(getPackageName());
-        params.getTrimControlStructures().set(getTrimControlStructures());
-        params.getHtmlTags().set(getHtmlTags());
-        params.getHtmlCommentsPreserved().set(getHtmlCommentsPreserved());
-        params.getBinaryStaticContent().set(getBinaryStaticContent());
-        params.getTargetResourceDirectory().set(getTargetResourceDirectory().toFile());
-    }
+    private final JteStage stage;
+    protected final JteExtension extension;
 
     // for backwards compatibility, set the stage if a setter on the task is called directly
     protected void setterCalled() {

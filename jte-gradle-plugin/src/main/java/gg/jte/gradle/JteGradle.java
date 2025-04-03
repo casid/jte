@@ -4,9 +4,6 @@ import gg.jte.ContentType;
 import gg.jte.runtime.Constants;
 import org.gradle.api.*;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
@@ -15,25 +12,11 @@ import org.gradle.api.tasks.TaskProvider;
 import java.io.File;
 
 public class JteGradle implements Plugin<Project> {
-    private static final Logger logger = Logging.getLogger(JteGradle.class);
-    private static final String KOTLIN_COMPILER_EMBEDDABLE = "org.jetbrains.kotlin:kotlin-compiler-embeddable";
 
-    @Override 
+    @Override
     public void apply(Project project) {
         project.getPlugins().apply(JavaPlugin.class);
         
-        // Check for kotlin-compiler-embeddable on classpath
-        project.getConfigurations().all(configuration -> {
-            configuration.getDependencies().all(dependency -> {
-                if (isKotlinCompilerEmbeddable(dependency)) {
-                    logger.warn(
-                        "Warning: {} was found on the build classpath. This may cause compatibility issues. " +
-                        "Consider using Gradle Worker API with classloader isolation instead.",
-                        KOTLIN_COMPILER_EMBEDDABLE
-                    );
-                }
-            });
-        });
         SourceSet main = getMainSourceSet(project);
         JteExtension extension = project.getExtensions().create("jte", JteExtension.class, project.getObjects());
         defaults(project, extension, main);
@@ -92,9 +75,5 @@ public class JteGradle implements Plugin<Project> {
             project.getTasks().named(taskName).configure(action);
         } catch (UnknownTaskException ignore) {
         }
-    }
-
-    private boolean isKotlinCompilerEmbeddable(Dependency dependency) {
-        return KOTLIN_COMPILER_EMBEDDABLE.equals(dependency.getGroup() + ":" + dependency.getName());
     }
 }

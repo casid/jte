@@ -12,9 +12,11 @@ import org.gradle.api.tasks.TaskProvider;
 import java.io.File;
 
 public class JteGradle implements Plugin<Project> {
+
     @Override
     public void apply(Project project) {
         project.getPlugins().apply(JavaPlugin.class);
+        
         SourceSet main = getMainSourceSet(project);
         JteExtension extension = project.getExtensions().create("jte", JteExtension.class, project.getObjects());
         defaults(project, extension, main);

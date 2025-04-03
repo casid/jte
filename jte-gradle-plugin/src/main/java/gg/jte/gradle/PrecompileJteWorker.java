@@ -4,12 +4,9 @@ import gg.jte.TemplateEngine;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.resolve.DirectoryCodeResolver;
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.api.provider.Property;
 import org.gradle.workers.WorkAction;
-import org.gradle.workers.WorkParameters;
 
 import java.io.File;
 import java.net.URLClassLoader;
@@ -18,36 +15,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWorker.Parameters> {
+public abstract class PrecompileJteWorker implements WorkAction<GenerateJteParams> {
     private static final Logger logger = Logging.getLogger(PrecompileJteWorker.class);
-
-    interface Parameters extends WorkParameters {
-        RegularFileProperty getSourceDirectory();
-
-        RegularFileProperty getTargetDirectory();
-
-        Property<gg.jte.ContentType> getContentType();
-
-        Property<String> getPackageName();
-
-        Property<Boolean> getTrimControlStructures();
-
-        Property<String[]> getHtmlTags();
-
-        Property<String> getHtmlPolicyClass();
-
-        Property<Boolean> getHtmlCommentsPreserved();
-
-        Property<Boolean> getBinaryStaticContent();
-
-        Property<String[]> getCompileArgs();
-
-        Property<String[]> getKotlinCompileArgs();
-
-        RegularFileProperty getTargetResourceDirectory();
-
-        ConfigurableFileCollection getCompilePath();
-    }
 
     @Override
     public void execute() {
@@ -55,11 +24,11 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
         System.setProperty("kotlin.environment.keepalive", "false");
 
         long start = System.nanoTime();
-        Parameters params = getParameters();
+        GenerateJteParams params = getParameters();
 
         // Load compiler in isolated classloader
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try (URLClassLoader compilerClassLoader = ClassLoaderUtils.createCompilerClassLoader(params.getCompilePath())) {
+        try (URLClassLoader compilerClassLoader = ClassLoaderUtils.createCompilerClassLoader(params.getCompilerClasspath())) {
             Thread.currentThread().setContextClassLoader(compilerClassLoader);
 
             Path sourceDirectory = params.getSourceDirectory().get().getAsFile().toPath();
@@ -80,7 +49,7 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
             String htmlPolicyClass = params.getHtmlPolicyClass().getOrNull();
 
             if (htmlPolicyClass != null) {
-                templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass, params.getCompilePath()));
+                templateEngine.setHtmlPolicy(createHtmlPolicy(htmlPolicyClass, params.getCompilerClasspath()));
             }
 
             templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(params.getHtmlCommentsPreserved().getOrNull()));
@@ -96,7 +65,7 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
             int amount;
             try {
                 templateEngine.cleanAll();
-                List<String> compilePathFiles = params.getCompilePath().getFiles().stream()
+                List<String> compilePathFiles = params.getCompilerClasspath().getFiles().stream()
                         .map(File::getAbsolutePath)
                         .collect(Collectors.toList());
                 amount = templateEngine.precompileAll(compilePathFiles).size();

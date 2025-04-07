@@ -1,6 +1,7 @@
 package gg.jte.gradle;
 
 import gg.jte.ContentType;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
@@ -78,5 +79,10 @@ public interface GenerateJteParams extends WorkParameters {
      * </ul>
      */
     MapProperty<String, Map<String, String>> getJteExtensions();
+
+    /**
+     * The classpath to use for compilation, including any compiler dependencies
+     */
+    ConfigurableFileCollection getCompilerClasspath();
 }
 

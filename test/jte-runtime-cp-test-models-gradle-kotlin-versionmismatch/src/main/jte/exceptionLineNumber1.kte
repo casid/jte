@@ -1,0 +1,3 @@
+@param model: test.Model
+
+${model.thatThrows()}

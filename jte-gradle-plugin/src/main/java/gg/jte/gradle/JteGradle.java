@@ -66,7 +66,12 @@ public class JteGradle implements Plugin<Project> {
         extension.getPackageName().convention(Constants.PACKAGE_NAME_PRECOMPILED);
         extension.getTargetResourceDirectory().convention(new File(project.getBuildDir(), "generated-resources/jte").toPath());
 
-        extension.getCompilePath().setFrom(main.getRuntimeClasspath());
+        // Create configuration to include Kotlin Compiler isolated from user Kotlin version
+        String configurationName = "jteKotlinCompiler";
+        Configuration kotlinCompiler = project.getConfigurations().create(configurationName);
+        project.getDependencies().add(configurationName, "org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.10");
+
+        extension.getCompilePath().setFrom(main.getRuntimeClasspath(), kotlinCompiler);
         extension.getProjectNamespace().convention(project.getGroup() + "/" + project.getName());
     }
 

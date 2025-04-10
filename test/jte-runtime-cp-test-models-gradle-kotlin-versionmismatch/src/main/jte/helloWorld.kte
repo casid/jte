@@ -1,0 +1,2 @@
+@param model: test.Model
+${model.hello} World

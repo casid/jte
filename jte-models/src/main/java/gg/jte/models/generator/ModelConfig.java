@@ -19,6 +19,14 @@ public class ModelConfig {
         return map.getOrDefault("implementationAnnotation", "");
     }
 
+    public String staticImplementationAnnotation() {
+        return map.getOrDefault("staticImplementationAnnotation", "");
+    }
+
+    public String dynamicImplementationAnnotation() {
+        return map.getOrDefault("dynamicImplementationAnnotation", "");
+    }
+
     public Language language() {
         String configuredLanguage = map.getOrDefault("language", "Java");
         try {
@@ -46,5 +54,9 @@ public class ModelConfig {
             return null;
         }
         return Pattern.compile(excludePattern);
+    }
+
+    public String interfaceName() {
+        return map.getOrDefault("interfaceName", "Templates");
     }
 }

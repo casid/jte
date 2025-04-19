@@ -18,6 +18,7 @@ import ${imp}
 @endfor
 
 ${modelConfig.implementationAnnotation()}
+${modelConfig.dynamicImplementationAnnotation()}
 class ${targetClassName}(private val engine: TemplateEngine) : ${interfaceName} {
     @for(TemplateDescription template: templates)
         @template.dynamictemplates.kmethod(template = template)

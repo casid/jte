@@ -43,10 +43,11 @@ public class ModelExtension implements JteExtension {
                 .filter(x -> excludePattern == null || !excludePattern.matcher(x.fullyQualifiedClassName()).matches()) //
                 .collect(Collectors.toSet());
 
+        var interfaceName = modelConfig.interfaceName();
         return Stream.of(
-                new ModelGenerator(engine, "interfacetemplates", "Templates", "Templates", language),
-                new ModelGenerator(engine, "statictemplates", "StaticTemplates", "Templates", language),
-                new ModelGenerator(engine, "dynamictemplates", "DynamicTemplates", "Templates", language)
+                new ModelGenerator(engine, "interfacetemplates", interfaceName, interfaceName, language),
+                new ModelGenerator(engine, "statictemplates", "Static" + interfaceName, interfaceName, language),
+                new ModelGenerator(engine, "dynamictemplates", "Dynamic" + interfaceName, interfaceName, language)
         ).map(g -> g.generate(config, templateDescriptionsFiltered, modelConfig))
                 .toList();
     }

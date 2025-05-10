@@ -21,6 +21,7 @@ import gg.jte.html.HtmlTemplateOutput;
 @endfor
 
 ${modelConfig.implementationAnnotation()}
+${modelConfig.staticImplementationAnnotation()}
 public class ${targetClassName} implements ${interfaceName} {
     @for(TemplateDescription template: templates)
         @template.statictemplates.method(config = config, template = template)

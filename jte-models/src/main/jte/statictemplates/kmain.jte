@@ -20,6 +20,7 @@ import ${imp}
 @endfor
 
 ${modelConfig.implementationAnnotation()}
+${modelConfig.staticImplementationAnnotation()}
 class ${targetClassName} : ${interfaceName} {
     @for(TemplateDescription template: templates)
         @template.statictemplates.kmethod(config = config, template = template)

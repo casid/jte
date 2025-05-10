@@ -31,7 +31,10 @@ jte {
     generate()
     binaryStaticContent = true
     jteExtension('gg.jte.models.generator.ModelExtension') {
-        implementationAnnotation = '@test.Dummy'
+        interfaceName = 'HtmlTemplates'
+        implementationAnnotation = '@test.Singleton'
+        staticImplementationAnnotation = '@test.Secondary'
+        dynamicImplementationAnnotation = '@test.Requires(bean = TemplateEngine.class)'
         includePattern = '.*'
         excludePattern = '.*Excluded.*'
     }

@@ -21,10 +21,11 @@ import gg.jte.models.runtime.*;
 @endfor
 
 ${modelConfig.implementationAnnotation()}
+${modelConfig.dynamicImplementationAnnotation()}
 public class ${targetClassName} implements ${interfaceName} {
     private final TemplateEngine engine;
 
-    public DynamicTemplates(TemplateEngine engine) {
+    public ${targetClassName}(TemplateEngine engine) {
         this.engine = engine;
     }
 

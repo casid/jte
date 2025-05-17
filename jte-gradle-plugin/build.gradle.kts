@@ -14,8 +14,8 @@ tasks.named<Test>("test") {
 }
 
 dependencies {
-    implementation("gg.jte:jte:3.2.1-SNAPSHOT")
-    implementation("gg.jte:jte-kotlin:3.2.1-SNAPSHOT") {
+    implementation("gg.jte:jte:3.2.2-SNAPSHOT")
+    implementation("gg.jte:jte-kotlin:3.2.2-SNAPSHOT") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
     }
     compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.10")
@@ -26,7 +26,7 @@ dependencies {
 }
 
 group = "gg.jte"
-version = "3.2.1-SNAPSHOT"
+version = "3.2.2-SNAPSHOT"
 
 tasks.withType<JavaCompile> {
     sourceCompatibility = "17"

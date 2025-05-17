@@ -1,17 +1,16 @@
 package gg.jte;
 
-import gg.jte.generated.precompiled.Templates;
-import gg.jte.output.StringOutput;
-import gg.jte.runtime.TemplateUtils;
-import org.assertj.core.api.AbstractThrowableAssert;
-import org.junit.jupiter.api.BeforeAll;
+import gg.jte.generated.precompiled.DynamicHtmlTemplates;
+import gg.jte.generated.precompiled.HtmlTemplates;
+import gg.jte.generated.precompiled.StaticHtmlTemplates;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import test.Dummy;
 import test.Model;
+import test.Requires;
+import test.Secondary;
+import test.Singleton;
 
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
@@ -26,8 +25,8 @@ public class TemplateEngineTest {
 
     private static TemplateEngine templateEngine = TemplateEngine.createPrecompiled(ContentType.Html);
 
-    private static final gg.jte.generated.precompiled.Templates staticTemplates = new gg.jte.generated.precompiled.StaticTemplates();
-    private static final gg.jte.generated.precompiled.Templates dynamicTemplates = new gg.jte.generated.precompiled.DynamicTemplates(templateEngine);
+    private static final gg.jte.generated.precompiled.HtmlTemplates staticTemplates = new gg.jte.generated.precompiled.StaticHtmlTemplates();
+    private static final gg.jte.generated.precompiled.HtmlTemplates dynamicTemplates = new gg.jte.generated.precompiled.DynamicHtmlTemplates(templateEngine);
     Model model = new Model();
 
     public static Stream<Arguments> templates() {
@@ -45,14 +44,14 @@ public class TemplateEngineTest {
 
     @ParameterizedTest
     @MethodSource("templates")
-    void helloWorld(gg.jte.generated.precompiled.Templates templates) {
+    void helloWorld(gg.jte.generated.precompiled.HtmlTemplates templates) {
         String output = templates.helloWorld(model).render();
         assertThat(output).isEqualTo("Hello World");
     }
 
     @ParameterizedTest
     @MethodSource("templates")
-    void exceptionLineNumber1(gg.jte.generated.precompiled.Templates templates) {
+    void exceptionLineNumber1(gg.jte.generated.precompiled.HtmlTemplates templates) {
         Throwable cause = catchThrowable(() -> templates.exceptionLineNumber1(model).render());
         assertThat(cause).isInstanceOf(TemplateException.class)
             .hasCauseInstanceOf(NullPointerException.class)
@@ -61,36 +60,42 @@ public class TemplateEngineTest {
 
     @ParameterizedTest
     @MethodSource("templates")
-    void unusedTag(gg.jte.generated.precompiled.Templates templates) {
+    void unusedTag(gg.jte.generated.precompiled.HtmlTemplates templates) {
         String output = templates.tagUnused("One", "Two").render();
         assertThat(output).isEqualTo("One is One, two is Two.");
     }
 
     @ParameterizedTest
     @MethodSource("templates")
-    void normalContent(Templates templates) {
+    void normalContent(HtmlTemplates templates) {
         String output = templates.main().render();
         assertThat(output).containsIgnoringWhitespaces("Header", "Main", "Footer");
     }
 
     @ParameterizedTest
     @MethodSource("templates")
-    void excludedTemplates(gg.jte.generated.precompiled.Templates templates){
+    void excludedTemplates(gg.jte.generated.precompiled.HtmlTemplates templates){
         assertThat(templates.getClass().getMethods()).noneMatch(m -> m.getName().contains("Exclude"));
     }
 
     @ParameterizedTest
     @MethodSource("templates")
-    void nestedContent(Templates templates) {
+    void nestedContent(HtmlTemplates templates) {
         String output = templates.layout(templates.helloWorld(model)).render();
         assertThat(output).containsIgnoringWhitespaces("Header", "Hello World", "Footer");
     }
 
     @ParameterizedTest
     @MethodSource("templates")
-    void hasAnnotation(Templates templates) {
-        Class<? extends Templates> clazz = templates.getClass();
+    void hasAnnotation(HtmlTemplates templates) {
+        Class<? extends HtmlTemplates> clazz = templates.getClass();
         Annotation[] annotations = clazz.getDeclaredAnnotations();
-        assertThat(annotations).anyMatch(a -> a instanceof Dummy);
+        assertThat(annotations).anyMatch(a -> a instanceof Singleton);
+        if (templates instanceof StaticHtmlTemplates) {
+            assertThat(annotations).anyMatch(a -> a instanceof Secondary);
+        }
+        if (templates instanceof DynamicHtmlTemplates) {
+            assertThat(annotations).anyMatch(a -> a instanceof Requires);
+        }
     }
 }

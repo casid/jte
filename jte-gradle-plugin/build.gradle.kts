@@ -9,12 +9,20 @@ repositories {
     mavenCentral()
 }
 
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation("gg.jte:jte:3.2.1-SNAPSHOT")
     implementation("gg.jte:jte-kotlin:3.2.1-SNAPSHOT") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
     }
     compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.10")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.assertj:assertj-core:3.27.3")
 }
 
 group = "gg.jte"

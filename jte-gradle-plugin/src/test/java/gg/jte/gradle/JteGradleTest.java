@@ -45,8 +45,9 @@ public class JteGradleTest {
 
         var result = GradleRunner.create()
                 .withProjectDir(tempProjectDir.toFile())
-                .withArguments("compileJava")
+                .withArguments("compileJava", "--info")
                 .withPluginClasspath()
+                .withDebug(true)
                 .build();
 
         assertThat(result).isNotNull();

@@ -1,12 +1,7 @@
 package gg.jte.gradle;
 
-import gg.jte.ContentType;
-import org.gradle.api.Action;
-import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.provider.Provider;
 
 import javax.inject.Inject;
 import java.nio.file.Path;
@@ -27,16 +22,18 @@ public abstract class JteNestedBuildSpec extends JteBuildSpec
     public JteNestedBuildSpec(String name, ObjectFactory objectFactory) {
         super(objectFactory);
         this.name = name;
+        getRelativePackageName().convention(name);
+        getRelativeSourceDirectory().convention(Path.of(name));
     }
 
     public abstract Property<Path> getRelativeSourceDirectory();
     public abstract Property<String> getRelativePackageName();
 
     public JteNestedBuildSpec convention(JteBuildSpec parent) {
-        getSourceDirectory().convention(parent.getSourceDirectory().map(parentSourceDirectory -> parentSourceDirectory.resolve(getRelativeSourceDirectory().get));
+        getSourceDirectory().convention(parent.getSourceDirectory().map(parentSourceDirectory -> parentSourceDirectory.resolve(getRelativeSourceDirectory().get())));
         getRelativeSourceDirectory().convention(Path.of(getName()));
 
-        getPackageName().convention(parent.getPackageName());
+        getPackageName().convention(parent.getPackageName().map(this::_appendRelativePackageName));
         getRelativePackageName().convention(getName());
 
         getStage().convention(parent.getStage());
@@ -54,6 +51,14 @@ public abstract class JteNestedBuildSpec extends JteBuildSpec
         getProjectNamespace().convention(parent.getProjectNamespace());
         getJteExtensions().convention(parent.getJteExtensions());
         return this;
+    }
+
+    private String _appendRelativePackageName(String parentPackageName) {
+        var relativePackageName = getRelativePackageName().get();
+        if (!relativePackageName.isBlank()) {
+            return parentPackageName + "." + relativePackageName;
+        }
+        return parentPackageName;
     }
 
     public String getName() {

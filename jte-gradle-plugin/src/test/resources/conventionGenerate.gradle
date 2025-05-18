@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+    id 'gg.jte.gradle'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation("gg.jte:jte-runtime:3.2.1-SNAPSHOT")
+}
+
+jte {
+    generate()
+}

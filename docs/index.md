@@ -273,6 +273,10 @@ This is the same benchmark as above, but the amount of threads was set to `#!jav
 - [Severell](https://github.com/severell/severell-jte-plugin)
 - [http4k](https://www.http4k.org/ecosystem/http4k/reference/templating/)
 
+## Tools
+
+- [Bootify](https://bootify.io) - create Spring Boot apps with jte frontend in Java or Kotlin
+
 ## Websites rendered with jte
 
 - [Mazebert TD (game website)](https://mazebert.com)

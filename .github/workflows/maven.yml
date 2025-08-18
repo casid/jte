@@ -168,9 +168,9 @@ jobs:
       - name: Build with Maven
         run: ./mvnw verify --file pom.xml -Pcoverage
       - name: Upload coverage report
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          file: ./test/jte-test-report/target/site/jacoco-aggregate/jacoco.xml
+          files: ./test/jte-test-report/target/site/jacoco-aggregate/jacoco.xml
           fail_ci_if_error: true

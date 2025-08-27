@@ -31,6 +31,11 @@ public class JteProperties {
      */
     private boolean exposeRequestAttributes = false;
 
+    /**
+     * Set whether to trim control structures, resulting in prettier output.
+     */
+    private boolean trimControlStructures = false;
+
     public String getTemplateSuffix() {
         return templateSuffix;
     }
@@ -78,5 +83,12 @@ public class JteProperties {
 	public void setExposeRequestAttributes(boolean exposeRequestAttributes) {
 		this.exposeRequestAttributes = exposeRequestAttributes;
 	}
-    
+
+    public boolean isTrimControlStructures() {
+        return trimControlStructures;
+    }
+
+    public void setTrimControlStructures(boolean trimControlStructures) {
+        this.trimControlStructures = trimControlStructures;
+    }
 }

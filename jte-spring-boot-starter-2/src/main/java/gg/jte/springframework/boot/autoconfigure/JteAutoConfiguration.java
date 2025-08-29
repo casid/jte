@@ -48,6 +48,7 @@ public class JteAutoConfiguration {
             CodeResolver codeResolver = new DirectoryCodeResolver(FileSystems.getDefault().getPath("", split));
             TemplateEngine templateEngine = TemplateEngine.create(codeResolver, Paths.get("jte-classes"), ContentType.Html, getClass().getClassLoader());
             templateEngine.setBinaryStaticContent(true);
+            templateEngine.setTrimControlStructures(jteProperties.isTrimControlStructures());
             return templateEngine;
         }
 

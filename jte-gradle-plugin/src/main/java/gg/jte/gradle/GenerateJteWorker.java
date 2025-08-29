@@ -2,7 +2,6 @@ package gg.jte.gradle;
 
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
-import org.gradle.api.file.RegularFileProperty;
 import org.gradle.workers.WorkAction;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -21,11 +20,11 @@ public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams>
 
         // Load compiler in isolated classloader
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try (URLClassLoader compilerClassLoader = ClassLoaderUtils.createCompilerClassLoader(params.getCompilerClasspath())) {
+        try (URLClassLoader compilerClassLoader = Utils.createCompilerClassLoader(params.getCompilerClasspath())) {
             Thread.currentThread().setContextClassLoader(compilerClassLoader);
 
-            Path sourceDirectory = path(params.getSourceDirectory());
-            Path targetDirectory = path(params.getTargetDirectory());
+            Path sourceDirectory = Utils.toPathOrNull(params.getSourceDirectory());
+            Path targetDirectory = Utils.toPathOrNull(params.getTargetDirectory());
 
             logger.info("Generating jte templates found in {}", sourceDirectory);
 
@@ -36,10 +35,10 @@ public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams>
                     null,
                     params.getPackageName().get());
             templateEngine.setTrimControlStructures(params.getTrimControlStructures().getOrElse(false));
-            templateEngine.setHtmlTags(params.getHtmlTags().getOrNull());
+            templateEngine.setHtmlTags(Utils.toStringArrayOrNull(params.getHtmlTags()));
             templateEngine.setHtmlCommentsPreserved(params.getHtmlCommentsPreserved().getOrElse(false));
             templateEngine.setBinaryStaticContent(params.getBinaryStaticContent().getOrElse(false));
-            templateEngine.setTargetResourceDirectory(path(params.getTargetResourceDirectory()));
+            templateEngine.setTargetResourceDirectory(Utils.toPathOrNull(params.getTargetResourceDirectory()));
             templateEngine.setProjectNamespace(params.getProjectNamespace().getOrNull());
             templateEngine.setExtensions(params.getJteExtensions().get());
 
@@ -62,8 +61,4 @@ public abstract class GenerateJteWorker implements WorkAction<GenerateJteParams>
         }
     }
 
-
-    private static Path path(RegularFileProperty property) {
-        return property.getAsFile().get().toPath();
-    }
 }

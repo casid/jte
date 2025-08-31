@@ -78,6 +78,12 @@ If you set `developmentMode = true` the jte [file watcher](hot-reloading.md) wil
 gg.jte.developmentMode=true
 ```
 
+In development mode, you can also set `trimControlStructures = true` which will trim control structures.
+
+```properties linenums="1"
+gg.jte.trimControlStructures=true
+```
+
 ### Production
 
 To use [precompiled Templates](pre-compiling.md) in production, for use with a JRE environment, you need to configure the Maven/Gradle Plugin to precompile your templates:

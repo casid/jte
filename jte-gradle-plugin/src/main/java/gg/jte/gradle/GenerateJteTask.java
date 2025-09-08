@@ -35,6 +35,7 @@ public abstract class GenerateJteTask extends JteTaskBase {
 
     @TaskAction
     public void execute() {
+        getLogger().info("{} execute", getClass().getName());
         // Use worker API with classloader isolation to avoid compiler symbol conflicts
         WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec -> {
             // Include both application and compiler classpath in isolation
@@ -63,5 +64,6 @@ public abstract class GenerateJteTask extends JteTaskBase {
     protected void wireExtension(JteExtension extension, Provider<Path> defaultTargetDirectory) {
         super.wireExtension(extension, defaultTargetDirectory);
         getProjectNamespace().set(extension.getProjectNamespace());
+        wiring = false;
     }
 }

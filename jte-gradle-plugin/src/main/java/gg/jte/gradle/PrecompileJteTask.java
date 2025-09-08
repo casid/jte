@@ -49,6 +49,7 @@ public abstract class PrecompileJteTask extends JteTaskBase {
 
     @TaskAction
     public void execute() {
+        getLogger().info("{} execute", getClass().getName());
         WorkQueue workQueue = workerExecutor.classLoaderIsolation(spec ->
                 spec.getClasspath().from(getCompilePath())
         );
@@ -77,5 +78,6 @@ public abstract class PrecompileJteTask extends JteTaskBase {
         getKotlinCompileArgs().set(extension.getKotlinCompileArgs());
         getHtmlPolicyClass().set(extension.getHtmlPolicyClass());
         getCompilePath().from(extension.getCompilePath());
+        wiring = false;
     }
 }

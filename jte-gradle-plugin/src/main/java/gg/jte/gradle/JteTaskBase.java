@@ -19,10 +19,24 @@ import java.util.List;
 
 public abstract class JteTaskBase extends DefaultTask {
     protected final ObjectFactory objectFactory;
+    protected final Property<Path> sourceDirectory;
+    protected boolean configured;
+    protected boolean wiring;
+    protected boolean projectEvaluated;
 
     protected JteTaskBase(JteStage taskStage, ObjectFactory objectFactory) {
         this.objectFactory = objectFactory;
-        onlyIf(t -> !getConfiguredStage().isPresent() || taskStage == getConfiguredStage().get());
+        this.sourceDirectory = objectFactory.property(Path.class);
+        try {
+            getProject().afterEvaluate(p -> projectEvaluated = true);
+        } catch (Exception e) {
+            // swallow expected exception
+        }
+        getLogger().info("This is a {}", getClass().getName());
+        onlyIf(t -> {
+            getLogger().info("{} onlyIf configured {}, taskStage {}, configuredStage {}", getClass().getName(), configured, taskStage, getConfiguredStage().getOrNull());
+            return (configured && (!getConfiguredStage().isPresent() || getConfiguredStage().get() == JteStage.NONE)) || taskStage == getConfiguredStage().get();
+        });
     }
 
     @Internal
@@ -30,11 +44,16 @@ public abstract class JteTaskBase extends DefaultTask {
 
     @InputDirectory
     @PathSensitive(PathSensitivity.RELATIVE)
-    public abstract Property<Path> getSourceDirectory();
+    public Property<Path> getSourceDirectory()
+    {
+        if (!wiring && !projectEvaluated) {
+            configured = true;
+        }
+        return sourceDirectory;
+    }
 
     @OutputDirectory
     public abstract Property<Path> getTargetDirectory();
-
 
     @Input
     public abstract Property<ContentType> getContentType();
@@ -70,6 +89,8 @@ public abstract class JteTaskBase extends DefaultTask {
     }
 
     protected void wireExtension(JteExtension extension, Provider<Path> defaultTargetDirectory) {
+        wiring = true;
+        getLogger().info("{} wireExtension", getClass().getName());
         getBinaryStaticContent().set(extension.getBinaryStaticContent());
         getConfiguredStage().set(extension.getStage());
         getContentType().set(extension.getContentType());

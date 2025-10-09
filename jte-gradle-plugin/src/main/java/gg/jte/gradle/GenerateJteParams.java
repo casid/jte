@@ -2,9 +2,11 @@ package gg.jte.gradle;
 
 import gg.jte.ContentType;
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Optional;
 import org.gradle.workers.WorkParameters;
 
 import java.util.Map;
@@ -18,12 +20,12 @@ public interface GenerateJteParams extends WorkParameters {
     /**
      * The directory where template files are located.
      */
-    RegularFileProperty getSourceDirectory();
+    DirectoryProperty getSourceDirectory();
 
     /**
      * Destination directory to store generated templates.
      */
-    RegularFileProperty getTargetDirectory();
+    DirectoryProperty getTargetDirectory();
 
     /**
      * The content type of all templates. Either Plain or Html.
@@ -44,7 +46,7 @@ public interface GenerateJteParams extends WorkParameters {
      * Intercepts the given html tags during template compilation
      * and calls the configured htmlInterceptor during template rendering.
      */
-    Property<String[]> getHtmlTags();
+    ListProperty<String> getHtmlTags();
 
     /**
      * By default, jte omits all HTML/CSS/JS comments, when compiling with {@link ContentType#Html}.
@@ -62,7 +64,8 @@ public interface GenerateJteParams extends WorkParameters {
      * Directory in which to generate non-java files (resources). Typically, set by plugin rather than end user.
      * Optional - if null, resources will not be generated
      */
-    RegularFileProperty getTargetResourceDirectory();
+    @Optional
+    DirectoryProperty getTargetResourceDirectory();
 
     /**
      * "group/artifact" of the project using jte. Typically, set by plugin rather than end user.

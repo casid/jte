@@ -15,7 +15,6 @@ public class JteViewResolver extends AbstractTemplateViewResolver {
         this.setSuffix(jteProperties.getTemplateSuffix());
         this.setViewClass(JteView.class);
         this.setContentType(MediaType.TEXT_HTML_VALUE);
-        this.setOrder(Ordered.HIGHEST_PRECEDENCE);
         this.setExposeRequestAttributes(jteProperties.isExposeRequestAttributes());
     }
 

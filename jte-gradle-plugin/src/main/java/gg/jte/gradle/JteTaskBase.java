@@ -20,22 +20,29 @@ import java.util.List;
 public abstract class JteTaskBase extends DefaultTask {
     protected final ObjectFactory objectFactory;
     protected final Property<Path> sourceDirectory;
-    protected boolean configured;
-    protected boolean wiring;
-    protected boolean projectEvaluated;
+    protected boolean configured; // true when getSourceDirectory was called during the evaluation, but not by wiring code
+    protected boolean wiring; // temporarily true while convention properties are being connected to this task
+    protected boolean projectEvaluated; // true when project evaluation has completed
 
+    /*
+    There is some awkward code in this class to detect 3 different use cases.
+    1. Deprecated old style task setup for backward compatibility.
+    2. Preferred convention based setup.
+    3. New independent task registration.
+     */
     protected JteTaskBase(JteStage taskStage, ObjectFactory objectFactory) {
         this.objectFactory = objectFactory;
         this.sourceDirectory = objectFactory.property(Path.class);
         try {
             getProject().afterEvaluate(p -> projectEvaluated = true);
         } catch (Exception e) {
-            // swallow expected exception
+            // Thrown if the project evaluation already completed. Can be ignored.
         }
         getLogger().info("This is a {}", getClass().getName());
         onlyIf(t -> {
             getLogger().info("{} onlyIf configured {}, taskStage {}, configuredStage {}", getClass().getName(), configured, taskStage, getConfiguredStage().getOrNull());
-            return (configured && (!getConfiguredStage().isPresent() || getConfiguredStage().get() == JteStage.NONE)) || taskStage == getConfiguredStage().get();
+            return (configured && (!getConfiguredStage().isPresent() || getConfiguredStage().get() == JteStage.NONE)) // true when using deprecated task setup or new task
+                    || taskStage == getConfiguredStage().get(); // true when using convention based setup
         });
     }
 

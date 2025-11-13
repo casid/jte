@@ -27,17 +27,17 @@ dependencies {
     jteGenerate('gg.jte:jte-native-resources:3.2.2-SNAPSHOT')
 }
 
-def ggggg = tasks.register("ggggg", GenerateJteTask) {
+def additionalGenerateTask = tasks.register("additionalGenerateTask", GenerateJteTask) {
     contentType = ContentType.Html
     sourceDirectory = file("src/main/jte").toPath()
-    targetDirectory = file("build/ggggg").toPath()
-    packageName = "gg.jte.ggggg"
+    targetDirectory = file("build/additionalGenerateTask").toPath()
+    packageName = "gg.jte.additionalgeneratetask"
 }
 
 tasks.named("compileJava") {
-    dependsOn(ggggg)
+    dependsOn(additionalGenerateTask)
 }
 
 sourceSets.named("main") {
-    java.srcDir(ggggg.map {it.targetDirectory})
+    java.srcDir(additionalGenerateTask.map {it.targetDirectory})
 }

@@ -59,6 +59,7 @@ public class GradleMatrixTest {
         // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:usage:invalidate
         deleteDir(projectDir.resolve(".gradle/configuration-cache"));
 
+//        BuildResult cleanResult = runner(projectDir, gradleVersion, "clean").build();
         // Then run the task
         BuildResult result = runner(projectDir, gradleVersion, TASK_NAME).build();
 

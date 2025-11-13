@@ -5,7 +5,22 @@ description: How to speed up startup and rendering in production when using jte.
 
 # Precompiling Templates
 
-To speed up startup and rendering on your production server, it is possible to precompile all templates during the build. This way, the template engine can load each template's `.class` file directly without first compiling it. For security reasons, you may not want to run a JDK on production - with precompiled templates, this is unnecessary. The recommended way to set up jte is to instantiate the engine differently, depending on when you are developing or running on a server.
+To speed up startup and rendering on your production server, it is possible to precompile all templates during the build. This way, the template engine can load each template's `.class` file directly without first compiling it. For security reasons, you may not want to run a JDK on production - with precompiled templates, this is unnecessary. 
+
+## 'Precompile' vs. 'Generate'
+
+Precompiling can be done in one of two stages of the build.
+
+<dl>
+<dt>Generate</dt><dd>Source code is generated from JTE templates _before_ application code is compiled, and added to the application source path. 
+JTE classes will be compiled at the same time as application classes, and will end up in the same `.jar`.</dd>
+<dt>Precompile</dt><dd>JTE classes are generated and compiled _after_ application classes. 
+The `.class` files may be loaded from a directory, or added to the application `.jar`.</dd>
+</dl>
+
+## Runtime setup
+
+The recommended way to set up jte is to instantiate the engine differently, depending on when you are developing or running on a server.
 
 ```java linenums="1"
 if (isDeveloperMachine()) {

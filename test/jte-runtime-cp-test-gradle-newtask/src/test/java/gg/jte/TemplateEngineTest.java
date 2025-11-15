@@ -22,7 +22,7 @@ public class TemplateEngineTest {
 
     @BeforeAll
     static void beforeAll() {
-        templateEngine = TemplateEngine.createPrecompiled(null, ContentType.Html, null, "gg.jte.ggggg");
+        templateEngine = TemplateEngine.createPrecompiled(null, ContentType.Html, null, "gg.jte.additionalgeneratetask");
     }
 
     @BeforeEach

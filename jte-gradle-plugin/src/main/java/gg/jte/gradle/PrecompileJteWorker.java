@@ -4,12 +4,9 @@ import gg.jte.TemplateEngine;
 import gg.jte.html.HtmlPolicy;
 import gg.jte.resolve.DirectoryCodeResolver;
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.api.provider.Property;
 import org.gradle.workers.WorkAction;
-import org.gradle.workers.WorkParameters;
 
 import java.io.File;
 import java.net.URLClassLoader;
@@ -18,36 +15,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWorker.Parameters> {
+public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteParams> {
     private static final Logger logger = Logging.getLogger(PrecompileJteWorker.class);
-
-    interface Parameters extends WorkParameters {
-        RegularFileProperty getSourceDirectory();
-
-        RegularFileProperty getTargetDirectory();
-
-        Property<gg.jte.ContentType> getContentType();
-
-        Property<String> getPackageName();
-
-        Property<Boolean> getTrimControlStructures();
-
-        Property<String[]> getHtmlTags();
-
-        Property<String> getHtmlPolicyClass();
-
-        Property<Boolean> getHtmlCommentsPreserved();
-
-        Property<Boolean> getBinaryStaticContent();
-
-        Property<String[]> getCompileArgs();
-
-        Property<String[]> getKotlinCompileArgs();
-
-        RegularFileProperty getTargetResourceDirectory();
-
-        ConfigurableFileCollection getCompilePath();
-    }
 
     @Override
     public void execute() {
@@ -55,15 +24,15 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
         System.setProperty("kotlin.environment.keepalive", "false");
 
         long start = System.nanoTime();
-        Parameters params = getParameters();
+        PrecompileJteParams params = getParameters();
 
         // Load compiler in isolated classloader
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-        try (URLClassLoader compilerClassLoader = ClassLoaderUtils.createCompilerClassLoader(params.getCompilePath())) {
+        try (URLClassLoader compilerClassLoader = Utils.createCompilerClassLoader(params.getCompilePath())) {
             Thread.currentThread().setContextClassLoader(compilerClassLoader);
 
-            Path sourceDirectory = params.getSourceDirectory().get().getAsFile().toPath();
-            Path targetDirectory = params.getTargetDirectory().get().getAsFile().toPath();
+            Path sourceDirectory = Utils.toPathOrNull(params.getSourceDirectory());
+            Path targetDirectory = Utils.toPathOrNull(params.getTargetDirectory());
 
             logger.info("Precompiling jte templates found in {}", sourceDirectory);
 
@@ -75,7 +44,7 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
                     params.getPackageName().get());
 
             templateEngine.setTrimControlStructures(Boolean.TRUE.equals(params.getTrimControlStructures().getOrNull()));
-            templateEngine.setHtmlTags(params.getHtmlTags().getOrNull());
+            templateEngine.setHtmlTags(Utils.toStringArrayOrNull(params.getHtmlTags()));
 
             String htmlPolicyClass = params.getHtmlPolicyClass().getOrNull();
 
@@ -85,13 +54,11 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
 
             templateEngine.setHtmlCommentsPreserved(Boolean.TRUE.equals(params.getHtmlCommentsPreserved().getOrNull()));
             templateEngine.setBinaryStaticContent(Boolean.TRUE.equals(params.getBinaryStaticContent().getOrNull()));
-            templateEngine.setCompileArgs(params.getCompileArgs().getOrNull());
-            templateEngine.setKotlinCompileArgs(params.getKotlinCompileArgs().getOrNull());
+            templateEngine.setCompileArgs(Utils.toStringArrayOrNull(params.getCompileArgs()));
+            templateEngine.setKotlinCompileArgs(Utils.toStringArrayOrNull(params.getKotlinCompileArgs()));
 
-            File targetResourceDir = params.getTargetResourceDirectory().getAsFile().getOrNull();
-            if (targetResourceDir != null) {
-                templateEngine.setTargetResourceDirectory(targetResourceDir.toPath());
-            }
+            Path targetResourceDir = Utils.toPathOrNull(params.getTargetResourceDirectory());
+            templateEngine.setTargetResourceDirectory(targetResourceDir);
 
             int amount;
             try {
@@ -116,7 +83,7 @@ public abstract class PrecompileJteWorker implements WorkAction<PrecompileJteWor
     }
 
     private HtmlPolicy createHtmlPolicy(String htmlPolicyClass, ConfigurableFileCollection compilePath) {
-        try (URLClassLoader compilerClassLoader = ClassLoaderUtils.createCompilerClassLoader(compilePath)) {
+        try (URLClassLoader compilerClassLoader = Utils.createCompilerClassLoader(compilePath)) {
             Class<?> clazz = compilerClassLoader.loadClass(htmlPolicyClass);
             return (HtmlPolicy) clazz.getConstructor().newInstance();
         } catch (Exception e) {

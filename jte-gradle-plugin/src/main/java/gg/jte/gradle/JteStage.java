@@ -18,5 +18,10 @@ public enum JteStage
      * "generate" means that jte files will be converted into Java source _before_ the main java code of your project
      * is compiled, and will become part of your application jar during project build.
      */
-    GENERATE
+    GENERATE,
+
+    /**
+     * stage has not yet been configured
+     */
+    NONE
 }

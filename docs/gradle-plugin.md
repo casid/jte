@@ -265,6 +265,63 @@ An application jar with generated classes can be built into a native binary usin
 
     There's an example [Gradle test project](https://github.com/casid/jte/blob/{{ latest-git-tag }}/test/jte-runtime-cp-test-gradle-convention/build.gradle) using `native-image` compilation.
 
+!!! warning
+    
+    An older task-based setup is supported for backward compatibility. 
+    This may be removed in a future version of JTE.
+    
+    Old:
+
+    ```groovy
+    tasks.generateJte { // or precompileJte
+        sourceDirectory = Paths.get(project.projectDir.absolutePath, "src", "main", "jte")
+        contentType = ContentType.Html
+    }
+    ```
+
+    New:
+
+    ```groovy
+    jte {
+        generate() // or precompile()
+        // source directory and contentType follow conventions
+    }
+    ```
+
+## Advanced - additional tasks
+
+In cases where a project has different JTE templates that need different settings, additional tasks can be registered.
+An example:
+
+```groovy
+import gg.jte.ContentType
+import gg.jte.gradle.GenerateJteTask
+
+plugins {
+    id 'java'
+    id 'gg.jte.gradle' version '${jte.version}'
+}
+
+dependencies {
+    implementation('gg.jte:jte:${jte.version}')
+}
+
+def additionalGenerateTask = tasks.register("additionalGenerateTask", GenerateJteTask) {
+    contentType = ContentType.Plain
+    sourceDirectory = file("src/main/otherJte").toPath()
+    targetDirectory = file("build/additionalGenerateTask").toPath()
+    packageName = "gg.jte.additionalgeneratetask"
+}
+
+tasks.named("compileJava") {
+    dependsOn(additionalGenerateTask)
+}
+
+sourceSets.named("main") {
+    java.srcDir(additionalGenerateTask.map {it.targetDirectory})
+}
+```
+
 [jte-gradle-plugin]: https://plugins.gradle.org/plugin/gg.jte.gradle
 [html-policy]: https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg.jte.runtime/gg/jte/html/HtmlPolicy.html
 [constants-package-name]: https://www.javadoc.io/doc/gg.jte/jte-runtime/{{ latest-git-tag }}/gg/jte.runtime/gg/jte/Constants.html#PACKAGE_NAME_PRECOMPILED

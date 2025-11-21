@@ -7,6 +7,7 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 
+import javax.inject.Inject;
 import java.nio.file.Path;
 
 
@@ -21,6 +22,7 @@ public abstract class JteExtension
 {
     private final ObjectFactory objectFactory;
 
+    @Inject
     public JteExtension(ObjectFactory objectFactory) {
         this.objectFactory = objectFactory;
     }
@@ -29,7 +31,7 @@ public abstract class JteExtension
     public abstract Property<Path> getSourceDirectory();
     public abstract Property<Path> getTargetDirectory();
     public abstract Property<ContentType> getContentType();
-    public abstract  Property<Boolean> getTrimControlStructures();
+    public abstract Property<Boolean> getTrimControlStructures();
     public abstract Property<String[]> getHtmlTags();
     public abstract Property<Boolean> getHtmlCommentsPreserved();
     public abstract Property<Boolean> getBinaryStaticContent();
@@ -38,7 +40,9 @@ public abstract class JteExtension
     public abstract ConfigurableFileCollection getCompilePath();
     public abstract Property<String> getHtmlPolicyClass();
     public abstract Property<String[]> getCompileArgs();
+
     public abstract Property<String[]> getKotlinCompileArgs();
+
     public abstract Property<String> getProjectNamespace();
     public abstract ListProperty<JteExtensionSettings> getJteExtensions();
 

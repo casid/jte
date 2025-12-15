@@ -80,7 +80,7 @@ jobs:
         run: cd test/gradle-test-wrapper && ./gradlew --stop
       - name: Store Gradle plugin test reports
         if: failure() && steps.gradlePluginTests.outcome == 'failure'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: failing-test-report
           path: test/gradle-test-wrapper/build/reports/tests/test/**/*

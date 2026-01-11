@@ -47,6 +47,7 @@ Documentation lives in the [jte website](https://jte.gg/).
 - [Javalin website example with login and multiple languages](https://github.com/casid/jte-javalin-tutorial)
 - [FlowCrypt Admin Panel](https://flowcrypt.com/docs/technical/enterprise-admin-panel/usage/ui-overview.html)
 - [Noticeable Newspages](https://noticeable.io)
+- [Demeter Car Rental](https://www.demetercar.de)
 
 [intellij-plugin]: https://plugins.jetbrains.com/plugin/14521-jte "IntelliJ jte Plugin"
 [template-benchmark]: https://github.com/casid/template-benchmark/ "Template Benchmarks"

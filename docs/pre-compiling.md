@@ -264,6 +264,32 @@ Use [binary encoding] for maximum performance! To activate it with precompiled t
         <configuration>
             <binaryStaticContent>true</binaryStaticContent>
             ...
+    </plugin>
+    
+    <!-- Since we use precompiled binary content parts, we need to copy those resources next to the compiled class files (the maven plugin doesn't do that for us) -->
+    <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+            <execution>
+                <phase>process-classes</phase>
+                <goals>
+                    <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                    <resources>
+                        <resource>
+                            <directory>${project.basedir}/target/generated-sources/jte</directory>
+                            <includes>
+                                <include>**/*.bin</include>
+                            </includes>
+                            <filtering>false</filtering>
+                        </resource>
+                    </resources>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
     ```
 
 === "Gradle"

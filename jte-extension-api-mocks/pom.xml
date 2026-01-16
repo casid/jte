@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>jte-extension-api-mocks</artifactId>
+    <name>jte-extension-api-mocks</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

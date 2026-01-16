@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>jte-extension-api</artifactId>
+    <name>jte-extension-api</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

@@ -2,6 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>jte-test-report</artifactId>
+    <name>jte-test-report</name>
     <packaging>pom</packaging>
 
     <parent>

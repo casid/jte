@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>jte-models</artifactId>
+    <name>jte-models</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

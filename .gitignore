@@ -101,6 +101,8 @@ Temporary Items
 /jte/jte/
 /jte/jte-classes/
 /jte-kotlin/jte-classes/
+/jte-spring-boot-starter-4/jte-classes/
+/jte-spring-boot-starter-4-core/jte-classes/
 /jte-watcher/jte-classes/
 /test/*/jte-classes/
 .run

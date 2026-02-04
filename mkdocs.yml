@@ -90,6 +90,7 @@ nav:
     - "jte-models Facade Generator": jte-models.md
     - "Extensions API": jte-extension-api.md
   - "Spring Boot Support":
+    - "Spring Boot Starter 4": spring-boot-starter-4.md
     - "Spring Boot Starter 3": spring-boot-starter-3.md
     - "Spring Boot Starter 2": spring-boot-starter-2.md
   - "Migrate to jte":

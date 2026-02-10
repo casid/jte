@@ -10,15 +10,15 @@ repositories {
 }
 
 dependencies {
-    implementation("gg.jte:jte:3.2.3")
-    implementation("gg.jte:jte-kotlin:3.2.3") {
+    implementation("gg.jte:jte:3.3.3-SNAPSHOT")
+    implementation("gg.jte:jte-kotlin:3.3.3-SNAPSHOT") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
     }
     compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.20")
 }
 
 group = "gg.jte"
-version = "3.2.3"
+version = "3.3.3-SNAPSHOT"
 
 tasks.withType<JavaCompile> {
     sourceCompatibility = "17"

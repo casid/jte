@@ -1,6 +1,6 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.1.20"
-    id("gg.jte.gradle") version("3.2.3")
+    id("gg.jte.gradle") version("3.3.3-SNAPSHOT")
 }
 
 repositories {
@@ -15,15 +15,15 @@ tasks.withType<Test> {
 }
 
 dependencies {
-    implementation("gg.jte:jte-runtime:3.2.3")
-    implementation("gg.jte:jte-kotlin:3.2.3")
+    implementation("gg.jte:jte-runtime:3.3.3-SNAPSHOT")
+    implementation("gg.jte:jte-kotlin:3.3.3-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
 
     testImplementation("org.assertj:assertj-core:3.23.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
-    jteGenerate("gg.jte:jte-models:3.2.3")
+    jteGenerate("gg.jte:jte-models:3.3.3-SNAPSHOT")
 }
 
 jte {

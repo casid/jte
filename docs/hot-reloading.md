@@ -7,7 +7,7 @@ description: How to use jte hot reloading in development mode.
 
 ## For a regular website
 
-Hot reloading is supported out of the box when using the [`gg.jte.resolve.DirectoryCodeResolver`](https://www.javadoc.io/doc/gg.jte/jte/{{ latest-git-tag }}/gg.jte/gg/jte/resolve/DirectoryCodeResolver.html) (or the [`gt.jte.resolve.ResourceCodeResolver`](https://www.javadoc.io/doc/gg.jte/jte/{{ latest-git-tag }}/gg.jte/gg/jte/resolve/ResourceCodeResolver.html) with resources located outside of JAR files). Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If any modification is detected, the template is recompiled, and the old one is discarded to GC.
+Hot reloading is supported out of the box when using the [`gg.jte.resolve.DirectoryCodeResolver`](https://www.javadoc.io/doc/gg.jte/jte/{{ latest-git-tag }}/gg.jte/gg/jte/resolve/DirectoryCodeResolver.html) (or the [`gg.jte.resolve.ResourceCodeResolver`](https://www.javadoc.io/doc/gg.jte/jte/{{ latest-git-tag }}/gg.jte/gg/jte/resolve/ResourceCodeResolver.html) with resources located outside of JAR files). Before a template is resolved, the modification timestamp of the template file and all of its dependencies is checked. If any modification is detected, the template is recompiled, and the old one is discarded to GC.
 
 !!! warning
 

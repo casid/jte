@@ -1562,6 +1562,15 @@ public class TemplateEngineTest {
         thenRenderingFailsWithException().hasMessage("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.");
     }
 
+    @Test
+    void issue493() {
+        // Support "..." in default param values, see https://github.com/casid/jte/issues/493
+        givenRawTemplate("@param String model = \"Loading...\"\n${model}");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
     private void givenTemplate(String name, String code) {
         dummyCodeResolver.givenCode(name, code);
     }

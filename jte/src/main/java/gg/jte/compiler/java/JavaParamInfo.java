@@ -16,7 +16,8 @@ public class JavaParamInfo {
         int nameEndIndex = -1;
         int defaultValueStartIndex = -1;
         int genericDepth = 0;
-        int varArgsIndex = parameterString.indexOf("...");
+        int varArgsIndex = -1;
+
         for (int i = 0; i < parameterString.length(); ++i) {
             char character = parameterString.charAt(i);
 
@@ -35,12 +36,24 @@ public class JavaParamInfo {
                     typeStartIndex = i;
                 }
             } else if (typeEndIndex == -1) {
-                if (Character.isWhitespace(character) && i > varArgsIndex) {
+                if (Character.isWhitespace(character)) {
                     typeEndIndex = i;
                 }
             } else if (nameStartIndex == -1) {
                 if (!Character.isWhitespace(character)) {
-                    nameStartIndex = i;
+                    // Check if this is "..." (varargs marker before parameter name)
+                    if (character == '.' && i + 2 < parameterString.length() &&
+                            parameterString.charAt(i + 1) == '.' && parameterString.charAt(i + 2) == '.') {
+                        // This is "...", which is the varargs indicator
+                        if (varArgsIndex == -1) {
+                            varArgsIndex = i;
+                        }
+                        // Skip to the position after the "..."
+                        i += 2;
+                    } else {
+                        // This is the start of the parameter name
+                        nameStartIndex = i;
+                    }
                 }
             } else if (nameEndIndex == -1) {
                 if (Character.isWhitespace(character) || character == '=') {
@@ -58,6 +71,10 @@ public class JavaParamInfo {
             type = "";
         } else {
             type = parameterString.substring(typeStartIndex, typeEndIndex);
+            // If varargs was found in the type, include it
+            if (varArgsIndex != -1 && varArgsIndex + 2 < parameterString.length() && varArgsIndex + 3 <= nameStartIndex) {
+                type = parameterString.substring(typeStartIndex, Math.min(nameStartIndex, varArgsIndex + 3));
+            }
         }
 
         if (nameEndIndex == -1) {

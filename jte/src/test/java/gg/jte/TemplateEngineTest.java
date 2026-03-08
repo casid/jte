@@ -805,6 +805,22 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void variadic() {
+        givenRawTemplate("@param String... models\n${models[0]}");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, new String[] { "test value" }, output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void variadic_annotation() {
+        givenRawTemplate("@param String @gg.jte.TestUtils.TypeUseAnnotation ... models\n${models[0]}");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, new String[] { "test value" }, output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
     void commentBeforeParams() {
         givenRawTemplate("<%--This is a comment--%>@param gg.jte.TemplateEngineTest.Model model\n" + "!{model.setX(12);}${model.x}");
         thenOutputIs("12");

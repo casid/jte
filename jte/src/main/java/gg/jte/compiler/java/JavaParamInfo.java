@@ -8,15 +8,10 @@ public class JavaParamInfo {
         String type;
         String name;
         String defaultValue;
-        boolean varargs;
 
-        int typeStartIndex = -1;
-        int typeEndIndex = -1;
-        int nameStartIndex = -1;
         int nameEndIndex = -1;
         int defaultValueStartIndex = -1;
         int genericDepth = 0;
-        int varArgsIndex = parameterString.indexOf("...");
         for (int i = 0; i < parameterString.length(); ++i) {
             char character = parameterString.charAt(i);
 
@@ -30,22 +25,9 @@ public class JavaParamInfo {
                 continue;
             }
 
-            if (typeStartIndex == -1) {
-                if (!Character.isWhitespace(character)) {
-                    typeStartIndex = i;
-                }
-            } else if (typeEndIndex == -1) {
-                if (Character.isWhitespace(character) && i > varArgsIndex) {
-                    typeEndIndex = i;
-                }
-            } else if (nameStartIndex == -1) {
-                if (!Character.isWhitespace(character)) {
-                    nameStartIndex = i;
-                }
-            } else if (nameEndIndex == -1) {
-                if (Character.isWhitespace(character) || character == '=') {
-                    nameEndIndex = i;
-                    i += 1;
+            if (nameEndIndex == -1) {
+                if (character == '=') {
+                    nameEndIndex = i - 1;
                 }
             } else if (defaultValueStartIndex == -1) {
                 if (!Character.isWhitespace(character)) {
@@ -54,21 +36,30 @@ public class JavaParamInfo {
             }
         }
 
-        if (typeStartIndex == -1 || typeEndIndex == -1) {
-            type = "";
-        } else {
-            type = parameterString.substring(typeStartIndex, typeEndIndex);
-        }
-
         if (nameEndIndex == -1) {
-            nameEndIndex = parameterString.length();
+            nameEndIndex = parameterString.length() - 1;
         }
 
-        if (nameStartIndex == -1) {
+        int typeNameSeparator = -1;
+        for (int i = nameEndIndex; i >= 0; --i) {
+            char character = parameterString.charAt(i);
+
+            if (Character.isWhitespace(character)) {
+                if (i == nameEndIndex) {
+                    --nameEndIndex; // trailing name whitespace
+                } else {
+                    typeNameSeparator = i;
+                    break;
+                }
+            }
+        }
+
+        if (typeNameSeparator == -1) {
             visitor.onError("Missing parameter name: '@param " + parameterString + "'");
         }
 
-        name = parameterString.substring(nameStartIndex, nameEndIndex);
+        type = parameterString.substring(0, typeNameSeparator);
+        name = parameterString.substring(typeNameSeparator + 1, nameEndIndex + 1);
 
         if (defaultValueStartIndex == -1) {
             defaultValue = null;
@@ -76,8 +67,6 @@ public class JavaParamInfo {
             defaultValue = parameterString.substring(defaultValueStartIndex);
         }
 
-        varargs = varArgsIndex != -1;
-
-        return new ParamInfo(type, name, defaultValue, varargs, templateLine);
+        return new ParamInfo(type, name, defaultValue, type.contains("..."), templateLine);
     }
 }

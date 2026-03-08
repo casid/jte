@@ -821,6 +821,14 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void variadic_issue493() { // https://github.com/casid/jte/issues/493
+        givenRawTemplate("@param String model = \"Loading...\"\n${model}");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
     void commentBeforeParams() {
         givenRawTemplate("<%--This is a comment--%>@param gg.jte.TemplateEngineTest.Model model\n" + "!{model.setX(12);}${model.x}");
         thenOutputIs("12");

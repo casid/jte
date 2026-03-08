@@ -12,8 +12,29 @@ public class JavaParamInfo {
         int nameEndIndex = -1;
         int defaultValueStartIndex = -1;
         int genericDepth = 0;
+
+        boolean stringMode = false;
         for (int i = 0; i < parameterString.length(); ++i) {
             char character = parameterString.charAt(i);
+
+            if (character == '"') {
+                if (stringMode) {
+                    int escapeCount = 0;
+                    while (parameterString.charAt(i - escapeCount - 1) == '\\') {
+                        ++escapeCount;
+                    }
+
+                    if (escapeCount % 2 == 0) {
+                        stringMode = false;
+                    }
+                } else {
+                    stringMode = true;
+                }
+            }
+
+            if (stringMode) {
+                continue;
+            }
 
             if (character == '<') {
                 ++genericDepth;
@@ -25,14 +46,16 @@ public class JavaParamInfo {
                 continue;
             }
 
-            if (nameEndIndex == -1) {
-                if (character == '=') {
-                    nameEndIndex = i - 1;
+            if (character == '=') {
+                nameEndIndex = i - 1;
+
+                while (Character.isWhitespace(character)) {
+                    ++i;
+                    character = parameterString.charAt(i);
                 }
-            } else if (defaultValueStartIndex == -1) {
-                if (!Character.isWhitespace(character)) {
-                    defaultValueStartIndex = i;
-                }
+
+                defaultValueStartIndex = i + 1;
+                break;
             }
         }
 

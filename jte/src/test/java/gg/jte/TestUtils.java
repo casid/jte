@@ -18,4 +18,11 @@ public class TestUtils {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface TypeUseAnnotation {
     }
+
+    @SuppressWarnings("unused") // see e.g. gg.jte.TemplateEngineTest.variadic_annotation
+    @Target({ElementType.TYPE_USE})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface TypeUseAnnotationParam {
+        String value();
+    }
 }

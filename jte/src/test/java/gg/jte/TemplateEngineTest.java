@@ -821,6 +821,30 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void variadic_annotationParam() {
+        givenRawTemplate("@param String @gg.jte.TestUtils.TypeUseAnnotationParam(\"=\") ... models\n${models[0]}");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, new String[] { "test value" }, output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void variadic_annotationParamEscape() {
+        givenRawTemplate("@param String @gg.jte.TestUtils.TypeUseAnnotationParam(\"\\\"\") ... models\n${models[0]}");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, new String[] { "test value" }, output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void variadic_annotationParamEscapeDouble() {
+        givenRawTemplate("@param String @gg.jte.TestUtils.TypeUseAnnotationParam(\"\\\\\") ... models\n${models[0]}");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, new String[] { "test value" }, output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
     void variadic_issue493() { // https://github.com/casid/jte/issues/493
         givenRawTemplate("@param String model = \"Loading...\"\n${model}");
         StringOutput output = new StringOutput();

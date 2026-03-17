@@ -58,6 +58,7 @@ public final class Template {
             throw e.getCause();
         } catch (IllegalArgumentException e) {
             checkWrongContentType(output, e);
+            throw e;
         }
     }
 

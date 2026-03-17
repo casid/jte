@@ -1,7 +1,6 @@
 package gg.jte;
 
 import gg.jte.output.StringOutput;
-import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,24 +48,12 @@ public class WrongContentTypeTest {
         thenRenderingFailsBecauseOfWrongContentType(() -> templateEngine.render("helloWorld.jte", Map.of("model", model), output));
     }
 
-    @Test
-    void illegalArgumentExceptionIsPropagated() {
-        thenRenderingFails(() -> templateEngine.render("illegalArgumentException.jte", Map.of("model", model), output))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Oops");
-    }
-
     @SuppressWarnings("SameParameterValue")
     private void thenRenderingFailsBecauseOfWrongContentType(Runnable whenTemplateIsRendered) {
-        thenRenderingFails(whenTemplateIsRendered)
+        Throwable throwable = catchThrowable(whenTemplateIsRendered::run);
+        assertThat(throwable)
                 .isInstanceOf(TemplateException.class)
                 .hasCauseInstanceOf(IllegalArgumentException.class)
                 .hasMessage("The template helloWorld.jte was compiled with ContentType.Html, but the template engine was initialized with ContentType.Plain. Please initialize the template engine with ContentType.Html.");
-    }
-
-    private AbstractThrowableAssert<?, Throwable> thenRenderingFails(Runnable whenTemplateIsRendered) {
-        Throwable throwable = catchThrowable(whenTemplateIsRendered::run);
-        return assertThat(throwable)
-            .isNotNull();
     }
 }

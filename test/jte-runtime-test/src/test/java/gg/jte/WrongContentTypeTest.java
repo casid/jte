@@ -1,7 +1,6 @@
 package gg.jte;
 
 import gg.jte.output.StringOutput;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,11 +30,6 @@ public class WrongContentTypeTest {
     @BeforeEach
     void setUp() {
         model.hello = "Hello";
-    }
-
-    @AfterEach
-    void cleanUp() {
-        output.reset();
     }
 
     @Test

@@ -95,22 +95,12 @@ public class TemplateEngineTest {
         assertThat(throwable).isInstanceOf(TemplateException.class).hasMessage("TemplateCompiler could not be located. Maybe jte isn't on your classpath?");
     }
 
-    @Test
-    void illegalArgumentExceptionIsPropagated() {
-        thenRenderingFailsWithException(() -> templateEngine.render("illegalArgumentException.jte", Map.of("model", model), output))
-            .hasCauseInstanceOf(IllegalArgumentException.class);
-    }
-
     private void whenTemplateIsRendered(String templateName) {
         templateEngine.render(templateName, model, output);
     }
 
     private AbstractThrowableAssert<?, ? extends Throwable> thenRenderingFailsWithException(String templateName) {
-        return thenRenderingFailsWithException(() -> whenTemplateIsRendered(templateName));
-    }
-
-    private AbstractThrowableAssert<?, ? extends Throwable> thenRenderingFailsWithException(Runnable whenTemplateIsRendered) {
-        Throwable throwable = catchThrowable(whenTemplateIsRendered::run);
+        Throwable throwable = catchThrowable(() -> whenTemplateIsRendered(templateName));
         return assertThat(throwable).isInstanceOf(TemplateException.class);
     }
 

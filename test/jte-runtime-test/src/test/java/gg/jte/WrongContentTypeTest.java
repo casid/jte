@@ -34,16 +34,16 @@ public class WrongContentTypeTest {
 
     @Test
     void wrongContentTypeInRender() {
-        renderingFailsBecauseOfWrongContentType(() -> templateEngine.render("helloWorld.jte", model, output));
+        thenRenderingFailsBecauseOfWrongContentType(() -> templateEngine.render("helloWorld.jte", model, output));
     }
 
     @Test
     void wrongContentTypeInRenderMap() {
-        renderingFailsBecauseOfWrongContentType(() -> templateEngine.render("helloWorld.jte", Map.of("model", model), output));
+        thenRenderingFailsBecauseOfWrongContentType(() -> templateEngine.render("helloWorld.jte", Map.of("model", model), output));
     }
 
     @SuppressWarnings("SameParameterValue")
-    private void renderingFailsBecauseOfWrongContentType(Runnable whenTemplateIsRendered) {
+    private void thenRenderingFailsBecauseOfWrongContentType(Runnable whenTemplateIsRendered) {
         Throwable throwable = catchThrowable(whenTemplateIsRendered::run);
         assertThat(throwable)
                 .isInstanceOf(TemplateException.class)

@@ -45,4 +45,8 @@ public class Model {
     public String getThatThrows() {
         throw new NullPointerException("Oops");
     }
+
+    public String getThatThrowsIllegalArgumentException() {
+        throw new IllegalArgumentException("Oops");
+    }
 }

@@ -1,13 +1,13 @@
 package gg.jte;
 
 import gg.jte.output.StringOutput;
-import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import test.Model;
 
 import java.nio.file.Paths;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -33,19 +33,21 @@ public class WrongContentTypeTest {
     }
 
     @Test
-    void wrongContentType() {
-        thenRenderingFailsWithException("helloWorld.jte")
-                .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasMessage("The template helloWorld.jte was compiled with ContentType.Html, but the template engine was initialized with ContentType.Plain. Please initialize the template engine with ContentType.Html.");
+    void wrongContentTypeInRender() {
+        thenRenderingFailsBecauseOfWrongContentType(() -> templateEngine.render("helloWorld.jte", model, output));
     }
 
-    private void whenTemplateIsRendered(String templateName) {
-        templateEngine.render(templateName, model, output);
+    @Test
+    void wrongContentTypeInRenderMap() {
+        thenRenderingFailsBecauseOfWrongContentType(() -> templateEngine.render("helloWorld.jte", Map.of("model", model), output));
     }
 
     @SuppressWarnings("SameParameterValue")
-    private AbstractThrowableAssert<?, ? extends Throwable> thenRenderingFailsWithException(String templateName) {
-        Throwable throwable = catchThrowable(() -> whenTemplateIsRendered(templateName));
-        return assertThat(throwable).isInstanceOf(TemplateException.class);
+    private void thenRenderingFailsBecauseOfWrongContentType(Runnable whenTemplateIsRendered) {
+        Throwable throwable = catchThrowable(whenTemplateIsRendered::run);
+        assertThat(throwable)
+                .isInstanceOf(TemplateException.class)
+                .hasCauseInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The template helloWorld.jte was compiled with ContentType.Html, but the template engine was initialized with ContentType.Plain. Please initialize the template engine with ContentType.Html.");
     }
 }

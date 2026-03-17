@@ -37,19 +37,17 @@ public final class Template {
         } catch (InvocationTargetException e) {
             throw e.getCause();
         } catch (IllegalArgumentException e) {
-            if (render.getParameterTypes()[0] == HtmlTemplateOutput.class && !(output instanceof HtmlTemplateOutput)) {
-                throw new TemplateException("The template " + name + " was compiled with ContentType.Html, but the template engine was initialized with ContentType.Plain. Please initialize the template engine with ContentType.Html.", e);
-            } else {
-                String expectedType = render.getParameterTypes()[2].getName();
-                String actualType = param != null ? param.getClass().getName() : null;
-                String message = "Failed to render " + name + ", type mismatch for parameter: Expected " + expectedType + ", got " + actualType;
+            checkWrongContentType(output, e);
 
-                if (isMangledKotlinRenderMethod(render)) {
-                    message += "\nIt looks like you're rendering a template with a Kotlin value class parameter. To make this work, pass the value class parameter in a map.\nExample: templateEngine.render(\"" + name + "\", mapOf(\"myValue\" to MyValueClass(), output)";
-                }
+            String expectedType = render.getParameterTypes()[2].getName();
+            String actualType = param != null ? param.getClass().getName() : null;
+            String message = "Failed to render " + name + ", type mismatch for parameter: Expected " + expectedType + ", got " + actualType;
 
-                throw new TemplateException(message, e);
+            if (isMangledKotlinRenderMethod(render)) {
+                message += "\nIt looks like you're rendering a template with a Kotlin value class parameter. To make this work, pass the value class parameter in a map.\nExample: templateEngine.render(\"" + name + "\", mapOf(\"myValue\" to MyValueClass(), output)";
             }
+
+            throw new TemplateException(message, e);
         }
     }
 
@@ -58,6 +56,15 @@ public final class Template {
             renderMap.invoke(null, output, htmlInterceptor, params);
         } catch (InvocationTargetException e) {
             throw e.getCause();
+        } catch (IllegalArgumentException e) {
+            checkWrongContentType(output, e);
+            throw e;
+        }
+    }
+
+    private void checkWrongContentType(TemplateOutput output, IllegalArgumentException e) {
+        if (render.getParameterTypes()[0] == HtmlTemplateOutput.class && !(output instanceof HtmlTemplateOutput)) {
+            throw new TemplateException("The template " + name + " was compiled with ContentType.Html, but the template engine was initialized with ContentType.Plain. Please initialize the template engine with ContentType.Html.", e);
         }
     }
 

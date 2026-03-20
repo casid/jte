@@ -74,6 +74,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     private void writeClass() {
         javaCode.append("@SuppressWarnings(\"unchecked\")\n");
+        javaCode.append("@javax.annotation.processing.Generated(\"gg.jte.TemplateEngine\")\n");
         javaCode.append("public final class ").append(classInfo.className).append(" {\n");
         fieldsMarker = javaCode.getMarkerOfCurrentPosition();
         javaCode.append("\tpublic static void render(");

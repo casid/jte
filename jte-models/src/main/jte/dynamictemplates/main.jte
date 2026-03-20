@@ -22,6 +22,7 @@ import gg.jte.models.runtime.*;
 
 ${modelConfig.implementationAnnotation()}
 ${modelConfig.dynamicImplementationAnnotation()}
+@javax.annotation.processing.Generated("gg.jte.TemplateEngine")
 public class ${targetClassName} implements ${interfaceName} {
     private final TemplateEngine engine;
 

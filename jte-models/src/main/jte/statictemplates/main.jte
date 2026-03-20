@@ -22,6 +22,7 @@ import gg.jte.html.HtmlTemplateOutput;
 
 ${modelConfig.implementationAnnotation()}
 ${modelConfig.staticImplementationAnnotation()}
+@javax.annotation.processing.Generated("gg.jte.TemplateEngine")
 public class ${targetClassName} implements ${interfaceName} {
     @for(TemplateDescription template: templates)
         @template.statictemplates.method(config = config, template = template)

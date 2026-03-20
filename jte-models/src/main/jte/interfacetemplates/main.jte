@@ -15,6 +15,7 @@ import ${imp};
 @endfor
 
 ${modelConfig.interfaceAnnotation()}
+@javax.annotation.processing.Generated("gg.jte.TemplateEngine")
 public interface ${targetClassName} {
     @for(TemplateDescription template: templates)
         @template.interfacetemplates.method(template = template)

@@ -48,7 +48,8 @@ public class TestModelExtension {
         @Test
         public void generateJavaFacades() {
             // Given
-            JteExtension modelExtension = new ModelExtension();
+            JteExtension modelExtension = new ModelExtension()
+                    .init(Map.of("staticImplementationSingleton", "TEMPLATES"));
             TemplateDescription templateDescription = mockTemplateDescription()
                     .packageName(TEST_PACKAGE)
                     .name("hello.jte")
@@ -87,6 +88,9 @@ public class TestModelExtension {
                 try {
                     String contents = Files.readString(path);
                     assertThat(contents).contains("JteModel hello(java.lang.String message)");
+                    if (STATIC_SOURCE_FILE.matcher(path.toString()).find()) {
+                        assertThat(contents).contains("public static final StaticTemplates TEMPLATES = new StaticTemplates();");
+                    }
                 } catch (IOException ex) {
                     fail("Could not read file " + path, ex);
                 }
@@ -105,6 +109,7 @@ public class TestModelExtension {
             JteExtension modelExtension = new ModelExtension();
             Map<String, String> config = new HashMap<>();
             config.put("language", Language.Kotlin.toString());
+            config.put("staticImplementationSingleton", "true");
             modelExtension.init(config);
 
             return modelExtension;
@@ -251,8 +256,7 @@ public class TestModelExtension {
                     import gg.jte.ContentType
                     import gg.jte.TemplateOutput
                     import gg.jte.html.HtmlTemplateOutput
-
-                    class StaticTemplates : Templates {
+                    object StaticTemplates : Templates {
                        \s
                         override fun hello(content: gg.jte.Content): JteModel = StaticJteModel<TemplateOutput>(
                             ContentType.Plain,
@@ -334,8 +338,7 @@ public class TestModelExtension {
                     import gg.jte.ContentType
                     import gg.jte.TemplateOutput
                     import gg.jte.html.HtmlTemplateOutput
-
-                    class StaticTemplates : Templates {
+                    object StaticTemplates : Templates {
                        \s
                         override fun hello(): JteModel = StaticJteModel<TemplateOutput>(
                             ContentType.Plain,

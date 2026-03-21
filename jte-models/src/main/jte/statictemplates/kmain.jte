@@ -21,7 +21,7 @@ import ${imp}
 
 ${modelConfig.implementationAnnotation()}
 ${modelConfig.staticImplementationAnnotation()}
-class ${targetClassName} : ${interfaceName} {
+${"true".equalsIgnoreCase(modelConfig.staticImplementationSingleton()) ? "object" : "class"} ${targetClassName} : ${interfaceName} {
     @for(TemplateDescription template: templates)
         @template.statictemplates.kmethod(config = config, template = template)
     @endfor

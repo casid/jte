@@ -24,6 +24,10 @@ ${modelConfig.implementationAnnotation()}
 ${modelConfig.staticImplementationAnnotation()}
 @javax.annotation.processing.Generated("gg.jte.TemplateEngine")
 public class ${targetClassName} implements ${interfaceName} {
+    !{final String staticImplementationSingletonName = modelConfig.staticImplementationSingleton();}
+    @if(staticImplementationSingletonName != null)
+    public static final ${targetClassName} ${staticImplementationSingletonName} = new ${targetClassName}();
+    @endif
     @for(TemplateDescription template: templates)
         @template.statictemplates.method(config = config, template = template)
     @endfor

@@ -1,6 +1,8 @@
 @import gg.jte.extension.api.*
+@import gg.jte.models.generator.Util
 @import gg.jte.models.generator.ModelConfig
 @import java.util.Set
+@import java.util.stream.Collectors
 
 @param String targetClassName
 @param String interfaceName
@@ -24,11 +26,18 @@ ${modelConfig.implementationAnnotation()}
 ${modelConfig.staticImplementationAnnotation()}
 @javax.annotation.processing.Generated("gg.jte.TemplateEngine")
 public class ${targetClassName} implements ${interfaceName} {
-    !{final String staticImplementationSingletonName = modelConfig.staticImplementationSingleton();}
-    @if(staticImplementationSingletonName != null)
-    public static final ${targetClassName} ${staticImplementationSingletonName} = new ${targetClassName}();
+    @if("true".equalsIgnoreCase(modelConfig.staticImplementationSingleton()))
+    public static final ${targetClassName} INSTANCE = new ${targetClassName}();
+    public static final class Singleton {
+        @for(TemplateDescription template : templates)
+        !{final String methodName = Util.methodName(template);}
+        public static JteModel ${methodName}(${Util.typedParams(template)}) {
+            return INSTANCE.${methodName}(${template.params().stream().map(ParamDescription::name).collect(Collectors.joining(","))});
+        }
+        @endfor
+    }
     @endif
-    @for(TemplateDescription template: templates)
+    @for(TemplateDescription template : templates)
         @template.statictemplates.method(config = config, template = template)
     @endfor
 }

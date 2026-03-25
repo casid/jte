@@ -28,7 +28,7 @@ public class ModelConfig {
     }
 
     public String staticImplementationSingleton() {
-        return map.get("staticImplementationSingleton");
+        return map.getOrDefault("staticImplementationSingleton", "true");
     }
 
     public Language language() {

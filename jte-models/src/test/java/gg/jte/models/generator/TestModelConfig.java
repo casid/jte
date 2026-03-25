@@ -36,14 +36,14 @@ public class TestModelConfig {
 
     @Test
     public void configureStaticImplementationSingleton() {
-        var modelConfig = new ModelConfig(Map.of("staticImplementationSingleton", "TEMPLATES"));
-        assertEquals("TEMPLATES", modelConfig.staticImplementationSingleton());
+        var modelConfig = new ModelConfig(Map.of("staticImplementationSingleton", "false"));
+        assertEquals("false", modelConfig.staticImplementationSingleton());
     }
 
     @Test
     public void staticImplementationSingletonNullWhenConfigurationNotPresent() {
         var modelConfig = new ModelConfig(Map.of());
-        assertNull(modelConfig.staticImplementationSingleton());
+        assertEquals("true", modelConfig.staticImplementationSingleton());
     }
 
     @Test

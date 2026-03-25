@@ -144,16 +144,17 @@ See details about it in the [jte-models documentation](jte-models.md).
 
 The following parameters are available for this extension:
 
-| Parameter                         | Description                                                                                                                                                                                                 | Default |
-|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| `interfaceAnnotation`             | The FQCN of the annotation to add to the generated interface                                                                                                                                                | None    |
-| `implementationAnnotation`        | The FQCN of the annotation to add to the generated implementation classes                                                                                                                                   | None    |
-| `staticImplementationAnnotation`  | The FQCN of the annotation to add to the generated static implementation classes                                                                                                                            | None    |
-| `dynamicImplementationAnnotation` | The FQCN of the annotation to add to the generated dynamic implementation classes                                                                                                                           | None    |
-| `staticImplementationSingleton`   | For `Java`, the field name of the singleton instance to add to the generated static implementation class. For `Kotlin`, `true` to use `object` instead of `class` for generated static implementation class | None    |
-| `language`                        | The target language for the generated classes. Either `Java` or `Kotlin`                                                                                                                                    | `Java`  |
-| `includePattern`                  | A regular expression to only include certain templates                                                                                                                                                      | None    |
-| `excludePattern`                  | A regular expression to exclude certain templates                                                                                                                                                           | None    |
+| Parameter                         | Description                                                                                                                                                            | Default     |
+|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| `interfaceAnnotation`             | The FQCN of the annotation to add to the generated interface                                                                                                           | None        |
+| `implementationAnnotation`        | The FQCN of the annotation to add to the generated implementation classes                                                                                              | None        |
+| `staticImplementationAnnotation`  | The FQCN of the annotation to add to the generated static implementation classes                                                                                       | None        |
+| `dynamicImplementationAnnotation` | The FQCN of the annotation to add to the generated dynamic implementation classes                                                                                      | None        |
+| `staticImplementationSingleton`   | For the generated static implementation classes, `Java` will provide a static wrapper class for a singleton instance and `Kotlin` will use `object` instead of `class` | `true`      |
+| `language`                        | The target language for the generated classes. Either `Java` or `Kotlin`                                                                                               | `Java`      |
+| `includePattern`                  | A regular expression to only include certain templates                                                                                                                 | None        |
+| `excludePattern`                  | A regular expression to exclude certain templates                                                                                                                      | None        |
+| `interfaceName`                   | The name of the interface                                                                                                                                              | `Templates` |
 
 ##### Example { #model-extension-example }
 

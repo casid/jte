@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestModelConfig {
@@ -31,6 +32,18 @@ public class TestModelConfig {
     public void implementationAnnotationNullWhenConfigurationNotPresent() {
         var modelConfig = new ModelConfig(Map.of());
         assertEquals("", modelConfig.implementationAnnotation());
+    }
+
+    @Test
+    public void configureStaticImplementationSingleton() {
+        var modelConfig = new ModelConfig(Map.of("staticImplementationSingleton", "false"));
+        assertEquals("false", modelConfig.staticImplementationSingleton());
+    }
+
+    @Test
+    public void staticImplementationSingletonNullWhenConfigurationNotPresent() {
+        var modelConfig = new ModelConfig(Map.of());
+        assertEquals("true", modelConfig.staticImplementationSingleton());
     }
 
     @Test

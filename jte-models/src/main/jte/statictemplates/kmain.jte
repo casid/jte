@@ -1,6 +1,8 @@
 @import gg.jte.extension.api.*
+@import gg.jte.models.generator.Util
 @import gg.jte.models.generator.ModelConfig
 @import java.util.Set
+@import java.util.stream.Collectors
 
 @param String targetClassName
 @param String interfaceName
@@ -22,7 +24,16 @@ import ${imp}
 ${modelConfig.implementationAnnotation()}
 ${modelConfig.staticImplementationAnnotation()}
 class ${targetClassName} : ${interfaceName} {
-    @for(TemplateDescription template: templates)
+    @if("true".equalsIgnoreCase(modelConfig.staticImplementationSingleton()))
+    companion object {
+        val INSTANCE = ${targetClassName}();
+        @for(TemplateDescription template : templates)
+        !{final String methodName = Util.methodName(template);}
+        fun ${methodName}(${Util.kotlinTypedParams(template, true)}) = INSTANCE.${methodName}(${template.params().stream().map(ParamDescription::name).collect(Collectors.joining(","))});
+        @endfor
+    }
+    @endif
+    @for(TemplateDescription template : templates)
         @template.statictemplates.kmethod(config = config, template = template)
     @endfor
 }

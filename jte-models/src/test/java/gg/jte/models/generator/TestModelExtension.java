@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,6 +86,11 @@ public class TestModelExtension {
                 try {
                     String contents = Files.readString(path);
                     assertThat(contents).contains("JteModel hello(java.lang.String message)");
+                    if (STATIC_SOURCE_FILE.matcher(path.toString()).find()) {
+                        assertThat(contents).contains("public static final StaticTemplates INSTANCE = new StaticTemplates();");
+                        assertThat(contents).contains("public static final class Singleton {");
+                        assertThat(contents).contains("public static JteModel hello(java.lang.String message)");
+                    }
                 } catch (IOException ex) {
                     fail("Could not read file " + path, ex);
                 }
@@ -102,12 +106,7 @@ public class TestModelExtension {
         public static final Pattern STATIC_SOURCE_FILE = Pattern.compile("target.generated-test-sources." + TEST_PACKAGE + ".StaticTemplates.kt");
 
         private JteExtension kotlinModelExtension() {
-            JteExtension modelExtension = new ModelExtension();
-            Map<String, String> config = new HashMap<>();
-            config.put("language", Language.Kotlin.toString());
-            modelExtension.init(config);
-
-            return modelExtension;
+            return new ModelExtension().init(Map.of("language", Language.Kotlin.toString()));
         }
 
         @Test
@@ -254,6 +253,13 @@ public class TestModelExtension {
 
                     class StaticTemplates : Templates {
                        \s
+                        companion object {
+                            val INSTANCE = StaticTemplates();
+                           \s
+                            fun hello(content: gg.jte.Content) = INSTANCE.hello(content);
+                           \s
+                        }
+                       \s
                         override fun hello(content: gg.jte.Content): JteModel = StaticJteModel<TemplateOutput>(
                             ContentType.Plain,
                             { output, interceptor -> test.myktemplates.JtehelloGenerated.render(output, interceptor, content) },
@@ -337,6 +343,13 @@ public class TestModelExtension {
 
                     class StaticTemplates : Templates {
                        \s
+                        companion object {
+                            val INSTANCE = StaticTemplates();
+                           \s
+                            fun hello() = INSTANCE.hello();
+                           \s
+                        }
+                       \s
                         override fun hello(): JteModel = StaticJteModel<TemplateOutput>(
                             ContentType.Plain,
                             { output, interceptor -> test.myktemplates.JtehelloGenerated.render(output, interceptor) },
@@ -369,6 +382,6 @@ public class TestModelExtension {
     }
 
     private static String withSystemLineEndings(String content) {
-        return content.replaceAll("\n", System.lineSeparator());
+        return content.replace("\n", System.lineSeparator());
     }
 }

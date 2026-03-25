@@ -27,6 +27,10 @@ public class ModelConfig {
         return map.getOrDefault("dynamicImplementationAnnotation", "");
     }
 
+    public String staticImplementationSingleton() {
+        return map.getOrDefault("staticImplementationSingleton", "true");
+    }
+
     public Language language() {
         String configuredLanguage = map.getOrDefault("language", "Java");
         try {

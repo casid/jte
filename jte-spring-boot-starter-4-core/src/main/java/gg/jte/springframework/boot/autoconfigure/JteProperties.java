@@ -60,7 +60,11 @@ public class JteProperties {
         this.developmentMode = developmentMode;
     }
 
-    public boolean usePreCompiledTemplates() {
+	public boolean usePreCompiledTemplates() {
+		return usePrecompiledTemplates;
+	}
+
+    public boolean isUsePrecompiledTemplates() {
         return usePrecompiledTemplates;
     }
 

@@ -21,10 +21,10 @@ public class JteAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(TemplateEngine.class)
     public TemplateEngine jteTemplateEngine(JteProperties jteProperties) {
-        if (jteProperties.isDevelopmentMode() && jteProperties.usePreCompiledTemplates()) {
+        if (jteProperties.isDevelopmentMode() && jteProperties.isUsePrecompiledTemplates()) {
             throw new JteConfigurationException("You can't use development mode and precompiledTemplates together");
         }
-        if (jteProperties.usePreCompiledTemplates()) {
+        if (jteProperties.isUsePrecompiledTemplates()) {
             // Templates will need to be compiled by the maven/gradle build task
             return TemplateEngine.createPrecompiled(ContentType.Html);
         }

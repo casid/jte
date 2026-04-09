@@ -17,7 +17,8 @@ jobs:
             --exclude "@template"
             --exclude test.com
             --exclude maven.apache.org
-            --exclude w3.org'
+            --exclude w3.org
+            --exclude "csp\.withgoogle\.com"'
           jobSummary: true
           format: markdown
           fail: true

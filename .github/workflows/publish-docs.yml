@@ -45,7 +45,7 @@ jobs:
         # find the static assets.
         run: mkdocs build --site-dir _site
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
 

@@ -1610,6 +1610,17 @@ public class TemplateEngineTest {
         thenRenderingFailsWithException().hasMessage("Failed to create kotlin generator. To handle .kte files, you need to add gg.jte:jte-kotlin to your project.");
     }
 
+    @Test
+    void annotation_issue433() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotation
+        @param @TypeUseAnnotation String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
     private void givenTemplate(String name, String code) {
         dummyCodeResolver.givenCode(name, code);
     }

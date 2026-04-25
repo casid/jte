@@ -12,19 +12,23 @@ in projects that enforce null-safety annotations.
 
 ## Setup
 
-Add `jspecify` to your project dependencies, then configure the build plugin to use the extension.
+Add `jspecify` 1.0.0 or later to your project dependencies, then configure the build plugin to use the extension.
 
 === "Maven"
 
-    ```xml linenums="1"
-    <dependencies>
-        <dependency>
-            <groupId>org.jspecify</groupId>
-            <artifactId>jspecify</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-    </dependencies>
+    Add to your `<dependencies>` section:
 
+    ```xml linenums="1"
+    <dependency>
+        <groupId>org.jspecify</groupId>
+        <artifactId>jspecify</artifactId>
+        <version>1.0.0</version>
+    </dependency>
+    ```
+
+    Add to your `<build><plugins>` section:
+
+    ```xml linenums="1"
     <plugin>
         <groupId>gg.jte</groupId>
         <artifactId>jte-maven-plugin</artifactId>
@@ -93,6 +97,8 @@ Add `jspecify` to your project dependencies, then configure the build plugin to 
         jteExtension("gg.jte.nullmarked.NullMarkedExtension")
     }
     ```
+
+Run the build to generate classes.
 
 ## Output
 

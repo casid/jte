@@ -919,6 +919,12 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void urlWithAtIfInAttribute() {
+        givenTemplate("<a href=\"https://example.com/@iffy-path/page\">link</a>");
+        thenOutputIs("<a href=\"https://example.com/@iffy-path/page\">link</a>");
+    }
+
+    @Test
     void paramAfterText() {
         givenTemplate("Hello @param");
         thenOutputIs("Hello @param");

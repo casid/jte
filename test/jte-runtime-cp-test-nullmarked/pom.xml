@@ -73,7 +73,7 @@
                 <dependencies>
                     <dependency>
                         <groupId>gg.jte</groupId>
-                        <artifactId>jte-nullmarked</artifactId>
+                        <artifactId>jte-jspecify-nullmarked</artifactId>
                         <version>3.2.4-SNAPSHOT</version>
                     </dependency>
                 </dependencies>

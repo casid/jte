@@ -1644,11 +1644,47 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void annotatedParam_assignEnum() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotationParam
+        @import gg.jte.TestUtils.TypeSelection
+        @param @TypeUseAnnotationParam(value = "value", typeSelection = TypeSelection.A) String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
     void annotatedParam_multiple() {
         givenRawTemplate("""
         @import gg.jte.TestUtils.TypeUseAnnotation
         @import gg.jte.TestUtils.TypeUseAnnotationParam
         @param @TypeUseAnnotation @TypeUseAnnotationParam("value") String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_nestedParens() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.Nest1
+        @import gg.jte.TestUtils.Nested
+        @param @Nest1(nested = @Nested()) String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_nested() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.Nest1
+        @import gg.jte.TestUtils.Nested
+        @param @Nest1(nested = @Nested) String model
         ${model}""");
         StringOutput output = new StringOutput();
         templateEngine.render(templateName, "test value", output);

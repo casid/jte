@@ -43,4 +43,11 @@ public class TestUtils {
     public @interface Nest1 {
         Nested nested();
     }
+
+    @SuppressWarnings("unused")
+    @Target({ElementType.TYPE_USE})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface AnnWithArray {
+        String[] values();
+    }
 }

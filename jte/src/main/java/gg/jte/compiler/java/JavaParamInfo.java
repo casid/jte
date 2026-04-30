@@ -12,6 +12,7 @@ public class JavaParamInfo {
         int nameEndIndex = -1;
         int defaultValueStartIndex = -1;
         int genericDepth = 0;
+        int parenDepth = 0;
 
         boolean stringMode = false;
         for (int i = 0; i < parameterString.length(); ++i) {
@@ -40,9 +41,13 @@ public class JavaParamInfo {
                 ++genericDepth;
             } else if (character == '>') {
                 --genericDepth;
+            } else if (character == '(') {
+                ++parenDepth;
+            } else if (character == ')') {
+                --parenDepth;
             }
 
-            if (genericDepth > 0) {
+            if (genericDepth > 0 || parenDepth > 0) {
                 continue;
             }
 

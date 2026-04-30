@@ -1691,6 +1691,86 @@ public class TemplateEngineTest {
         assertThat(output.toString()).isEqualTo("test value");
     }
 
+    @Test
+    void annotatedParam_withDefaultValue() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotation
+        @param @TypeUseAnnotation String model = "default"
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_assign_withDefaultValue() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotationParam
+        @param @TypeUseAnnotationParam(value = "x", count = 5) String model = "default"
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_generic() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotation
+        @import java.util.List
+        @param @TypeUseAnnotation List<String> model
+        ${model.get(0)}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, List.of("test value"), output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_arrayValue() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.AnnWithArray
+        @param @AnnWithArray(values = {"a", "b"}) String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_multiple_assign() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotationParam
+        @import gg.jte.TestUtils.Nest1
+        @import gg.jte.TestUtils.Nested
+        @param @TypeUseAnnotationParam(value = "x") @Nest1(nested = @Nested) String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_arrayType() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotation
+        @param @TypeUseAnnotation String[] model
+        ${model[0]}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, new String[]{"test value"}, output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_escapedString() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotationParam
+        @param @TypeUseAnnotationParam("a \\"quoted\\" string") String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
     private void givenTemplate(String name, String code) {
         dummyCodeResolver.givenCode(name, code);
     }

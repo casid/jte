@@ -24,5 +24,6 @@ public class TestUtils {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface TypeUseAnnotationParam {
         String value();
+        int count() default 0;
     }
 }

@@ -1611,10 +1611,44 @@ public class TemplateEngineTest {
     }
 
     @Test
-    void annotation_issue433() {
+    void annotatedParam() {
         givenRawTemplate("""
         @import gg.jte.TestUtils.TypeUseAnnotation
         @param @TypeUseAnnotation String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_value() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotationParam
+        @param @TypeUseAnnotationParam("value") String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_assign() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotationParam
+        @param @TypeUseAnnotationParam(value = "value", count = 123) String model
+        ${model}""");
+        StringOutput output = new StringOutput();
+        templateEngine.render(templateName, "test value", output);
+        assertThat(output.toString()).isEqualTo("test value");
+    }
+
+    @Test
+    void annotatedParam_multiple() {
+        givenRawTemplate("""
+        @import gg.jte.TestUtils.TypeUseAnnotation
+        @import gg.jte.TestUtils.TypeUseAnnotationParam
+        @param @TypeUseAnnotation @TypeUseAnnotationParam("value") String model
         ${model}""");
         StringOutput output = new StringOutput();
         templateEngine.render(templateName, "test value", output);

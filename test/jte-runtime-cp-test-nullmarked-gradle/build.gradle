@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id 'gg.jte.gradle' version '3.2.4-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+group = 'gg.jte.testgroup'
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation('gg.jte:jte-runtime:3.2.4-SNAPSHOT')
+    implementation('org.jspecify:jspecify:1.0.0')
+    testImplementation('org.junit.jupiter:junit-jupiter:5.9.0')
+    testImplementation('org.assertj:assertj-core:3.27.7')
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.9.0')
+    jteGenerate('gg.jte:jte-jspecify-nullmarked:3.2.4-SNAPSHOT')
+}
+
+jte {
+    generate()
+    jteExtension('gg.jte.nullmarked.NullMarkedExtension')
+}

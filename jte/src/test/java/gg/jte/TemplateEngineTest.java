@@ -913,6 +913,18 @@ public class TemplateEngineTest {
     }
 
     @Test
+    void urlWithAtForInAttribute() {
+        givenTemplate("<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1/css/all.min.css\">");
+        thenOutputIs("<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1/css/all.min.css\">");
+    }
+
+    @Test
+    void urlWithAtIfInAttribute() {
+        givenTemplate("<a href=\"https://example.com/@iffy-path/page\">link</a>");
+        thenOutputIs("<a href=\"https://example.com/@iffy-path/page\">link</a>");
+    }
+
+    @Test
     void paramAfterText() {
         givenTemplate("Hello @param");
         thenOutputIs("Hello @param");

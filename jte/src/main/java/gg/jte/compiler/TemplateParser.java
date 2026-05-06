@@ -203,7 +203,7 @@ public final class TemplateParser {
                     extract(templateCode, lastIndex, i, visitor::onUnsafeCodePart);
                     lastIndex = i + 1;
                 }
-            } else if (currentMode == Mode.Text && regionMatches("@if")) {
+            } else if (currentMode == Mode.Text && regionMatches("@if") && (nextChar() == '(' || Character.isWhitespace(nextChar()))) {
                 extractTextPart(i - 2, Mode.Condition);
                 lastIndex = i + 1;
                 push(Mode.Condition);
@@ -298,7 +298,7 @@ public final class TemplateParser {
                     visitor.onConditionEnd(depth);
                     pop();
                 }
-            } else if (currentMode == Mode.Text && regionMatches("@for")) {
+            } else if (currentMode == Mode.Text && regionMatches("@for") && (nextChar() == '(' || Character.isWhitespace(nextChar()))) {
                 extractTextPart(i - 3, Mode.ForLoop);
                 lastIndex = i + 1;
                 push(Mode.ForLoop);

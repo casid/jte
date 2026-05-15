@@ -38,7 +38,7 @@ Add `jspecify` 1.0.0 or later to your project dependencies, then configure the b
             <contentType>Html</contentType>
             <extensions>
                 <extension>
-                    <className>gg.jte.nullmarked.NullMarkedExtension</className>
+                    <className>gg.jte.jspecify.NullMarkedExtension</className>
                 </extension>
             </extensions>
         </configuration>
@@ -75,7 +75,7 @@ Add `jspecify` 1.0.0 or later to your project dependencies, then configure the b
 
     jte {
         generate()
-        jteExtension 'gg.jte.nullmarked.NullMarkedExtension'
+        jteExtension 'gg.jte.jspecify.NullMarkedExtension'
     }
     ```
 
@@ -94,7 +94,7 @@ Add `jspecify` 1.0.0 or later to your project dependencies, then configure the b
 
     jte {
         generate()
-        jteExtension("gg.jte.nullmarked.NullMarkedExtension")
+        jteExtension("gg.jte.jspecify.NullMarkedExtension")
     }
     ```
 

@@ -58,7 +58,7 @@
                     <contentType>Html</contentType>
                     <extensions>
                         <extension>
-                            <className>gg.jte.nullmarked.NullMarkedExtension</className>
+                            <className>gg.jte.jspecify.NullMarkedExtension</className>
                         </extension>
                     </extensions>
                 </configuration>

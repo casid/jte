@@ -25,5 +25,5 @@ dependencies {
 
 jte {
     generate()
-    jteExtension('gg.jte.nullmarked.NullMarkedExtension')
+    jteExtension('gg.jte.jspecify.NullMarkedExtension')
 }

@@ -1,4 +1,4 @@
-package gg.jte.nullmarked;
+package gg.jte.jspecify;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

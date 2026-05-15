@@ -1,4 +1,4 @@
-package gg.jte.nullmarked;
+package gg.jte.jspecify;
 
 import gg.jte.extension.api.JteConfig;
 import gg.jte.extension.api.JteExtension;

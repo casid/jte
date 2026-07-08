@@ -80,6 +80,7 @@ nav:
   - "Build Tools":
     - "Maven Plugin": maven-plugin.md
     - "Gradle Plugin": gradle-plugin.md
+    - "Command Line Interface": cli.md
   - "How To":
     - "Hot Reloading": hot-reloading.md
     - "Precompiling Templates": pre-compiling.md

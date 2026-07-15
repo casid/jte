@@ -43,7 +43,7 @@ Run with `--help` to see all options.
 | `-c, --content-type`            | The content type of all templates. Either `Plain` or `Html`                       | None. Required.                                                 |
 | `--trim-control-structures`     | Trims control structures, resulting in prettier output                            | `false`                                                         |
 | `--html-tags`                   | Intercepts the given (comma-separated) html tags during template compilation      | None                                                            |
-| `--html-comments-preserved`     | If HTML comments should be preserved in the output                                | `false`                                                         |
+| `--preserve-html-comments`      | If HTML comments should be preserved in the output                                | `false`                                                         |
 | `--binary-static-content`       | If to generate a [binary content](binary-rendering.md) resource for each template | `false`                                                         |
 | `--package-name`                | The package name, where template classes are generated to                         | [`Constants.PACKAGE_NAME_PRECOMPILED`][constants-package-name]  |
 | `--target-resource-directory`   | Directory in which to generate non-java files (resources)                         | None                                                            |

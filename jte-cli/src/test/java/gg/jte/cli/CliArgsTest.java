@@ -18,7 +18,7 @@ class CliArgsTest {
                 "-c", "Html",
                 "--trim-control-structures",
                 "--html-tags", "form,input",
-                "--html-comments-preserved",
+                "--preserve-html-comments",
                 "--binary-static-content",
                 "--package-name", "com.example.templates",
                 "--target-resource-directory", "target/resources"

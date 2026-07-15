@@ -32,7 +32,7 @@ public class Main implements Callable<Integer> {
     @Option(names = "--html-tags", split = ",", description = "Intercepts the given html tags during template compilation.")
     public String[] htmlTags;
 
-    @Option(names = "--html-comments-preserved", description = "Preserves HTML/CSS/JS comments, which are omitted by default when using Html content type.")
+    @Option(names = "--preserve-html-comments", description = "Preserves HTML/CSS/JS comments, which are omitted by default when using Html content type.")
     public boolean htmlCommentsPreserved;
 
     @Option(names = "--binary-static-content", description = "UTF-8 encodes all static template parts at compile time.")

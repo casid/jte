@@ -14,11 +14,11 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MainCallTest {
+class GenerateCommandCallTest {
 
     @Test
     void printsFriendlyErrorWhenSourceDirectoryDoesNotExist(@TempDir Path tempDir) {
-        Main main = new Main();
+        GenerateCommand main = new GenerateCommand();
         main.sourceDirectory = tempDir.resolve("does-not-exist");
         main.targetDirectory = tempDir.resolve("generated");
         main.contentType = ContentType.Plain;
@@ -41,7 +41,7 @@ class MainCallTest {
         assertThat(readOnlyDirectory.toFile().setWritable(false)).isTrue();
 
         try {
-            Main main = new Main();
+            GenerateCommand main = new GenerateCommand();
             main.sourceDirectory = sourceDirectory;
             main.targetDirectory = readOnlyDirectory.resolve("generated");
             main.contentType = ContentType.Plain;
@@ -55,7 +55,7 @@ class MainCallTest {
         }
     }
 
-    private static String callAndCaptureStderr(Main main) {
+    private static String callAndCaptureStderr(GenerateCommand main) {
         ByteArrayOutputStream err = new ByteArrayOutputStream();
         PrintStream originalErr = System.err;
         System.setErr(new PrintStream(err));

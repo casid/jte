@@ -26,13 +26,13 @@ No Maven installation is required to fetch it - any tool that can download a fil
 ## Usage
 
 ```shell linenums="1"
-java -jar jte-cli-{{ latest-git-tag }}-executable.jar \
+java -jar jte-cli-{{ latest-git-tag }}-executable.jar generate \
     --source-directory src/main/jte \
     --target-directory target/generated-sources/jte \
     --content-type Html
 ```
 
-Run with `--help` to see all options.
+`generate` is currently the only command. Run with `--help` or `generate --help` to see all options.
 
 ### Options { #options }
 

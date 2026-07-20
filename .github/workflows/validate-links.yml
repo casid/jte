@@ -29,6 +29,7 @@ jobs:
         with:
           args: '**/*.java **/*.md **/*.xml **/*.html **/*.yml
             --verbose --no-progress
+            --exclude-path _site
             --exclude localhost
             --exclude "github\.com/casid/jte/blob"
             --exclude "@template"

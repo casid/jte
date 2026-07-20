@@ -7,6 +7,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v6
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - name: Setup MkDocs
+        run: .github/scripts/setup-docs-dependencies.sh
+      - name: Build docs
+        # Build the docs as they will look after the next release is published,
+        # so links to pages/anchors added in this commit can be remapped below
+        # instead of being checked against the still-unpublished live site.
+        run: mkdocs build --site-dir _site
       - name: Link Checker
         uses: lycheeverse/lychee-action@v2
         with:
@@ -18,7 +35,8 @@ jobs:
             --exclude test.com
             --exclude maven.apache.org
             --exclude w3.org
-            --exclude "csp\.withgoogle\.com"'
+            --exclude "csp\.withgoogle\.com"
+            --remap "^https://jte\.gg file://$(pwd)/_site"'
           jobSummary: true
           format: markdown
           fail: true

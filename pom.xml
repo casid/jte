@@ -50,6 +50,7 @@
         <module>jte-extension-api-mocks</module>
         <module>jte-native-resources</module>
         <module>jte-jspecify-nullmarked</module>
+        <module>jte-models-runtime</module>
         <module>jte-models</module>
         <module>jte-watcher</module>
         <module>jte-maven-plugin</module>

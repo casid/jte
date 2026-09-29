@@ -34,6 +34,11 @@
             <artifactId>jte</artifactId>
             <version>3.2.5-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>gg.jte</groupId>
+            <artifactId>jte-models-runtime</artifactId>
+            <version>3.2.5-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

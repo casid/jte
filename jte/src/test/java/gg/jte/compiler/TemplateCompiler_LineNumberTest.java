@@ -3,6 +3,7 @@ package gg.jte.compiler;
 import gg.jte.ContentType;
 import gg.jte.DummyCodeResolver;
 import gg.jte.TemplateConfig;
+import gg.jte.TemplateException;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import org.junit.jupiter.api.Disabled;
@@ -14,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 public class TemplateCompiler_LineNumberTest {
@@ -26,11 +28,14 @@ public class TemplateCompiler_LineNumberTest {
         ${content}
         """
         );
+
+        // Comment numbers are zero-indexed to match JTE_LINE_INFO; user-facing error messages will be one-indexed
+
         // This test case is designed to exercise a number of pathological cases involving content blocks integrated into
         // various kinds of code blocks. The output should be manually verified using dumpAnnotatedGeneratedCode and then copy-pasted
         // into static data in the tests to prevent regressions
         dummyCodeResolver.givenCode("test.jte", """
-        @import java.util.List      <%-- Line0 --%>
+        @import java.util.List      <%-- Line 0 --%>
         @import java.util.Map       <%-- Line 1 --%>
                                     <%-- Line 2 --%>
         @param String example       <%-- Line 3 --%>
@@ -83,6 +88,36 @@ public class TemplateCompiler_LineNumberTest {
         ClassInfo info = templateCompiler.getClassInfo(null, "test.jte");
         assertThat(info.lineInfo).isEqualTo(new int[] {0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,8,8,9,10,10,10,11,12,12,12,13,13,14,15,15,16,17,17,17,18,19,19,19,20,20,21,22,22,22,23,24,24,25,26,27,27,27,28,30,30,31,32,0,0,3,4,4,6,6,6,0,0,0});
     }
+
+    @Test
+    void testJteCompilerError() {
+        DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
+        dummyCodeResolver.givenCode("invalidJte.jte", """
+        @import java.util.List    <%-- Line 0 --%>
+                                  <%-- Line 1 --%>
+        @param List<String> args  <%-- Line 2 --%>
+                                  <%-- Line 3 --%>
+        ${args.toString()         <%-- Line 4 --%>
+        """);
+        TemplateCompiler templateCompiler = new TemplateCompiler(new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED), dummyCodeResolver, Paths.get(""), null);
+        assertThatThrownBy(templateCompiler::generateAll).isInstanceOf(TemplateException.class).hasMessageContaining("error at line 6");
+    }
+
+    @Test
+    void testJteJavaError() {
+        DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
+        // The Map reference should produce a "cannot find symbol" error on user-facing line 3
+        dummyCodeResolver.givenCode("invalidJte.jte", """
+        @import java.util.List           <%-- Line 0 --%>
+                                         <%-- Line 1 --%>
+        @param Map<String, String> args  <%-- Line 2 --%>
+                                         <%-- Line 3 --%>
+        ${args.toString()}               <%-- Line 4 --%>
+        """);
+        TemplateCompiler templateCompiler = new TemplateCompiler(new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED), dummyCodeResolver, Paths.get(""), null);
+        assertThatThrownBy(templateCompiler::precompileAll).isInstanceOf(TemplateException.class).hasMessageContaining("invalidJte.jte:3");
+    }
+
 
     @Disabled("Test exists to dump the annotated generated code for debugging/updating the above tests")
     @Test

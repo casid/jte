@@ -58,17 +58,18 @@ public class JavaClassCompiler implements ClassCompiler {
             //Pattern matches '<absolutePath><separatorChar><relativeTemplatePath>.java:<Line>: error'
             Pattern pattern = Pattern.compile("^\\Q%s%s\\E(?<ClassName>.*?)\\.java:(?<LineNumber>\\d+?): error".formatted(absolutePath, File.separatorChar), Pattern.MULTILINE);
             Matcher matcher = pattern.matcher(errors);
-            if (!matcher.find()) {
-                return "Failed to compile template, error at\n" + errors;
-            }
 
-            String className = matcher.group("ClassName").replace(File.separatorChar, '.');
-            int javaLine = Integer.parseInt(matcher.group("LineNumber"));
+            String formattedErrors = matcher.replaceAll(mr -> {
+                String className = matcher.group("ClassName").replace(File.separatorChar, '.');
+                int javaLine = Integer.parseInt(matcher.group("LineNumber"));
+                ClassInfo templateInfo = templateByClassName.get(className);
 
-            ClassInfo templateInfo = templateByClassName.get(className);
-            int templateLine = templateInfo.lineInfo[javaLine - 1] + 1;
+                int templateLine = templateInfo.lineInfo[javaLine - 1] + 1;
 
-            return "Failed to compile template, error at " + templateInfo.name + ":" + templateLine + "\n" + errors;
+                return templateInfo.name + ":" + templateLine + "\n" + errors.substring(mr.start(), mr.end());
+            });
+
+            return "Failed to compile template:\n" + formattedErrors;
         } catch (Exception e) {
             return "Failed to compile template, error at\n" + errors;
         }

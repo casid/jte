@@ -1,3 +1,3 @@
-# jte-models-runtime
+# jte-models
 
-Runtime classes necessary for using jte-models.
+See officials docs: <https://jte.gg/jte-models/>.

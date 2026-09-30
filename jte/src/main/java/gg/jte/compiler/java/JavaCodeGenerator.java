@@ -73,7 +73,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private void writeClass() {
-        int currentLineWas = getCurrentTemplateLine();
+        int previousLineWas = getCurrentTemplateLine();
         javaCode.setCurrentTemplateLine(0);
         javaCode.append("@SuppressWarnings(\"unchecked\")\n");
         javaCode.append("@javax.annotation.processing.Generated(\"gg.jte.TemplateEngine\")\n");
@@ -82,7 +82,7 @@ public class JavaCodeGenerator implements CodeGenerator {
         javaCode.append("\tpublic static void render(");
         writeTemplateOutputParam();
         javaCode.append(", gg.jte.html.HtmlInterceptor jteHtmlInterceptor");
-        javaCode.setCurrentTemplateLine(currentLineWas);
+        javaCode.setCurrentTemplateLine(previousLineWas);
 
         hasWrittenClass = true;
     }
@@ -110,10 +110,10 @@ public class JavaCodeGenerator implements CodeGenerator {
             writeClass();
         }
 
-        int currentLineWas = getCurrentTemplateLine();
+        int previousLineWas = getCurrentTemplateLine();
         javaCode.setCurrentTemplateLine(0);
         javaCode.append(") {\n");
-        javaCode.setCurrentTemplateLine(currentLineWas);
+        javaCode.setCurrentTemplateLine(previousLineWas);
 
         paramOrder.put(classInfo.name, parameters);
     }
@@ -495,10 +495,10 @@ public class JavaCodeGenerator implements CodeGenerator {
             int lineCount = (int) code.chars().filter(x -> x == '\n').count();
             new JavaContentProcessor(depth, endLine - lineCount, code).process();
         } else {
-            int currentLineWas = getCurrentTemplateLine();
+            int previousLineWas = getCurrentTemplateLine();
             javaCode.setCurrentTemplateLine(endLine);
             javaCode.appendUserContent(code);
-            javaCode.setCurrentTemplateLine(currentLineWas);
+            javaCode.setCurrentTemplateLine(previousLineWas);
         }
     }
 

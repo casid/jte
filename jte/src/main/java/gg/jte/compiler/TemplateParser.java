@@ -108,14 +108,14 @@ public final class TemplateParser {
                 push(Mode.Import);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Import && currentChar == '\n') {
-                extract(templateCode, lastIndex, i, (depth, content) -> visitor.onImport(stripComments(content).trim()));
+                extract(templateCode, lastIndex, i, (depth, content) -> visitor.onImport(content.trim()));
                 pop();
                 lastIndex = i + 1;
             } else if (!currentMode.isComment() && regionMatches("@param") && isParamOrImportAllowed()) {
                 push(Mode.Param);
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Param && currentChar == '\n') {
-                extract(templateCode, lastIndex, i, (depth, content) -> visitor.onParam(stripComments(content).trim()));
+                extract(templateCode, lastIndex, i, (depth, content) -> visitor.onParam(content.trim()));
                 pop();
                 lastIndex = i + 1;
             } else if (currentMode == Mode.Text && regionMatches("@raw")) {
@@ -362,11 +362,6 @@ public final class TemplateParser {
             completeParamsIfRequired();
             visitor.onComplete();
         }
-    }
-
-    // Used on parameters and imports
-    private String stripComments(String content) {
-        return content.replaceAll("<%--.*?--%>", "");
     }
 
     @SuppressWarnings("SameParameterValue")

@@ -66,7 +66,7 @@ public class JavaClassCompiler implements ClassCompiler {
 
                 int templateLine = templateInfo.lineInfo[javaLine - 1] + 1;
 
-                return templateInfo.name + ":" + templateLine + "\n" + errors.substring(mr.start(), mr.end());
+                return Matcher.quoteReplacement(templateInfo.name + ":" + templateLine + "\n" + errors.substring(mr.start(), mr.end()));
             });
 
             return "Failed to compile template:\n" + formattedErrors;

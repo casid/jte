@@ -86,7 +86,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     }
 
     private void writeClass() {
-        int currentLineWas = getCurrentTemplateLine();
+        int previousLineWas = getCurrentTemplateLine();
         kotlinCode.setCurrentTemplateLine(0);
         kotlinCode.append("@Suppress(\"UNCHECKED_CAST\", \"UNUSED_PARAMETER\")").append('\n');
         kotlinCode.append("internal class ").append(classInfo.className).append(" {\n");
@@ -95,7 +95,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         kotlinCode.append("\t@JvmStatic fun render(");
         writeTemplateOutputParam();
         kotlinCode.append(", jteHtmlInterceptor:gg.jte.html.HtmlInterceptor?");
-        kotlinCode.setCurrentTemplateLine(currentLineWas);
+        kotlinCode.setCurrentTemplateLine(previousLineWas);
 
         hasWrittenClass = true;
     }
@@ -123,10 +123,10 @@ public class KotlinCodeGenerator implements CodeGenerator {
             writeClass();
         }
 
-        int currentLineWas = getCurrentTemplateLine();
+        int previousLineWas = getCurrentTemplateLine();
         kotlinCode.setCurrentTemplateLine(0);
         kotlinCode.append(") {\n");
-        kotlinCode.setCurrentTemplateLine(currentLineWas);
+        kotlinCode.setCurrentTemplateLine(previousLineWas);
 
         paramOrder.put(classInfo.name, parameters);
     }
@@ -523,10 +523,10 @@ public class KotlinCodeGenerator implements CodeGenerator {
             int lineCount = (int) code.chars().filter(x -> x == '\n').count();
             new KotlinContentProcessor(depth, endLine - lineCount, code).process();
         } else {
-            int currentLineWas = getCurrentTemplateLine();
+            int previousLineWas = getCurrentTemplateLine();
             kotlinCode.setCurrentTemplateLine(endLine);
             kotlinCode.appendUserContent(code);
-            kotlinCode.setCurrentTemplateLine(currentLineWas);
+            kotlinCode.setCurrentTemplateLine(previousLineWas);
         }
     }
 

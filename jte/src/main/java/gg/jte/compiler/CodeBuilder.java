@@ -24,6 +24,12 @@ public final class CodeBuilder {
 
     public CodeBuilder append(String code) {
         this.code.append(code);
+        addLines(code);
+        return this;
+    }
+
+    public CodeBuilder appendUserContent(String code) {
+        this.code.append(code);
         addLines(code, 0, code.length());
         return this;
     }
@@ -153,11 +159,14 @@ public final class CodeBuilder {
         currentCodeLine += count;
     }
 
+    private void addLines(String code) {
+        code.chars().filter(ch -> ch == '\n').forEach(i -> addLine(currentTemplateLine));
+    }
+
     private void addLines(String code, int start, int end) {
-        for (int i = start; i < end; ++i) {
-            if (code.charAt(i) == '\n') {
-                addLine(currentTemplateLine);
-            }
+        int lineCount = (int) code.substring(start, end).chars().filter(ch -> ch == '\n').count();
+        for (int i = lineCount; i > 0; i--) {
+            addLine(currentTemplateLine - i);
         }
     }
 

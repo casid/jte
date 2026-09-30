@@ -84,7 +84,7 @@ public class TemplateParserVisitorAdapter implements TemplateParserVisitor {
     }
 
     @Override
-    public void onTemplateCall(int depth, String name, List<String> params) {
+    public void onTemplateCall(int depth, String name, List<TemplateParser.TemplateParam> params) {
 
     }
 

@@ -48,7 +48,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     public void onImport(String importClass) {
         writePackageIfRequired();
         imports.add(importClass);
-        javaCode.append("import ").append(importClass).append(";\n");
+        javaCode.append("import ").appendUserContent(importClass).append(";\n");
     }
 
     private void writePackageIfRequired() {
@@ -67,12 +67,14 @@ public class JavaCodeGenerator implements CodeGenerator {
             writeClass();
         }
 
-        javaCode.append(", ").append(paramInfo.type).append(' ').append(paramInfo.name);
+        javaCode.append(", ").appendUserContent(paramInfo.type).append(' ').appendUserContent(paramInfo.name);
 
         parameters.add(paramInfo);
     }
 
     private void writeClass() {
+        int currentLineWas = getCurrentTemplateLine();
+        javaCode.setCurrentTemplateLine(0);
         javaCode.append("@SuppressWarnings(\"unchecked\")\n");
         javaCode.append("@javax.annotation.processing.Generated(\"gg.jte.TemplateEngine\")\n");
         javaCode.append("public final class ").append(classInfo.className).append(" {\n");
@@ -80,6 +82,7 @@ public class JavaCodeGenerator implements CodeGenerator {
         javaCode.append("\tpublic static void render(");
         writeTemplateOutputParam();
         javaCode.append(", gg.jte.html.HtmlInterceptor jteHtmlInterceptor");
+        javaCode.setCurrentTemplateLine(currentLineWas);
 
         hasWrittenClass = true;
     }
@@ -107,7 +110,10 @@ public class JavaCodeGenerator implements CodeGenerator {
             writeClass();
         }
 
+        int currentLineWas = getCurrentTemplateLine();
+        javaCode.setCurrentTemplateLine(0);
         javaCode.append(") {\n");
+        javaCode.setCurrentTemplateLine(currentLineWas);
 
         paramOrder.put(classInfo.name, parameters);
     }
@@ -119,6 +125,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     @Override
     public void onComplete() {
+        javaCode.setCurrentTemplateLine(0);
         javaCode.append("\t}\n");
 
         javaCode.append("\tpublic static void renderMap(");
@@ -132,15 +139,16 @@ public class JavaCodeGenerator implements CodeGenerator {
             }
 
             javaCode.setCurrentTemplateLine(parameter.templateLine);
-            javaCode.append("\t\t").append(parameter.type).append(" ").append(parameter.name).append(" = (").append(parameter.type);
+            javaCode.append("\t\t").appendUserContent(parameter.type).append(" ").appendUserContent(parameter.name).append(" = (").appendUserContent(parameter.type);
             if (parameter.defaultValue != null) {
-                javaCode.append(")params.getOrDefault(\"").append(parameter.name).append("\", ");
-                writeJavaCodeWithContentSupport(0, parameter.defaultValue);
+                javaCode.append(")params.getOrDefault(\"").appendUserContent(parameter.name).append("\", ");
+                writeJavaCodeWithContentSupport(0, parameter.templateLine, parameter.defaultValue);
                 javaCode.append(");\n");
             } else {
-                javaCode.append(")params.get(\"").append(parameter.name).append("\");\n");
+                javaCode.append(")params.get(\"").appendUserContent(parameter.name).append("\");\n");
             }
         }
+        javaCode.setCurrentTemplateLine(0);
         javaCode.append("\t\trender(jteOutput, jteHtmlInterceptor");
 
         for (ParamInfo parameter : parameters) {
@@ -148,7 +156,7 @@ public class JavaCodeGenerator implements CodeGenerator {
                 continue;
             }
 
-            javaCode.append(", ").append(parameter.name);
+            javaCode.append(", ").appendUserContent(parameter.name);
         }
         javaCode.append(");\n");
         javaCode.append("\t}\n");
@@ -308,7 +316,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
         writeIndentation(depth);
-        javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", null);\n");
+        javaCode.append("jteOutput.setContext(\"").appendUserContent(tagName).append("\", null);\n");
 
         writeCodePart(depth, codePart);
     }
@@ -316,19 +324,19 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
         writeIndentation(depth);
-        javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", \"").append(attributeName).append("\");\n");
+        javaCode.append("jteOutput.setContext(\"").appendUserContent(tagName).append("\", \"").appendUserContent(attributeName).append("\");\n");
 
         writeCodePart(depth, codePart);
 
         writeIndentation(depth);
-        javaCode.append("jteOutput.setContext(\"").append(tagName).append("\", null);\n");
+        javaCode.append("jteOutput.setContext(\"").appendUserContent(tagName).append("\", null);\n");
     }
 
     @Override
     public void onUnsafeCodePart(int depth, String codePart) {
         writeIndentation(depth);
         javaCode.append("jteOutput.writeUnsafeContent(");
-        javaCode.append(codePart);
+        javaCode.appendUserContent(codePart);
         javaCode.append(");\n");
     }
 
@@ -336,14 +344,14 @@ public class JavaCodeGenerator implements CodeGenerator {
         writeIndentation(depth);
 
         javaCode.append("jteOutput.writeUserContent(");
-        writeJavaCodeWithContentSupport(depth, codePart);
+        writeJavaCodeWithContentSupport(depth, getCurrentTemplateLine(), codePart);
         javaCode.append(");\n");
     }
 
     @Override
     public void onCodeStatement(int depth, String codePart) {
         writeIndentation(depth);
-        writeJavaCodeWithContentSupport(depth, codePart);
+        writeJavaCodeWithContentSupport(depth, getCurrentTemplateLine(), codePart);
         javaCode.append("\n");
     }
 
@@ -352,7 +360,7 @@ public class JavaCodeGenerator implements CodeGenerator {
         writeIndentation(depth);
 
         javaCode.append("if (");
-        javaCode.append(condition);
+        javaCode.appendUserContent(condition);
         javaCode.append(") {\n");
     }
 
@@ -360,7 +368,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     public void onConditionElse(int depth, String condition) {
         writeIndentation(depth);
         javaCode.append("} else if (");
-        javaCode.append(condition);
+        javaCode.appendUserContent(condition);
         javaCode.append(") {\n");
     }
 
@@ -381,7 +389,7 @@ public class JavaCodeGenerator implements CodeGenerator {
         CodeMarker beforeLoop = javaCode.getMarkerOfCurrentPosition();
 
         writeIndentation(depth);
-        javaCode.append("for (").append(codePart).append(") {\n");
+        javaCode.append("for (").appendUserContent(codePart).append(") {\n");
 
         CodeMarker inLoop = javaCode.getMarkerOfCurrentPosition();
 
@@ -422,12 +430,12 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     @Override
-    public void onTemplateCall(int depth, String name, List<String> params) {
+    public void onTemplateCall(int depth, String name, List<TemplateParser.TemplateParam> params) {
         ClassInfo tagInfo = compiler.generateTemplateCall(name, "jte", classDefinitions, templateDependencies, getCurrentDebugInfo());
 
         writeIndentation(depth);
 
-        javaCode.append(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
+        javaCode.appendUserContent(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
 
         appendParams(depth, tagInfo.name, params);
         javaCode.append(");\n");
@@ -436,7 +444,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
-        javaCode.append("jteHtmlInterceptor.onHtmlTagOpened(\"").append(htmlTag.name).append("\", ");
+        javaCode.append("jteHtmlInterceptor.onHtmlTagOpened(\"").appendUserContent(htmlTag.name).append("\", ");
         writeAttributeMap(htmlTag);
         javaCode.append(", jteOutput);\n");
     }
@@ -444,7 +452,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
-        javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").append(htmlTag.name).append("\", jteOutput);\n");
+        javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").appendUserContent(htmlTag.name).append("\", jteOutput);\n");
     }
 
     @Override
@@ -473,7 +481,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
         writeIndentation(depth);
 
-        javaCode.append("var ").append(variableName).append(" = ").append(variableValue).append(";\n");
+        javaCode.append("var ").append(variableName).append(" = ").appendUserContent(variableValue).append(";\n");
 
         return variableName;
     }
@@ -482,11 +490,15 @@ public class JavaCodeGenerator implements CodeGenerator {
         CodeGenerator.writeAttributeMap(javaCode, htmlTag);
     }
 
-    private void writeJavaCodeWithContentSupport(int depth, String code) {
+    private void writeJavaCodeWithContentSupport(int depth, int endLine, String code) {
         if (code.contains("@`")) {
-            new JavaContentProcessor(depth, code).process();
+            int lineCount = (int) code.chars().filter(x -> x == '\n').count();
+            new JavaContentProcessor(depth, endLine - lineCount, code).process();
         } else {
-            javaCode.append(code);
+            int currentLineWas = getCurrentTemplateLine();
+            javaCode.setCurrentTemplateLine(endLine);
+            javaCode.appendUserContent(code);
+            javaCode.setCurrentTemplateLine(currentLineWas);
         }
     }
 
@@ -513,7 +525,7 @@ public class JavaCodeGenerator implements CodeGenerator {
         return imports;
     }
 
-    private void appendParams(int depth, String name, List<String> params) {
+    private void appendParams(int depth, String name, List<TemplateParser.TemplateParam> params) {
         List<ParamInfo> paramInfos = paramOrder.get(name);
         if (paramInfos == null) {
             throw new IllegalStateException("No parameter information for " + name);
@@ -521,7 +533,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
         int index = 0;
         ParamCallInfo[] paramCallInfos = new ParamCallInfo[Math.max(params.size(), paramInfos.size())];
-        for (String param : params) {
+        for (TemplateParser.TemplateParam param : params) {
             ParamCallInfo paramCallInfo = new ParamCallInfo(param);
             int parameterIndex = getParameterIndex(name, paramInfos, paramCallInfo);
             if (parameterIndex == -1) {
@@ -535,19 +547,19 @@ public class JavaCodeGenerator implements CodeGenerator {
         for (int i = 0; i < paramCallInfos.length; i++) {
             ParamCallInfo paramCallInfo = paramCallInfos[i];
             if (paramCallInfo != null) {
-                appendParam(depth, paramCallInfo.data);
+                appendParam(depth, paramCallInfo.lineNumber, paramCallInfo.data);
             } else {
                 ParamInfo paramInfo = paramInfos.get(i);
                 if (paramInfo.defaultValue != null) {
-                    appendParam(depth, paramInfo.defaultValue);
+                    appendParam(depth, paramInfo.templateLine, paramInfo.defaultValue);
                 }
             }
         }
     }
 
-    private void appendParam(int depth, String param) {
+    private void appendParam(int depth, int templateLine, String param) {
         javaCode.append(", ");
-        writeJavaCodeWithContentSupport(depth, param);
+        writeJavaCodeWithContentSupport(depth, templateLine, param);
     }
 
     private int getParameterIndex(String name, List<ParamInfo> paramInfos, ParamCallInfo paramCallInfo) {
@@ -589,12 +601,14 @@ public class JavaCodeGenerator implements CodeGenerator {
 
     class JavaContentProcessor extends ContentProcessor {
 
-        public JavaContentProcessor( int depth, String code ) {
-            super(depth, code);
+        public JavaContentProcessor( int depth, int startLine, String code ) {
+            super(depth, startLine, code);
         }
 
         @Override
-        protected void onContentBlock( int depth, String code, int lastWrittenIndex, int startIndex, int endIndex ) {
+        protected void onContentBlock( int depth, String code, int lastWrittenIndex, int startLine, int startIndex, int endIndex ) {
+            int templateLineWas = getCurrentTemplateLine();
+            javaCode.setCurrentTemplateLine(startLine);
             javaCode.append(code, lastWrittenIndex + 1, startIndex - 2);
 
             javaCode.append("new ").append(getContentClass()).append("() {\n");
@@ -608,6 +622,7 @@ public class JavaCodeGenerator implements CodeGenerator {
             parser.setStartIndex(startIndex);
             parser.setEndIndex(endIndex);
             parser.setParamsComplete(true);
+            javaCode.setCurrentTemplateLine(startLine);
             parser.parse(depth + 2);
 
             writeIndentation(depth + 1);
@@ -615,6 +630,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
             writeIndentation(depth);
             javaCode.append("}");
+            javaCode.setCurrentTemplateLine(templateLineWas);
         }
 
         @Override
@@ -624,11 +640,13 @@ public class JavaCodeGenerator implements CodeGenerator {
     }
 
     private static final class ParamCallInfo {
+        final int lineNumber;
         final String name;
         final String data;
 
-        public ParamCallInfo(String param) {
-            param = param.trim();
+        public ParamCallInfo(TemplateParser.TemplateParam fullParam) {
+            lineNumber = fullParam.lineNumber();
+            String param = fullParam.param().trim();
 
             int nameEndIndex = -1;
             int dataStartIndex = -1;

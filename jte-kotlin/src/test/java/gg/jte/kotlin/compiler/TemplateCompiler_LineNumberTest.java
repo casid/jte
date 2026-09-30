@@ -1,9 +1,10 @@
-package gg.jte.compiler;
+package gg.jte.kotlin.compiler;
 
 import gg.jte.ContentType;
-import gg.jte.DummyCodeResolver;
 import gg.jte.TemplateConfig;
 import gg.jte.TemplateException;
+import gg.jte.compiler.TemplateCompiler;
+import gg.jte.kotlin.DummyCodeResolver;
 import gg.jte.runtime.ClassInfo;
 import gg.jte.runtime.Constants;
 import org.junit.jupiter.api.Disabled;
@@ -22,8 +23,8 @@ public class TemplateCompiler_LineNumberTest {
 
     public DummyCodeResolver getDummyCodeResolver() {
         DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-        dummyCodeResolver.givenCode("another.jte", """
-        @param Content content
+        dummyCodeResolver.givenCode("another.kte", """
+        @param content:Content
         
         ${content}
         """
@@ -34,12 +35,12 @@ public class TemplateCompiler_LineNumberTest {
         // This test case is designed to exercise a number of pathological cases involving content blocks integrated into
         // various kinds of code blocks. The output should be manually verified using dumpAnnotatedGeneratedCode and then copy-pasted
         // into static data in the tests to prevent regressions
-        dummyCodeResolver.givenCode("test.jte", """
+        dummyCodeResolver.givenCode("test.kte", """
         @import java.util.List      <%-- Line 0 --%>
         @import java.util.Map       <%-- Line 1 --%>
                                     <%-- Line 2 --%>
-        @param String example       <%-- Line 3 --%>
-        @param Content content = @` <%-- Line 4 --%>
+        @param example: String      <%-- Line 3 --%>
+        @param content: Content = @`<%-- Line 4 --%>
           content0                  <%-- Line 5 --%>
         `                           <%-- Line 6 --%>
         Some text 1                 <%-- Line 7 --%>
@@ -75,8 +76,8 @@ public class TemplateCompiler_LineNumberTest {
     void testLineNumbers() {
         TemplateCompiler templateCompiler = new TemplateCompiler(new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED), getDummyCodeResolver(), Paths.get(""), null);
         templateCompiler.generateAll();
-        ClassInfo info = templateCompiler.getClassInfo(null, "test.jte");
-        assertThat(info.lineInfo).isEqualTo(new int[] {0,0,1,0,0,0,0,0,0,7,8,8,9,10,10,10,11,12,12,12,13,13,14,15,15,16,17,17,17,18,19,19,19,20,20,21,22,22,22,23,24,24,25,26,27,27,27,28,30,30,31,32,0,0,3,4,4,6,6,6,0,0,0});
+        ClassInfo info = templateCompiler.getClassInfo(null, "test.kte");
+        assertThat(info.lineInfo).isEqualTo(new int[] {0,0,0,1,0,0,0,0,0,0,7,8,8,9,10,10,10,11,12,12,12,13,13,14,15,15,16,17,17,17,18,19,19,19,20,20,21,22,22,22,23,24,24,25,26,27,27,27,28,30,30,31,32,0,0,3,4,4,6,6,6,0,0,0,0});
     }
 
     @Test
@@ -85,37 +86,38 @@ public class TemplateCompiler_LineNumberTest {
         config.binaryStaticContent = true;
         TemplateCompiler templateCompiler = new TemplateCompiler(config, getDummyCodeResolver(), Paths.get(""), null);
         templateCompiler.generateAll();
-        ClassInfo info = templateCompiler.getClassInfo(null, "test.jte");
-        assertThat(info.lineInfo).isEqualTo(new int[] {0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,8,8,9,10,10,10,11,12,12,12,13,13,14,15,15,16,17,17,17,18,19,19,19,20,20,21,22,22,22,23,24,24,25,26,27,27,27,28,30,30,31,32,0,0,3,4,4,6,6,6,0,0,0});
+        ClassInfo info = templateCompiler.getClassInfo(null, "test.kte");
+        assertThat(info.lineInfo).isEqualTo(new int[] {0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,8,8,9,10,10,10,11,12,12,12,13,13,14,15,15,16,17,17,17,18,19,19,19,20,20,21,22,22,22,23,24,24,25,26,27,27,27,28,30,30,31,32,0,0,3,4,4,6,6,6,0,0,0,0});
     }
 
     @Test
     void testJteCompilerError() {
         DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-        dummyCodeResolver.givenCode("invalidJte.jte", """
-        @import java.util.List    <%-- Line 0 --%>
-                                  <%-- Line 1 --%>
-        @param List<String> args  <%-- Line 2 --%>
-                                  <%-- Line 3 --%>
-        ${args.toString()         <%-- Line 4 --%>
+        dummyCodeResolver.givenCode("invalidJte.kte", """
+        @import kotlin.collections.List  <%-- Line 0 --%>
+                                         <%-- Line 1 --%>
+        @param args: List<String>        <%-- Line 2 --%>
+                                         <%-- Line 3 --%>
+        ${args.toString()                <%-- Line 4 --%>
         """);
         TemplateCompiler templateCompiler = new TemplateCompiler(new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED), dummyCodeResolver, Paths.get(""), null);
         assertThatThrownBy(templateCompiler::generateAll).isInstanceOf(TemplateException.class).hasMessageContaining("error at line 6");
     }
 
     @Test
-    void testJteJavaError() {
+    void testJteKotlinError() {
         DummyCodeResolver dummyCodeResolver = new DummyCodeResolver();
-        // The Map reference should produce a "cannot find symbol" error on user-facing line 3
-        dummyCodeResolver.givenCode("invalidJava.jte", """
-        @import java.util.List           <%-- Line 0 --%>
-                                         <%-- Line 1 --%>
-        @param Map<String, String> args  <%-- Line 2 --%>
-                                         <%-- Line 3 --%>
-        ${args.toString()}               <%-- Line 4 --%>
+        // The Map reference should produce a "Unresolved reference 'fakemap'" error on user-facing line 3
+        dummyCodeResolver.givenCode("invalidKotlin.kte", """
+        @import kotlin.collections.List      <%-- Line 0 --%>
+                                             <%-- Line 1 --%>
+        @param args: FakeMap<String, String> <%-- Line 2 --%>
+                                             <%-- Line 3 --%>
+        ${args.toString()}                   <%-- Line 4 --%>
         """);
         TemplateCompiler templateCompiler = new TemplateCompiler(new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED), dummyCodeResolver, Paths.get(""), null);
-        assertThatThrownBy(templateCompiler::precompileAll).isInstanceOf(TemplateException.class).hasMessageContaining("invalidJava.jte:3");
+        templateCompiler.precompileAll();
+        assertThatThrownBy(templateCompiler::precompileAll).isInstanceOf(TemplateException.class).hasMessageContaining("invalidKotlin.kte:3");
     }
 
 
@@ -125,8 +127,8 @@ public class TemplateCompiler_LineNumberTest {
         TemplateConfig config = new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED);
         config.binaryStaticContent = false;
         TemplateCompiler templateCompiler = new TemplateCompiler(config, getDummyCodeResolver(), Paths.get(""), null);
-        String generatedPath = templateCompiler.generateAll().stream().filter(p -> p.endsWith("testGenerated.java")).findFirst().orElseThrow();
-        ClassInfo info = templateCompiler.getClassInfo(null, "test.jte");
+        String generatedPath = templateCompiler.generateAll().stream().filter(p -> p.endsWith("testGenerated.kt")).findFirst().orElseThrow();
+        ClassInfo info = templateCompiler.getClassInfo(null, "test.kte");
         List<String> content = Files.readAllLines(Paths.get(generatedPath));
         for(int i = 0; i < info.lineInfo.length; i++) {
             System.out.printf("%02d: %02d -> %s%n", i, info.lineInfo[i], content.get(i));

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused") // Used by gg.jte.compiler.TemplateCompiler
 public class KotlinClassCompiler implements ClassCompiler {
@@ -62,11 +63,10 @@ public class KotlinClassCompiler implements ClassCompiler {
     private static class SimpleKotlinCompilerMessageCollector implements MessageCollector {
 
         private final Map<String, ClassInfo> templateByClassName;
-        private final List<String> errors = new ArrayList<>();
+        private final List<ErrorInfo> errors = new ArrayList<>();
         private final String packageName;
 
-        private String className;
-        private int line;
+        private record ErrorInfo(String className, int line, String message) {}
 
         private SimpleKotlinCompilerMessageCollector(Map<String, ClassInfo> templateByClassName, String packageName) {
             this.templateByClassName = templateByClassName;
@@ -86,16 +86,14 @@ public class KotlinClassCompiler implements ClassCompiler {
         public void report(CompilerMessageSeverity severity, @SuppressWarnings("NullableProblems") String s, CompilerMessageSourceLocation location) {
             if (severity.isError()) {
                 if ((location != null) && (location.getLineContent() != null)) {
-                    if (className == null) {
-                        className = extractClassName(location);
-                        line = location.getLine();
-                    }
+                    String className = extractClassName(location);
+                    int line = location.getLine();
 
-                    errors.add("%s%n%s:%d:%d%nReason: %s".formatted(location.getLineContent(), location.getPath(),
+                    errors.add(new ErrorInfo(className, line, "%s%n%s:%d:%d%nReason: %s".formatted(location.getLineContent(), location.getPath(),
                             location.getLine(),
-                            location.getColumn(), s));
+                            location.getColumn(), s)));
                 } else {
-                    errors.add(s);
+                    errors.add(new ErrorInfo(null, -1, s));
                 }
             }
         }
@@ -114,16 +112,18 @@ public class KotlinClassCompiler implements ClassCompiler {
         }
 
         public String getErrorMessage() {
-            String allErrors = String.join("\n", errors);
-
-            if (className != null) {
-                ClassInfo templateInfo = templateByClassName.get(className);
-                int templateLine = templateInfo.lineInfo[line - 1] + 1;
-
-                return "Failed to compile template, error at " + templateInfo.name + ":" + templateLine + "\n" + allErrors;
-            } else {
-                return "Failed to compile template, error at\n" + errors;
-            }
+            String errorMessage = errors.stream()
+                    .map(e -> {
+                        if(e.className != null) {
+                            ClassInfo templateInfo = templateByClassName.get(e.className);
+                            int templateLine = templateInfo.lineInfo[e.line - 1] + 1;
+                            return "%s:%d%n%s".formatted(templateInfo.name, templateLine, e.message.toString());
+                        } else {
+                            return e.toString();
+                        }
+                    })
+                    .collect(Collectors.joining("\n"));
+            return "Failed to compile template:\n" + errorMessage;
         }
     }
 }

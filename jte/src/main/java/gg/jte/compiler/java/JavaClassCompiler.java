@@ -71,7 +71,7 @@ public class JavaClassCompiler implements ClassCompiler {
 
             return "Failed to compile template:\n" + formattedErrors;
         } catch (Exception e) {
-            return "Failed to compile template, error at\n" + errors;
+            return "Failed to compile template:\n" + errors;
         }
     }
 }

@@ -116,7 +116,6 @@ public class TemplateCompiler_LineNumberTest {
         ${args.toString()}                   <%-- Line 4 --%>
         """));
         TemplateCompiler templateCompiler = new TemplateCompiler(new TemplateConfig(ContentType.Plain, Constants.PACKAGE_NAME_PRECOMPILED), dummyCodeResolver, Paths.get(""), null);
-        templateCompiler.precompileAll();
         assertThatThrownBy(templateCompiler::precompileAll).isInstanceOf(TemplateException.class).hasMessageContaining("invalidKotlin.kte:3");
     }
 

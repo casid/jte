@@ -55,8 +55,8 @@ public class JavaClassCompiler implements ClassCompiler {
     private static String getErrorMessage(String errors, Path classDirectory, Map<String, ClassInfo> templateByClassName) {
         try {
             String absolutePath = classDirectory.toAbsolutePath().toString();
-            //Pattern matches '<absolutePath><separatorChar><relativeTemplatePath>.java:<Line>: error'
-            Pattern pattern = Pattern.compile("^\\Q%s%s\\E(?<ClassName>.*?)\\.java:(?<LineNumber>\\d+?): error".formatted(absolutePath, File.separatorChar), Pattern.MULTILINE);
+            //Pattern matches '<absolutePath><separatorChar><relativeTemplatePath>.java:<Line>:'
+            Pattern pattern = Pattern.compile("^\\Q%s%s\\E(?<ClassName>.*?)\\.java:(?<LineNumber>\\d+?):".formatted(absolutePath, File.separatorChar), Pattern.MULTILINE);
             Matcher matcher = pattern.matcher(errors);
 
             String formattedErrors = matcher.replaceAll(mr -> {

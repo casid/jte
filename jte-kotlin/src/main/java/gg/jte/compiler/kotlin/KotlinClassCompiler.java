@@ -117,7 +117,7 @@ public class KotlinClassCompiler implements ClassCompiler {
                         if(e.className != null) {
                             ClassInfo templateInfo = templateByClassName.get(e.className);
                             int templateLine = templateInfo.lineInfo[e.line - 1] + 1;
-                            return "%s:%d%n%s".formatted(templateInfo.name, templateLine, e.message.toString());
+                            return "%s:%d\n%s".formatted(templateInfo.name, templateLine, e.message.toString());
                         } else {
                             return e.toString();
                         }

@@ -14,6 +14,18 @@ To use jte-models, set up your build script to include one of these:
 === "Maven"
 
     ```xml linenums="1"
+    <dependencies>
+        <dependency>
+            <groupId>gg.jte</groupId>
+            <artifactId>jte-runtime</artifactId>
+            <version>${jte.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>gg.jte</groupId>
+            <artifactId>jte-models-runtime</artifactId>
+            <version>${jte.version}</version>
+        </dependency>
+    </dependencies>
     <plugin>
         <groupId>gg.jte</groupId>
         <artifactId>jte-maven-plugin</artifactId>
@@ -54,6 +66,7 @@ To use jte-models, set up your build script to include one of these:
     
     dependencies {
         implementation 'gg.jte:jte-runtime:${jte.version}'
+        implementation 'gg.jte:jte-models-runtime:${jte.version}'
         jteGenerate 'gg.jte:jte-models:${jte.version}'
     }
     
@@ -73,6 +86,7 @@ To use jte-models, set up your build script to include one of these:
     
     dependencies {
         implementation("gg.jte:jte-runtime:${jte.version}")
+        implementation("gg.jte:jte-models-runtime:${jte.version}")
         jteGenerate("gg.jte:jte-models:${jte.version}")
     }
     

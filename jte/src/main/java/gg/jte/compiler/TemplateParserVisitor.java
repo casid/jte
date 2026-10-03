@@ -39,7 +39,7 @@ public interface TemplateParserVisitor {
 
     default void onRawEnd(int depth) {}
 
-    void onTemplateCall(int depth, String name, List<String> params);
+    void onTemplateCall(int depth, String name, List<TemplateParser.TemplateParam> params);
 
     void onLineFinished();
 

@@ -217,7 +217,7 @@ public final class TemplateParser {
                     TemplateCallMode previousMode = getPreviousMode(TemplateCallMode.class);
                     extract(templateCode, lastIndex, i, (d, c) -> {
                         if (!StringUtils.isBlank(c)) {
-                            previousMode.params.add(c);
+                            previousMode.params.add(new TemplateParam(c, getCurrentTemplateLine()));
                         }
                     });
                 } else if (currentMode instanceof JavaCodeMode javaCodeMode) {
@@ -260,7 +260,7 @@ public final class TemplateParser {
                 TemplateCallMode previousMode = getPreviousMode(TemplateCallMode.class);
                 extract(templateCode, lastIndex, i, (d, c) -> {
                     if (!StringUtils.isBlank(c)) {
-                        previousMode.params.add(c);
+                        previousMode.params.add(new TemplateParam(c, getCurrentTemplateLine()));
                     }
                 });
                 lastIndex = i + 1;
@@ -340,7 +340,7 @@ public final class TemplateParser {
                 interceptHtmlTags();
             }
 
-            if (currentChar == '\n' && currentMode != Mode.Content) {
+            if (currentChar == '\n') {
                 visitor.onLineFinished();
                 lastLineIndex = i + 1;
             }
@@ -1047,7 +1047,7 @@ public final class TemplateParser {
 
     private static class TemplateCallMode implements Mode {
         final StringBuilder name = new StringBuilder();
-        final List<String> params = new ArrayList<>();
+        final List<TemplateParam> params = new ArrayList<>();
 
         @Override
         public boolean isTrackStrings() {
@@ -1064,6 +1064,8 @@ public final class TemplateParser {
             return false;
         }
     }
+
+    public static record TemplateParam(String param, int lineNumber) {}
 
     private static class JavaCodeMode implements Mode {
 

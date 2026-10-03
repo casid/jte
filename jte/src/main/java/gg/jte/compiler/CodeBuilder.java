@@ -28,7 +28,7 @@ public final class CodeBuilder {
         return this;
     }
 
-    public CodeBuilder appendUserContent(String code) {
+    public CodeBuilder appendTemplateContent(String code) {
         this.code.append(code);
         addLines(code, 0, code.length());
         return this;

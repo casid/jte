@@ -49,7 +49,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     public void onImport(String importClass) {
         writePackageIfRequired();
         imports.add(importClass);
-        kotlinCode.append("import ").appendUserContent(importClass).append("\n");
+        kotlinCode.append("import ").appendTemplateContent(importClass).append("\n");
     }
 
     private void writePackageIfRequired() {
@@ -73,13 +73,13 @@ public class KotlinCodeGenerator implements CodeGenerator {
         if (paramInfo.varargs) {
             kotlinCode.append("vararg ");
         }
-        kotlinCode.appendUserContent(paramInfo.name).append(':').appendUserContent(paramInfo.type);
+        kotlinCode.appendTemplateContent(paramInfo.name).append(':').appendTemplateContent(paramInfo.type);
 
         // If there is a default value that IS NOT a gg.jte.Content, then add it to the
         // method definition. gg.jte.Content are excluded because the syntax is not supported
         // by Kotlin.
         if (paramInfo.defaultValue != null && !paramInfo.defaultValue.startsWith("@`")) {
-            kotlinCode.append(" = ").appendUserContent(paramInfo.defaultValue);
+            kotlinCode.append(" = ").appendTemplateContent(paramInfo.defaultValue);
         }
 
         parameters.add(paramInfo);
@@ -161,7 +161,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
                 continue;
             }
 
-            kotlinCode.append(", ").appendUserContent(parameter.name);
+            kotlinCode.append(", ").appendTemplateContent(parameter.name);
         }
         kotlinCode.append(");\n");
         kotlinCode.append("\t}\n");
@@ -190,13 +190,13 @@ public class KotlinCodeGenerator implements CodeGenerator {
         var nonNullDefaultValue = parameter.defaultValue != null && !parameter.defaultValue.equals("null");
 
         kotlinCode.setCurrentTemplateLine(parameter.templateLine);
-        kotlinCode.append("\t\tval ").appendUserContent(parameter.name).append(" = params[\"").appendUserContent(parameter.name).append("\"] as ");
+        kotlinCode.append("\t\tval ").appendTemplateContent(parameter.name).append(" = params[\"").appendTemplateContent(parameter.name).append("\"] as ");
         if (nonNullDefaultValue) {
-            kotlinCode.appendUserContent(asNullableType(parameter.type));
+            kotlinCode.appendTemplateContent(asNullableType(parameter.type));
             kotlinCode.append(" ?: ");
             writeCodeWithContentSupport(0, parameter.templateLine, parameter.defaultValue);
         } else {
-            kotlinCode.appendUserContent(parameter.type);
+            kotlinCode.appendTemplateContent(parameter.type);
         }
         kotlinCode.append('\n');
     }
@@ -345,7 +345,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
         writeIndentation(depth);
-        kotlinCode.append("jteOutput.setContext(\"").appendUserContent(tagName).append("\", null)\n");
+        kotlinCode.append("jteOutput.setContext(\"").appendTemplateContent(tagName).append("\", null)\n");
 
         writeCodePart(depth, codePart);
     }
@@ -353,19 +353,19 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
         writeIndentation(depth);
-        kotlinCode.append("jteOutput.setContext(\"").appendUserContent(tagName).append("\", \"").appendEscaped(attributeName).append("\")\n");
+        kotlinCode.append("jteOutput.setContext(\"").appendTemplateContent(tagName).append("\", \"").appendEscaped(attributeName).append("\")\n");
 
         writeCodePart(depth, codePart);
 
         writeIndentation(depth);
-        kotlinCode.append("jteOutput.setContext(\"").appendUserContent(tagName).append("\", null)\n");
+        kotlinCode.append("jteOutput.setContext(\"").appendTemplateContent(tagName).append("\", null)\n");
     }
 
     @Override
     public void onUnsafeCodePart(int depth, String codePart) {
         writeIndentation(depth);
         kotlinCode.append("jteOutput.writeUnsafeContent(");
-        kotlinCode.appendUserContent(codePart);
+        kotlinCode.appendTemplateContent(codePart);
         kotlinCode.append(")\n");
     }
 
@@ -389,7 +389,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         writeIndentation(depth);
 
         kotlinCode.append("if (");
-        kotlinCode.appendUserContent(condition);
+        kotlinCode.appendTemplateContent(condition);
         kotlinCode.append(") {\n");
     }
 
@@ -397,7 +397,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     public void onConditionElse(int depth, String condition) {
         writeIndentation(depth);
         kotlinCode.append("} else if (");
-        kotlinCode.appendUserContent(condition);
+        kotlinCode.appendTemplateContent(condition);
         kotlinCode.append(") {\n");
     }
 
@@ -418,7 +418,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         CodeMarker beforeLoop = kotlinCode.getMarkerOfCurrentPosition();
 
         writeIndentation(depth);
-        kotlinCode.append("for (").appendUserContent(codePart).append(") {\n");
+        kotlinCode.append("for (").appendTemplateContent(codePart).append(") {\n");
 
         CodeMarker inLoop = kotlinCode.getMarkerOfCurrentPosition();
 
@@ -464,7 +464,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
         writeIndentation(depth);
 
-        kotlinCode.appendUserContent(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
+        kotlinCode.appendTemplateContent(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
 
         appendParams(depth, tagInfo.name, params);
         kotlinCode.append(");\n");
@@ -473,7 +473,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
-        kotlinCode.append("jteHtmlInterceptor?.onHtmlTagOpened(\"").appendUserContent(htmlTag.name).append("\", ");
+        kotlinCode.append("jteHtmlInterceptor?.onHtmlTagOpened(\"").appendTemplateContent(htmlTag.name).append("\", ");
         writeAttributeMap(htmlTag);
         kotlinCode.append(", jteOutput)\n");
     }
@@ -481,7 +481,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
     @Override
     public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
-        kotlinCode.append("jteHtmlInterceptor?.onHtmlTagClosed(\"").appendUserContent(htmlTag.name).append("\", jteOutput)\n");
+        kotlinCode.append("jteHtmlInterceptor?.onHtmlTagClosed(\"").appendTemplateContent(htmlTag.name).append("\", jteOutput)\n");
     }
 
     @Override
@@ -509,7 +509,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
 
         writeIndentation(depth);
 
-        kotlinCode.append("val ").append(variableName).append(" = ").appendUserContent(variableValue).append("\n");
+        kotlinCode.append("val ").append(variableName).append(" = ").appendTemplateContent(variableValue).append("\n");
 
         return variableName;
     }
@@ -525,7 +525,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         } else {
             int previousLineWas = getCurrentTemplateLine();
             kotlinCode.setCurrentTemplateLine(endLine);
-            kotlinCode.appendUserContent(code);
+            kotlinCode.appendTemplateContent(code);
             kotlinCode.setCurrentTemplateLine(previousLineWas);
         }
     }

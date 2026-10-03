@@ -48,7 +48,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     public void onImport(String importClass) {
         writePackageIfRequired();
         imports.add(importClass);
-        javaCode.append("import ").appendUserContent(importClass).append(";\n");
+        javaCode.append("import ").appendTemplateContent(importClass).append(";\n");
     }
 
     private void writePackageIfRequired() {
@@ -67,7 +67,7 @@ public class JavaCodeGenerator implements CodeGenerator {
             writeClass();
         }
 
-        javaCode.append(", ").appendUserContent(paramInfo.type).append(' ').appendUserContent(paramInfo.name);
+        javaCode.append(", ").appendTemplateContent(paramInfo.type).append(' ').appendTemplateContent(paramInfo.name);
 
         parameters.add(paramInfo);
     }
@@ -139,13 +139,13 @@ public class JavaCodeGenerator implements CodeGenerator {
             }
 
             javaCode.setCurrentTemplateLine(parameter.templateLine);
-            javaCode.append("\t\t").appendUserContent(parameter.type).append(" ").appendUserContent(parameter.name).append(" = (").appendUserContent(parameter.type);
+            javaCode.append("\t\t").appendTemplateContent(parameter.type).append(" ").appendTemplateContent(parameter.name).append(" = (").appendTemplateContent(parameter.type);
             if (parameter.defaultValue != null) {
-                javaCode.append(")params.getOrDefault(\"").appendUserContent(parameter.name).append("\", ");
+                javaCode.append(")params.getOrDefault(\"").appendTemplateContent(parameter.name).append("\", ");
                 writeJavaCodeWithContentSupport(0, parameter.templateLine, parameter.defaultValue);
                 javaCode.append(");\n");
             } else {
-                javaCode.append(")params.get(\"").appendUserContent(parameter.name).append("\");\n");
+                javaCode.append(")params.get(\"").appendTemplateContent(parameter.name).append("\");\n");
             }
         }
         javaCode.setCurrentTemplateLine(0);
@@ -156,7 +156,7 @@ public class JavaCodeGenerator implements CodeGenerator {
                 continue;
             }
 
-            javaCode.append(", ").appendUserContent(parameter.name);
+            javaCode.append(", ").appendTemplateContent(parameter.name);
         }
         javaCode.append(");\n");
         javaCode.append("\t}\n");
@@ -316,7 +316,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagBodyCodePart(int depth, String codePart, String tagName) {
         writeIndentation(depth);
-        javaCode.append("jteOutput.setContext(\"").appendUserContent(tagName).append("\", null);\n");
+        javaCode.append("jteOutput.setContext(\"").appendTemplateContent(tagName).append("\", null);\n");
 
         writeCodePart(depth, codePart);
     }
@@ -324,19 +324,19 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onHtmlTagAttributeCodePart(int depth, String codePart, String tagName, String attributeName) {
         writeIndentation(depth);
-        javaCode.append("jteOutput.setContext(\"").appendUserContent(tagName).append("\", \"").appendUserContent(attributeName).append("\");\n");
+        javaCode.append("jteOutput.setContext(\"").appendTemplateContent(tagName).append("\", \"").appendTemplateContent(attributeName).append("\");\n");
 
         writeCodePart(depth, codePart);
 
         writeIndentation(depth);
-        javaCode.append("jteOutput.setContext(\"").appendUserContent(tagName).append("\", null);\n");
+        javaCode.append("jteOutput.setContext(\"").appendTemplateContent(tagName).append("\", null);\n");
     }
 
     @Override
     public void onUnsafeCodePart(int depth, String codePart) {
         writeIndentation(depth);
         javaCode.append("jteOutput.writeUnsafeContent(");
-        javaCode.appendUserContent(codePart);
+        javaCode.appendTemplateContent(codePart);
         javaCode.append(");\n");
     }
 
@@ -360,7 +360,7 @@ public class JavaCodeGenerator implements CodeGenerator {
         writeIndentation(depth);
 
         javaCode.append("if (");
-        javaCode.appendUserContent(condition);
+        javaCode.appendTemplateContent(condition);
         javaCode.append(") {\n");
     }
 
@@ -368,7 +368,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     public void onConditionElse(int depth, String condition) {
         writeIndentation(depth);
         javaCode.append("} else if (");
-        javaCode.appendUserContent(condition);
+        javaCode.appendTemplateContent(condition);
         javaCode.append(") {\n");
     }
 
@@ -389,7 +389,7 @@ public class JavaCodeGenerator implements CodeGenerator {
         CodeMarker beforeLoop = javaCode.getMarkerOfCurrentPosition();
 
         writeIndentation(depth);
-        javaCode.append("for (").appendUserContent(codePart).append(") {\n");
+        javaCode.append("for (").appendTemplateContent(codePart).append(") {\n");
 
         CodeMarker inLoop = javaCode.getMarkerOfCurrentPosition();
 
@@ -435,7 +435,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
         writeIndentation(depth);
 
-        javaCode.appendUserContent(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
+        javaCode.appendTemplateContent(tagInfo.fullName).append(".render(jteOutput, jteHtmlInterceptor");
 
         appendParams(depth, tagInfo.name, params);
         javaCode.append(");\n");
@@ -444,7 +444,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onInterceptHtmlTagOpened(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
-        javaCode.append("jteHtmlInterceptor.onHtmlTagOpened(\"").appendUserContent(htmlTag.name).append("\", ");
+        javaCode.append("jteHtmlInterceptor.onHtmlTagOpened(\"").appendTemplateContent(htmlTag.name).append("\", ");
         writeAttributeMap(htmlTag);
         javaCode.append(", jteOutput);\n");
     }
@@ -452,7 +452,7 @@ public class JavaCodeGenerator implements CodeGenerator {
     @Override
     public void onInterceptHtmlTagClosed(int depth, TemplateParser.HtmlTag htmlTag) {
         writeIndentation(depth);
-        javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").appendUserContent(htmlTag.name).append("\", jteOutput);\n");
+        javaCode.append("jteHtmlInterceptor.onHtmlTagClosed(\"").appendTemplateContent(htmlTag.name).append("\", jteOutput);\n");
     }
 
     @Override
@@ -481,7 +481,7 @@ public class JavaCodeGenerator implements CodeGenerator {
 
         writeIndentation(depth);
 
-        javaCode.append("var ").append(variableName).append(" = ").appendUserContent(variableValue).append(";\n");
+        javaCode.append("var ").append(variableName).append(" = ").appendTemplateContent(variableValue).append(";\n");
 
         return variableName;
     }
@@ -497,7 +497,7 @@ public class JavaCodeGenerator implements CodeGenerator {
         } else {
             int previousLineWas = getCurrentTemplateLine();
             javaCode.setCurrentTemplateLine(endLine);
-            javaCode.appendUserContent(code);
+            javaCode.appendTemplateContent(code);
             javaCode.setCurrentTemplateLine(previousLineWas);
         }
     }

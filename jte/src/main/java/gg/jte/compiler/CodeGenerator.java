@@ -30,7 +30,7 @@ public interface CodeGenerator extends TemplateParserVisitor {
                     code.append("null");
                 }
             } else if (attribute.variableName != null) {
-                code.appendUserContent(attribute.variableName);
+                code.appendTemplateContent(attribute.variableName);
             } else {
                 List<TemplateExpressionPart> expressionParts = extractTemplateExpressionParts(attribute.value);
                 if (!expressionParts.isEmpty()) {
@@ -45,7 +45,7 @@ public interface CodeGenerator extends TemplateParserVisitor {
                         }
 
                         switch (expressionPart.type) {
-                            case Code -> code.append("(").appendUserContent(expressionPart.value).append(")");
+                            case Code -> code.append("(").appendTemplateContent(expressionPart.value).append(")");
                             case Text -> code.append("\"").appendEscaped(expressionPart.value).append("\"");
                         }
                     }

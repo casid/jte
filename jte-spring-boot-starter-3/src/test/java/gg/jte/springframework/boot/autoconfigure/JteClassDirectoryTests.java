@@ -57,7 +57,8 @@ class JteClassDirectoryTests {
     @ParameterizedTest
     @MethodSource("configurations")
     void rendersIntoConfiguredClassDirectory(Class<?> configuration, boolean relativePath) throws Exception {
-        Path templates = temporaryDirectory.resolve("templates").toAbsolutePath();
+        Path templates = Path.of("target", "class-directory-tests",
+                temporaryDirectory.getFileName().toString(), "templates");
         Files.createDirectories(templates);
         Files.writeString(templates.resolve("greeting.jte"), "@param String subject\nHello ${subject}!");
         Path classes = relativePath

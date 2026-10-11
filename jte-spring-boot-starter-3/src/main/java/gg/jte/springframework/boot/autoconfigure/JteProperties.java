@@ -22,6 +22,11 @@ public class JteProperties {
     private String templateLocation = "src/main/jte";
 
     /**
+     * Directory for runtime-compiled templates. Relative paths are resolved against the working directory.
+     */
+    private String classDirectory = "jte-classes";
+
+    /**
      * You can configure the file suffix of jte templates the compiler resolves
      */
     private String templateSuffix = ".jte";
@@ -50,6 +55,14 @@ public class JteProperties {
 
     public void setTemplateLocation(String templateLocation) {
         this.templateLocation = templateLocation;
+    }
+
+    public String getClassDirectory() {
+        return classDirectory;
+    }
+
+    public void setClassDirectory(String classDirectory) {
+        this.classDirectory = classDirectory;
     }
 
     public boolean usePreCompiledTemplates() {

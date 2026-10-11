@@ -33,7 +33,7 @@ public class JteAutoConfiguration {
             // If using IntelliJ, use Ctrl-F9 to trigger an auto-refresh when editing non-jte files.
             String[] split = jteProperties.getTemplateLocation().split("/");
             CodeResolver codeResolver = new DirectoryCodeResolver(FileSystems.getDefault().getPath("", split));
-            TemplateEngine templateEngine = TemplateEngine.create(codeResolver, Paths.get("jte-classes"), ContentType.Html, getClass().getClassLoader());
+            TemplateEngine templateEngine = TemplateEngine.create(codeResolver, Paths.get(jteProperties.getClassDirectory()), ContentType.Html, getClass().getClassLoader());
             templateEngine.setTrimControlStructures(jteProperties.isTrimControlStructures());
             return templateEngine;
         }

@@ -72,6 +72,15 @@ If you set `developmentMode = true` the jte [file watcher](hot-reloading.md) wil
 gg.jte.developmentMode=true
 ```
 
+Runtime-compiled templates are written to `jte-classes` relative to the application's working directory by default.
+In the Spring Boot 4 starters, you can set `gg.jte.class-directory` to an absolute or relative path:
+
+```properties linenums="1"
+gg.jte.class-directory=target/jte-classes
+```
+
+This setting applies to both `jte-spring-boot-starter-4` and `jte-spring-boot-starter-4-core`, including Spring WebMVC and WebFlux. It does not configure the Maven or Gradle plugin's precompiled output.
+
 In development mode, you can also set `trimControlStructures = true` which will trim control structures.
 
 ```properties linenums="1"

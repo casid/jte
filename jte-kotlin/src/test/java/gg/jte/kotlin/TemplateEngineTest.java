@@ -588,7 +588,7 @@ public class TemplateEngineTest {
     void tagWithoutParams_paramPassed() {
         givenTag("basic", "I do nothing!");
         givenTemplate("@template.tag.basic(42)");
-        thenRenderingFailsWithException().hasMessageStartingWith("Failed to compile template, error at test/template.kte:2");
+        thenRenderingFailsWithException().hasMessageStartingWith("Failed to compile template:\ntest/template.kte:2");
     }
 
     @Test
@@ -1283,7 +1283,7 @@ public class TemplateEngineTest {
                 """);
 
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at test/template.kte:4\n")
+                .hasMessageStartingWith("Failed to compile template:\ntest/template.kte:4\n")
                 .hasMessageContaining("Unresolved reference")
                 .hasMessageContaining("model.helloUnknown");
     }
@@ -1293,7 +1293,7 @@ public class TemplateEngineTest {
         givenTag("test", "@param model:gg.jte.kotlin.TemplateEngineTest.Model\nThis will not compile!\n${model.helloUnknown}\n!!");
         givenTemplate("@template.tag.test(model)");
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at tag/test.kte:3\n")
+                .hasMessageStartingWith("Failed to compile template:\ntag/test.kte:3\n")
                 .hasMessageContaining("Unresolved reference")
                 .hasMessageContaining("model.helloUnknown");
     }
@@ -1311,7 +1311,7 @@ public class TemplateEngineTest {
                 """);
         givenTemplate("@template.tag.test(model)");
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at tag/test.kte:5\n")
+                .hasMessageStartingWith("Failed to compile template:\ntag/test.kte:5\n")
                 .hasMessageContaining("Unresolved reference")
                 .hasMessageContaining("model.helloUnknown");
     }

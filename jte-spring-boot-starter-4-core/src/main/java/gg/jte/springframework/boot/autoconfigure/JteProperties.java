@@ -41,6 +41,15 @@ public class JteProperties {
      */
     private boolean trimControlStructures = false;
 
+    /**
+     * Error view resolution (servlet only): resolve error pages from jte templates.
+     */
+    private final ErrorView errorView = new ErrorView();
+
+    public ErrorView getErrorView() {
+        return errorView;
+    }
+
     public String getTemplateSuffix() {
         return templateSuffix;
     }
@@ -99,5 +108,34 @@ public class JteProperties {
 
     public void setTrimControlStructures(boolean trimControlStructures) {
         this.trimControlStructures = trimControlStructures;
+    }
+
+    public static class ErrorView {
+
+        /**
+         * Whether error pages are resolved from jte templates, e.g. error/404.jte, falling back to error/4xx.jte and error/5xx.jte.
+         */
+        private boolean enabled = true;
+
+        /**
+         * Template directory (without suffix) where error templates are looked up.
+         */
+        private String path = "error";
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
     }
 }

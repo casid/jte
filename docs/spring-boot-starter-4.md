@@ -87,6 +87,44 @@ In development mode, you can also set `trimControlStructures = true` which will 
 gg.jte.trimControlStructures=true
 ```
 
+### Error pages
+
+For Spring WebMVC (servlet) applications, the starter registers an `ErrorViewResolver` that renders error pages from jte templates. When Spring Boot handles an error, templates are looked up in this order:
+
+1. `error/<status>` - a template for the exact HTTP status, e.g. `error/404`, `error/418` or `error/503`. Any status can have its own template.
+2. `error/4xx` for client errors (400-499) or `error/5xx` for server errors (500-599).
+
+If no jte template matches, the resolution falls back to the default Spring Boot behavior (e.g. static `error/404.html` pages or the whitelabel error page).
+
+```
+src/main/jte/error/404.jte   -> HTTP 404 only
+src/main/jte/error/503.jte   -> HTTP 503 only
+src/main/jte/error/4xx.jte   -> any 4xx status without its own template
+src/main/jte/error/5xx.jte   -> any 5xx status without its own template
+```
+
+The standard Spring Boot error attributes (`timestamp`, `status`, `error`, `message`, `path`, ...) are available as template parameters, so you can declare the ones you need:
+
+```html linenums="1"
+@param int status
+@param String error
+
+<h1>${status} - ${error}</h1>
+```
+
+The directory and the behavior can be configured:
+
+```properties linenums="1"
+gg.jte.error-view.enabled=true
+gg.jte.error-view.path=error
+```
+
+`gg.jte.error-view.path` is the template directory (relative to `gg.jte.templateLocation`) where error templates are looked up, and `gg.jte.templateSuffix` is respected as well. Set `gg.jte.error-view.enabled=false` to turn this off.
+
+!!! info
+
+    If you define your own `ErrorViewResolver` bean, the jte one backs off. This feature is only available for servlet applications, not for Spring WebFlux.
+
 ### Production
 
 To use [precompiled Templates](pre-compiling.md) in production, for use with a JRE environment, you need to configure the Maven/Gradle Plugin to precompile your templates:

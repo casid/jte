@@ -3,14 +3,17 @@ package gg.jte.kotlin;
 import gg.jte.*;
 import gg.jte.output.StringOutput;
 import gg.jte.runtime.TemplateUtils;
+import gg.jte.resolve.DirectoryCodeResolver;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -1426,6 +1429,28 @@ public class TemplateEngineTest {
         dummyCodeResolver.givenCode("tag/name.kte", "@param a:Int\n@param b:String\nKotlin says ${a}, ${b}!");
 
         thenOutputIs("Hello, Kotlin says 42, foo!");
+    }
+
+    @Test
+    void kotlinTemplateCallHotReloadsAcrossDirectories(@TempDir Path tempDir) throws IOException {
+        Path templates = tempDir.resolve("templates");
+        Files.createDirectories(templates.resolve("a"));
+        Files.createDirectories(templates.resolve("b"));
+        Files.writeString(templates.resolve("a/component.kte"), "@param text: String\n${text}");
+        Path caller = templates.resolve("b/index.kte");
+        Files.writeString(caller, "@template.a.component(text = \"Before\")");
+
+        TemplateEngine engine = TemplateEngine.create(new DirectoryCodeResolver(templates),
+                tempDir.resolve("classes"), ContentType.Plain);
+        StringOutput first = new StringOutput();
+        engine.render("b/index.kte", Collections.emptyMap(), first);
+        assertThat(first.toString()).isEqualTo("Before");
+
+        Files.writeString(caller, "@template.a.component(text = \"After\")");
+        Files.setLastModifiedTime(caller, FileTime.fromMillis(System.currentTimeMillis() + 2000));
+        StringOutput second = new StringOutput();
+        engine.render("b/index.kte", Collections.emptyMap(), second);
+        assertThat(second.toString()).isEqualTo("After");
     }
 
     @Test

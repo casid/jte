@@ -89,7 +89,7 @@ public class KotlinCodeGenerator implements CodeGenerator {
         int previousLineWas = getCurrentTemplateLine();
         kotlinCode.setCurrentTemplateLine(0);
         kotlinCode.append("@Suppress(\"UNCHECKED_CAST\", \"UNUSED_PARAMETER\")").append('\n');
-        kotlinCode.append("internal class ").append(classInfo.className).append(" {\n");
+        kotlinCode.append("class ").append(classInfo.className).append(" {\n");
         kotlinCode.append("companion object {\n");
         fieldsMarker = kotlinCode.getMarkerOfCurrentPosition();
         kotlinCode.append("\t@JvmStatic fun render(");

@@ -64,7 +64,7 @@ public class TemplateCompiler extends TemplateLoader {
     }
 
     @Override
-    protected ClassInfo getClassInfo(ClassLoader classLoader, String className) {
+    public ClassInfo getClassInfo(ClassLoader classLoader, String className) {
         return templateByClassName.get(className);
     }
 

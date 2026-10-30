@@ -9,28 +9,35 @@ import java.util.Deque;
  */
 public abstract class ContentProcessor {
    private final int depth;
+   private final int startLine;
    private final String code;
    private final Deque<Mode> stack = new ArrayDeque<>();
 
    private int startIndex = -1;
    private int endIndex = -1;
+   private int currentStartLine = -1;
    private int lastWrittenIndex = -1;
    private Mode currentMode;
 
    private int i;
 
-   public ContentProcessor(int depth, String code) {
+   public ContentProcessor(int depth, int startLine, String code) {
       this.depth = depth;
+      this.startLine = startLine;
       this.code = code;
    }
 
    public void process() {
       push(Mode.Code);
 
+      int currentLine = startLine;
       for ( i = 0; i < code.length(); ++i) {
-         if (regionMatches("@`") && currentMode.isContentBlockAllowed()) {
+         if(regionMatches("\n")) {
+            ++currentLine;
+         } else if (regionMatches("@`") && currentMode.isContentBlockAllowed()) {
             if (currentMode == Mode.Code) {
                startIndex = i + 1;
+               currentStartLine = currentLine;
             }
             push(Mode.Content);
          } else if (regionMatches("`") && currentMode == Mode.Content) {
@@ -66,12 +73,12 @@ public abstract class ContentProcessor {
    }
 
    private void handleContentBlock() {
-      onContentBlock(depth, code, lastWrittenIndex, startIndex, endIndex);
+      onContentBlock(depth, code, lastWrittenIndex, currentStartLine, startIndex, endIndex);
 
       lastWrittenIndex = endIndex;
    }
 
-   protected abstract void onContentBlock(int depth, String code, int lastWrittenIndex, int startIndex, int endIndex);
+   protected abstract void onContentBlock(int depth, String code, int lastWrittenIndex, int startLine, int startIndex, int endIndex);
 
    protected abstract void onRemainingCode(String code, int startIndex, int endIndex);
 

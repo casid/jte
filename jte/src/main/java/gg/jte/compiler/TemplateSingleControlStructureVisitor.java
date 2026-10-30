@@ -76,7 +76,7 @@ class TemplateSingleControlStructureVisitor extends TemplateParserVisitorAdapter
     }
 
     @Override
-    public void onTemplateCall(int depth, String name, List<String> params) {
+    public void onTemplateCall(int depth, String name, List<TemplateParser.TemplateParam> params) {
         throw new NotSingleControlStructure();
     }
 

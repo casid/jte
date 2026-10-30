@@ -612,7 +612,7 @@ public class TemplateEngineTest {
     void templateWithoutParams_paramPassed() {
         givenTemplate("basic.jte", "I do nothing!");
         givenTemplate("@template.basic(42)");
-        thenRenderingFailsWithException().hasMessageStartingWith("Failed to compile template, error at test/template.jte:2");
+        thenRenderingFailsWithException().hasMessageStartingWith("Failed to compile template:\ntest/template.jte:2");
     }
 
     @Test
@@ -1492,7 +1492,7 @@ public class TemplateEngineTest {
                 ${model.helloUnknown}""");
 
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at test/template.jte:4\n")
+                .hasMessageStartingWith("Failed to compile template:\ntest/template.jte:4\n")
                 .hasMessageContaining("cannot find symbol")
                 .hasMessageContaining("model.helloUnknown");
     }
@@ -1502,7 +1502,7 @@ public class TemplateEngineTest {
         givenTemplate("test.jte", "@param gg.jte.TemplateEngineTest.Model model\nThis will not compile!\n${model.helloUnknown}\n!!");
         givenTemplate("@template.test(model)");
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at test.jte:3\n")
+                .hasMessageStartingWith("Failed to compile template:\ntest.jte:3\n")
                 .hasMessageContaining("cannot find symbol")
                 .hasMessageContaining("model.helloUnknown");
     }
@@ -1519,7 +1519,7 @@ public class TemplateEngineTest {
                 `}""");
         givenTemplate("@template.test(model)");
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at test.jte:5\n")
+                .hasMessageStartingWith("Failed to compile template:\ntest.jte:5\n")
                 .hasMessageContaining("cannot find symbol")
                 .hasMessageContaining("model.helloUnknown");
     }
@@ -1543,8 +1543,9 @@ public class TemplateEngineTest {
         givenTemplate("test.jte", "@param gg.jte.TemplateEngineTest.Model model\n${model.deprecatedMethod()}\nThis will not compile!\n${model.helloUnknown}\n!!");
         givenTemplate("@template.test(model)");
         thenRenderingFailsWithException()
-                .hasMessageStartingWith("Failed to compile template, error at test.jte:4\n")
+                .hasMessageStartingWith("Failed to compile template:\ntest.jte:2\n")
                 .hasMessageContaining("cannot find symbol")
+                .hasMessageContaining("test.jte:4\n")
                 .hasMessageContaining("model.helloUnknown")
                 .hasMessageContaining("has been deprecated");
     }

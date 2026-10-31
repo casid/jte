@@ -18,5 +18,14 @@ class StringUtilsTest {
         Assertions.assertThat(startsWithIgnoringCaseAndWhitespaces("   javascript:", prefix)).isTrue();
         Assertions.assertThat(startsWithIgnoringCaseAndWhitespaces("  \t JavaScript:", prefix)).isTrue();
         Assertions.assertThat(startsWithIgnoringCaseAndWhitespaces("  \t JavaScript", prefix)).isFalse();
+        Assertions.assertThat(startsWithIgnoringCaseAndWhitespaces("java\tscript:", prefix)).isTrue();
+        Assertions.assertThat(startsWithIgnoringCaseAndWhitespaces("java\nscript:", prefix)).isTrue();
+        Assertions.assertThat(startsWithIgnoringCaseAndWhitespaces("java\rscript:", prefix)).isTrue();
+        Assertions.assertThat(startsWithIgnoringCaseAndWhitespaces("java script:", prefix)).isFalse();
+        Assertions.assertThat(startsWithIgnoringCaseAndWhitespaces("java\0script:", prefix)).isFalse();
+
+        for (char c = 0; c <= ' '; ++c) {
+            Assertions.assertThat(startsWithIgnoringCaseAndWhitespaces(c + prefix, prefix)).isTrue();
+        }
     }
 }

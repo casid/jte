@@ -10,7 +10,7 @@ public final class StringUtils {
         for (int i = 0; i < string.length() && j < prefix.length(); ++i) {
             char c = string.charAt(i);
 
-            if (j == 0 && Character.isWhitespace(c)) {
+            if (c == '\t' || c == '\n' || c == '\r' || (j == 0 && (c <= ' ' || Character.isWhitespace(c)))) {
                 continue;
             }
 

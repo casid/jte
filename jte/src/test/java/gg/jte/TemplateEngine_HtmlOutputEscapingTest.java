@@ -1185,6 +1185,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void javascriptUrl_asciiTabOrNewlineWithinScheme() {
+        codeResolver.givenCode("template.jte", "@param String url\n<a href=\"${url}\">Click me!</a>");
+
+        templateEngine.render("template.jte", "java\tscr\nip\rt:alert(1)", output);
+
+        assertThat(output.toString()).isEqualTo("<a href=\"\">Click me!</a>");
+    }
+
+    @Test
     void javascriptUrl_mixedCaseAttribute() {
         codeResolver.givenCode("template.jte", "@param String url\n<a HreF=\"${url}\">Click me!</a>");
 

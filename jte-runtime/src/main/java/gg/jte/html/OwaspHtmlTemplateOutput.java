@@ -55,7 +55,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     }
 
     private void writeTagBodyUserContent(String value) {
-        if ("script".equals(tagName)) {
+        if ("script".equalsIgnoreCase(tagName)) {
             Escape.javaScriptBlock(value, templateOutput);
         } else {
             Escape.htmlContent(value, templateOutput);
@@ -63,11 +63,11 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     }
 
     private void writeTagAttributeUserContent(String value) {
-        if ("a".equals(tagName) && "href".equals(attributeName) && StringUtils.startsWithIgnoringCaseAndWhitespaces(value, "javascript:")) {
+        if ("a".equalsIgnoreCase(tagName) && "href".equalsIgnoreCase(attributeName) && StringUtils.startsWithIgnoringCaseAndWhitespaces(value, "javascript:")) {
             return;
         }
 
-        if (attributeName.startsWith("on")) {
+        if (attributeName.regionMatches(true, 0, "on", 0, 2)) {
             Escape.javaScriptAttribute(value, templateOutput);
         } else {
             Escape.htmlAttribute(value, templateOutput);

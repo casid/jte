@@ -1185,6 +1185,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void javascriptUrl_mixedCaseAttribute() {
+        codeResolver.givenCode("template.jte", "@param String url\n<a HreF=\"${url}\">Click me!</a>");
+
+        templateEngine.render("template.jte", "javascript:alert(1)", output);
+
+        assertThat(output.toString()).isEqualTo("<a HreF=\"\">Click me!</a>");
+    }
+
+    @Test
     void tagCallInScript() {
         codeResolver.givenCode("tag/snippet.jte", "var x = y;");
         codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@template.tag.snippet()\n}\n</script>");
@@ -1378,21 +1387,30 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
-    void templateStringInJavaScriptAttribute_backtick() {
-        codeResolver.givenCode("template.jte", "@param String p\n<span onClick=\"console.log(`${p}`)\">foo</span>");
+    void templateStringInJavaScriptBlock_mixedCaseTag() {
+        codeResolver.givenCode("template.jte", "@param String p\n<ScrIpt>window.someVariable = `${p}`;</ScrIpt>");
 
         templateEngine.render("template.jte", "` + alert(`xss`) + `", output);
 
-        assertThat(output.toString()).isEqualTo("<span onClick=\"console.log(`\\x60 + alert(\\x60xss\\x60) + \\x60`)\">foo</span>");
+        assertThat(output.toString()).isEqualTo("<ScrIpt>window.someVariable = `\\` + alert(\\`xss\\`) + \\``;</ScrIpt>");
+    }
+
+    @Test
+    void templateStringInJavaScriptAttribute_backtick() {
+        codeResolver.givenCode("template.jte", "@param String p\n<span OnClick=\"console.log(`${p}`)\">foo</span>");
+
+        templateEngine.render("template.jte", "` + alert(`xss`) + `", output);
+
+        assertThat(output.toString()).isEqualTo("<span OnClick=\"console.log(`\\x60 + alert(\\x60xss\\x60) + \\x60`)\">foo</span>");
     }
 
     @Test
     void templateStringInJavaScriptAttribute_dollar() {
-        codeResolver.givenCode("template.jte", "@param String p\n<span onClick=\"console.log(`${p}`)\">foo</span>");
+        codeResolver.givenCode("template.jte", "@param String p\n<span OnClick=\"console.log(`${p}`)\">foo</span>");
 
         templateEngine.render("template.jte", "${secret}", output);
 
-        assertThat(output.toString()).isEqualTo("<span onClick=\"console.log(`\\x24{secret}`)\">foo</span>");
+        assertThat(output.toString()).isEqualTo("<span OnClick=\"console.log(`\\x24{secret}`)\">foo</span>");
     }
 
     @Test

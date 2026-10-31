@@ -1089,6 +1089,33 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void javascriptUrl_mixedCaseAttribute() {
+        codeResolver.givenCode("template.kte", "@param url:String\n<a HreF=\"${url}\">Click me!</a>");
+
+        templateEngine.render("template.kte", "javascript:alert(1)", output);
+
+        assertThat(output.toString()).isEqualTo("<a HreF=\"\">Click me!</a>");
+    }
+
+    @Test
+    void templateStringInJavaScriptBlock_mixedCaseTag() {
+        codeResolver.givenCode("template.kte", "@param p:String\n<ScrIpt>window.someVariable = `${p}`;</ScrIpt>");
+
+        templateEngine.render("template.kte", "` + alert(`xss`) + `", output);
+
+        assertThat(output.toString()).isEqualTo("<ScrIpt>window.someVariable = `\\` + alert(\\`xss\\`) + \\``;</ScrIpt>");
+    }
+
+    @Test
+    void templateStringInJavaScriptAttribute_mixedCaseName() {
+        codeResolver.givenCode("template.kte", "@param p:String\n<span OnClick=\"console.log(`${p}`)\">foo</span>");
+
+        templateEngine.render("template.kte", "${secret}", output);
+
+        assertThat(output.toString()).isEqualTo("<span OnClick=\"console.log(`\\x24{secret}`)\">foo</span>");
+    }
+
+    @Test
     void tagCallInScript() {
         codeResolver.givenCode("tag/snippet.kte", "var x = y;");
         codeResolver.givenCode("template.kte", "@param ignored:String\n<script>\nfunction() {\n@template.tag.snippet()\n}\n</script>");

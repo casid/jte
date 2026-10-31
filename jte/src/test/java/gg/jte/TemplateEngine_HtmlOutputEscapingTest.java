@@ -1212,6 +1212,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void dataUrl() {
+        codeResolver.givenCode("template.jte", "@param String url\n<a href=\"${url}\">Click me!</a><img src=\"${url}\">");
+
+        templateEngine.render("template.jte", "data:text/html,<script>alert(1)</script>", output);
+
+        assertThat(output.toString()).isEqualTo("<a href=\"\">Click me!</a><img src=\"data:text/html,&lt;script>alert(1)&lt;/script>\">");
+    }
+
+    @Test
     void iframeSrcdoc() {
         codeResolver.givenCode("template.jte", "@param String doc\n<iframe srcdoc=\"${doc}\"></iframe>");
 

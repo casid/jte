@@ -67,7 +67,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
             return;
         }
 
-        if (isGuardedUrlAttribute() && StringUtils.startsWithIgnoringCaseAndWhitespaces(value, "javascript:")) {
+        if (isGuardedUrlAttribute() && isUnsafeUrl(value)) {
             return;
         }
 
@@ -92,6 +92,11 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         }
 
         return "form".equalsIgnoreCase(tagName) && "action".equalsIgnoreCase(attributeName);
+    }
+
+    private boolean isUnsafeUrl(String value) {
+        return StringUtils.startsWithIgnoringCaseAndWhitespaces(value, "javascript:") ||
+                StringUtils.startsWithIgnoringCaseAndWhitespaces(value, "data:");
     }
 
     @Override

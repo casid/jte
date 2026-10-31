@@ -1116,6 +1116,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void dataUrl() {
+        codeResolver.givenCode("template.kte", "@param url:String\n<a href=\"${url}\">Click me!</a><img src=\"${url}\">");
+
+        templateEngine.render("template.kte", "data:text/html,<script>alert(1)</script>", output);
+
+        assertThat(output.toString()).isEqualTo("<a href=\"\">Click me!</a><img src=\"data:text/html,&lt;script>alert(1)&lt;/script>\">");
+    }
+
+    @Test
     void iframeSrcdoc() {
         codeResolver.givenCode("template.kte", "@param doc:String\n<iframe srcdoc=\"${doc}\"></iframe>");
 

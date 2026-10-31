@@ -1107,6 +1107,24 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void iframeSrcdoc() {
+        codeResolver.givenCode("template.kte", "@param doc:String\n<iframe srcdoc=\"${doc}\"></iframe>");
+
+        templateEngine.render("template.kte", "<script>document.title=\"pwned\"</script>", output);
+
+        assertThat(output.toString()).isEqualTo("<iframe srcdoc=\"\"></iframe>");
+    }
+
+    @Test
+    void iframeSrcdoc_unsafeAllowsTrustedContent() {
+        codeResolver.givenCode("template.kte", "@param doc:String\n<iframe srcdoc=\"$unsafe{doc}\"></iframe>");
+
+        templateEngine.render("template.kte", "<script>document.title='trusted'</script>", output);
+
+        assertThat(output.toString()).isEqualTo("<iframe srcdoc=\"<script>document.title='trusted'</script>\"></iframe>");
+    }
+
+    @Test
     void templateStringInJavaScriptBlock_mixedCaseTag() {
         codeResolver.givenCode("template.kte", "@param p:String\n<ScrIpt>window.someVariable = `${p}`;</ScrIpt>");
 

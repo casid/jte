@@ -1203,6 +1203,24 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void iframeSrcdoc() {
+        codeResolver.givenCode("template.jte", "@param String doc\n<iframe srcdoc=\"${doc}\"></iframe>");
+
+        templateEngine.render("template.jte", "<script>document.title=\"pwned\"</script>", output);
+
+        assertThat(output.toString()).isEqualTo("<iframe srcdoc=\"\"></iframe>");
+    }
+
+    @Test
+    void iframeSrcdoc_unsafeAllowsTrustedContent() {
+        codeResolver.givenCode("template.jte", "@param String doc\n<iframe srcdoc=\"$unsafe{doc}\"></iframe>");
+
+        templateEngine.render("template.jte", "<script>document.title='trusted'</script>", output);
+
+        assertThat(output.toString()).isEqualTo("<iframe srcdoc=\"<script>document.title='trusted'</script>\"></iframe>");
+    }
+
+    @Test
     void tagCallInScript() {
         codeResolver.givenCode("tag/snippet.jte", "var x = y;");
         codeResolver.givenCode("template.jte", "@param String ignored\n<script>\nfunction() {\n@template.tag.snippet()\n}\n</script>");

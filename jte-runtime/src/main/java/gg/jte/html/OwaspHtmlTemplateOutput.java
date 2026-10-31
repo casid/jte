@@ -63,6 +63,10 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
     }
 
     private void writeTagAttributeUserContent(String value) {
+        if ("iframe".equalsIgnoreCase(tagName) && "srcdoc".equalsIgnoreCase(attributeName)) {
+            return;
+        }
+
         if ("a".equalsIgnoreCase(tagName) && "href".equalsIgnoreCase(attributeName) && StringUtils.startsWithIgnoringCaseAndWhitespaces(value, "javascript:")) {
             return;
         }

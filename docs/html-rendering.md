@@ -91,6 +91,8 @@ With `userName` being `#!html "><script>alert('xss')</script>`, the output would
 
 The quote `"` is escaped with `&#34;` and the attacker cannot escape the attribute.
 
+User output in the `srcdoc` attribute of an `iframe` is omitted. Browsers parse its decoded value as another HTML document, so escaping it as a regular HTML attribute does not prevent injected markup from executing. Trusted dynamic `srcdoc` content must use the explicit `$unsafe{}` syntax.
+
 ### JavaScript attributes
 
 User output in HTML attributes is escaped with `gg.jte.html.escape.Escape.javaScriptAttribute`. Those are all HTML attributes starting with `on`.

@@ -91,6 +91,8 @@ With `userName` being `#!html "><script>alert('xss')</script>`, the output would
 
 The quote `"` is escaped with `&#34;` and the attacker cannot escape the attribute.
 
+User output beginning with the `javascript:` scheme is omitted from navigation and document URL attributes: `href` on `a`, `area`, and `base`; `action` on `form`; `formaction` on `button` and `input`; and `src` on `iframe`.
+
 User output in the `srcdoc` attribute of an `iframe` is omitted. Browsers parse its decoded value as another HTML document, so escaping it as a regular HTML attribute does not prevent injected markup from executing. Trusted dynamic `srcdoc` content must use the explicit `$unsafe{}` syntax.
 
 ### JavaScript attributes

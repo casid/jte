@@ -67,7 +67,7 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
             return;
         }
 
-        if ("a".equalsIgnoreCase(tagName) && "href".equalsIgnoreCase(attributeName) && StringUtils.startsWithIgnoringCaseAndWhitespaces(value, "javascript:")) {
+        if (isGuardedUrlAttribute() && StringUtils.startsWithIgnoringCaseAndWhitespaces(value, "javascript:")) {
             return;
         }
 
@@ -76,6 +76,22 @@ public class OwaspHtmlTemplateOutput implements HtmlTemplateOutput {
         } else {
             Escape.htmlAttribute(value, templateOutput);
         }
+    }
+
+    private boolean isGuardedUrlAttribute() {
+        if ("href".equalsIgnoreCase(attributeName)) {
+            return "a".equalsIgnoreCase(tagName) || "area".equalsIgnoreCase(tagName) || "base".equalsIgnoreCase(tagName);
+        }
+
+        if ("src".equalsIgnoreCase(attributeName)) {
+            return "iframe".equalsIgnoreCase(tagName);
+        }
+
+        if ("formaction".equalsIgnoreCase(attributeName)) {
+            return "button".equalsIgnoreCase(tagName) || "input".equalsIgnoreCase(tagName);
+        }
+
+        return "form".equalsIgnoreCase(tagName) && "action".equalsIgnoreCase(attributeName);
     }
 
     @Override

@@ -1203,6 +1203,15 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     }
 
     @Test
+    void javascriptUrl_otherUrlAttributes() {
+        codeResolver.givenCode("template.jte", "@param String url\n<iframe src=\"${url}\"></iframe><form action=\"${url}\"></form><button formaction=\"${url}\"></button><input type=\"submit\" formaction=\"${url}\"><area href=\"${url}\"><base href=\"${url}\">");
+
+        templateEngine.render("template.jte", "javascript:alert(1)", output);
+
+        assertThat(output.toString()).isEqualTo("<iframe src=\"\"></iframe><form action=\"\"></form><button formaction=\"\"></button><input type=\"submit\" formaction=\"\"><area href=\"\"><base href=\"\">");
+    }
+
+    @Test
     void iframeSrcdoc() {
         codeResolver.givenCode("template.jte", "@param String doc\n<iframe srcdoc=\"${doc}\"></iframe>");
 

@@ -1526,7 +1526,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
     @Nested
     class DynamicAttributesForHotwire {
 
-        class HotwireHtmlPolicy extends PolicyGroup {
+        static class HotwireHtmlPolicy extends PolicyGroup {
             HotwireHtmlPolicy() {
                 addPolicy(new PreventUppercaseTagsAndAttributes());
                 addPolicy(new PreventOutputInTagsAndAttributes(false));

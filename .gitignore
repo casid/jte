@@ -106,6 +106,8 @@ Temporary Items
 /jte-watcher/jte-classes/
 /test/*/jte-classes/
 .run
+/jte/gg/jte/generated/precompiled
+/jte-kotlin/gg/jte/generated/precompiled
 
 ### VS Code / VS Code Java extension (uses Eclipse code) ###
 .vscode/

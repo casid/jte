@@ -1,0 +1,3 @@
+@param String resources
+
+${resources}

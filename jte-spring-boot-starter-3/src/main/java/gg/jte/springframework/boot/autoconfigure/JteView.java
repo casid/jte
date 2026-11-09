@@ -19,7 +19,11 @@ public class JteView extends AbstractTemplateView {
 
     @Override
     public boolean checkResource(Locale locale) {
-        return templateEngine.hasTemplate(this.getUrl());
+        return templateEngine.hasTemplate(this.getUrl(), e -> {
+            if (logger.isDebugEnabled()) {
+                logger.debug("jte template [" + getUrl() + "] not found: " + e.getMessage(), e.getCause());
+            }
+        });
     }
 
     @Override

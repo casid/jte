@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * jte is a simple, yet powerful template engine for Java.
@@ -260,10 +261,23 @@ public final class TemplateEngine {
     }
 
     public boolean hasTemplate(String name) {
+        return hasTemplate(name, null);
+    }
+
+    /**
+     * Checks whether a template exists.
+     * @param name the template name relative to the specified root directory, for instance "my/example.jte".
+     * @param onNotFound called with the original exception if the template does not exist, so callers can log why (for instance the path that was tried). May be null.
+     * @return true if the template exists
+     */
+    public boolean hasTemplate(String name, Consumer<TemplateNotFoundException> onNotFound) {
         try {
             resolveTemplate(name);
             return true;
         } catch (TemplateNotFoundException e) {
+            if (onNotFound != null) {
+                onNotFound.accept(e);
+            }
             return false;
         }
     }

@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -38,5 +40,24 @@ public class TemplateEngine_HasTemplate_DirectoryCodeResolverTest {
         assertThat(throwable).isInstanceOf(TemplateNotFoundException.class)
                 .hasMessageStartingWith("does-not-exist.jte not found (tried to load file at ")
                 .hasMessageEndingWith("does-not-exist.jte)");
+    }
+
+    @Test
+    void notFoundCallbackReceivesException() {
+        List<TemplateNotFoundException> exceptions = new ArrayList<>();
+
+        assertThat(templateEngine.hasTemplate("foo.jte", exceptions::add)).isFalse();
+
+        assertThat(exceptions).hasSize(1);
+        assertThat(exceptions.get(0).getMessage()).contains("foo.jte");
+    }
+
+    @Test
+    void notFoundCallbackNotCalledIfTemplateExists() {
+        List<TemplateNotFoundException> exceptions = new ArrayList<>();
+
+        assertThat(templateEngine.hasTemplate("welcome.jte", exceptions::add)).isTrue();
+
+        assertThat(exceptions).isEmpty();
     }
 }

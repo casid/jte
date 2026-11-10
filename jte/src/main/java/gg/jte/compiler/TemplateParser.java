@@ -38,6 +38,7 @@ public final class TemplateParser {
     private int lastIndex = 0;
     private int lastLineIndex = 0;
     private int lastTrimmedIndex = -1;
+    private int htmlCommentLineEnd = -1;
 
     private char previousChar;
     private char currentChar;
@@ -153,7 +154,8 @@ public final class TemplateParser {
             } else if (currentMode == Mode.HtmlComment) {
                 if (regionMatches("-->")) {
                     pop();
-                    lastIndex = i + 1;
+                    lastIndex = htmlCommentLineEnd == -1 ? i + 1 : htmlCommentLineEnd;
+                    htmlCommentLineEnd = -1;
                 }
             } else if (currentMode == Mode.CssComment || currentMode == Mode.JsBlockComment) {
                 if (regionMatches("*/")) {
@@ -633,8 +635,23 @@ public final class TemplateParser {
     }
 
     private void extractComment(Mode mode, int startIndex) {
+        if (mode == Mode.HtmlComment) {
+            int commentEnd = templateCode.indexOf("-->", startIndex);
+            if (commentEnd != -1 && commentEnd + 3 <= endIndex) {
+                int lineEnd = templateCode.indexOf('\n', commentEnd + 3);
+                if (lineEnd == -1 || lineEnd >= endIndex) {
+                    lineEnd = endIndex;
+                }
+                int commentLineEnd = templateCode.indexOf('\n', startIndex);
+                if ((commentLineEnd == -1 || commentLineEnd > commentEnd)
+                        && templateCode.substring(lastLineIndex, startIndex).isBlank()
+                        && templateCode.substring(commentEnd + 3, lineEnd).isBlank()) {
+                    htmlCommentLineEnd = lineEnd == endIndex ? lineEnd : lineEnd + 1;
+                }
+            }
+        }
         if (paramsComplete || areParamsComplete(startIndex)) {
-            extractTextPart(startIndex, mode);
+            extractTextPart(htmlCommentLineEnd == -1 ? startIndex : lastLineIndex, mode);
         }
         push(mode);
     }

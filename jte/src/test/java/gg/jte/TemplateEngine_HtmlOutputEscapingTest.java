@@ -582,7 +582,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.jte", "Hello", output);
 
-        assertThat(output.toString()).isEqualTo("\n\n<span>Test</span>");
+        assertThat(output.toString()).isEqualTo("\n<span>Test</span>");
     }
 
     @Test
@@ -593,6 +593,33 @@ public class TemplateEngine_HtmlOutputEscapingTest {
         templateEngine.render("template.jte", "Hello", output);
 
         assertThat(output.toString()).isEqualTo("\n<!--Comment here with Hello-->\n<span>Test</span>");
+    }
+
+    @Test
+    void htmlComment_onIndentedLine() {
+        codeResolver.givenCode("template.jte", "<p>Before</p>\n  <!-- removed -->  \n<p>After</p>");
+
+        templateEngine.render("template.jte", null, output);
+
+        assertThat(output.toString()).isEqualTo("<p>Before</p>\n<p>After</p>");
+    }
+
+    @Test
+    void htmlComment_inlineRetainsWhitespace() {
+        codeResolver.givenCode("template.jte", "<p>Before</p> <!-- removed --> <p>After</p>");
+
+        templateEngine.render("template.jte", null, output);
+
+        assertThat(output.toString()).isEqualTo("<p>Before</p>  <p>After</p>");
+    }
+
+    @Test
+    void htmlComment_atEndOfFile() {
+        codeResolver.givenCode("template.jte", "<p>Before</p>\n  <!-- removed -->  ");
+
+        templateEngine.render("template.jte", null, output);
+
+        assertThat(output.toString()).isEqualTo("<p>Before</p>\n");
     }
 
     @Test

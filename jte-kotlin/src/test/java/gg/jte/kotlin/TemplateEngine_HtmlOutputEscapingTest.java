@@ -529,7 +529,7 @@ public class TemplateEngine_HtmlOutputEscapingTest {
 
         templateEngine.render("template.kte", "Hello", output);
 
-        assertThat(output.toString()).isEqualTo("\n\n<span>Test</span>");
+        assertThat(output.toString()).isEqualTo("\n<span>Test</span>");
     }
 
     @Test

@@ -87,6 +87,18 @@ The default phase for this goal is `process-classes`, and it accepts the followi
     - [`-release` option](https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html#option-release)
     - [`-source`](https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html#option-source) and [`-target`](https://docs.oracle.com/en/java/javase/21/docs/specs/man/javac.html#option-target) options
 
+    To pass several arguments, configure `compileArgs` with one nested element per argument. Each element is passed to `javac` as is, so a flag and its value need separate elements:
+
+    ```xml linenums="1"
+    <compileArgs>
+        <arg>--enable-preview</arg>
+        <arg>--release</arg>
+        <arg>21</arg>
+    </compileArgs>
+    ```
+
+    The same applies to `kotlinCompileArgs`.
+
 !!! warning "Clean all before precompiling"
 
     The `precompile` goal cleans the directory containing the compiled template classes every time it runs. In your local development environment, it may make more sense to use [hot reloading](hot-reloading.md).

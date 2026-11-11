@@ -1,6 +1,7 @@
 package gg.jte.springframework.boot.autoconfigure;
 
 import gg.jte.TemplateEngine;
+import gg.jte.TemplateNotFoundException;
 import gg.jte.output.Utf8ByteOutput;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -26,11 +27,15 @@ public class ReactiveJteView extends AbstractUrlBasedView {
 
     @Override
     public boolean checkResourceExists(@NonNull Locale locale) {
-        return templateEngine.hasTemplate(this.getUrl(), e -> {
+        try {
+            templateEngine.requireTemplate(this.getUrl());
+            return true;
+        } catch (TemplateNotFoundException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("jte template [" + getUrl() + "] not found: " + e.getMessage(), e.getCause());
             }
-        });
+            return false;
+        }
     }
 
     @Override

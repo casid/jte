@@ -1,6 +1,7 @@
 package gg.jte.springframework.boot.autoconfigure;
 
 import gg.jte.TemplateEngine;
+import gg.jte.TemplateNotFoundException;
 import gg.jte.output.PrintWriterOutput;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,11 +22,15 @@ public class JteView extends AbstractTemplateView {
 
     @Override
     public boolean checkResource(@NonNull Locale locale) {
-        return templateEngine.hasTemplate(this.getUrl(), e -> {
+        try {
+            templateEngine.requireTemplate(this.getUrl());
+            return true;
+        } catch (TemplateNotFoundException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("jte template [" + getUrl() + "] not found: " + e.getMessage(), e.getCause());
             }
-        });
+            return false;
+        }
     }
 
     @Override

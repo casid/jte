@@ -21,11 +21,15 @@ public class ReactiveJteView extends AbstractUrlBasedView {
 
     @Override
     public boolean checkResourceExists(Locale locale) {
-        return templateEngine.hasTemplate(this.getUrl(), e -> {
+        try {
+            templateEngine.requireTemplate(this.getUrl());
+            return true;
+        } catch (TemplateNotFoundException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("jte template [" + getUrl() + "] not found: " + e.getMessage(), e.getCause());
             }
-        });
+            return false;
+        }
     }
 
     @Override

@@ -14,7 +14,7 @@ dependencies {
     implementation("gg.jte:jte-kotlin:3.2.6-SNAPSHOT") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
     }
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.20")
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.4.21")
 }
 
 group = "gg.jte"

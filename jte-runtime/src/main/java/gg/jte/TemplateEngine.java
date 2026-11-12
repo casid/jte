@@ -285,6 +285,7 @@ public final class TemplateEngine {
     /**
      * Prepares the template with the given name for rendering
      * @param name the template name relative to the specified root directory, for instance "pages/welcome.jte".
+     * @throws TemplateNotFoundException if the template does not exist. The message names the location that was tried.
      */
     public void prepareForRendering(String name) {
         resolveTemplate(name);

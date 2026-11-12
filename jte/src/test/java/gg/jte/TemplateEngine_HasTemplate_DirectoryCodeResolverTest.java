@@ -39,4 +39,21 @@ public class TemplateEngine_HasTemplate_DirectoryCodeResolverTest {
                 .hasMessageStartingWith("does-not-exist.jte not found (tried to load file at ")
                 .hasMessageEndingWith("does-not-exist.jte)");
     }
+
+    @Test
+    void prepareForRenderingThrowsIfTemplateDoesNotExist() {
+        Throwable throwable = catchThrowable(() -> templateEngine.prepareForRendering("does-not-exist.jte"));
+
+        assertThat(throwable)
+                .isInstanceOf(TemplateNotFoundException.class)
+                .hasMessageStartingWith("does-not-exist.jte not found (tried to load file at ")
+                .hasMessageEndingWith("does-not-exist.jte)");
+    }
+
+    @Test
+    void prepareForRenderingAcceptsExistingTemplate() {
+        templateEngine.prepareForRendering("welcome.jte");
+
+        assertThat(templateEngine.hasTemplate("welcome.jte")).isTrue();
+    }
 }

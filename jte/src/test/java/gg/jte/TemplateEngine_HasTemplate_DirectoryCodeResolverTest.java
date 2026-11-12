@@ -41,8 +41,8 @@ public class TemplateEngine_HasTemplate_DirectoryCodeResolverTest {
     }
 
     @Test
-    void requireTemplate_throwsWithPathThatWasTried() {
-        Throwable throwable = catchThrowable(() -> templateEngine.requireTemplate("does-not-exist.jte"));
+    void prepareForRenderingThrowsIfTemplateDoesNotExist() {
+        Throwable throwable = catchThrowable(() -> templateEngine.prepareForRendering("does-not-exist.jte"));
 
         assertThat(throwable)
                 .isInstanceOf(TemplateNotFoundException.class)
@@ -51,7 +51,9 @@ public class TemplateEngine_HasTemplate_DirectoryCodeResolverTest {
     }
 
     @Test
-    void requireTemplate_existingTemplate() {
-        templateEngine.requireTemplate("welcome.jte");
+    void prepareForRenderingAcceptsExistingTemplate() {
+        templateEngine.prepareForRendering("welcome.jte");
+
+        assertThat(templateEngine.hasTemplate("welcome.jte")).isTrue();
     }
 }

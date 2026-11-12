@@ -261,20 +261,11 @@ public final class TemplateEngine {
 
     public boolean hasTemplate(String name) {
         try {
-            requireTemplate(name);
+            resolveTemplate(name);
             return true;
         } catch (TemplateNotFoundException e) {
             return false;
         }
-    }
-
-    /**
-     * Checks that a template exists. Unlike {@link #hasTemplate(String)}, it tells why a template was not found.
-     * @param name the template name relative to the specified root directory, for instance "my/example.jte".
-     * @throws TemplateNotFoundException if the template does not exist. The message names the location that was tried.
-     */
-    public void requireTemplate(String name) throws TemplateNotFoundException {
-        resolveTemplate(name);
     }
 
     public List<String> getTemplatesUsing(String name) {
@@ -294,6 +285,7 @@ public final class TemplateEngine {
     /**
      * Prepares the template with the given name for rendering
      * @param name the template name relative to the specified root directory, for instance "pages/welcome.jte".
+     * @throws TemplateNotFoundException if the template does not exist. The message names the location that was tried.
      */
     public void prepareForRendering(String name) {
         resolveTemplate(name);

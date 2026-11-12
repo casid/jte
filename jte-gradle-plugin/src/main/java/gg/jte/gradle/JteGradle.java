@@ -62,7 +62,7 @@ public class JteGradle implements Plugin<Project> {
         // Create configuration to include Kotlin Compiler isolated from user Kotlin version
         String configurationName = "jteKotlinCompiler";
         Configuration kotlinCompiler = project.getConfigurations().create(configurationName);
-        project.getDependencies().add(configurationName, "org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.20");
+        project.getDependencies().add(configurationName, "org.jetbrains.kotlin:kotlin-compiler-embeddable:2.4.21");
 
         extension.getCompilePath().setFrom(main.getRuntimeClasspath(), kotlinCompiler);
         extension.getProjectNamespace().convention(project.getGroup() + "/" + project.getName());

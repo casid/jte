@@ -13,6 +13,8 @@ files are only needed for Kotlin based templates.
 
 This dependency is a compile time dependency to avoid including the Kotlin compiler in the resulting build.
 
+`jte-kotlin` {{ latest-git-tag }} uses Kotlin compiler 2.4.x and requires your project to use Kotlin 2.3.0 or newer. Older Kotlin versions fail to compile with "Module was compiled with an incompatible version of Kotlin".
+
 === "Maven"
 
     ```xml linenums="1"

@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.1.20"
+    id("org.jetbrains.kotlin.jvm") version "2.3.21"
     id("gg.jte.gradle") version("3.2.6-SNAPSHOT")
 }
 
@@ -17,7 +17,7 @@ tasks.withType<Test> {
 dependencies {
     implementation("gg.jte:jte-runtime:3.2.6-SNAPSHOT")
     implementation("gg.jte:jte-kotlin:3.2.6-SNAPSHOT")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21")
 
     testImplementation("org.assertj:assertj-core:3.23.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")

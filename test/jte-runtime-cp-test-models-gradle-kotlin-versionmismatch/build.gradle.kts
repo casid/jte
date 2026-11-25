@@ -16,6 +16,7 @@ tasks.withType<Test> {
 
 dependencies {
     implementation("gg.jte:jte-runtime:3.2.6-SNAPSHOT")
+    implementation("gg.jte:jte-models-runtime:3.2.6-SNAPSHOT")
     implementation("gg.jte:jte-kotlin:3.2.6-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
 

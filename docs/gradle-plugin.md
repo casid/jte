@@ -166,6 +166,7 @@ The following parameters are available for this extension:
     
     dependencies {
         implementation 'gg.jte:jte-runtime:${jte.version}'
+        implementation 'gg.jte:jte-models-runtime:${jte.version}'
         jteGenerate 'gg.jte:jte-models:${jte.version}'
     }
     
@@ -197,6 +198,7 @@ The following parameters are available for this extension:
     
     dependencies {
         implementation("gg.jte:jte-runtime:${jte.version}")
+        implementation("gg.jte:jte-models-runtime:${jte.version}")
         jteGenerate("gg.jte:jte-models:${jte.version}")
     }
     
@@ -238,7 +240,7 @@ An application jar with generated classes can be built into a native binary usin
     
     dependencies {
         implementation 'gg.jte:jte-runtime:${jte.version}'
-        jteGenerate 'gg.jte:jte-models:${jte.version}'
+        jteGenerate 'gg.jte:jte-native-resources:${jte.version}'
     }
     
     jte {
@@ -256,7 +258,7 @@ An application jar with generated classes can be built into a native binary usin
     
     dependencies {
         implementation("gg.jte:jte-runtime:${jte.version}")
-        jteGenerate("gg.jte:jte-models:${jte.version}")
+        jteGenerate("gg.jte:jte-native-resources:${jte.version}")
     }
     
     jte {

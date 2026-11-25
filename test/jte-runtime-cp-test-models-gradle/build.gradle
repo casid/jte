@@ -19,6 +19,7 @@ test {
 
 dependencies {
     implementation('gg.jte:jte-runtime:3.2.6-SNAPSHOT')
+    implementation('gg.jte:jte-models-runtime:3.2.6-SNAPSHOT')
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
     testImplementation('org.assertj:assertj-core:3.23.1')
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'

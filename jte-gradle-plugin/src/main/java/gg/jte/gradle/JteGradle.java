@@ -43,7 +43,6 @@ public class JteGradle implements Plugin<Project> {
                 main.getResources().srcDir(t.getTargetResourceDirectory());
             }
         });
-        project.getConfigurations().named(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME, conf -> conf.extendsFrom(additionalClasspath));
     }
 
     private SourceSet getMainSourceSet(Project project) {

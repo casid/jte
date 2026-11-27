@@ -10,6 +10,6 @@
         ContentType.${config.contentType()},
         { output, interceptor -> ${template.fullyQualifiedClassName()}.render(output, interceptor${Util.paramNames(template)}) },
         "${template.name()}",
-        "${template.packageName()}",
+        "${config.packageName()}",
         ${template.fullyQualifiedClassName()}.JTE_LINE_INFO
     )

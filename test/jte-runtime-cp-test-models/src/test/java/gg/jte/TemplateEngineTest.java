@@ -62,6 +62,15 @@ public class TemplateEngineTest {
 
     @ParameterizedTest
     @MethodSource("templates")
+    void subExceptionLineNumber2(gg.jte.generated.precompiled.Templates templates) {
+        Throwable cause = catchThrowable(() -> templates.subExceptionLineNumber2(model).render());
+        assertThat(cause).isInstanceOf(TemplateException.class)
+            .hasCauseInstanceOf(NullPointerException.class)
+                .hasMessage("Failed to render sub/exceptionLineNumber2.jte, error at sub/exceptionLineNumber2.jte:5");
+    }
+
+    @ParameterizedTest
+    @MethodSource("templates")
     void unusedTag(gg.jte.generated.precompiled.Templates templates) {
         String output = templates.tagUnused("One", "Two").render();
         assertThat(output).isEqualTo("One is One, two is Two.");

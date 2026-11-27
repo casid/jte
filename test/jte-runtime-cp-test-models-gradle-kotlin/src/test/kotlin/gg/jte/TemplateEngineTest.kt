@@ -43,6 +43,20 @@ class TemplateEngineTest {
 
     @ParameterizedTest
     @MethodSource("templates")
+    fun subExceptionLineNumber2(templates: Templates) {
+        val cause: Throwable =
+            Assertions.catchThrowable(ThrowableAssert.ThrowingCallable {
+                templates.subExceptionLineNumber2(
+                    model
+                ).render()
+            })
+        Assertions.assertThat<Throwable>(cause).isInstanceOf(TemplateException::class.java)
+            .hasCauseInstanceOf(NullPointerException::class.java)
+            .hasMessage("Failed to render sub/exceptionLineNumber2.kte, error at sub/exceptionLineNumber2.kte:3")
+    }
+
+    @ParameterizedTest
+    @MethodSource("templates")
     fun unusedTag(templates: Templates) {
         val output: String = templates.tagUnused("One", "Two").render()
         Assertions.assertThat(output).isEqualTo("One is One, two is Two.")
